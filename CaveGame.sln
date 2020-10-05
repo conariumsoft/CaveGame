@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Core", "CaveCore\Core.shproj", "{A0CDBD0E-3A41-42B7-9425-A838BC2C7383}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Server", "CaveServer\Server.shproj", "{97C00592-E703-4C2A-8DF6-2E04C8F9B523}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Client", "Client\Client.shproj", "{D3ACAB99-F010-400F-86F1-C2772BC56B94}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cave", "Cave\Cave.csproj", "{4C766195-B4B8-4CA9-A46F-9A61E37F87AA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StandaloneServer", "StandaloneServer\StandaloneServer.csproj", "{733DFAD9-4D0F-46F6-913D-6F4BEF29B30D}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		CaveCore\CaveCore.projitems*{4c766195-b4b8-4ca9-a46f-9a61e37f87aa}*SharedItemsImports = 5
+		CaveServer\CaveServer.projitems*{4c766195-b4b8-4ca9-a46f-9a61e37f87aa}*SharedItemsImports = 5
+		Client\Client.projitems*{4c766195-b4b8-4ca9-a46f-9a61e37f87aa}*SharedItemsImports = 5
+		CaveCore\CaveCore.projitems*{733dfad9-4d0f-46f6-913d-6f4bef29b30d}*SharedItemsImports = 5
+		CaveServer\CaveServer.projitems*{733dfad9-4d0f-46f6-913d-6f4bef29b30d}*SharedItemsImports = 5
+		CaveServer\CaveServer.projitems*{97c00592-e703-4c2a-8df6-2e04c8f9b523}*SharedItemsImports = 13
+		CaveCore\CaveCore.projitems*{a0cdbd0e-3a41-42b7-9425-a838bc2c7383}*SharedItemsImports = 13
+		Client\Client.projitems*{d3acab99-f010-400f-86f1-c2772bc56b94}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4C766195-B4B8-4CA9-A46F-9A61E37F87AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C766195-B4B8-4CA9-A46F-9A61E37F87AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C766195-B4B8-4CA9-A46F-9A61E37F87AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C766195-B4B8-4CA9-A46F-9A61E37F87AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{733DFAD9-4D0F-46F6-913D-6F4BEF29B30D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{733DFAD9-4D0F-46F6-913D-6F4BEF29B30D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{733DFAD9-4D0F-46F6-913D-6F4BEF29B30D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{733DFAD9-4D0F-46F6-913D-6F4BEF29B30D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {13352D72-36A7-42A4-99F3-CBF6ACBC10B9}
+	EndGlobalSection
+EndGlobal
