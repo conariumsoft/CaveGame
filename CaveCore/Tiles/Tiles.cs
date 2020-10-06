@@ -71,38 +71,36 @@ namespace CaveGame.Core.Tiles
 
 	public static class TileDefinitions
 	{
-public static TDef Void       = new TDef {};
-public static TDef Air		 = new TDef { Hardness = 0,  Opacity = 1, Quad = TileMap.Default };
-public static TDef Dirt		 = new TDef { Hardness = 2,  Opacity = 3, Quad = TileMap.Soil,	 Color = Color.SaddleBrown };
-public static TDef Water      = new TDef { Hardness = 0,  Opacity = 2, Quad = TileMap.Default,	 Color = Color.Blue };
-public static TDef Grass      = new TDef { Hardness = 2,  Opacity = 3, Quad = TileMap.Soil,	 Color = Color.Green };
-public static TDef Stone      = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Stone,	 Color = new Color(0.7f, 0.7f, 0.7f) };
-public static TDef StoneBrick = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Brick,	 Color = new Color(0.7f, 0.7f, 0.7f) };
-public static TDef ClayBrick  = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Brick,	 Color = new Color(0.85f, 0.4f, 0.4f) };
-public static TDef Log        = new TDef { Hardness = 5, Opacity = 1, Quad = TileMap.Log, Color = new Color(0.6f, 0.3f, 0.2f) };
-public static TDef Leaves     = new TDef { Hardness = 5, Opacity = 0, Quad = TileMap.Leaves, Color = new Color(0.1f, 0.9f, 0.1f) };
-public static TDef Torch		 = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.8f, 0.8f, 0.4f) };
-public static TDef WhiteTorch = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.8f, 0.8f, 0.8f) };
+public static TDef Void        = new TDef {};
+public static TDef Air		   = new TDef { Hardness = 0,  Opacity = 1, Quad = TileMap.Default };
+public static TDef Dirt		   = new TDef { Hardness = 2,  Opacity = 3, Quad = TileMap.Soil,	 Color = Color.SaddleBrown };
+public static TDef Water       = new TDef { Hardness = 0,  Opacity = 2, Quad = TileMap.Default,	 Color = Color.Blue };
+public static TDef Grass       = new TDef { Hardness = 2,  Opacity = 3, Quad = TileMap.Soil,	 Color = Color.Green };
+public static TDef Stone       = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Stone,	 Color = new Color(0.7f, 0.7f, 0.7f) };
+public static TDef StoneBrick  = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Brick,	 Color = new Color(0.7f, 0.7f, 0.7f) };
+public static TDef ClayBrick   = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Brick,	 Color = new Color(0.85f, 0.4f, 0.4f) };
+public static TDef Log         = new TDef { Hardness = 5, Opacity = 1, Quad = TileMap.Log, Color = new Color(0.6f, 0.3f, 0.2f) };
+public static TDef Leaves      = new TDef { Hardness = 5, Opacity = 0, Quad = TileMap.Leaves, Color = new Color(0.1f, 0.9f, 0.1f) };
+public static TDef Torch	   = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.8f, 0.8f, 0.4f) };
+public static TDef WhiteTorch  = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.8f, 0.8f, 0.8f) };
 public static TDef YellowTorch = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.9f, 0.9f, 0.2f) };
-public static TDef RedTorch = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.9f, 0.2f, 0.2f) };
-public static TDef BlueTorch = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.2f, 0.2f, 0.9f) };
-public static TDef GreenTorch = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.2f, 0.9f, 0.2f) };
+public static TDef RedTorch    = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.9f, 0.2f, 0.2f) };
+public static TDef BlueTorch   = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.2f, 0.2f, 0.9f) };
+public static TDef GreenTorch  = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.2f, 0.9f, 0.2f) };
 
 public static TDef Mud		 = new TDef { Hardness = 2, Opacity = 3, Quad = TileMap.Soil, Color = new Color(0.3f, 0.1f, 0.1f) };
 public static TDef Sand		 = new TDef { Hardness = 2, Opacity = 3, Quad = TileMap.Soil, Color = new Color(0.8f, 0.6f, 0.2f) };
 public static TDef Granite	 = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Soil, Color = new Color(0.8f, 0.7f, 0.7f) };
-public static TDef Sandstone  = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Stone, Color = new Color(0.7f, 0.6f, 0.4f) };
-public static TDef Clay       = new TDef { Hardness = 3, Opacity = 3, Quad = TileMap.Soil, Color = new Color(0.8f, 0.5f, 0.2f )};
-public static TDef OakPlank = new TDef { Hardness = 6, Opacity = 3, Quad = TileMap.Plank, Color = new Color(0.8f, 0.5f, 0.3f) };
-
-
-		public static TDef CopperOre = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(1.0f, 0.45f, 0f) };
-		public static TDef LeadOre = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(0.35f, 0.35f, 0.4f) };
-		public static TDef TinOre = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(0.65f, 0.4f, 0.4f) };
-		public static TDef IronOre = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(1.0f, 0.75f, 0.75f) };
-		public static TDef CobaltOre = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(0.3f, 0.3f, 1f) };
-		public static TDef GoldOre = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(1f, 1f, 0.5f) };
-		public static TDef UraniumOre = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(0.35f, 0.8f, 0.35f) };
+public static TDef Sandstone = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Stone, Color = new Color(0.7f, 0.6f, 0.4f) };
+public static TDef Clay      = new TDef { Hardness = 3, Opacity = 3, Quad = TileMap.Soil, Color = new Color(0.8f, 0.5f, 0.2f )};
+public static TDef OakPlank  = new TDef { Hardness = 6, Opacity = 3, Quad = TileMap.Plank, Color = new Color(0.8f, 0.5f, 0.3f) };
+public static TDef CopperOre = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(1.0f, 0.45f, 0f) };
+public static TDef LeadOre   = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(0.35f, 0.35f, 0.4f) };
+public static TDef TinOre    = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(0.65f, 0.4f, 0.4f) };
+public static TDef IronOre   = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(1.0f, 0.75f, 0.75f) };
+public static TDef CobaltOre = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(0.3f, 0.3f, 1f) };
+public static TDef GoldOre   = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(1f, 1f, 0.5f) };
+public static TDef UraniumOre= new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(0.35f, 0.8f, 0.35f) };
 	}
 
 	public interface IWaterBreakable { }
@@ -215,7 +213,12 @@ public static TDef OakPlank = new TDef { Hardness = 6, Opacity = 3, Quad = TileM
 
 		public virtual void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
 		{
-			sb.Draw(Tilesheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), Quad, color.MultiplyAgainst(Color));
+			sb.Draw(
+				Tilesheet, 
+				new Vector2(x * Globals.TileSize, y * Globals.TileSize), 
+				Quad, color.MultiplyAgainst(Color), 0,
+				Vector2.Zero, 1, SpriteEffects.None, 0.5f
+			);
 		}
 
 		public bool Equals([AllowNull] Tile other)

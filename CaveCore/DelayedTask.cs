@@ -25,6 +25,7 @@ namespace CaveGame.Core
 
 		public DelayedTask(Action action, float timeIncrement, TimeStepProcedure procedure = TimeStepProcedure.SetToZero) 
 		{
+			Active = true;
 			job = action;
 			increment = timeIncrement;
 			TimeStepProcedure = procedure;

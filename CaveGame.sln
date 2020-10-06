@@ -13,9 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cave", "Cave\Cave.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StandaloneServer", "StandaloneServer\StandaloneServer.csproj", "{733DFAD9-4D0F-46F6-913D-6F4BEF29B30D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Editor", "Editor", "{D88BA644-8A10-4A54-B2AD-FF537A90B39B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EditorD", "EditorD", "{D88BA644-8A10-4A54-B2AD-FF537A90B39B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editor", "Editor\Editor\Editor.csproj", "{91250AC7-E656-4B32-B650-E490600A483C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editor", "Editor\Editor\Editor.csproj", "{91250AC7-E656-4B32-B650-E490600A483C}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -51,8 +51,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {13352D72-36A7-42A4-99F3-CBF6ACBC10B9}
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{91250AC7-E656-4B32-B650-E490600A483C} = {D88BA644-8A10-4A54-B2AD-FF537A90B39B}
 	EndGlobalSection
 EndGlobal

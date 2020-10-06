@@ -182,7 +182,7 @@ namespace CaveGame.Core
 
 			device.Clear(Color.Black * 0f);
 
-			sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+			sb.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend);
 			Tile tile;
 			Wall wall;
 			for (int x = 0; x < ChunkSize; x++)

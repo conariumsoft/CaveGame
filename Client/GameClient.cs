@@ -129,21 +129,18 @@ namespace CaveGame.Client
 
 		public LocalPlayer myPlayer;
 
-		float chunkUnloadCheck;
-
 		private DelayedTask chunkUnloadingTask;
 		DelayedTask playerStateReplicationTask;
 		public GameClient(CaveGameGL _game)
 		{
 			Game = _game;
 
-			chunkUnloadCheck = 0;
 			World = new LocalWorld();
 			Camera = new Camera2D(Game.GraphicsDevice.Viewport) { Zoom = CameraZoom };
 			Chat = new GameChat(this);
 
 
-			playerStateReplicationTask = new DelayedTask(ReplicatePlayerState, 1 / 20.0f);
+			playerStateReplicationTask = new DelayedTask(ReplicatePlayerState, 1 / 10.0f);
 			chunkUnloadingTask = new DelayedTask(ChunkUnloadingCheck, 1/20.0f);
 		}
 
@@ -411,16 +408,23 @@ namespace CaveGame.Client
 
 		}
 
-
+		
 		private void DrawChunks(SpriteBatch sb)
 		{
-			Chunk.RefreshedThisFrame = false;
-			foreach (var chunkpair in World.Chunks)
+			if (drawTimer > (1/2.0f))
 			{
-				chunkpair.Value.Draw(GameTextures.TileSheet, Game.GraphicsDevice, sb);
+				drawTimer = 0;
+				Chunk.RefreshedThisFrame = false;
+				foreach (var chunkpair in World.Chunks)
+				{
+					//if (chunkpair.Value.UpdateRenderBuffer)
+					//{
+						chunkpair.Value.Draw(GameTextures.TileSheet, Game.GraphicsDevice, sb);
+						//return;
+					//}
+					
+				}
 			}
-
-			
 		}
 
 		private void EntityRendering(SpriteBatch sb)
@@ -517,7 +521,7 @@ namespace CaveGame.Client
 			DrawChunks(sb);
 
 			Game.GraphicsDevice.Clear(Color.CornflowerBlue);
-			sb.Begin(SpriteSortMode.Texture, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
+			sb.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
 			DrawChunkCachedTextures(sb);
 			EntityRendering(sb);
 
@@ -619,6 +623,7 @@ namespace CaveGame.Client
 
 		private void ReplicatePlayerState()
 		{
+			//Debug.WriteLine("Replicating");
 			if (myPlayer != null)
 			{
 				gameClient?.SendPacket(
@@ -646,8 +651,12 @@ namespace CaveGame.Client
 			}
 		}
 
+		float drawTimer = 0;
 		public void Update(GameTime gt)
 		{
+
+			drawTimer += (float)gt.ElapsedGameTime.TotalSeconds;
+			
 			playerStateReplicationTask.Update(gt);
 			chunkUnloadingTask.Update(gt);
 

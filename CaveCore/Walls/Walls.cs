@@ -46,7 +46,7 @@ namespace CaveGame.Core.Walls
 	{
 		public static WDef Void		  = new WDef { };
 		public static WDef Air		  = new WDef { Hardness = 0, Opacity = 0, Quad = TileMap.Default };
-		public static WDef Dirt = new WDef { Hardness = 2, Opacity = 2, Quad = TileMap.Soil, Color = TileDefinitions.Dirt.Color.Sub(Wall.BGDarken) };
+		public static WDef Dirt		  = new WDef { Hardness = 2, Opacity = 2, Quad = TileMap.Soil, Color = new Color() };
 		public static WDef Stone	  = new WDef { Hardness = 5, Opacity = 2, Quad = TileMap.Stone, Color = TileDefinitions.Stone.Color.Sub(Wall.BGDarken) };
 		public static WDef RockyDirt  = new WDef { Hardness = 5, Opacity = 2, Quad = TileMap.StoneSpot, Color = TileDefinitions.Dirt.Color.Sub(Wall.BGDarken) };
 		public static WDef OakPlank	  = new WDef { Hardness = 5, Opacity = 2, Quad = TileMap.Plank, Color = TileDefinitions.OakPlank.Color.Sub(Wall.BGDarken) };
@@ -133,7 +133,16 @@ namespace CaveGame.Core.Walls
 
 		public virtual void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
 		{
-			sb.Draw(Tilesheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), Quad, color.MultiplyAgainst(Color));
+			sb.Draw(
+				Tilesheet, 
+				new Vector2(x * Globals.TileSize, y * Globals.TileSize), 
+				Quad, color.MultiplyAgainst(Color), 
+				0, 
+				Vector2.Zero, 
+				1, 
+				SpriteEffects.None, 
+				0.1f
+			);
 		}
 
 	}

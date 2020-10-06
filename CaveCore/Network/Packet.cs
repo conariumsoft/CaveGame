@@ -137,6 +137,7 @@ namespace CaveGame.Core.Network
 
 		public KickPacket(string reason) : base(PacketType.SKick)
 		{
+			Payload = new byte[128];
 			KickReason = reason;
 
 		}
@@ -546,7 +547,7 @@ namespace CaveGame.Core.Network
 				{
 					for (int y = 0; y < Globals.ChunkSize; y++)
 					{
-						var w = value.Tiles[x, y];
+						var w = value.Walls[x, y];
 						w.Serialize(ref Payload, index);
 						index+=4;
 					}
