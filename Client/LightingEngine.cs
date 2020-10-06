@@ -192,7 +192,7 @@ namespace CaveGame.Client
 			}
 			return null;
 		}
-		private void SetTile(int x, int y, Wall w) {
+		private void SetWall(int x, int y, Wall w) {
 			int chunkX = (int)Math.Floor((double)x / Globals.ChunkSize);
 			int chunkY = (int)Math.Floor((double)y / Globals.ChunkSize);
 
@@ -230,26 +230,16 @@ namespace CaveGame.Client
 				
 
 				tile = GetTile(data.X, data.Y);
+				wall = GetWall(data.X, data.Y);
 
-				
-				if (tile == null)
+				if (tile == null || wall == null)
 					continue;
-				byte opacity = tile.Opacity;
+				byte opacity = Math.Max(tile.Opacity, wall.Opacity);
 				var tileLight = Light3.Dark;
-				if (tile.ID == 0)
+				if (tile.ID == 0 && wall.ID == 0)
 					tileLight = Light3.Ambience;
 				else if (tile is ILightEmitter emitter)
 					tileLight = emitter.Light;
-
-				if (tile is INonSolid)
-				{
-					wall = GetWall(data.X, data.Y);
-					if (wall != null)
-					{
-						opacity = Math.Max(tile.Opacity, wall.Opacity);
-					}
-					
-				}
 
 				var current = GetLight(data.X, data.Y);
 
@@ -363,6 +353,57 @@ namespace CaveGame.Client
 							}
 						}
 						
+						//UpdatedCells.Enqueue(new Cell(recvdata.Item1, recvdata.Item2, Light3.Dark));
+
+					}
+				}
+
+				Tuple<int, int, Wall> recv2;
+				for (int i = 0; i < ChangedWalls.Count; i++)
+				{
+					bool have = ChangedWalls.TryDequeue(out recv2);
+					if (have)
+					{
+
+						SetWall(recv2.Item1, recv2.Item2, recv2.Item3);
+						//var prevLight = GetLight(recvdata.Item1, recvdata.Item2);
+						//var postOpacity = recvdata.Item3.Opacity;
+
+
+						//byte r = (byte)(prevLight.Red - postOpacity);
+						//byte g = (byte)(prevLight.Green - postOpacity);
+						//byte b = (byte)(prevLight.Blue - postOpacity);
+
+						//var newL = new Light3(r, g, b);
+						for (int x = -6; x < 6; x++)
+						{
+							for (int y = -6; y < 6; y++)
+							{
+								SetLight(recv2.Item1 + x, recv2.Item2 + y, Light3.Dark);
+								//UpdatedCells.Enqueue(new Cell(recvdata.Item1+x, recvdata.Item2+y, Light3.Dark));
+							}
+						}
+
+						for (int x = -8; x < 8; x++)
+						{
+							for (int y = -8; y < 8; y++)
+							{
+								int mx = recv2.Item1 + x;
+								int my = recv2.Item2 + y;
+
+								byte absorb = 0;
+
+								var w = GetWall(mx, my);
+								if (w != null)
+									absorb = w.Opacity;
+
+								UpdatedCells.Enqueue(new Cell(mx, my, GetLight(mx + 1, my).Absorb(absorb)));
+								UpdatedCells.Enqueue(new Cell(mx, my, GetLight(mx - 1, my).Absorb(absorb)));
+								UpdatedCells.Enqueue(new Cell(mx, my, GetLight(mx, my + 1).Absorb(absorb)));
+								UpdatedCells.Enqueue(new Cell(mx, my, GetLight(mx, my - 1).Absorb(absorb)));
+							}
+						}
+
 						//UpdatedCells.Enqueue(new Cell(recvdata.Item1, recvdata.Item2, Light3.Dark));
 
 					}

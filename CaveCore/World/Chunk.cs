@@ -31,7 +31,8 @@ namespace CaveGame.Core
 		public ChunkCoordinates Coordinates;
 		public bool UpdateRenderBuffer = true;
 
-		public RenderTarget2D RenderBuffer;
+		public RenderTarget2D ForegroundRenderBuffer;
+		public RenderTarget2D BackgroundRenderBuffer;
 
 		public Chunk(int X, int Y)
 		{
@@ -96,7 +97,7 @@ namespace CaveGame.Core
 						SetWall(x, y, new Walls.Dirt());
 					}
 					else {
-						SetWall(x, y, new Walls.Dirt());
+						SetWall(x, y, new Walls.Stone());
 						var noise = simplex.Noise(curX / 4.0f, curY / 4.0f)*30;
 						if (noise+depth > 30.5)
 						{
@@ -169,46 +170,66 @@ namespace CaveGame.Core
 			}
 		}
 
+		private void DrawForegroundBuffer(Texture2D tilesheet, GraphicsDevice device, SpriteBatch sb)
+		{
+			if (ForegroundRenderBuffer == null)
+				ForegroundRenderBuffer = new RenderTarget2D(device, ChunkSize * Globals.TileSize, ChunkSize * Globals.TileSize);
+
+			device.SetRenderTarget(ForegroundRenderBuffer);
+			device.Clear(Color.Black * 0f);
+
+			sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+			Tile tile;
+
+			for (int x = 0; x < ChunkSize; x++)
+			{
+				for(int y = 0; y<ChunkSize; y++)
+				{
+					tile = GetTile(x, y);
+					if (tile.ID > 0)
+					{
+						tile.Draw(tilesheet, sb, x, y, Lights[x, y]);
+					}
+				}
+			}
+			sb.End();
+			device.SetRenderTarget(null);
+		}
+
+		private void DrawBackgroundBuffer(Texture2D tilesheet, GraphicsDevice device, SpriteBatch sb)
+		{
+			if (BackgroundRenderBuffer == null)
+				BackgroundRenderBuffer = new RenderTarget2D(device, ChunkSize * Globals.TileSize, ChunkSize * Globals.TileSize);
+
+			device.SetRenderTarget(BackgroundRenderBuffer);
+			device.Clear(Color.Black * 0f);
+
+			sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+			Wall wall;
+
+			for (int x = 0; x < ChunkSize; x++)
+			{
+				for (int y = 0; y < ChunkSize; y++)
+				{
+					wall = GetWall(x, y);
+					if (wall.ID > 0)
+					{
+						wall.Draw(tilesheet, sb, x, y, Lights[x, y]);
+					}
+				}
+			}
+			sb.End();
+			device.SetRenderTarget(null);
+		}
+
 		public void Draw(Texture2D tilesheet, GraphicsDevice device, SpriteBatch sb)
 		{
 
 			Chunk.RefreshedThisFrame = true;
 				// cock and ball torture
 			UpdateRenderBuffer = false;
-			if (RenderBuffer == null)
-				RenderBuffer = new RenderTarget2D(device, ChunkSize * Globals.TileSize, ChunkSize * Globals.TileSize);
-
-			device.SetRenderTarget(RenderBuffer);
-
-			device.Clear(Color.Black * 0f);
-
-			sb.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend);
-			Tile tile;
-			Wall wall;
-			for (int x = 0; x < ChunkSize; x++)
-			{
-				for (int y = 0; y < ChunkSize; y++)
-				{
-					tile = GetTile(x, y);
-					wall = GetWall(x, y);
-					if (wall.ID > 0)
-					{
-						wall.Draw(tilesheet, sb, x, y, Lights[x, y]);
-					}
-					if (tile.ID > 0)
-					{
-						tile.Draw(tilesheet, sb, x, y, Lights[x, y]);
-
-						
-					}
-
-					
-
-				}
-			}
-				
-			sb.End();
-			device.SetRenderTarget(null);
+			DrawBackgroundBuffer(tilesheet, device, sb);
+			DrawForegroundBuffer(tilesheet, device, sb);
 		}
 	}
 }

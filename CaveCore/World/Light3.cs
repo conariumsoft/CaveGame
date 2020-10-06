@@ -13,8 +13,8 @@ namespace CaveGame.Core
 		public static Light3 Ambience = new Light3(16, 16, 16);
 
 		[FieldOffset(0)]public byte Red;
-		[FieldOffset(1)] public byte Blue;
-		[FieldOffset(2)] public byte Green;
+		[FieldOffset(1)]public byte Blue;
+		[FieldOffset(2)]public byte Green;
 
 		public Light3(byte r, byte g, byte b)
 		{
@@ -27,16 +27,13 @@ namespace CaveGame.Core
 		{
 			return (other.Red == Red && other.Blue == Blue && other.Green == Green);
 		}
-
+		private static double Squirt = Math.Sqrt(15.0);
 		public Color MultiplyAgainst(Color col)
 		{
-			byte cRed = Math.Min(Red, (byte)15);
-			byte cGreen = Math.Min(Green, (byte)15);
-			byte cBlue = Math.Min(Blue, (byte)15);
 			return new Color(
-				(col.R / 255.0f) * (cRed / 15.0f),
-				(col.G / 255.0f) * (cGreen / 15.0f),
-				(col.B / 255.0f) * (cBlue / 15.0f),
+				(col.R / 255.0f) * (float) (Math.Sqrt(Red/30.0f)),
+				 (col.G / 255.0f) * (float) (Math.Sqrt(Green/ 30.0f)),
+				(col.B / 255.0f) * (float) (Math.Sqrt(Blue/ 30.0f)),
 				col.A
 			);
 		}
