@@ -1,4 +1,5 @@
-﻿using CaveGame.Core.Entities;
+﻿using Cave;
+using CaveGame.Core.Entities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -94,21 +95,12 @@ namespace CaveGame.Client
 		static Game _game;
 		static BasicEffect _effect3D;
 
-		#region Fonts
-		public static SpriteFont Arial10;
-		public static SpriteFont Consolas10;
-		public static SpriteFont ComicSans10;
-		public static SpriteFont Arial20;
-		#endregion
 
 		public static void Initialize(Game game)
 		{
 			_game = game;
 
-			Arial10 = game.Content.Load<SpriteFont>("Fonts/Arial10");
-			Arial20 = game.Content.Load<SpriteFont>("Fonts/Arial20");
-			Consolas10 = game.Content.Load<SpriteFont>("Fonts/Consolas10");
-			ComicSans10 = game.Content.Load<SpriteFont>("Fonts/ComicSans10");
+			
 
 
 			_pixel = new Texture2D(game.GraphicsDevice, 1, 1);
@@ -187,7 +179,7 @@ namespace CaveGame.Client
 		}
 		public static void Print(this SpriteBatch sb, Color color, Vector2 position, string text)
 		{
-			Print(sb, Arial10, color, position, text);
+			Print(sb, GameFonts.Arial10, color, position, text);
 		}
 		public static void Print(this SpriteBatch sb, SpriteFont font, Color color, Vector2 position, string text)
 		{

@@ -10,13 +10,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Camera.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Chat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameChat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LightingEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clipboard.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CommandBar\CommandBar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FPSGraph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FrameCounter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LocalWorld.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Menu\Settings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SteamManager.cs" />
     <Compile Include="..\Client\NetworkClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IGameContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\Homepage.cs" />
@@ -31,5 +34,8 @@
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Entities\" />
   </ItemGroup>
 </Project>

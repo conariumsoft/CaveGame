@@ -1,8 +1,10 @@
 ﻿//#define SERVER
 
 using Cave;
+using CaveGame.Client.UI;
 using CaveGame.Core;
 using CaveGame.Core.Entities;
+using CaveGame.Core.Inventory;
 using CaveGame.Core.Network;
 using CaveGame.Core.Tiles;
 using CaveGame.Server;
@@ -10,20 +12,102 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
 namespace CaveGame.Client
 {
+	public class TempItemDef
+	{
+		public Rectangle Quad;
+		public byte TileID;
+		public Color Color;
+	}
 
 	// The testbench for building the server/client archite ture
+	public class Hotbar
+	{
+		
+
+		public int Index { get; set; }
+
+		public TempItemDef[] ItemSet =
+		{
+			new TempItemDef{ Quad=TileMap.Stone, Color = Color.Gray, TileID = (byte)TileID.Stone },
+			new TempItemDef{ Quad=TileMap.Soil, Color = Color.Green, TileID = (byte)TileID.Grass },
+			new TempItemDef{ Quad=TileMap.Soil, Color = TileDefinitions.Dirt.Color, TileID = (byte)TileID.Dirt },
+			new TempItemDef{ Quad=TileMap.Leaves, Color = Color.Green, TileID = (byte)TileID.Leaves},
+			new TempItemDef{ Quad=TileMap.Brick, Color = TileDefinitions.ClayBrick.Color, TileID = (byte)TileID.ClayBrick},
+			new TempItemDef{ Quad=TileMap.Brick, Color = TileDefinitions.StoneBrick.Color, TileID = (byte)TileID.StoneBrick},
+			new TempItemDef{ Quad=TileMap.Default, Color = Color.Blue, TileID = (byte)TileID.Water},
+			new TempItemDef{ Quad=Torch.AnimStates[0], Color = TileDefinitions.Torch.Color, TileID = (byte)TileID.Torch},
+			new TempItemDef{ Quad=Torch.AnimStates[0], Color = TileDefinitions.RedTorch.Color, TileID = (byte)TileID.RedTorch},
+			new TempItemDef{ Quad=Torch.AnimStates[0], Color = TileDefinitions.BlueTorch.Color, TileID = (byte)TileID.BlueTorch},
+			new TempItemDef{ Quad=Torch.AnimStates[0], Color = TileDefinitions.GreenTorch.Color, TileID = (byte)TileID.GreenTorch},
+			new TempItemDef{ Quad=Torch.AnimStates[0], Color = TileDefinitions.YellowTorch.Color, TileID = (byte)TileID.YellowTorch},
+			new TempItemDef{ Quad=TileMap.Plank, Color = TileDefinitions.OakPlank.Color, TileID = (byte)TileID.OakPlank},
+			new TempItemDef{ Quad=TileMap.Ore, Color = TileDefinitions.CopperOre.Color, TileID = (byte)TileID.CopperOre},
+			new TempItemDef{ Quad=TileMap.Ore, Color = TileDefinitions.IronOre.Color, TileID = (byte)TileID.IronOre},
+			new TempItemDef{ Quad=TileMap.Ore, Color = TileDefinitions.GoldOre.Color, TileID = (byte)TileID.GoldOre},
+			new TempItemDef{ Quad=TileMap.Ore, Color = TileDefinitions.CobaltOre.Color, TileID = (byte)TileID.CobaltOre},
+			new TempItemDef{ Quad=TileMap.Ore, Color = TileDefinitions.LeadOre.Color, TileID = (byte)TileID.LeadOre},
+			new TempItemDef{ Quad=TileMap.Ore, Color = TileDefinitions.UraniumOre.Color, TileID = (byte)TileID.UraniumOre},
+		};
+
+		private int lastScroll = 0;
+
+		public void Update(GameTime gt)
+		{
+			MouseState mouse = Mouse.GetState();
+
+			
+			var scroll = (mouse.ScrollWheelValue / 120) - (lastScroll/120); // why is MouseScroll in 120 increments???
+			lastScroll = mouse.ScrollWheelValue;
+
+			Index -= scroll;
+			Index = Index.Mod(ItemSet.Length);
+
+		}
+
+
+		public void Draw(SpriteBatch sb)
+		{
+			sb.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
+			int travel = 0;
+
+			Vector2 pos = new Vector2(GameGlobals.Width - (30* ItemSet.Length), GameGlobals.Height - 30);
+
+			for (int i = 0; i < ItemSet.Length; i++)
+			{
+				if (Index == i)
+				{
+
+					sb.Rect(Color.Gray, pos+new Vector2(travel, -4), new Vector2(32, 32));
+					sb.Draw(GameTextures.TileSheet,
+						pos+new Vector2(travel, -4), ItemSet[i].Quad, ItemSet[i].Color, 0, Vector2.Zero, 4, SpriteEffects.None, 0);
+					travel += 32;
+				}
+				else
+				{
+					sb.Rect(Color.Gray, pos + new Vector2(travel, 0), new Vector2(24, 24));
+					sb.Draw(GameTextures.TileSheet,
+						pos + new Vector2(travel, 0), ItemSet[i].Quad, ItemSet[i].Color, 0, Vector2.Zero, 3, SpriteEffects.None, 0);
+					travel += 24;
+				}
+			}
+
+			sb.End();
+		}
+	}
+
 
 	public class GameClient : IGameContext
 	{
-		public static float CameraZoom = 2.0f;
+		public static float CameraZoom = 4.0f;
 
 		public CaveGameGL Game { get; private set; }
+
+		public GameChat Chat { get; private set; }
 
 		public string NetworkUsername { get; set; }
 		public string ConnectAddress { get; set; }
@@ -31,6 +115,8 @@ namespace CaveGame.Client
 		public bool Active { get; set; }
 
 		Game IGameContext.Game => Game;
+
+		public Hotbar Hotbar { get; set; }
 
 		public LocalWorld World { get; private set; }
 		private NetworkClient gameClient;
@@ -45,38 +131,62 @@ namespace CaveGame.Client
 
 		float chunkUnloadCheck;
 
+		private DelayedTask chunkUnloadingTask;
+		DelayedTask playerStateReplicationTask;
 		public GameClient(CaveGameGL _game)
 		{
 			Game = _game;
 
 			chunkUnloadCheck = 0;
-
 			World = new LocalWorld();
 			Camera = new Camera2D(Game.GraphicsDevice.Viewport) { Zoom = CameraZoom };
-			//
+			Chat = new GameChat(this);
+
+
+			playerStateReplicationTask = new DelayedTask(ReplicatePlayerState, 1 / 20.0f);
+			chunkUnloadingTask = new DelayedTask(ChunkUnloadingCheck, 1/20.0f);
 		}
 
-		#region network listeners
-		private void ChunkUnloadingCheckUpdate(GameTime gameTime)
+
+		public void SendChatMessage(object sender, string message)
 		{
-			chunkUnloadCheck += (float)gameTime.ElapsedGameTime.TotalSeconds;
+			Chat.Open = false;
+			gameClient.SendPacket(new ClientChatMessagePacket(message));	
+		}
+		private IEntity FindEntityOfID(int id)
+		{
+			foreach (var entity in World.Entities)
+				if (entity.EntityNetworkID == id)
+					return entity;
+			return null;
+		}
+		public void Disconnect()
+		{
+			if (myPlayer != null)
+			{
+				gameClient.SendPacket(new QuitPacket(myPlayer.EntityNetworkID));
+			}
 
-		//	if (chunkUnloadCheck > (1 / 5.0f))
-		//	{
-			//	chunkUnloadCheck = 0;
+			Thread.Sleep(50);
+			//gameClient.Stop();
+		}
 
-				foreach (var chunkpair in World.Chunks)
+
+		private void ChunkUnloadingCheck()
+		{
+
+			foreach (var chunkpair in World.Chunks)
+			{
+				if (!World.LoadedChunks.Contains(chunkpair.Key))
 				{
-					if (!World.LoadedChunks.Contains(chunkpair.Key))
+					if (World.Chunks.ContainsKey(chunkpair.Key))
 					{
-						if (World.Chunks.ContainsKey(chunkpair.Key))
-						{
-							World.Chunks.TryRemove(chunkpair.Key, out _);
-							World.Lighting.UnregisterChunk(chunkpair.Key);
-						}
+						World.Chunks.TryRemove(chunkpair.Key, out _);
+						World.Lighting.UnregisterChunk(chunkpair.Key);
 					}
 				}
-		//	}
+			}
+			//	}
 		}
 
 		private void ChunkLoadingCheckUpdate(GameTime gameTime)
@@ -84,7 +194,7 @@ namespace CaveGame.Client
 			int camChunkX = (int)Math.Floor(Camera.ScreenCenterToWorldSpace.X / (Globals.ChunkSize * Globals.TileSize));
 			int camChunkY = (int)Math.Floor(Camera.ScreenCenterToWorldSpace.Y / (Globals.ChunkSize * Globals.TileSize));
 
-			int rendr = 2;
+			int rendr = 1;
 			World.LoadedChunks.Clear();
 			for (int x = -rendr; x < rendr + 1; x++)
 			{
@@ -104,6 +214,9 @@ namespace CaveGame.Client
 			}
 		}
 
+		#region NetworkListenerMethods
+
+
 		private void DownloadChunk(NetworkMessage message)
 		{
 			ChunkDownloadPacket chunkdata = new ChunkDownloadPacket(message.Packet.GetBytes());
@@ -120,18 +233,18 @@ namespace CaveGame.Client
 			}
 			
 		}
-
 		private void UpdateTile(NetworkMessage message)
 		{
 			PlaceTilePacket packet = new PlaceTilePacket(message.Packet.GetBytes());
 
 			Tile t = Tile.FromID(packet.TileID);
+
+
+			//Debug.WriteLine(String.Format("CTile {0} {1} id {2}", packet.WorldX, packet.WorldY, packet.TileID));
 			t.Damage = packet.Damage;
 			t.TileState = packet.TileState;
-
 			World.SetTile(packet.WorldX, packet.WorldY, t);
 		}
-
 		private void OnPeerJoined(NetworkMessage message)
 		{
 			PlayerJoinedPacket packet = new PlayerJoinedPacket(message.Packet.GetBytes());
@@ -145,27 +258,6 @@ namespace CaveGame.Client
 			};
 			World.Entities.Add(player);
 		}
-
-		private IEntity FindEntityOfID(int id)
-		{
-			foreach (var entity in World.Entities)
-				if (entity.EntityNetworkID == id)
-					return entity;
-			return null;
-		}
-
-
-		public void Disconnect()
-		{
-			if (myPlayer != null)
-			{
-				gameClient.SendPacket(new QuitPacket(myPlayer.EntityNetworkID));
-			}
-			
-			Thread.Sleep(50);
-			//gameClient.Stop();
-		}
-
 		private void OnPeerLeft(NetworkMessage message)
 		{
 			PlayerLeftPacket packet = new PlayerLeftPacket(message.Packet.GetBytes());
@@ -177,7 +269,6 @@ namespace CaveGame.Client
 				World.Entities.Remove(entity);
 			}
 		}
-
 		private void OnPeerPosition(NetworkMessage message)
 		{
 			EntityPositionPacket packet = new EntityPositionPacket(message.Packet.GetBytes());
@@ -208,58 +299,74 @@ namespace CaveGame.Client
 			if (entity is INextPosition next)
 				next.NextPosition = new Vector2(packet.NextX, packet.NextY);
 		}
+		private void OnChatMessage(NetworkMessage message)
+		{
+			ServerChatMessagePacket packet = new ServerChatMessagePacket(message.Packet.GetBytes());
+			Chat.AddMessage(packet.Message, packet.TextColor);
+		}
+		private void OnPlayerState(NetworkMessage message)
+		{
+			PlayerStatePacket packet = new PlayerStatePacket(message.Packet.GetBytes());
+
+			IEntity ent = FindEntityOfID(packet.EntityID);
+
+			if (ent is Player plr)
+			{
+				plr.Walking = packet.Walking;
+				plr.OnGround = packet.OnGround;
+				plr.Facing = packet.Facing;
+			}
+		}
+		private void OnServerDenyJoining(NetworkMessage message)
+		{
+			RejectJoinPacket packet = new RejectJoinPacket(message.Packet.GetBytes());
+			// TODO: send player to the rejection screen
+
+			Game.CurrentGameContext = Game.ServerKickedContext;
+			Game.ServerKickedContext.Message = packet.RejectReason;
+		}
+		private void OnServerAcceptJoining(NetworkMessage message)
+		{
+			AcceptJoinPacket packet = new AcceptJoinPacket(message.Packet.GetBytes());
+
+
+			MyUserID = packet.YourUserNetworkID;
+			MyPlayerID = packet.YourPlayerNetworkID;
+
+			// create me player
+			LocalPlayer myplayer = new LocalPlayer();
+			myplayer.EntityNetworkID = MyPlayerID;
+			myPlayer = myplayer;
+			World.Entities.Add(myplayer);
+		}
+
+
 		#endregion
-		private void NetworkUpdate()
+
+		private void ReadIncomingPackets()
 		{
 			while (gameClient.HaveIncomingMessage())
 			{
 				NetworkMessage msg = gameClient.GetLatestMessage();
 
+				if (msg.Packet.Type == PacketType.SChatMessage)
+					OnChatMessage(msg);
+				if (msg.Packet.Type == PacketType.PlayerState)
+					OnPlayerState(msg);
 				if (msg.Packet.Type == PacketType.SDownloadChunk)
-				{
 					DownloadChunk(msg);
-					return;
-				}
-
 				if (msg.Packet.Type == PacketType.PlaceTile)
-				{
 					UpdateTile(msg);
-					return;
-				}
-
 				if (msg.Packet.Type == PacketType.SDenyJoin)
-				{
-					RejectJoinPacket packet = new RejectJoinPacket(msg.Packet.GetBytes());
-					// TODO: send player to the rejection screen
-
-					Game.CurrentGameContext = Game.ServerKickedContext;
-					Game.ServerKickedContext.Message = packet.RejectReason;
-				}
-
+					OnServerDenyJoining(msg);
 				if (msg.Packet.Type == PacketType.SAcceptJoin)
-				{
-					AcceptJoinPacket packet = new AcceptJoinPacket(msg.Packet.GetBytes());
-
-
-					MyUserID = packet.YourUserNetworkID;
-					MyPlayerID = packet.YourPlayerNetworkID;
-
-					// create me player
-					LocalPlayer myplayer = new LocalPlayer();
-					myplayer.EntityNetworkID = MyPlayerID;
-					myPlayer = myplayer;
-					World.Entities.Add(myplayer);
-				}
-
+					OnServerAcceptJoining(msg);
 				if (msg.Packet.Type == PacketType.SPlayerJoined)
 					OnPeerJoined(msg);
-
 				if (msg.Packet.Type == PacketType.SPlayerLeft)
 					OnPeerLeft(msg);
-
 				if (msg.Packet.Type == PacketType.SPlayerPosition)
 					OnPeerPosition(msg);
-
 			}
 		}
 
@@ -279,7 +386,7 @@ namespace CaveGame.Client
 				), new Vector2(
 					(camChunkX + x) * (Globals.ChunkSize * Globals.TileSize),
 					(camChunkY + rendr) * (Globals.ChunkSize * Globals.TileSize)
-				));
+				), 0.5f);
 			}
 
 			for (int y = -rendr; y <= rendr; y++)
@@ -290,7 +397,7 @@ namespace CaveGame.Client
 				), new Vector2(
 					(camChunkX + rendr) * (Globals.ChunkSize * Globals.TileSize),
 					(camChunkY + y) * (Globals.ChunkSize * Globals.TileSize)
-				));
+				), 0.5f);
 			}
 
 			for (int x = -rendr; x <= rendr; x++)
@@ -298,7 +405,7 @@ namespace CaveGame.Client
 				for (int y = -rendr; y <= rendr; y++)
 				{
 					var pos = new Vector2(camChunkX + x, camChunkY + y) * (Globals.ChunkSize * Globals.TileSize);
-					spriteBatch.Print(new Color(1, 1, 1, 0.5f), pos, (camChunkX + x) + ", " + (camChunkY + y));
+					spriteBatch.Print(GameFonts.Arial8, new Color(1, 1, 1, 0.5f), pos, (camChunkX + x) + ", " + (camChunkY + y));
 				}
 			}
 
@@ -307,12 +414,13 @@ namespace CaveGame.Client
 
 		private void DrawChunks(SpriteBatch sb)
 		{
-			// Poll chunk render buffer;
 			Chunk.RefreshedThisFrame = false;
 			foreach (var chunkpair in World.Chunks)
 			{
-				chunkpair.Value.Draw(CaveGameGL.tiles, Game.GraphicsDevice, sb);
+				chunkpair.Value.Draw(GameTextures.TileSheet, Game.GraphicsDevice, sb);
 			}
+
+			
 		}
 
 		private void EntityRendering(SpriteBatch sb)
@@ -320,13 +428,14 @@ namespace CaveGame.Client
 			foreach (Entity entity in World.Entities)
 			{
 				//Re.Draw(sb);
-				if (entity is LocalPlayer player)
+				//if (entity is LocalPlayer player)
+				//{
+					//sb.Rect(Color.Red, player.TopLeft, player.BoundingBox * 2);
+				//}
+				if (entity is Player plr)
 				{
-					sb.Rect(Color.Red, player.TopLeft, player.BoundingBox * 2);
-				}
-				else if (entity is Player plr)
-				{
-					sb.Rect(plr.Color, plr.TopLeft, plr.BoundingBox * 2);
+					plr.Draw(sb);
+					//sb.Rect(plr.Color, plr.TopLeft, plr.BoundingBox * 2);
 				}
 			}
 		}
@@ -350,8 +459,61 @@ namespace CaveGame.Client
 			}
 		}
 
+		private void DrawDebugInfo(SpriteBatch sb)
+		{
+			sb.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
+			MouseState mouse = Mouse.GetState();
+
+			var mp = Camera.ScreenToWorldCoordinates(mouse.Position.ToVector2());
+
+			mp /= 8;
+			mp.Floor();
+			var tileCoords = mp;
+			mp *= 8;
+
+
+			var tileat = World.GetTile((int)tileCoords.X, (int)tileCoords.Y);
+
+
+
+			if (myPlayer != null)
+			{
+				sb.Print(Color.White, new Vector2(2, 12),
+					String.Format("pos {0} {1} vel {2} {3}",
+						Math.Floor(myPlayer.Position.X / Globals.TileSize),
+						Math.Floor(myPlayer.Position.Y / Globals.TileSize),
+						Math.Round(myPlayer.Velocity.X, 2),
+						Math.Round(myPlayer.Velocity.Y, 2)
+					)
+				);
+				sb.Print(Color.White, new Vector2(2, 24),
+					String.Format("pin {0}, pout {1} myid {2}",
+						gameClient.ReceivedCount,
+						gameClient.SentCount,
+						myPlayer?.EntityNetworkID
+					)
+				);
+				sb.Print(Color.White, new Vector2(2, 36),
+					String.Format("tid {0}, state {1} dmg {2} light {3}",
+						tileat.ID,
+						tileat.TileState,
+						tileat.Damage,
+						World.GetLight((int)tileCoords.X, (int)tileCoords.Y).ToString()
+					)
+				);
+
+			}
+			sb.End();
+		}
+
+
+		private SpriteBatch sbReference;
 		public void Draw(SpriteBatch sb)
 		{
+			if (sbReference == null)
+				sbReference = sb;
+
+
 			DrawChunks(sb);
 
 			Game.GraphicsDevice.Clear(Color.CornflowerBlue);
@@ -382,44 +544,15 @@ namespace CaveGame.Client
 			DrawChunkGridLines(sb);
 			sb.End();
 
-			sb.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
+			Hotbar.Draw(sb);
 
-			var tileat = World.GetTile((int)tileCoords.X, (int)tileCoords.Y);
-
-
-			if (myPlayer != null)
-			{
-				sb.Print(Color.White, new Vector2(2, 12),
-					String.Format("pos {0} {1} vel {2} {3}", 
-						Math.Floor(myPlayer.Position.X/Globals.TileSize), 
-						Math.Floor(myPlayer.Position.Y/Globals.TileSize), 
-						Math.Round(myPlayer.Velocity.X, 2), 
-						Math.Round(myPlayer.Velocity.Y, 2)
-					)
-				);
-				sb.Print(Color.White, new Vector2(2, 24),
-					String.Format("pin {0}, pout {1} myid {2}",
-						gameClient.ReceivedCount,
-						gameClient.SentCount,
-						myPlayer?.EntityNetworkID
-					)
-				);
-				sb.Print(Color.White, new Vector2(2, 36),
-					String.Format("tid {0}, state {1} dmg {2} light {3}",
-						tileat.ID,
-						tileat.TileState,
-						tileat.Damage,
-						World.GetLight((int)tileCoords.X, (int)tileCoords.Y).ToString()
-					)
-				);
-
-			}
-			sb.End();
+			DrawDebugInfo(sb);
+			Chat.Draw(sb);
 		}
 
 		public void Load()
 		{
-
+			Hotbar = new Hotbar();
 			ServerConfig localServerConf = new ServerConfig
 			{
 				Port = 40269,
@@ -438,15 +571,13 @@ namespace CaveGame.Client
 #endif
 			//	gameClient = new NetworkClient("72.243.56.7", 40269);
 			gameClient = new NetworkClient(ConnectAddress);
+
 			gameClient.Output = Game.Console;
 			gameClient.Start();
 			gameClient.SendPacket(new RequestJoinPacket(NetworkUsername));
 		}
 
-		public void Unload()
-		{
-
-		}
+		public void Unload() {}
 
 		private void TilePlacementUpdate(GameTime gt)
 		{
@@ -460,11 +591,11 @@ namespace CaveGame.Client
 				mp.Floor();
 				int x = (int)mp.X;
 				int y = (int)mp.Y;
-				byte stoneID = (byte)TileID.Stone;
-				if (World.GetTile(x, y).ID != stoneID)
+				byte tileID = Hotbar.ItemSet[Hotbar.Index].TileID;
+				if (World.GetTile(x, y).ID != tileID)
 				{
-					gameClient?.SendPacket(new PlaceTilePacket(stoneID, 0,0, x, y));
-					World.SetTile(x, y, Tile.FromID(stoneID));
+					gameClient?.SendPacket(new PlaceTilePacket(tileID, 0,0, x, y));
+					World.SetTile(x, y, Tile.FromID(tileID));
 				}
 				
 
@@ -484,47 +615,57 @@ namespace CaveGame.Client
 			}
 		}
 
-		float sendpostimer;
 
-		public void Update(GameTime gt)
+
+		private void ReplicatePlayerState()
 		{
-			World.Update(gt);
-			float delta = (float)gt.ElapsedGameTime.TotalSeconds;
-			sendpostimer += delta;
-
-			if (sendpostimer > (1/20.0f))
+			if (myPlayer != null)
 			{
-				sendpostimer = 0;
-				if (myPlayer != null)
-				{
-					gameClient?.SendPacket(
-						new EntityPositionPacket(myPlayer.EntityNetworkID, myPlayer.Position.X, myPlayer.Position.Y,
-							myPlayer.Velocity.X, myPlayer.Velocity.Y, myPlayer.NextPosition.X, myPlayer.NextPosition.Y)
-					);
-				}
+				gameClient?.SendPacket(
+					new EntityPositionPacket(myPlayer.EntityNetworkID, myPlayer.Position.X, myPlayer.Position.Y,
+						myPlayer.Velocity.X, myPlayer.Velocity.Y, myPlayer.NextPosition.X, myPlayer.NextPosition.Y)
+				);
+
+				gameClient?.SendPacket(new PlayerStatePacket(myPlayer.Facing, myPlayer.OnGround, myPlayer.Walking));
 			}
+		}
 
-			KeyboardState kb = Keyboard.GetState();
-			TilePlacementUpdate(gt);
-			// exit game
-			if (kb.IsKeyDown(Keys.Escape))
-				Game.CurrentGameContext = Game.HomePageContext;
-
-			if (myPlayer != null) {
-				if ( (Camera.Position - myPlayer.Position).Length() < 500f )
+		private void UpdateCameraFollow(GameTime gt)
+		{
+			if (myPlayer != null)
+			{
+				if ((Camera.Position - myPlayer.Position).Length() < 500f)
 				{
 					float speed = (float)(gt.ElapsedGameTime.TotalSeconds * 10.0);
 					Camera.Position = Camera.Position.Lerp(myPlayer.Position, speed);
-				} else
+				}
+				else
 				{
 					Camera.Position = myPlayer.Position;
 				}
 			}
+		}
 
-			gameServer?.Update(gt);
+		public void Update(GameTime gt)
+		{
+			playerStateReplicationTask.Update(gt);
+			chunkUnloadingTask.Update(gt);
+
+			Chat.Update(gt);
+			Hotbar.Update(gt);
+			World.Update(gt);
+
+			
+			TilePlacementUpdate(gt);
+			UpdateCameraFollow(gt);
+			//gameServer?.Update(gt);
 			ChunkLoadingCheckUpdate(gt);
-			ChunkUnloadingCheckUpdate(gt);
-			NetworkUpdate();
+			//ChunkUnloadingCheckUpdate(gt);
+			ReadIncomingPackets();
+
+
+			if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+				Game.CurrentGameContext = Game.HomePageContext;
 		}
 	}
 }

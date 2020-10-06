@@ -48,7 +48,9 @@ namespace CaveGame.Client
 
 		public NetworkClient(string ipaddress)
 		{
-			IPEndPoint addr = IPEndPoint.Parse(ipaddress);
+			IPEndPoint addr;
+			
+			bool success = IPEndPoint.TryParse(ipaddress, out addr);
 			
 			ServerHostname = addr.Address.ToString();
 			ServerPort = addr.Port;
@@ -79,7 +81,6 @@ namespace CaveGame.Client
 				// get data if there's any
 				if (canRead)
 				{
-
 					IPEndPoint ep = new IPEndPoint(IPAddress.Any, 0);
 					byte[] data = udpClient.Receive(ref ep);
 

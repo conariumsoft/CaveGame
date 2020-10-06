@@ -1,4 +1,6 @@
-﻿using CaveGame.Core.Tiles;
+﻿using CaveGame.Core.Entities;
+using CaveGame.Core.Tiles;
+using CaveGame.Core.Walls;
 using Microsoft.Xna.Framework;
 using System;
 using System.Diagnostics;
@@ -34,7 +36,8 @@ namespace CaveGame.Core.Network
 		SAddPlayerEntity,
 		SPlayerPosition,
 		SDestroyEntity,
-		ClientQuit
+		ClientQuit,
+		PlayerState
 	}
 
 
@@ -126,6 +129,39 @@ namespace CaveGame.Core.Network
 			return bob.ToString();
 		}
 
+	}
+
+
+	public class KickPacket : Packet
+	{
+
+		public KickPacket(string reason) : base(PacketType.SKick)
+		{
+			KickReason = reason;
+
+		}
+
+		public KickPacket(byte[] bytes) : base(bytes) { }
+
+
+		public byte KickReasonLength
+		{
+			get { return Payload[0]; }
+			set { Payload[0] = value; }
+		}
+		public string KickReason
+		{
+			get { return Encoding.UTF8.GetString(Payload, 1, KickReasonLength); }
+			set
+			{
+
+				KickReasonLength = (byte)value.Length;
+
+				Encoding.UTF8.GetBytes(value, 0, KickReasonLength).CopyTo(Payload, 1);
+
+
+			}
+		}
 	}
 
 	// Client requests connection
@@ -275,8 +311,6 @@ namespace CaveGame.Core.Network
 
 	public class EntityPositionPacket : Packet, IPrintablePacket
 	{
-		
-
 		public override string ToString()
 		{
 			return String.Format("netid {0}[{1}] x {2}[{3}] y {4}[{5}]",
@@ -284,7 +318,7 @@ namespace CaveGame.Core.Network
 				PosX, DumpHex(Payload, 4, 4),
 				PosY, DumpHex(Payload, 8, 4)
 
-			) ;
+			);
 		}
 
 		public int EntityID
@@ -329,8 +363,6 @@ namespace CaveGame.Core.Network
 			set { TypeSerializer.FromFloat(ref Payload, 24, value); }
 		}
 
-
-
 		public EntityPositionPacket(int entityid, float x, float y, 
 			float vx=0, float vy=0, float nx = 0, float ny = 0) : base(PacketType.SPlayerPosition) {
 			Payload = new byte[32];
@@ -344,6 +376,46 @@ namespace CaveGame.Core.Network
 		}
 
 		public EntityPositionPacket(byte[] bytes) : base(bytes) { }
+
+	}
+
+
+	public class PlayerStatePacket : Packet
+	{
+		public int EntityID
+		{
+			get { return TypeSerializer.ToInt(Payload, 0); }
+			set { TypeSerializer.FromInt(ref Payload, 0, value); }
+		}
+
+		public HorizontalDirection Facing
+		{
+			get { return (HorizontalDirection)Payload[4]; }
+			set { Payload[4] = (byte)value; }
+		}
+
+		public bool OnGround {
+			get { return Payload[5].Get(0); }
+			set { Payload[5].Set(0, value); }
+		}
+
+		public bool Walking
+		{
+			get { return Payload[5].Get(1); }
+			set { Payload[5].Set(1, value); }
+		}
+
+		public PlayerStatePacket(HorizontalDirection f, bool grounded, bool walk) : base(PacketType.PlayerState)
+		{
+			Payload = new byte[12];
+
+			OnGround = grounded;
+			Facing = f;
+			Walking = walk;
+		}
+
+		public PlayerStatePacket(byte[] data) : base(data) { }
+
 
 	}
 
@@ -370,12 +442,18 @@ namespace CaveGame.Core.Network
 	public class ServerChatMessagePacket: Packet
 	{
 		// Payload array offsets
-		
 
+		public byte MessageLength
+		{
+			get { return Payload[3]; }
+			set { Payload[3] = value; }
+		}
 		public string Message
 		{
-			get { return Encoding.UTF8.GetString(Payload, 3, 128); }
-			set { Payload = Encoding.UTF8.GetBytes(value, 3, 128); }
+			get { return Encoding.UTF8.GetString(Payload, 4, MessageLength); }
+			set { 
+				MessageLength = (byte)value.Length;
+				Encoding.UTF8.GetBytes(value).CopyTo(Payload, 4); }
 		}
 
 		public Color TextColor
@@ -393,12 +471,16 @@ namespace CaveGame.Core.Network
 			}
 		}
 
+		public ServerChatMessagePacket(byte[] data) : base(data) { }
+
 		public ServerChatMessagePacket(string msg) : base(PacketType.SChatMessage) {
+			Payload = new byte[140];
 			TextColor = Color.White;
 			Message = msg;
 		}
 
 		public ServerChatMessagePacket(string msg, Color col) : base(PacketType.SChatMessage) {
+			Payload = new byte[140];
 			TextColor = col;
 			Message = msg;
 		}
@@ -430,22 +512,43 @@ namespace CaveGame.Core.Network
 						index++;
 					}
 				}
+
+				for (int x = 0; x < Globals.ChunkSize; x++)
+				{
+					for (int y = 0; y < Globals.ChunkSize; y++)
+					{
+						var w = Wall.FromID(Payload[index * 4]);
+						w.Damage = Payload[1 + (index * 4)];
+
+						chk.Walls[x, y] = w;
+						index++;
+					}
+				}
 				return chk;
 			}
 			set {
-				Payload = new byte[4200];
+				Payload = new byte[8200];
 				int index = 0;
-				TypeSerializer.FromInt(ref Payload, index * 4, value.Coordinates.X);
-				index++;
-				TypeSerializer.FromInt(ref Payload, index * 4, value.Coordinates.Y);
-				index++;
+				TypeSerializer.FromInt(ref Payload, index , value.Coordinates.X);
+				index+=4;
+				TypeSerializer.FromInt(ref Payload, index, value.Coordinates.Y);
+				index+=4;
 				for (int x = 0; x < Globals.ChunkSize; x++)
 				{
 					for (int y = 0; y < Globals.ChunkSize; y++)
 					{
 						var t = value.Tiles[x, y];
-						t.Serialize(ref Payload, index * 4);
-						index++;
+						t.Serialize(ref Payload, index);
+						index+=4;
+					}
+				}
+				for (int x = 0; x < Globals.ChunkSize; x++)
+				{
+					for (int y = 0; y < Globals.ChunkSize; y++)
+					{
+						var w = value.Tiles[x, y];
+						w.Serialize(ref Payload, index);
+						index+=4;
 					}
 				}
 			}

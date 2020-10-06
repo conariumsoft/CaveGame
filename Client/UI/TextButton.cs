@@ -55,7 +55,7 @@ namespace CaveGame.Client.UI
 				{
 					if (mouse.LeftButton == ButtonState.Pressed && !(prevMouse.LeftButton == ButtonState.Pressed))
 					{
-						CaveGame.Client.Menu.HomePage.buttonBlipSFX.Play(1.0f, 0.9f, 0.0f);
+						GameSounds.MenuBlip?.Play(1.0f, 0.9f, 0.0f);
 						OnLeftClick?.Invoke(this, mouse);
 						CaveGameGL.ClickTimer = 0;
 					}
@@ -63,7 +63,7 @@ namespace CaveGame.Client.UI
 
 					if (mouse.RightButton == ButtonState.Pressed && !(prevMouse.RightButton == ButtonState.Pressed))
 					{
-						CaveGame.Client.Menu.HomePage.buttonBlipSFX.Play(1.0f, 0.9f, 0.0f);
+						GameSounds.MenuBlip?.Play(1.0f, 0.9f, 0.0f);
 						OnRightClick?.Invoke(this, mouse);
 						CaveGameGL.ClickTimer = 0;
 					}

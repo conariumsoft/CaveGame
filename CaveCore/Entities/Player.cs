@@ -1,4 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿#if CLIENT
+using CaveGame.Client;
+#endif
+using CaveGame.Core.Network;
+using CaveGame.Core.Tiles;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
@@ -6,19 +12,31 @@ using System.Text;
 
 namespace CaveGame.Core.Entities
 {
+	public enum HorizontalDirection: byte
+	{
+		Left = 0,
+		Right
+	}
+
 	public class Player : Entity, IPhysicsObject, IPositional, IVelocity, INextPosition
 	{
-
+		public User User { get; set; }
 		public string DisplayName;
 
+		public HorizontalDirection Facing { get; set; }
 		public Vector2 Position { get; set; }
 		public Vector2 Velocity { get; set; }
-		public Vector2 BoundingBox;
+		public Vector2 BoundingBox => new Vector2(6, 12);
 		public Vector2 NextPosition { get; set; }
+
 		public Color Color;
 		public bool OnGround;
 
+		public bool Walking { get; set; }
+
 		public bool NotMyProblem { get; set; }
+
+		protected float walkingAnimationTimer;
 
 		public Vector2 TopLeft
 		{
@@ -27,17 +45,17 @@ namespace CaveGame.Core.Entities
 
 		public Player()
 		{
-			Position = new Vector2(0, -100);
+			Position = new Vector2(0, -200);
 			Velocity = Vector2.Zero;
-			BoundingBox = new Vector2(8, 12);
 			OnGround = false;
-			Color = Color.Red;
+			Color = Color.White;
 		}
 
 		public virtual void PhysicsStep(IGameWorld world, float step)
 		{
 			if (NotMyProblem)
 			{
+
 				Position = Position.Lerp(NextPosition, 0.5f);
 
 				return;
@@ -56,7 +74,7 @@ namespace CaveGame.Core.Entities
 
 					var tile = world.GetTile((int)tileBoxPos.X, (int)tileBoxPos.Y);
 
-					if (tile.ID != 0)
+					if (tile.ID != 0 && !(tile is INonSolid))
 					{
 						var tileChec = (tileBoxPos * Globals.TileSize) + new Vector2(4, 4);
 						var tileBoxSize = new Vector2(4, 4);
@@ -86,9 +104,12 @@ namespace CaveGame.Core.Entities
 				}
 			}
 
-			Velocity = new Vector2(Velocity.X * 0.95f, Velocity.Y);
+			
 
-			float gravity = 3f;
+
+			Velocity = new Vector2(Velocity.X * 0.92f, Velocity.Y);
+
+			float gravity = 4f;
 			Velocity = new Vector2(Velocity.X, Velocity.Y + gravity * step);
 
 			Position = NextPosition;
@@ -98,13 +119,55 @@ namespace CaveGame.Core.Entities
 
 		public override void Update(IGameWorld world, GameTime gt)
 		{
-			
+			walkingAnimationTimer += (float)gt.ElapsedGameTime.TotalSeconds * 5;
 			base.Update(world, gt);
 		}
+
+	#if CLIENT
+		public void Draw(SpriteBatch sb) {
+
+			Rectangle spriteFrame = new Rectangle(0, 0, 16, 24);
+
+			int flipSprite = 0;
+			if (Facing == HorizontalDirection.Left)
+			{
+				flipSprite = 0;
+			}
+			if (Facing == HorizontalDirection.Right)
+			{
+				flipSprite = 1;
+			}
+
+
+			if (Walking)
+			{
+				spriteFrame = new Rectangle(16, 0, 16, 24);
+				if (walkingAnimationTimer % 2 >= 1)
+				{
+					spriteFrame = new Rectangle(32, 0, 16, 24);
+				}
+			}
+
+			if (!OnGround)
+			{
+				spriteFrame = new Rectangle(48, 0, 16, 24);
+			}
+
+			
+
+
+			sb.Draw(GameTextures.Player, TopLeft, spriteFrame, Color, 0, new Vector2(0,0), 1, (SpriteEffects)flipSprite, 0);
+		}
+
+
+	#endif
+
 	}
 
 	public class LocalPlayer : Player
 	{
+
+		float jumpEnergy;
 
 		public override void PhysicsStep(IGameWorld world, float step)
 		{
@@ -114,16 +177,48 @@ namespace CaveGame.Core.Entities
 			float velX = 0;
 			float velY = 0;
 
-			float speed = 10;
-			if (kb.IsKeyDown(Keys.Up))
-				velY -= step * speed*1;
+			float speed = 6;
+			float horizspeed = 8;
+
+			if (OnGround)
+			{
+				jumpEnergy = 0.2f;
+			}
 
 
-			if (kb.IsKeyDown(Keys.Left))
-				velX -= step * speed;
+			if (kb.IsKeyDown(Keys.Space))
+			{
+				if (OnGround)
+				{
+					velY -= step * speed * 16;
+				} else
+				{
+					jumpEnergy -= step;
+					if (jumpEnergy > 0)
+					{
+						velY -= step * speed * 1.0f;
+					}
+					
+				}
+			}
 
-			if (kb.IsKeyDown(Keys.Right))
-				velX += step * speed;
+			Walking = false;
+
+			if (kb.IsKeyDown(Keys.A))
+			{
+				Walking = true;
+				velX -= step * horizspeed;
+				Facing = HorizontalDirection.Left;
+			}
+				
+
+			if (kb.IsKeyDown(Keys.D))
+			{
+				Walking = true;
+				velX += step * horizspeed;
+				Facing = HorizontalDirection.Right;
+			}
+				
 
 			
 			Velocity += new Vector2(velX, velY);
@@ -133,6 +228,7 @@ namespace CaveGame.Core.Entities
 
 		public override void Update(IGameWorld world, GameTime gt)
 		{
+			
 			base.Update(world, gt);
 		}
 	}

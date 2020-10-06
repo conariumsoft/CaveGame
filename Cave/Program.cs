@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CaveGame.Client;
+using System;
 
 namespace Cave
 {

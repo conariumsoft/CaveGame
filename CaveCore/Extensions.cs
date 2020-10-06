@@ -22,5 +22,38 @@ namespace CaveGame.Core
 		{
 			return a + (b - a) * alpha;
 		}
+
+		public static void Set(ref this byte a, int pos, bool value)
+		{
+			if (value)
+			{
+				a = (byte)(a | (1 << pos));
+			} else
+			{
+				a = (byte)(a & ~(1 << pos));
+			}
+			//return a;
+		}
+
+		public static bool Get(this byte a, int pos)
+		{
+			return ((a & (1 << pos)) != 0);
+		}
+
+		// positive modulus
+		public static int Mod(this int num, int remainder)
+		{
+			return (num % remainder + remainder) % remainder;
+		}
+
+		public static Color Sub(this Color a, Color b)
+		{
+			return new Color(a.R - b.R, a.G - b.G, a.B - b.B);
+		}
+
+		public static Color Add(this Color a, Color b)
+		{
+			return new Color(a.R + b.R, a.G + b.G, a.B + b.B);
+		}
 	}
 }

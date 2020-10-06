@@ -1,12 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace CaveGame.Client
 {
-
 
 	public struct GraphEntry
 	{
@@ -16,6 +16,8 @@ namespace CaveGame.Client
 
 	public class FPSGraph: GameComponent
 	{
+		public bool Enabled { get; set; }
+
 		public int PollingRate { get; set; }
 		public int SampleCount { get; set; }
 
@@ -23,11 +25,11 @@ namespace CaveGame.Client
 
 		public FPSGraph(Game game, int pollrate, int samplecount) : base(game)
 		{
-			Position = new Vector2(5, 200);
+			Position = new Vector2(0, 0);
 			PollingRate = pollrate;
 			SampleCount = samplecount;
-			SamplePoints = new List<GraphEntry>();	
-
+			SamplePoints = new List<GraphEntry>();
+			Enabled = false;
 
 			for (int x = 0; x < SampleCount+1; x++)
 			{
@@ -40,8 +42,24 @@ namespace CaveGame.Client
 
 		public List<GraphEntry> SamplePoints;
 
+		KeyboardState prevKeyboard;
+
 		public override void Update(GameTime gt)
 		{
+
+			KeyboardState keyboard = Keyboard.GetState();
+
+			if (prevKeyboard != null)
+			{
+				if (keyboard.IsKeyDown(Keys.F1) && !prevKeyboard.IsKeyDown(Keys.F1)) {
+					Enabled = !Enabled;
+				}
+			}
+			prevKeyboard = keyboard;
+
+			if (!Enabled)
+				return;
+
 			float frametime = (float)gt.ElapsedGameTime.TotalSeconds;
 
 
@@ -61,23 +79,22 @@ namespace CaveGame.Client
 					SamplePoints.RemoveAt(SampleCount);
 				}
 			}
-
-			
 		}
 
 		int sampleWidth = 3;
-		float heightScale = 10000f;
+		float heightScale = 5000f;
 
 		public void Draw(SpriteBatch sb)
 		{
+			if (!Enabled)
+				return;
+
 			sb.Begin(SpriteSortMode.BackToFront, null, SamplerState.PointClamp);
 			for (int idx = 0; idx < SampleCount; idx++)
 			{
 				var entry = SamplePoints[idx];
-				sb.Rect(Color.Red, Position+new Vector2(sampleWidth*idx, 0), new Vector2(sampleWidth, (entry.FrameTime * heightScale)));
+				sb.Rect(Color.Red, Position + new Vector2(sampleWidth * idx, 0), new Vector2(sampleWidth, 2+(entry.FrameTime * heightScale)));
 			}
-
-			sb.Print(Color.Black, Position + new Vector2(0, ((1/5) * heightScale)), "10dt");
 
 			sb.End();
 		}

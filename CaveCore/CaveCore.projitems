@@ -9,18 +9,23 @@
     <Import_RootNamespace>CaveGame.Core</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Chunk.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ChunkCoordinates.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Class1.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DelayedTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)World\Chunk.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)World\ChunkCoordinates.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CollisionSolver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Entity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Explosion.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Entities\Itemstack.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\ItemstackEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Player.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileUtil\Configuration.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GameWorld.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)World\GameWorld.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Globals.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IMessageOutlet.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Inventory\Items.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Inventory\ItemStack.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)World\Light3.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Message.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\NetworkMessage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\Packet.cs" />
@@ -38,6 +43,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Chat\" />
-    <Folder Include="$(MSBuildThisFileDirectory)Inventory\" />
+    <Folder Include="$(MSBuildThisFileDirectory)World\" />
   </ItemGroup>
 </Project>

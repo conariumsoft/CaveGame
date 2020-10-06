@@ -163,12 +163,14 @@ namespace CaveGame.Core
 		public CommandBar(Game game): base(game)
 		{
 			inputBox = new TextInput();
+			inputBox.ClearOnReturn = true;
 			inputBox.Handler += ProcessInput;
 
 			_game = game;
 			CommandHistory = new List<string>();
 			Open = false;
 
+			TextInputManager.ListenTextInput += OnTextInput;
 
 			autocompletemenuOpen = false;
 			MessageHistory = new List<Message>();

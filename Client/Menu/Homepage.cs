@@ -65,8 +65,6 @@ namespace CaveGame.Client.Menu
 
 		public CaveGameGL Game { get; private set; }
 
-		ContentManager MenuContent;
-
 		public bool Active { get; set; }
 
 		Game IGameContext.Game => Game;
@@ -85,7 +83,10 @@ namespace CaveGame.Client.Menu
 
 
 		// TODO: change this
-		public static SoundEffect buttonBlipSFX;
+		#region patterns
+
+		#endregion
+
 
 		public HomePage(CaveGameGL _game)
 		{
@@ -101,11 +102,11 @@ namespace CaveGame.Client.Menu
 		}
 
 		private void WhenMouseOverButton(TextButton b, MouseState m) {
-			buttonBlipSFX?.Play(1.0f, 1, 0.0f);
+			GameSounds.MenuBlip?.Play(1.0f, 1, 0.0f);
 		}
 		private void WhenMouseOffButton(TextButton b, MouseState m)
 		{
-			buttonBlipSFX?.Play(0.8f, 1, 0.0f);
+			GameSounds.MenuBlip?.Play(0.8f, 1, 0.0f);
 		}
 
 		private void OpenUrl(string url)
@@ -160,7 +161,7 @@ namespace CaveGame.Client.Menu
 				Parent = MainMenu,
 				TextColor = Color.White,
 				Text = "CAVE GAME",
-				Font = Renderer.Arial20,
+				Font = GameFonts.Arial20,
 				BorderSize = 0,
 				TextWrap = false,
 				TextYAlign = TextYAlignment.Center,
@@ -182,7 +183,7 @@ namespace CaveGame.Client.Menu
 				TextColor = Color.White,
 				Text = "Copyright Conarium Software 2019-2020",
 				BorderSize = 0,
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				TextWrap = false,
 				TextYAlign = TextYAlignment.Bottom,
 				TextXAlign = TextXAlignment.Left,
@@ -200,7 +201,7 @@ namespace CaveGame.Client.Menu
 				TextColor = Color.White,
 				Text = "Version 2.0.0 Alpha",
 				BorderSize = 0,
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				TextWrap = false,
 				TextYAlign = TextYAlignment.Bottom,
 				TextXAlign = TextXAlignment.Right,
@@ -227,7 +228,7 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "SINGLEPLAYER",
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				Size = new UICoords(0, 30, 1f, 0),
 				TextWrap = true,
 				TextYAlign = TextYAlignment.Center,
@@ -243,7 +244,7 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "MULTIPLAYER",
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				Size = new UICoords(0, 30, 1f, 0),
 				Position = new UICoords(0, 30, 0, 0),
 				TextWrap = true,
@@ -261,7 +262,7 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "STATISTICS",
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				Size = new UICoords(0, 30, 1f, 0),
 				Position = new UICoords(0, 30, 0, 0),
 				TextWrap = true,
@@ -277,7 +278,7 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "STEAM WORKSHOP",
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				Size = new UICoords(0, 30, 1f, 0),
 				Position = new UICoords(0, 30, 0, 0),
 				TextWrap = true,
@@ -294,7 +295,7 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "DISCORD COMMUNITY",
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				Size = new UICoords(0, 30, 1f, 0),
 				Position = new UICoords(0, 30, 0, 0),
 				TextWrap = true,
@@ -312,7 +313,7 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "CREDITS",
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				Size = new UICoords(0, 30, 1f, 0),
 				Position = new UICoords(0, 30, 0, 0),
 				TextWrap = true,
@@ -328,7 +329,7 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "SETTINGS",
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				Size = new UICoords(0, 30, 1f, 0),
 				Position = new UICoords(0, 30, 0, 0),
 				TextWrap = true,
@@ -344,7 +345,7 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "EXIT TO DESKTOP",
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				Size = new UICoords(0, 30, 1f, 0),
 				Position = new UICoords(0, 30, 0, 0),
 				TextWrap = true,
@@ -389,7 +390,7 @@ namespace CaveGame.Client.Menu
 				Parent = SingleplayerMenu,
 				TextColor = Color.White,
 				Text = "SELECT A WORLD",
-				Font = Renderer.Arial20,
+				Font = GameFonts.Arial20,
 				BorderSize = 0,
 				TextWrap = false,
 				TextYAlign = TextYAlignment.Center,
@@ -405,7 +406,7 @@ namespace CaveGame.Client.Menu
 				Position = new UICoords(10, 0, 0, 0.1f),
 				Parent = SingleplayerMenu,
 				Text = "CREATE NEW WORLD",
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				BorderSize = 0,
 				TextColor = Color.White,
 				TextWrap = false,
@@ -427,7 +428,7 @@ namespace CaveGame.Client.Menu
 				Position = new UICoords(10, -10, 0, 1f),
 				Parent = SingleplayerMenu,
 				Text = "CANCEL",
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				BorderSize = 0,
 				TextColor = Color.White,
 				TextWrap = false,
@@ -494,7 +495,7 @@ namespace CaveGame.Client.Menu
 				Parent = WorldCreationMenu,
 				TextColor = Color.White,
 				Text = "CREATE NEW WORLD",
-				Font = Renderer.Arial20,
+				Font = GameFonts.Arial20,
 				BorderSize = 0,
 				TextWrap = false,
 				TextYAlign = TextYAlignment.Center,
@@ -510,7 +511,7 @@ namespace CaveGame.Client.Menu
 				Position = new UICoords(10, 0, 0, 0.1f),
 				Parent = WorldCreationMenu,
 				Text = "CONFIRM AND CREATE",
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				BorderSize = 0,
 				TextColor = Color.White,
 				TextWrap = false,
@@ -531,7 +532,7 @@ namespace CaveGame.Client.Menu
 				Position = new UICoords(10, -10, 0, 1f),
 				Parent = WorldCreationMenu,
 				Text = "BACK",
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				BorderSize = 0,
 				TextColor = Color.White,
 				TextWrap = false,
@@ -575,7 +576,7 @@ namespace CaveGame.Client.Menu
 				Parent = MultiplayerMenu,
 				TextColor = Color.White,
 				Text = "MULTIPLAYER",
-				Font = Renderer.Arial20,
+				Font = GameFonts.Arial20,
 				BorderSize = 0,
 				TextWrap = false,
 				TextYAlign = TextYAlignment.Center,
@@ -610,7 +611,7 @@ namespace CaveGame.Client.Menu
 				BGColor = new Color(0.2f, 0.2f, 0.2f),
 				BorderColor = Color.DarkBlue,
 				//Provider = inputter,
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				BackgroundText = "Server Address",
 				BackgroundTextColor = Color.Gray,
 				TextYAlign = TextYAlignment.Center,
@@ -628,7 +629,7 @@ namespace CaveGame.Client.Menu
 			//	Position = new UICoords(20, 40, 0, 0.2f),
 				Parent = buttons,
 				//Text = "Test1",
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				BGColor = new Color(0.2f, 0.2f, 0.2f),
 				BorderColor = Color.DarkBlue,
 				BackgroundText = "Nickname",
@@ -648,7 +649,7 @@ namespace CaveGame.Client.Menu
 				//Position = new UICoords(10, -10, 0, 1f),
 				Parent = buttons,
 				Text = "CONNECT",
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				BorderSize = 0,
 				TextColor = Color.White,
 				TextWrap = false,
@@ -671,7 +672,7 @@ namespace CaveGame.Client.Menu
 				Position = new UICoords(10, -10, 0, 1f),
 				Parent = MultiplayerMenu,
 				Text = "BACK",
-				Font = Renderer.Arial10,
+				Font = GameFonts.Arial10,
 				BorderSize = 0,
 				TextColor = Color.White,
 				TextWrap = false,
@@ -696,9 +697,8 @@ namespace CaveGame.Client.Menu
 
 		public void Load()
 		{
-			MenuContent = new ContentManager(Game.Services, Game.Content.RootDirectory);
 
-			buttonBlipSFX = MenuContent.Load<SoundEffect>("Sound/click1");
+			
 
 			ConstructMainMenu();
 			ConstructSingleplayerMenu();
@@ -711,7 +711,7 @@ namespace CaveGame.Client.Menu
 
 		public void Unload()
 		{
-			MenuContent.Unload();
+
 		}
 
 

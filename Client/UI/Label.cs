@@ -142,7 +142,7 @@ namespace CaveGame.Client.UI
 
 		public Label() : base()
 		{
-			Font = Renderer.ComicSans10;
+			Font = GameFonts.ComicSans10;
 			Text = "Bottom Text";
 			TextColor = Color.White;
 		}

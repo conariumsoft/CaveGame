@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ConsoleOuputWrapper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NetworkServer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameServer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServerConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServerWorld.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)User.cs" />

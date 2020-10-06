@@ -23,6 +23,7 @@ namespace StandaloneServer
 			GameServer server = new GameServer(config);
 			server.Output = consoleWrapper;
 
+			server.LoadPlugins();
 			server.Start();
 			server.Run();
 		}
