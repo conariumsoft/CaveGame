@@ -11,37 +11,70 @@
     WindowStartupLocation="CenterScreen"
     Width="800"
     Height="480">
-    <Window.DataContext>
-        <local:MainWindowViewModel />
-    </Window.DataContext>
+	<Window.DataContext>
+		<local:MainWindowViewModel />
+	</Window.DataContext>
 
-    <DockPanel LastChildFill="True">
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
-                <MenuItem Header="_New" />
-                <MenuItem Header="_Open..." />
-                <Separator />
-                <MenuItem Header="_Save" />
-                <MenuItem Header="Save _As..." />
-                <Separator />
-                <MenuItem Header="E_xit" />
-            </MenuItem>
-            <MenuItem Header="_Edit">
-                <MenuItem Header="_Undo" />
-                <MenuItem Header="_Redo" />
-                <Separator />
-                <MenuItem Header="Cu_t" />
-                <MenuItem Header="_Copy" />
-                <MenuItem Header="_Paste" />
-                <MenuItem Header="_Delete" />
-                <Separator />
-                <MenuItem Header="Select _All" />
-            </MenuItem>
-            <MenuItem Header="_Help">
-                <MenuItem Header="_About Editor" />
-            </MenuItem>
-        </Menu>
+	<DockPanel LastChildFill="True">
+		<Menu Name="TopMenu" DockPanel.Dock="Top">
+			<MenuItem Header="_File">
+				<MenuItem Header="_New"  Click="Menu_New"/>
+				<MenuItem Header="_Open..." Click="Menu_Open"/>
+				<Separator />
+				<MenuItem Header="_Save" Click="Menu_Save" />
+				<MenuItem Header="Save _As..." Click="Menu_SaveAs"/>
+				<Separator />
+				<MenuItem Header="E_xit" Click="Menu_Exit"/>
+			</MenuItem>
+			<MenuItem Header="_Edit">
+				<MenuItem Header="_Undo" Click="Menu_Undo"/>
+				<MenuItem Header="_Redo" Click="Menu_Redo"/>
+				<Separator />
+				<MenuItem Header="Cu_t" Click="Menu_Cut"/>
+				<MenuItem Header="_Copy" Click="Menu_Copy" />
+				<MenuItem Header="_Paste" Click="Menu_Paste"/>
+				<MenuItem Header="_Delete" Click="Menu_Delete" />
+				<Separator />
+				<MenuItem Header="Select _All" Click="Menu_SelectAll" />
+			</MenuItem>
+			<MenuItem Header="_Help">
+				<MenuItem Header="_About Editor" Click="Menu_About" />
+			</MenuItem>
+		</Menu>
+		<StatusBar Name="StatusBar"  Height="14" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Background="Black"/>
+		<Grid Margin="0,0,-5,0" ScrollViewer.VerticalScrollBarVisibility="Disabled" ShowGridLines="True">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="200" MaxWidth="500" MinWidth="50" />
+				<ColumnDefinition Width="5" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<StatusBar Name="SideBar" Background="#FF897D7D" Grid.Column="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top">
+				<Grid x:Name="InnerGrid"  Margin="0,0,0,-3">
+					<Grid.RowDefinitions>
+						<RowDefinition Height ="*" />
+						<RowDefinition Height="*" />
+						<RowDefinition Height="*" />
+						<RowDefinition Height="*" />
+						<RowDefinition Height="*" />
+						<RowDefinition Height="*" />
+						<RowDefinition Height="*" />
+						<RowDefinition Height="*" />
+					</Grid.RowDefinitions>
 
-        <monoGameControls:MonoGameContentControl />
-    </DockPanel>
+					<CheckBox Content="Show Walls" Checked="CheckBox_Checked" Grid.Row="0"/>
+					<CheckBox Content="Show Tiles" Checked="CheckBox_Checked" Grid.Row="1"/>
+					<CheckBox Content="Show Air" Checked="CheckBox_Checked" Grid.Row="2"/>
+					<CheckBox Content="Show Grid" Checked="CheckBox_Checked" Grid.Row="3"/>
+					<CheckBox Content="CheckBox" Checked="CheckBox_Checked" Grid.Row="4"/>
+				</Grid>
+			</StatusBar>
+			<GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
+			<monoGameControls:MonoGameContentControl Grid.Column="2"/>
+
+		</Grid>
+
+
+
+
+	</DockPanel>
 </Window>
