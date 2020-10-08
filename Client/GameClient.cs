@@ -534,7 +534,6 @@ namespace CaveGame.Client
 
 			Game.GraphicsDevice.Clear(Color.CornflowerBlue);
 			sb.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
-			DrawChunkCachedTextures(sb);
 			EntityRendering(sb);
 			DrawChunkFGTextures(sb);
 
