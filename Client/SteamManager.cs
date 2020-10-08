@@ -19,7 +19,9 @@ namespace CaveGame.Client
 	using System.Collections;
 	using System.Diagnostics;
 	using Microsoft.Xna.Framework;
+#if CLIENT
 	using Steamworks;
+#endif
 #endif
 
 	//

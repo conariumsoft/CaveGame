@@ -63,7 +63,7 @@ namespace CaveGame.Core.Entities
 
 			OnGround = false;
 			var tilePosition = new Vector2(Position.X / Globals.TileSize, Position.Y / Globals.TileSize);
-			tilePosition.Floor();
+			//tilePosition = Vector2.Floor(tilePosition);
 
 			int bb = 4;
 			for (int x = -bb; x < bb; x++)

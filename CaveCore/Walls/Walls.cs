@@ -124,8 +124,8 @@ namespace CaveGame.Core.Walls
 
 			foreach (var type in types)
 			{
-				bool exists = Enum.TryParse(typeof(WallID), type.Name, out object id);
-				if (exists && (WallID)id == (WallID)t)
+				bool exists = Enum.TryParse(type.Name, out WallID id);
+				if (exists && id == (WallID)t)
 					return (Wall)type.GetConstructor(Type.EmptyTypes).Invoke(null);
 			}
 			throw new Exception(String.Format("WallID not valid! {0}", t));

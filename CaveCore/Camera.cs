@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CaveGame.Client
+namespace CaveGame.Core
 {
     public class Camera2D
     {

@@ -13,20 +13,20 @@ namespace CaveGame.Core
 
 	public interface IGameWorld
 	{
-		public List<IEntity> Entities { get; }
-		public Tile GetTile(int x, int y);
-		public void SetTile(int x, int y, Tile t);
+		List<IEntity> Entities { get; }
+		Tile GetTile(int x, int y);
+		void SetTile(int x, int y, Tile t);
 
-		public void GetTile(int x, int y, out Tile t);
+		void GetTile(int x, int y, out Tile t);
 
 
-		public Wall GetWall(int x, int y);
-		public void SetWall(int x, int y, Wall w);
-		public void SetTileNetworkUpdated(int x, int y);
-		public void DoUpdatePropogation(int x, int y);
-		public void SetTileUpdated(int x, int y);
+		Wall GetWall(int x, int y);
+		void SetWall(int x, int y, Wall w);
+		void SetTileNetworkUpdated(int x, int y);
+		void DoUpdatePropogation(int x, int y);
+		void SetTileUpdated(int x, int y);
 
-		public void Update(GameTime gt);
+		void Update(GameTime gt);
 	}
 
 	public abstract class World : IGameWorld

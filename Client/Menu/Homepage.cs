@@ -563,7 +563,6 @@ namespace CaveGame.Client.Menu
 		private void ConstructMultiplayerMenu() {
 			
 
-
 			MultiplayerMenu = new UIRoot(Game.GraphicsDevice);
 
 			Label title = new Label
@@ -620,8 +619,6 @@ namespace CaveGame.Client.Menu
 			serverInputBox.Input.inputBuffer = persistence.IPAddress;
 			buttons.Children.Add(serverInputBox);
 
-			
-
 			var usernameInputBox = new TextInputLabel
 			{
 				Size = new UICoords(0, 25, 1, 0),
@@ -663,7 +660,6 @@ namespace CaveGame.Client.Menu
 			connect.OnMouseExit += WhenMouseOffButton;
 			connect.OnLeftClick += (b, m) => OnJoinServer(serverInputBox.Input.InternalText, usernameInputBox.Input.InternalText);
 			buttons.Children.Add(connect);
-
 
 			var back = new TextButton
 			{

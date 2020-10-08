@@ -102,6 +102,7 @@ namespace CaveGame.Client
 
 		private Queue<Cell> UpdatedCells;
 
+#if CLIENT
 		private byte Solve(byte tile, byte cur, byte inp)
 		{
 			byte a = Math.Max(cur, inp);
@@ -428,14 +429,16 @@ namespace CaveGame.Client
 				}
 			}
 		}
-
+#endif
 		public void On()
 		{
+#if CLIENT
 			running.Value = true;
 			//Task.Factory.StartNew(LightingThread);
 			LightThread =  new Thread(LightingThread);
 			LightThread.Priority = ThreadPriority.AboveNormal;
 			LightThread.Start();
+#endif
 		}
 		public void Off()
 		{

@@ -108,21 +108,21 @@ public static TDef UraniumOre= new TDef { Hardness = 12, Opacity = 3, Quad = Til
 	// Property interfaces
 	public interface ILightEmitter
 	{
-		public Light3 Light { get; }
+		Light3 Light { get; }
 	}
 	// Method interfaces
 
 	public interface ILocalTileUpdate
 	{
-		public void LocalTileUpdate(IGameWorld world, int x, int y);
+		void LocalTileUpdate(IGameWorld world, int x, int y);
 	}
 	public interface IRandomTick
 	{
-		public void RandomTick(IGameWorld world, int x, int y);
+		void RandomTick(IGameWorld world, int x, int y);
 	}
 	public interface ITileUpdate
 	{
-		public void TileUpdate(IGameWorld world, int x, int y);
+		void TileUpdate(IGameWorld world, int x, int y);
 	}
 	public interface ISoil { }
 	public interface IGas { }
@@ -157,9 +157,8 @@ public static TDef UraniumOre= new TDef { Hardness = 12, Opacity = 3, Quad = Til
 
 			foreach (var type in types)
 			{
-
-				bool exists = Enum.TryParse(typeof(TileID), type.Name, out object id);
-				if (exists && (TileID)id == (TileID)t)
+				bool exists = Enum.TryParse(type.Name, out TileID id);
+				if (exists && id == (TileID)t)
 					return (Tile)type.GetConstructor(Type.EmptyTypes).Invoke(null);
 			}
 			throw new Exception("ID not valid!");
@@ -221,7 +220,7 @@ public static TDef UraniumOre= new TDef { Hardness = 12, Opacity = 3, Quad = Til
 			);
 		}
 
-		public bool Equals([AllowNull] Tile other)
+		public bool Equals(Tile other)
 		{
 			return (other.ID == ID && other.TileState == TileState && other.Damage == Damage);
 		}
