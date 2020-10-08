@@ -8,29 +8,29 @@ namespace CaveGame.Core.Entities
 {
 	public interface IPositional
 	{
-		public Vector2 Position { get; set; }
+		Vector2 Position { get; set; }
 	}
 
 	public interface IVelocity
 	{
-		public Vector2 Velocity { get; set; }
+		Vector2 Velocity { get; set; }
 	}
 
 	public interface INextPosition
 	{
-		public Vector2 NextPosition { get;set; }
+		Vector2 NextPosition { get;set; }
 	}
 
 	public interface IPhysicsObject
 	{
-		public void PhysicsStep(IGameWorld world, float step);
+		void PhysicsStep(IGameWorld world, float step);
 	}
 
 	public interface IEntity
 	{
-		public void Update(IGameWorld world, GameTime gt);
-		public void ServerUpdate(IGameWorld world, GameTime gt);
-		public void ClientUpdate(IGameWorld world, GameTime gt);
+		void Update(IGameWorld world, GameTime gt);
+		void ServerUpdate(IGameWorld world, GameTime gt);
+		void ClientUpdate(IGameWorld world, GameTime gt);
 		int EntityNetworkID { get; set; }
 	}
 

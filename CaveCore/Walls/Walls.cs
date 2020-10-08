@@ -37,7 +37,7 @@ namespace CaveGame.Core.Walls
 		{
 			Color = Color.White;
 			Hardness = 4;
-			Opacity = 4;
+			Opacity = 2;
 			Namespace = "CaveGame";
 		}
 	}
@@ -46,12 +46,12 @@ namespace CaveGame.Core.Walls
 	{
 		public static WDef Void		  = new WDef { };
 		public static WDef Air		  = new WDef { Hardness = 0, Opacity = 0, Quad = TileMap.Default };
-		public static WDef Dirt		  = new WDef { Hardness = 2, Opacity = 2, Quad = TileMap.Soil, Color = new Color() };
-		public static WDef Stone	  = new WDef { Hardness = 5, Opacity = 2, Quad = TileMap.Stone, Color = TileDefinitions.Stone.Color.Sub(Wall.BGDarken) };
-		public static WDef RockyDirt  = new WDef { Hardness = 5, Opacity = 2, Quad = TileMap.StoneSpot, Color = TileDefinitions.Dirt.Color.Sub(Wall.BGDarken) };
-		public static WDef OakPlank	  = new WDef { Hardness = 5, Opacity = 2, Quad = TileMap.Plank, Color = TileDefinitions.OakPlank.Color.Sub(Wall.BGDarken) };
-		public static WDef ClayBrick  = new WDef { Hardness = 5, Opacity = 2, Quad = TileMap.Brick, Color = TileDefinitions.ClayBrick.Color.Sub(Wall.BGDarken) };
-		public static WDef StoneBrick = new WDef { Hardness = 5, Opacity = 2, Quad = TileMap.Brick, Color = TileDefinitions.StoneBrick.Color.Sub(Wall.BGDarken) };
+		public static WDef Dirt		  = new WDef { Hardness = 2, Quad = TileMap.Soil, Color = new Color(40, 20, 5) };
+		public static WDef Stone	  = new WDef { Hardness = 5, Quad = TileMap.Stone, Color = TileDefinitions.Stone.Color.Sub(Wall.BGDarken) };
+		public static WDef RockyDirt  = new WDef { Hardness = 5, Quad = TileMap.StoneSpot, Color = TileDefinitions.Dirt.Color.Sub(Wall.BGDarken) };
+		public static WDef OakPlank	  = new WDef { Hardness = 5, Quad = TileMap.Plank, Color = TileDefinitions.OakPlank.Color.Sub(Wall.BGDarken) };
+		public static WDef ClayBrick  = new WDef { Hardness = 5, Quad = TileMap.Brick, Color = TileDefinitions.ClayBrick.Color.Sub(Wall.BGDarken) };
+		public static WDef StoneBrick = new WDef { Hardness = 5, Quad = TileMap.Brick, Color = TileDefinitions.StoneBrick.Color.Sub(Wall.BGDarken) };
 	}
 
 	public class Wall
@@ -124,8 +124,8 @@ namespace CaveGame.Core.Walls
 
 			foreach (var type in types)
 			{
-				bool exists = Enum.TryParse(typeof(WallID), type.Name, out object id);
-				if (exists && (WallID)id == (WallID)t)
+				bool exists = Enum.TryParse(type.Name, out WallID id);
+				if (exists && id == (WallID)t)
 					return (Wall)type.GetConstructor(Type.EmptyTypes).Invoke(null);
 			}
 			throw new Exception(String.Format("WallID not valid! {0}", t));
@@ -134,25 +134,20 @@ namespace CaveGame.Core.Walls
 		public virtual void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
 		{
 			sb.Draw(
-				Tilesheet, 
+				tilesheet, 
 				new Vector2(x * Globals.TileSize, y * Globals.TileSize), 
-				Quad, color.MultiplyAgainst(Color), 
-				0, 
-				Vector2.Zero, 
-				1, 
-				SpriteEffects.None, 
-				0.1f
+				Quad, color.MultiplyAgainst(Color)
 			);
 		}
 
 	}
 
 
-	public class Void : Wall 
+	public class Void : Wall
 	{
 		public Void(): base(WallDefinitions.Void) { }
 	}
-	public class Air : Wall {
+	public class Air : Wall, INonSolid {
 		public Air() : base(WallDefinitions.Air) { }
 	}
 	public class Stone : Wall {

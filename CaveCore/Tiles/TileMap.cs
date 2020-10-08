@@ -42,6 +42,8 @@ namespace CaveGame.Core.Tiles
 		public static Rectangle DirtFading = Quad(7, 7);
 
 		public static Rectangle Torch = Quad(11, 7);
+		public static Rectangle SideTorch = Quad(12, 7);
+		public static Rectangle WallTorch = Quad(13, 7);
 		
 
 		public static Dictionary<string, Rectangle> Atlas = new Dictionary<string, Rectangle> {

@@ -108,21 +108,21 @@ public static TDef UraniumOre= new TDef { Hardness = 12, Opacity = 3, Quad = Til
 	// Property interfaces
 	public interface ILightEmitter
 	{
-		public Light3 Light { get; }
+		Light3 Light { get; }
 	}
 	// Method interfaces
 
 	public interface ILocalTileUpdate
 	{
-		public void LocalTileUpdate(IGameWorld world, int x, int y);
+		void LocalTileUpdate(IGameWorld world, int x, int y);
 	}
 	public interface IRandomTick
 	{
-		public void RandomTick(IGameWorld world, int x, int y);
+		void RandomTick(IGameWorld world, int x, int y);
 	}
 	public interface ITileUpdate
 	{
-		public void TileUpdate(IGameWorld world, int x, int y);
+		void TileUpdate(IGameWorld world, int x, int y);
 	}
 	public interface ISoil { }
 	public interface IGas { }
@@ -157,9 +157,8 @@ public static TDef UraniumOre= new TDef { Hardness = 12, Opacity = 3, Quad = Til
 
 			foreach (var type in types)
 			{
-
-				bool exists = Enum.TryParse(typeof(TileID), type.Name, out object id);
-				if (exists && (TileID)id == (TileID)t)
+				bool exists = Enum.TryParse(type.Name, out TileID id);
+				if (exists && id == (TileID)t)
 					return (Tile)type.GetConstructor(Type.EmptyTypes).Invoke(null);
 			}
 			throw new Exception("ID not valid!");
@@ -214,14 +213,14 @@ public static TDef UraniumOre= new TDef { Hardness = 12, Opacity = 3, Quad = Til
 		public virtual void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
 		{
 			sb.Draw(
-				Tilesheet, 
+				tilesheet, 
 				new Vector2(x * Globals.TileSize, y * Globals.TileSize), 
 				Quad, color.MultiplyAgainst(Color), 0,
-				Vector2.Zero, 1, SpriteEffects.None, 0.5f
+				Vector2.Zero, 1, SpriteEffects.None, 0
 			);
 		}
 
-		public bool Equals([AllowNull] Tile other)
+		public bool Equals(Tile other)
 		{
 			return (other.ID == ID && other.TileState == TileState && other.Damage == Damage);
 		}
@@ -906,20 +905,56 @@ public static TDef UraniumOre= new TDef { Hardness = 12, Opacity = 3, Quad = Til
 		{
 			Vector2 position = new Vector2(Globals.TileSize * x, Globals.TileSize * y);
 			sb.Draw(tilesheet, position, TileMap.Torch, color.MultiplyAgainst(Color));
+
+
 		}
 
 
 		public void TileUpdate(IGameWorld world, int x, int y)
 		{
+			// States:
+			// 1 - SupportedBelow
+			// 2 - SupportedLeft
+			// 3 - SupportedRight
+			// 4 - SupportedBehind
 
 
-			//if (TileState == 0)
-			//{
-			if ((world.GetTile(x, y + 1) is INonSolid))
+			bool supportedBelow = (world.GetTile(x, y + 1) is INonSolid);
+
+			bool supportedLeft = (world.GetTile(x - 1, y) is INonSolid);
+
+			bool supportedRight = (world.GetTile(x + 1, y) is INonSolid);
+			bool supportedWall = !(world.GetWall(x, y) is INonSolid);
+
+			if (TileState == 0)
 			{
-				world.SetTile(x, y, new Air()); // TODO: Drop Tile;
+				if (supportedBelow)
+					TileState = 1;
+				if (supportedLeft)
+					TileState = 2;
+				if (supportedRight)
+					TileState = 3;
+				if (supportedWall)
+					TileState = 4;
 			}
-			//}
+
+			if (TileState == 0)
+			{
+				world.SetTile(x, y, new Air()); // TODO: Prevent Placement
+			}
+
+			if (TileState == 1 && !supportedBelow)
+				world.SetTile(x, y, new Air()); // TODO: Drop Tile;
+
+			if (TileState == 2 && !supportedLeft)
+				world.SetTile(x, y, new Air()); // TODO: Drop Tile;
+
+			if (TileState == 3 && !supportedRight)
+				world.SetTile(x, y, new Air()); // TODO: Drop Tile;
+
+			if (TileState == 4 && !supportedWall)
+				world.SetTile(x, y, new Air()); // TODO: Drop Tile;
+			
 		}
 
 

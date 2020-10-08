@@ -10,22 +10,6 @@ using System.Threading.Tasks;
 
 namespace CaveGame.Client
 {
-
-	//public class RenderComponent
-	//{
-	//	Texture2D pixel;
-	//	public RenderComponent(Game game)
-	//	{
-
-	//	}
-	//	public void Draw(Player player)
-		//{
-			//sb.Print(Color.Black, player.TopLeft - new Vector2(0, 10), "YOU");
-		//	sb.Rect(Color.Red, player.TopLeft, player.BoundingBox * 2);
-		//	base.Draw(sb);
-		//}
-	//}
-
 	using Circle = List<Vector2>;
 	using Arc = List<Vector2>;
 

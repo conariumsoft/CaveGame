@@ -9,8 +9,11 @@
     <Import_RootNamespace>CaveGame.Core</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Camera.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Class1.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DelayedTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileUtil\StructureFile.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Network\User.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\Chunk.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\ChunkCoordinates.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CollisionSolver.cs" />

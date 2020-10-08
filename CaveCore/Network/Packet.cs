@@ -158,7 +158,7 @@ namespace CaveGame.Core.Network
 
 				KickReasonLength = (byte)value.Length;
 
-				Encoding.UTF8.GetBytes(value, 0, KickReasonLength).CopyTo(Payload, 1);
+				Encoding.UTF8.GetBytes(value.ToCharArray(), 0, KickReasonLength).CopyTo(Payload, 1);
 
 
 			}
@@ -264,7 +264,7 @@ namespace CaveGame.Core.Network
 
 				UsernameLength = (byte)value.Length;
 
-				Encoding.UTF8.GetBytes(value, 0, UsernameLength).CopyTo(Payload, 12);
+				Encoding.UTF8.GetBytes(value.ToCharArray(), 0, UsernameLength).CopyTo(Payload, 12);
 				
 			
 			}

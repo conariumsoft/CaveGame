@@ -101,9 +101,11 @@ namespace CaveGame.Client
 	}
 
 
+
+
 	public class GameClient : IGameContext
 	{
-		public static float CameraZoom = 4.0f;
+		public static float CameraZoom = 2.0f;
 
 		public CaveGameGL Game { get; private set; }
 
@@ -134,6 +136,9 @@ namespace CaveGame.Client
 		public GameClient(CaveGameGL _game)
 		{
 			Game = _game;
+
+
+
 
 			World = new LocalWorld();
 			Camera = new Camera2D(Game.GraphicsDevice.Viewport) { Zoom = CameraZoom };
@@ -444,25 +449,30 @@ namespace CaveGame.Client
 			}
 		}
 
-		private void DrawChunkCachedTextures(SpriteBatch sb)
+		private void DrawChunkFGTextures(SpriteBatch sb)
 		{
 			foreach (var chunkpair in World.Chunks)
 			{
 				
 				Chunk chunk = chunkpair.Value;
 				Vector2 pos = new Vector2(chunk.Coordinates.X * Globals.ChunkSize * Globals.TileSize, chunk.Coordinates.Y * Globals.ChunkSize * Globals.TileSize);
-				if (chunk.RenderBuffer != null)
-				{
-					sb.Draw(
-						chunk.RenderBuffer,
-						pos,
-						Color.White
-					);
-				}
-				
+				if (chunk.ForegroundRenderBuffer != null)
+					sb.Draw(chunk.ForegroundRenderBuffer, pos, Color.White);
+
 			}
 		}
+		private void DrawChunkBGTextures(SpriteBatch sb)
+		{
+			foreach (var chunkpair in World.Chunks)
+			{
 
+				Chunk chunk = chunkpair.Value;
+				Vector2 pos = new Vector2(chunk.Coordinates.X * Globals.ChunkSize * Globals.TileSize, chunk.Coordinates.Y * Globals.ChunkSize * Globals.TileSize);
+
+				if (chunk.BackgroundRenderBuffer != null)
+					sb.Draw(chunk.BackgroundRenderBuffer, pos, Color.White);
+			}
+		}
 		private void DrawDebugInfo(SpriteBatch sb)
 		{
 			sb.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
@@ -477,7 +487,7 @@ namespace CaveGame.Client
 
 
 			var tileat = World.GetTile((int)tileCoords.X, (int)tileCoords.Y);
-
+			var wallat = World.GetWall((int)tileCoords.X, (int)tileCoords.Y);
 
 
 			if (myPlayer != null)
@@ -498,10 +508,12 @@ namespace CaveGame.Client
 					)
 				);
 				sb.Print(Color.White, new Vector2(2, 36),
-					String.Format("tid {0}, state {1} dmg {2} light {3}",
+					String.Format("tid {0}, state {1} tdmg {2} wid {3} wdmg {4} light {5}",
 						tileat.ID,
 						tileat.TileState,
 						tileat.Damage,
+						wallat.ID,
+						wallat.Damage,
 						World.GetLight((int)tileCoords.X, (int)tileCoords.Y).ToString()
 					)
 				);
@@ -521,10 +533,10 @@ namespace CaveGame.Client
 			DrawChunks(sb);
 
 			Game.GraphicsDevice.Clear(Color.CornflowerBlue);
-			sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, GameShaders.aaaaaaaaaaa, Camera.View);
-			GameShaders.aaaaaaaaaaa.CurrentTechnique.Passes[0].Apply();
+			sb.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
 			DrawChunkCachedTextures(sb);
 			EntityRendering(sb);
+			DrawChunkFGTextures(sb);
 
 			MouseState mouse = Mouse.GetState();
 
@@ -619,7 +631,6 @@ namespace CaveGame.Client
 				}
 			}
 		}
-
 
 
 		private void ReplicatePlayerState()

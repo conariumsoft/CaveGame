@@ -7,8 +7,8 @@ namespace CaveGame.Core.Inventory
 
 	public interface IITem
 	{
-		public int MaxStack { get; }
-		public string Name { get; }
+		int MaxStack { get; }
+		string Name { get; }
 
 	}
 	// items

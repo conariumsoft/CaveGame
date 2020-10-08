@@ -24,6 +24,7 @@ Global
 		Client\Client.projitems*{4c766195-b4b8-4ca9-a46f-9a61e37f87aa}*SharedItemsImports = 5
 		CaveCore\CaveCore.projitems*{733dfad9-4d0f-46f6-913d-6f4bef29b30d}*SharedItemsImports = 5
 		CaveServer\CaveServer.projitems*{733dfad9-4d0f-46f6-913d-6f4bef29b30d}*SharedItemsImports = 5
+		CaveCore\CaveCore.projitems*{91250ac7-e656-4b32-b650-e490600a483c}*SharedItemsImports = 5
 		CaveServer\CaveServer.projitems*{97c00592-e703-4c2a-8df6-2e04c8f9b523}*SharedItemsImports = 13
 		CaveCore\CaveCore.projitems*{a0cdbd0e-3a41-42b7-9425-a838bc2c7383}*SharedItemsImports = 13
 		Client\Client.projitems*{d3acab99-f010-400f-86f1-c2772bc56b94}*SharedItemsImports = 13
