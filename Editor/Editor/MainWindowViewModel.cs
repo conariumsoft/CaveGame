@@ -9,12 +9,20 @@ using CaveGame.Core;
 using System.Diagnostics;
 using System.Windows.Media.Media3D;
 using Microsoft.Xna.Framework.Input;
+using System.Windows.Input;
+using System.Windows.Controls;
 
 namespace Editor
 {
 
+
     public static class EditorTypeExtensions
 	{
+
+        public static Vector2 ToVector2(this System.Windows.Point point)
+		{
+            return new Vector2((float)point.X, (float)point.Y);
+		}
 
         // TODO: Fix code duplication between this and Renderer.cs
         public static void Line(this SpriteBatch spriteBatch, Color color, Vector2 point1, Vector2 point2, float thickness = 1f)
@@ -37,10 +45,11 @@ namespace Editor
 
         public static void Draw(this StructureFile structure, SpriteBatch sb)
         {
-            foreach(Layer layer in structure.Layers)
+
+            foreach (Layer layer in structure.Layers)
 			{
                 if (layer.Visible)
-				{
+                {
                     for (int x = 0; x < structure.Metadata.Width; x++)
                     {
                         for (int y = 0; y < structure.Metadata.Height; y++)
@@ -49,17 +58,38 @@ namespace Editor
                             Tile tile = layer.Tiles[x, y];
 
 
-                            wall.Draw(MainWindowViewModel.TileSheet, sb, x * Globals.TileSize, y * Globals.TileSize, new Light3(16, 16, 16));
-                            tile.Draw(MainWindowViewModel.TileSheet, sb, x * Globals.TileSize, y * Globals.TileSize, new Light3(16, 16, 16));
+                            wall.Draw(MainWindowViewModel.TileSheet, sb, x, y, new Light3(16, 16, 16));
+                            tile.Draw(MainWindowViewModel.TileSheet, sb, x, y, new Light3(16, 16, 16));
+
                         }
                     }
                 }
 			}
         }
     }
-    public class MainWindowViewModel : MonoGameViewModel
+
+    public interface I_MGCCInput
+	{
+        void MGCC_KeyDown(object sender, KeyEventArgs e);
+        void MGCC_KeyUp(object sender, KeyEventArgs e);
+        void MGCC_MouseWheel(object sender, MouseWheelEventArgs e);
+        void MGCC_MouseDoubleClick(object sender, MouseButtonEventArgs e);
+        void MGCC_MouseDown(object sender, MouseButtonEventArgs e);
+        void MGCC_MouseMove(object sender, MouseEventArgs e);
+        void MGCC_MouseLeave(object sender, MouseEventArgs e);
+        void MGCC_MouseEnter(object sender, MouseEventArgs e);
+        void MGCC_MouseUp(object sender, MouseButtonEventArgs e);
+	}
+
+
+    public class MainWindowViewModel : MonoGameViewModel, I_MGCCInput
     {
-        public Color BackgroundColor => new Color(15, 15, 15);
+        public bool ShiftDown { get; set; }
+        public bool MousePanning { get; set; }
+        public bool EditorFocused { get; set; }
+
+        public Color BackgroundColor => new Color(10, 10, 10);
+        public Color UnfocusedBackground => new Color(25, 25, 25);
         public Color GridLineColor => new Color(45, 45, 45);
 
         public static Texture2D TileSheet;
@@ -69,9 +99,11 @@ namespace Editor
 
         public Camera2D Camera { get; private set; }
 
+        float _cameraZoom = 1.0f;
+
         public MainWindowViewModel() : base()
         {
-            WPFEventBridge.OnNewFile += NewFile;
+
         }
 
         private SpriteBatch _spriteBatch;
@@ -82,42 +114,12 @@ namespace Editor
         private Vector2 _scale;
 
 
-        protected void NewFile(StructureMetadata md)
-		{
-            LoadedStructure = new StructureFile(md);
-            Layer brug = new Layer(LoadedStructure) { LayerID = "ZOG" };
-            LoadedStructure.Layers.Add(brug);
-            brug.Tiles = new CaveGame.Core.Tiles.Tile[md.Width, md.Height];
-            for (int x = 0; x < md.Width; x++)
-            {
-                for (int y = 0; y < md.Height; y++)
-                {
-                    brug.Tiles[x, y] = new CaveGame.Core.Tiles.Dirt();
-                }
-            }
-            brug.Walls = new CaveGame.Core.Walls.Wall[md.Width, md.Height];
-            for (int x = 0; x < md.Width; x++)
-            {
-                for (int y = 0; y < md.Height; y++)
-                {
-                    brug.Walls[x, y] = new CaveGame.Core.Walls.Stone();
-                }
-            }
-            brug.Tiles[5, 5] = new CaveGame.Core.Tiles.Stone();
-            brug.Tiles[5, 5] = new CaveGame.Core.Tiles.Stone();
-            brug.Tiles[5, 6] = new CaveGame.Core.Tiles.Stone();
-            brug.Walls[1, 1] = new CaveGame.Core.Walls.Stone();
-            LoadedStructure.Save();
-            Debug.WriteLine("ASS!!");
-        }
-
-
 		public override void Initialize()
 		{
             base.Initialize();
 
 
-            Camera = new Camera2D(GraphicsDevice.Viewport) { Zoom = 2 };
+            Camera = new Camera2D(GraphicsDevice.Viewport) { Zoom = 0.5f };
             
 		}
 
@@ -132,25 +134,11 @@ namespace Editor
             Pixel.SetData<Color>(new Color[] { Color.White });
         }
 
-        MouseState lastState;
         public override void Update(GameTime gameTime)
         {
-            MouseState state = Mouse.GetState();
 
-            if ((state.RightButton == ButtonState.Pressed) && lastState!=null)
-			{
-                Debug.WriteLine("YESS");
-                int difx = state.X - lastState.X;
-                int dify = state.Y - lastState.Y;
-                var mp = Camera.ScreenToWorldCoordinates(state.Position.ToVector2());
-                var mp2 = Camera.ScreenToWorldCoordinates(lastState.Position.ToVector2());
-
-
-                Camera.Position = mp;
-			}
-            lastState = state;
-
-
+            Camera.Zoom = Camera.Zoom.Lerp(_cameraZoom, 0.3f);
+           
             _position = GraphicsDevice.Viewport.Bounds.Center.ToVector2();
             _rotation = (float)Math.Sin(gameTime.TotalGameTime.TotalSeconds) / 4f;
             _origin = _texture.Bounds.Center.ToVector2();
@@ -159,49 +147,118 @@ namespace Editor
 
         private void DrawGridLines(SpriteBatch spriteBatch)
         {
-            int camChunkX = (int)Math.Floor(Camera.ScreenCenterToWorldSpace.X / (Globals.TileSize));
-            int camChunkY = (int)Math.Floor(Camera.ScreenCenterToWorldSpace.Y / ( Globals.TileSize));
+
 
             for (int x = 0; x < LoadedStructure.Metadata.Width; x++)
             {
                 spriteBatch.Line(GridLineColor, new Vector2(
-                    (camChunkX + x) * (Globals.TileSize),
-                    (camChunkY) * ( Globals.TileSize)
+                    x * (Globals.TileSize),
+                    0
                 ), new Vector2(
-                    (camChunkX + x) * ( Globals.TileSize),
-                    (camChunkY + LoadedStructure.Metadata.Height) * (Globals.TileSize)
-                ), 1);
+                    x * ( Globals.TileSize),
+                    LoadedStructure.Metadata.Height * (Globals.TileSize)
+                ), 0.5f);
             }
 
             for (int y = 0; y < LoadedStructure.Metadata.Height; y++)
             {
                 spriteBatch.Line(GridLineColor, new Vector2(
-                    (camChunkX) * ( Globals.TileSize),
-                    (camChunkY + y) * ( Globals.TileSize)
+                    0,
+                    y *  Globals.TileSize
                 ), new Vector2(
-                    (camChunkX + LoadedStructure.Metadata.Width) * ( Globals.TileSize),
-                    (camChunkY + y) * ( Globals.TileSize)
-                ), 1);
+                    LoadedStructure.Metadata.Width * ( Globals.TileSize),
+                    y *  Globals.TileSize
+                ), 0.5f);
             }
 
         }
 
         public override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(BackgroundColor);
+            if (EditorFocused)
+                GraphicsDevice.Clear(BackgroundColor);
+            else
+                GraphicsDevice.Clear(UnfocusedBackground);
 
             _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
             if (LoadedStructure != null)
 			{
                 DrawGridLines(_spriteBatch);
                 LoadedStructure.Draw(_spriteBatch);
+                DrawGridLines(_spriteBatch);
             }
-
-            //_spriteBatch.Draw(_texture, _position, null, Color.White, _rotation, _origin, _scale, SpriteEffects.None, 0f);
 
             
             _spriteBatch.Draw(TileSheet, new Vector2(100, 100), TileMap.Brick, Color.Red);
             _spriteBatch.End();
         }
-    }
+
+		public void MGCC_KeyDown(object sender, KeyEventArgs e)
+		{
+		    if (e.Key == Key.LeftShift) { ShiftDown = true; }	
+		}
+        public void MGCC_KeyUp(object sender, KeyEventArgs e)
+		{
+            if (e.Key == Key.LeftShift) { ShiftDown = false; }
+        }
+
+
+        public void MGCC_MouseWheel(object sender, MouseWheelEventArgs e)
+		{
+            if (ShiftDown || MousePanning)
+			{
+                _cameraZoom += (e.Delta / 1000.0f);
+            }
+            
+		}
+
+		public void MGCC_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			
+		}
+
+		public void MGCC_MouseDown(object sender, MouseButtonEventArgs e)
+		{
+			if (e.ChangedButton == MouseButton.Right)
+			{
+                MousePanning = true;
+			}
+		}
+
+        System.Windows.Point lastmousepoint = new System.Windows.Point(0, 0);
+		public void MGCC_MouseMove(object sender, MouseEventArgs e)
+		{
+            var point = e.GetPosition((System.Windows.IInputElement)sender);
+            if (MousePanning)
+			{
+                var lastWorld = Camera.ScreenToWorldCoordinates(lastmousepoint.ToVector2());
+
+                var diff = Camera.ScreenToWorldCoordinates(point.ToVector2()) - lastWorld;
+
+                Camera.Position -= new Vector2(diff.X, diff.Y);
+			}
+            lastmousepoint = point;
+
+        }
+
+		public void MGCC_MouseLeave(object sender, MouseEventArgs e)
+		{
+            EditorFocused = false;
+        }
+
+		public void MGCC_MouseEnter(object sender, MouseEventArgs e)
+		{
+            EditorFocused = true;
+
+        }
+
+		public void MGCC_MouseUp(object sender, MouseButtonEventArgs e)
+		{
+            if (e.ChangedButton == MouseButton.Right)
+            {
+                MousePanning = false;
+            }
+        }
+       
+	}
 }

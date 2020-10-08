@@ -5,41 +5,58 @@ using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Editor
 {
-	public delegate void NewStructureFileHandler(StructureMetadata md);
 
-	public static class WPFEventBridge
-	{
-		public static event RoutedEventHandler OnMenuOpen;
-		public static event RoutedEventHandler OnMenuNew;
-		public static event RoutedEventHandler OnMenuSave;
-		public static event RoutedEventHandler OnMenuSaveAs;
-		public static event RoutedEventHandler OnMenuDies;
-		public static event NewStructureFileHandler OnNewFile;
-		public static event MouseEventHandler OnMouseMove;
-		public static event MouseEventHandler OnMouseClick;
-		public static event MouseWheelEventHandler OnMouseWheel;
-
-		public static void NewFile(StructureMetadata meta)
-		{
-			OnNewFile?.Invoke(meta);
-		}
-	}
-
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IMainWindow
     {
 
-		MainWindowViewModel viewModel = new MainWindowViewModel();
+		MainWindowViewModel _vm;
+
+
+		public MainWindowViewModel ViewModel
+		{
+			get { if (_vm == null) { _vm = new MainWindowViewModel(); } return _vm; }
+			set => _vm = value;
+		}
 
         public MainWindow()
         {
 
             InitializeComponent();
-			Debug.WriteLine( this.DataContext.GetType() );
+			
+			DataContext = ViewModel;
 		}
-		
+
+		protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
+		{
+			return new PointHitTestResult(this, hitTestParameters.HitPoint);
+		}
+
+		public void GetNewStructure(StructureMetadata md)
+		{
+			
+			var LoadedStructure = new StructureFile(md);
+			Layer brug = new Layer(LoadedStructure) { LayerID = "ZOG", Visible = true };
+			for (int x = 0; x < md.Width; x++)
+			{
+				for (int y = 0; y < md.Height; y++)
+				{
+					brug.Tiles[x, y] = new CaveGame.Core.Tiles.Dirt();
+				}
+			}
+			for (int x = 0; x < md.Width; x++)
+			{
+				for (int y = 0; y < md.Height; y++)
+				{
+					brug.Walls[x, y] = new CaveGame.Core.Walls.Stone();
+				}
+			}
+			LoadedStructure.Layers.Add(brug);
+			ViewModel.LoadedStructure = LoadedStructure;
+		}
 
 		private void Menu_Open(object sender, RoutedEventArgs e)
 		{
@@ -54,10 +71,11 @@ namespace Editor
 
 		private void Menu_New(object sender, RoutedEventArgs e)
 		{
-			NewFileDialog dialog = new NewFileDialog();
+			NewFileDialog dialog = new NewFileDialog(this);
 
 			dialog.Owner = this;
 			dialog.ShowDialog();
+			
 		}
 
 		private void Menu_About(object sender, RoutedEventArgs e) { }
@@ -78,46 +96,54 @@ namespace Editor
 
 		}
 
-
-		private void OnMouseEnter(object sender, MouseEventArgs e)
+		#region MonoGameContentControls Input->ViewModel
+		private void MonoGameContentControl_MouseEnter(object sender, MouseEventArgs e)
 		{
-			
+			ViewModel.MGCC_MouseEnter(sender, e);
 		}
 
-		private void OnMouseLeave(object sender, MouseEventArgs e)
+		private void MonoGameContentControl_MouseLeave(object sender, MouseEventArgs e)
 		{
-
-			
+			ViewModel.MGCC_MouseLeave(sender, e);
 		}
 
-		private void OnMouseMove(object sender, MouseEventArgs e)
+		private void MonoGameContentControl_MouseUp(object sender, MouseButtonEventArgs e)
 		{
-			
+			ViewModel.MGCC_MouseUp(sender, e);
 		}
 
-		private void OnMouseDown(object sender, MouseButtonEventArgs e)
+		private void MonoGameContentControl_MouseMove(object sender, MouseEventArgs e)
 		{
-			
+			ViewModel.MGCC_MouseMove(sender, e);
 		}
-		private void OnMouseWheel(object sender, MouseWheelEventArgs e)
-		{
-			// If the mouse wheel delta is positive, move the box up.
-			if (e.Delta > 0)
-			{
-				if (Canvas.GetTop(box) >= 1)
-				{
-					Canvas.SetTop(box, Canvas.GetTop(box) - 1);
-				}
-			}
 
-			// If the mouse wheel delta is negative, move the box down.
-			if (e.Delta < 0)
-			{
-				if ((Canvas.GetTop(box) + box.Height) <= (MainCanvas.Height))
-				{
-					Canvas.SetTop(box, Canvas.GetTop(box) + 1);
-				}
-			}
+		private void MonoGameContentControl_MouseDown(object sender, MouseButtonEventArgs e)
+		{
+			ViewModel.MGCC_MouseDown(sender, e);
 		}
+
+		private void MonoGameContentControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			ViewModel.MGCC_MouseDoubleClick(sender, e);
+		}
+
+		private void MonoGameContentControl_MouseWheel(object sender, MouseWheelEventArgs e)
+		{
+			ViewModel.MGCC_MouseWheel(sender, e);
+		}
+
+		private void MonoGameContentControl_KeyDown(object sender, KeyEventArgs e)
+		{
+			ViewModel.MGCC_KeyDown(sender, e);
+		}
+
+		private void MonoGameContentControl_KeyUp(object sender, KeyEventArgs e)
+		{
+			ViewModel.MGCC_KeyU
+		}
+		#endregion
+
+
+
 	}
 }

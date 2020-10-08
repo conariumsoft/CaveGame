@@ -69,7 +69,11 @@
 				</Grid>
 			</StatusBar>
 			<GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
-			<monoGameControls:MonoGameContentControl Grid.Column="2"/>
+			<monoGameControls:MonoGameContentControl Grid.Column="2" 
+				MouseEnter="MonoGameContentControl_MouseEnter" MouseLeave="MonoGameContentControl_MouseLeave"
+				MouseMove="MonoGameContentControl_MouseMove" MouseDown="MonoGameContentControl_MouseDown" MouseUp="MonoGameContentControl_MouseUp"
+				MouseDoubleClick="MonoGameContentControl_MouseDoubleClick" MouseWheel="MonoGameContentControl_MouseWheel"
+				KeyDown="MonoGameContentControl_KeyDown" KeyUp="MonoGameContentControl_KeyUp"/>
 
 		</Grid>
 

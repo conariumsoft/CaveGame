@@ -19,31 +19,36 @@ namespace Editor
 	/// <summary>
 	/// Interaction logic for NewFileDialog.xaml
 	/// </summary>
+	/// 
+	public interface IMainWindow {
+		void GetNewStructure(StructureMetadata meta);
+	}
+
 	public partial class NewFileDialog : Window
 	{
-		public NewFileDialog()
+		IMainWindow _window;
+		public NewFileDialog(IMainWindow window)
 		{
+			_window = window;
 			InitializeComponent();
 		}
 
 		private void okButton_Click(object sender, RoutedEventArgs e)
 		{
 
-			StructureMetadata md = new StructureMetadata
-			{
+			_window.GetNewStructure(new StructureMetadata { 
 				Author = this.authorTextBox.Text,
 				Name = this.authorTextBox.Text,
 				//Notes = this.authorTextBox.Notes,
 				Width = Int32.Parse(this.widthTextBox.Text),
 				Height = Int32.Parse(this.heightTextBox.Text),
-			};
-
-			WPFEventBridge.NewFile(md);
+			});
+			this.Close();
 		}
 
 		private void cancelButton_Click(object sender, RoutedEventArgs e)
 		{
-
+			this.Close();
 		}
 	}
 }

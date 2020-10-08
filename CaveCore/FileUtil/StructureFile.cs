@@ -53,17 +53,15 @@ namespace CaveGame.Core.FileUtil
 		public List<Furniture> Furniture;
 
 		public Layer(StructureFile file) {
+			
 			Structure = file;
+			Tiles = new CaveGame.Core.Tiles.Tile[Structure.Metadata.Width, Structure.Metadata.Height];
+			Walls = new CaveGame.Core.Walls.Wall[Structure.Metadata.Width, Structure.Metadata.Height];
 			Furniture = new List<Furniture>();
 		}
 
 		public Layer() {
 			Visible = true;
-		}
-
-		private void CheckExists()
-		{
-
 		}
 
 		private void CreateFolder()

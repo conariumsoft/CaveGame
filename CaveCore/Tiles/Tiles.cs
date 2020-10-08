@@ -213,7 +213,7 @@ public static TDef UraniumOre= new TDef { Hardness = 12, Opacity = 3, Quad = Til
 		public virtual void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
 		{
 			sb.Draw(
-				Tilesheet, 
+				tilesheet, 
 				new Vector2(x * Globals.TileSize, y * Globals.TileSize), 
 				Quad, color.MultiplyAgainst(Color), 0,
 				Vector2.Zero, 1, SpriteEffects.None, 0

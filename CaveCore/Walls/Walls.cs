@@ -134,7 +134,7 @@ namespace CaveGame.Core.Walls
 		public virtual void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
 		{
 			sb.Draw(
-				Tilesheet, 
+				tilesheet, 
 				new Vector2(x * Globals.TileSize, y * Globals.TileSize), 
 				Quad, color.MultiplyAgainst(Color)
 			);
