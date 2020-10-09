@@ -17,20 +17,6 @@ using CaveGame.Core.Tiles;
 
 namespace CaveGame.Client
 {
-
-
-
-	public static class GameShaders
-	{
-
-		public static Effect aaaaaaaaaaa { get; private set; }
-		
-		public static void LoadAssets(ContentManager Content)
-		{
-			aaaaaaaaaaa = Content.Load<Effect>("Shaders/idkwhatthisisgoingtodo");
-		}
-	}
-
 	public static class GameGlobals
 	{
 		public static int Width;
@@ -204,8 +190,6 @@ namespace CaveGame.Client
 			GameFonts.LoadAssets(Content);
 			GameSounds.LoadAssets(Content);
 			GameTextures.LoadAssets(Content);
-			GameShaders.LoadAssets(Content);
-			
 
 			HomePageContext = new HomePage(this);
 			//HomePageContext.Load();
