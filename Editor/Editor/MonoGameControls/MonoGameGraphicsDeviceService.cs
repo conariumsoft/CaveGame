@@ -15,7 +15,11 @@ namespace Editor.MonoGameControls
         public void Dispose()
         {
             DeviceDisposing?.Invoke(this, EventArgs.Empty);
-            GraphicsDevice?.Dispose();
+            if (GraphicsDevice!=null)
+			{
+                //GraphicsDevice.Dispose();
+            }
+            
             Direct3DDevice?.Dispose();
             Direct3DContext?.Dispose();
         }

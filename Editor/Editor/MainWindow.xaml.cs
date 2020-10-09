@@ -26,22 +26,15 @@ namespace Editor
 
         public MainWindow()
         {
-			
+			EventManager.RegisterClassHandler(typeof(MainWindow),
+			 Keyboard.KeyUpEvent, new KeyEventHandler(MonoGameContentControl_KeyUp), true);
+			EventManager.RegisterClassHandler(typeof(MainWindow),
+			 Keyboard.KeyDownEvent, new KeyEventHandler(MonoGameContentControl_KeyDown), true);
 			System.Windows.Forms.Integration.ElementHost.EnableModelessKeyboardInterop(this);
 			InitializeComponent();
-			
 			DataContext = ViewModel;
-		
 		}
 
-		public static IEnumerable<Key> KeysDown()
-		{
-			foreach (Key key in Enum.GetValues(typeof(Key)))
-			{
-				if (Keyboard.IsKeyDown(key))
-					yield return key;
-			}
-		}
 
 		protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
 		{
@@ -57,14 +50,14 @@ namespace Editor
 			{
 				for (int y = 0; y < md.Height; y++)
 				{
-					brug.Tiles[x, y] = new CaveGame.Core.Tiles.Dirt();
+					brug.Tiles[x, y] = new CaveGame.Core.Tiles.Air();
 				}
 			}
 			for (int x = 0; x < md.Width; x++)
 			{
 				for (int y = 0; y < md.Height; y++)
 				{
-					brug.Walls[x, y] = new CaveGame.Core.Walls.Stone();
+					brug.Walls[x, y] = new CaveGame.Core.Walls.Air();
 				}
 			}
 			LoadedStructure.Layers.Add(brug);
@@ -78,6 +71,7 @@ namespace Editor
 			if (openFileDialog.ShowDialog() == true)
 			{
 				
+				ViewModel.LoadedStructure = StructureFile.LoadStructure(openFileDialog.FileName);
 			}
 
 		}
@@ -103,6 +97,7 @@ namespace Editor
 					if (saveFileDialog.ShowDialog() == true)
 					{
 						ViewModel.LoadedStructure.Metadata.File = saveFileDialog.FileName;
+						ViewModel.LoadedStructure.Filepath = saveFileDialog.FileName;
 						ViewModel.LoadedStructure?.Save();
 					}
 				} else
@@ -114,6 +109,7 @@ namespace Editor
 		}
 		private void Menu_SaveAs(object sender, RoutedEventArgs e) {
 			SaveFileDialog saveFileDialog = new SaveFileDialog();
+			saveFileDialog.Filter = "Structure file (*.structure)|*.structure";
 			if (saveFileDialog.ShowDialog() == true)
 			{
 				if (ViewModel.LoadedStructure != null)
@@ -178,7 +174,10 @@ namespace Editor
 
 		private void MonoGameContentControl_KeyDown(object sender, KeyEventArgs e)
 		{
+			if (e.Key == Key.Escape)
+				MessageBox.Show("There is no escape.");
 			ViewModel.MGCC_KeyDown(sender, e);
+
 		}
 
 		private void MonoGameContentControl_KeyUp(object sender, KeyEventArgs e)

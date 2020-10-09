@@ -79,7 +79,7 @@ public static TDef Grass       = new TDef { Hardness = 2,  Opacity = 3, Quad = T
 public static TDef Stone       = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Stone,	 Color = new Color(0.7f, 0.7f, 0.7f) };
 public static TDef StoneBrick  = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Brick,	 Color = new Color(0.7f, 0.7f, 0.7f) };
 public static TDef ClayBrick   = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Brick,	 Color = new Color(0.85f, 0.4f, 0.4f) };
-public static TDef OakLog         = new TDef { Hardness = 5, Opacity = 1, Quad = TileMap.Log, Color = new Color(0.6f, 0.3f, 0.2f) };
+public static TDef OakLog      = new TDef { Hardness = 5, Opacity = 1, Quad = TileMap.Log, Color = new Color(0.6f, 0.3f, 0.2f) };
 public static TDef Leaves      = new TDef { Hardness = 5, Opacity = 0, Quad = TileMap.Leaves, Color = new Color(0.1f, 0.9f, 0.1f) };
 public static TDef Torch	   = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.8f, 0.8f, 0.4f) };
 public static TDef WhiteTorch  = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.8f, 0.8f, 0.8f) };

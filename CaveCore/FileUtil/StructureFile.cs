@@ -3,6 +3,7 @@ using CaveGame.Core.Tiles;
 using CaveGame.Core.Walls;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
@@ -82,13 +83,14 @@ namespace CaveGame.Core.FileUtil
 		public void LoadWalls(byte[] WallData)
 		{
 
-
 			int index = 0;
 			for (int x = 0; x < Structure.Metadata.Width; x++)
 			{
 				for (int y = 0; y < Structure.Metadata.Height; y++)
 				{
-					Walls[x,y] = Wall.FromID(WallData[index]);
+					Wall w = Wall.FromID(WallData[index]);
+					Trace.WriteLine(w);
+					Walls[x,y] = w;
 					index++;
 				}
 			}
@@ -140,8 +142,7 @@ namespace CaveGame.Core.FileUtil
 
 		public StructureMetadata Metadata { get; set; }
 
-		[XmlArray("Structure")]
-		[XmlArrayItem("Layer")]
+		[XmlIgnore]
 		public List<Layer> Layers;
 
 		[XmlInclude(typeof(StructureFile))]
@@ -166,7 +167,7 @@ namespace CaveGame.Core.FileUtil
 							tstream.Write(layer.SaveTiles());
 						using (var wstream = new BinaryWriter(archive.CreateEntry("layers/" + layer.LayerID + "/walls.l").Open()))
 							wstream.Write(layer.SaveWalls());
-						using (var fstream = new StreamWriter(archive.CreateEntry("layers/" + layer.LayerID + "furniture.xml").Open()))
+						using (var fstream = new StreamWriter(archive.CreateEntry("layers/" + layer.LayerID + "/furniture.xml").Open()))
 							furnitureWriter.Serialize(fstream, layer.Furniture);
 					}
 				}
@@ -178,7 +179,9 @@ namespace CaveGame.Core.FileUtil
 		public static StructureFile LoadStructure(string filepath)
 		{
 
-			string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+			string tempDirectory = Path.GetTempPath()+"structure\\";
+			if (Directory.Exists(tempDirectory))
+				Directory.Delete(tempDirectory, true);
 			ZipFile.ExtractToDirectory(filepath, tempDirectory);
 
 
@@ -189,18 +192,22 @@ namespace CaveGame.Core.FileUtil
 				structure = (StructureFile)reader.Deserialize(stream);
 			XmlSerializer furnitureReader = new XmlSerializer(typeof(List<Furniture>));
 
-			foreach (string directory in Directory.GetDirectories(tempDirectory))
+			foreach (string directory in Directory.GetDirectories(tempDirectory+"layers"))
 			{
 				Layer layer = new Layer(structure);
+				layer.Visible = true;
 				layer.Structure = structure;
-				layer.LoadTiles(File.ReadAllBytes(tempDirectory+ directory+"/tiles.l"));
-				layer.LoadWalls(File.ReadAllBytes(tempDirectory+directory+"/walls.l"));
+				layer.LoadTiles(File.ReadAllBytes(directory+"/tiles.l"));
+				layer.LoadWalls(File.ReadAllBytes(directory+"/walls.l"));
 
-				using (var stream = File.Open(tempDirectory + directory + "/furniture.xml", FileMode.Open, FileAccess.Read))
+				using (var stream = File.Open(directory + "/furniture.xml", FileMode.Open, FileAccess.Read))
 					layer.Furniture = (List<Furniture>)furnitureReader.Deserialize(stream);
+
+				structure.Layers.Add(layer);
 
 			}
 			structure.Filepath = filepath;
+			Directory.Delete(Path.GetTempPath() + "structure\\", true);
 			return structure;				
 		}
 
@@ -212,7 +219,9 @@ namespace CaveGame.Core.FileUtil
 			Layers = new List<Layer>();
 		}
 
-		public StructureFile() { }
+		public StructureFile() {
+			Layers = new List<Layer>();
+		}
 	}
 
 }
