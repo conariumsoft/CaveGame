@@ -2,6 +2,8 @@
 using CaveGame.Core.Tiles;
 using Microsoft.Win32;
 using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
@@ -24,10 +26,21 @@ namespace Editor
 
         public MainWindow()
         {
-
-            InitializeComponent();
+			
+			System.Windows.Forms.Integration.ElementHost.EnableModelessKeyboardInterop(this);
+			InitializeComponent();
 			
 			DataContext = ViewModel;
+		
+		}
+
+		public static IEnumerable<Key> KeysDown()
+		{
+			foreach (Key key in Enum.GetValues(typeof(Key)))
+			{
+				if (Keyboard.IsKeyDown(key))
+					yield return key;
+			}
 		}
 
 		protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
@@ -80,8 +93,39 @@ namespace Editor
 
 		private void Menu_About(object sender, RoutedEventArgs e) { }
 
-		private void Menu_Save(object sender, RoutedEventArgs e) { }
-		private void Menu_SaveAs(object sender, RoutedEventArgs e) { }
+		private void Menu_Save(object sender, RoutedEventArgs e) {
+			if (ViewModel.LoadedStructure != null)
+			{
+				if (ViewModel.LoadedStructure.Metadata.File == null)
+				{
+					SaveFileDialog saveFileDialog = new SaveFileDialog();
+					saveFileDialog.Filter = "Structure file (*.structure)|*.structure";
+					if (saveFileDialog.ShowDialog() == true)
+					{
+						ViewModel.LoadedStructure.Metadata.File = saveFileDialog.FileName;
+						ViewModel.LoadedStructure?.Save();
+					}
+				} else
+				{
+					ViewModel.LoadedStructure?.Save();
+				}
+				
+			}
+		}
+		private void Menu_SaveAs(object sender, RoutedEventArgs e) {
+			SaveFileDialog saveFileDialog = new SaveFileDialog();
+			if (saveFileDialog.ShowDialog() == true)
+			{
+				if (ViewModel.LoadedStructure != null)
+				{
+					ViewModel.LoadedStructure.Metadata.File = saveFileDialog.FileName;
+					ViewModel.LoadedStructure.Filepath = saveFileDialog.FileName;
+					ViewModel.LoadedStructure?.Save();
+				}
+				
+			}
+				
+		}
 		private void Menu_Exit(object sender, RoutedEventArgs e) { }
 		private void Menu_Undo(object sender, RoutedEventArgs e) { }
 		private void Menu_Redo(object sender, RoutedEventArgs e) { }
@@ -139,7 +183,7 @@ namespace Editor
 
 		private void MonoGameContentControl_KeyUp(object sender, KeyEventArgs e)
 		{
-			ViewModel.MGCC_KeyU
+			ViewModel.MGCC_KeyUp(sender, e);
 		}
 		#endregion
 

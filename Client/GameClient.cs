@@ -422,12 +422,7 @@ namespace CaveGame.Client
 				Chunk.RefreshedThisFrame = false;
 				foreach (var chunkpair in World.Chunks)
 				{
-					//if (chunkpair.Value.UpdateRenderBuffer)
-					//{
-						chunkpair.Value.Draw(GameTextures.TileSheet, Game.GraphicsDevice, sb);
-						//return;
-					//}
-					
+					chunkpair.Value.Draw(GameTextures.TileSheet, Game.GraphicsDevice, sb);	
 				}
 			}
 		}

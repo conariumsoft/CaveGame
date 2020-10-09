@@ -41,7 +41,16 @@ namespace Editor
             Vector2 scale = new Vector2(length, thickness);
             sb.Draw(MainWindowViewModel.Pixel, point, null, color, angle, origin, scale, SpriteEffects.None, 0);
         }
-
+        public static void Rect(this SpriteBatch sb, Color color, int x, int y, int width, int height, float rotation = 0)
+        {
+            sb.Draw(
+                MainWindowViewModel.Pixel,
+                new Rectangle(x, y, width, height),
+                null,
+                color, rotation, new Vector2(0, 0), SpriteEffects.None, 0
+            );
+            // retardretardretardretardretardretard
+        }
 
         public static void Draw(this StructureFile structure, SpriteBatch sb)
         {
@@ -81,12 +90,36 @@ namespace Editor
         void MGCC_MouseUp(object sender, MouseButtonEventArgs e);
 	}
 
+    public enum EditorActivity
+	{
+        EditTile,
+        EditWall
+	}
+
 
     public class MainWindowViewModel : MonoGameViewModel, I_MGCCInput
     {
+        // Data Bindings
+        public string TileDisplayInfo { get; set; }
+        public string FPSDisplayInfo { get; set; }
+        public string StructureDisplayInfo { get; set; }
+
+        public System.Windows.Point MousePosition { get; set; }
+        System.Windows.Point LastMousePosition = new System.Windows.Point(0, 0);
+        public bool LeftMouseDown { get; set; }
         public bool ShiftDown { get; set; }
+        public bool CtrlDown { get; set; }
         public bool MousePanning { get; set; }
         public bool EditorFocused { get; set; }
+
+        protected int _selectedtile;
+        public int SelectedTile { 
+            get { if (CtrlDown) { return 0; } return _selectedtile; }
+            set { _selectedtile = value; }
+        }
+        public int SelectedWall { get; set; }
+
+        public EditorActivity LayerActivity { get; set; }
 
         public Color BackgroundColor => new Color(10, 10, 10);
         public Color UnfocusedBackground => new Color(25, 25, 25);
@@ -94,6 +127,7 @@ namespace Editor
 
         public static Texture2D TileSheet;
         public static Texture2D Pixel;
+        public static SpriteFont Arial10;
 
         public StructureFile LoadedStructure { get; set; }
 
@@ -103,7 +137,7 @@ namespace Editor
 
         public MainWindowViewModel() : base()
         {
-
+            TileDisplayInfo = "";
         }
 
         private SpriteBatch _spriteBatch;
@@ -124,7 +158,6 @@ namespace Editor
 		}
 
 
-
 		public override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -136,7 +169,32 @@ namespace Editor
 
         public override void Update(GameTime gameTime)
         {
+            int selectedTile = SelectedTile;
+            if (CtrlDown)
+                selectedTile = 0;
 
+
+            var type = typeof(TileDefinitions);
+            var members = type.GetFields();
+            byte finalID = (byte)(selectedTile).Mod(members.Length); // TODO: temp hack
+
+            TDef tdef = (TDef)members[finalID].GetValue(null);
+
+            var mp = Camera.ScreenToWorldCoordinates(MousePosition.ToVector2());
+
+            mp /= 8;
+            var dp = new Vector2((int)mp.X, (int)mp.Y);
+            if (LeftMouseDown && LoadedStructure!=null && dp.X <= LoadedStructure.Metadata.Width && dp.Y<=LoadedStructure.Metadata.Height)
+            {
+                
+                
+
+
+                LoadedStructure.Layers[0].Tiles[(int)dp.X, (int)dp.Y] = Tile.FromName(members[finalID].Name);
+            }
+
+            
+            TileDisplayInfo = String.Format("tile {0} {1}", members[finalID].Name, tdef.ID);
             Camera.Zoom = Camera.Zoom.Lerp(_cameraZoom, 0.3f);
            
             _position = GraphicsDevice.Viewport.Bounds.Center.ToVector2();
@@ -173,6 +231,52 @@ namespace Editor
 
         }
 
+        private void DrawTileSelectionSet(SpriteBatch sb)
+		{
+            sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
+            for (int i = -20; i<20; i++)
+			{
+                var type = typeof(TileDefinitions);
+                var members = type.GetFields();
+                byte finalID = (byte)(SelectedTile + i).Mod(members.Length); // TODO: temp hack
+
+                TDef tdef = (TDef)members[finalID].GetValue(null);
+
+                Vector2 pos = new Vector2((20*24)+10+(i*25), 10);
+                if (i == 0)
+                {
+                    sb.Rect(Color.White * 0.5f, (int)pos.X - 4, (int)pos.Y - 4, 24, 24);
+                   
+                }
+                sb.Draw(TileSheet, pos, tdef.Quad, tdef.Color, 0, Vector2.Zero, 2, SpriteEffects.None, 0);
+               
+			}
+            sb.End();
+        }
+
+        private void DrawWallSelectionSet(SpriteBatch sb)
+		{
+            sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
+            for (int i = -20; i < 20; i++)
+            {
+
+                var type = typeof(WallDefinitions);
+                var members = type.GetFields();
+                byte finalID = (byte)(SelectedWall + i).Mod(members.Length); // TODO: temp hack
+
+                Wall tdef = (Wall)members[finalID].GetValue(null);
+
+                Vector2 pos = new Vector2((20 * 24) + 10 + (i * 25), 10);
+                if (i == 0)
+                {
+                    sb.Rect(Color.White * 0.5f, (int)pos.X - 4, (int)pos.Y - 4, 24, 24);
+                }
+                sb.Draw(TileSheet, pos, tdef.Quad, tdef.Color, 0, Vector2.Zero, 2, SpriteEffects.None, 0);
+
+            }
+            sb.End();
+        }
+
         public override void Draw(GameTime gameTime)
         {
             if (EditorFocused)
@@ -191,15 +295,26 @@ namespace Editor
             
             _spriteBatch.Draw(TileSheet, new Vector2(100, 100), TileMap.Brick, Color.Red);
             _spriteBatch.End();
+
+            if (LayerActivity == EditorActivity.EditTile)
+                DrawTileSelectionSet(_spriteBatch);
+            else if (LayerActivity == EditorActivity.EditWall)
+                DrawWallSelectionSet(_spriteBatch);
         }
 
 		public void MGCC_KeyDown(object sender, KeyEventArgs e)
 		{
-		    if (e.Key == Key.LeftShift) { ShiftDown = true; }	
-		}
+            CtrlDown = (e.KeyboardDevice.Modifiers == ModifierKeys.Control);
+            ShiftDown = (e.KeyboardDevice.Modifiers == ModifierKeys.Shift);
+          //  if (e.Key == Key.LeftShift) { ShiftDown = true; }
+           // if (e.Key == Key.LeftCtrl) { CtrlDown = true; }
+        }
         public void MGCC_KeyUp(object sender, KeyEventArgs e)
 		{
-            if (e.Key == Key.LeftShift) { ShiftDown = false; }
+            CtrlDown = (e.KeyboardDevice.Modifiers == ModifierKeys.Control);
+            ShiftDown = (e.KeyboardDevice.Modifiers == ModifierKeys.Shift);
+           // if (e.Key == Key.LeftShift) { ShiftDown = false; }
+           // if (e.Key == Key.LeftCtrl) { CtrlDown = false; }
         }
 
 
@@ -208,7 +323,10 @@ namespace Editor
             if (ShiftDown || MousePanning)
 			{
                 _cameraZoom += (e.Delta / 1000.0f);
-            }
+            } else
+			{
+                SelectedTile += (e.Delta/120);
+			}
             
 		}
 
@@ -217,27 +335,46 @@ namespace Editor
 			
 		}
 
-		public void MGCC_MouseDown(object sender, MouseButtonEventArgs e)
+        public void MGCC_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+                LeftMouseDown = false;
+            if (e.ChangedButton == MouseButton.Right)
+            {
+                MousePanning = false;
+            }
+        }
+
+        public void MGCC_MouseDown(object sender, MouseButtonEventArgs e)
 		{
+            if (e.ChangedButton == MouseButton.Left)
+                LeftMouseDown = true;
 			if (e.ChangedButton == MouseButton.Right)
 			{
                 MousePanning = true;
 			}
 		}
 
-        System.Windows.Point lastmousepoint = new System.Windows.Point(0, 0);
+        
 		public void MGCC_MouseMove(object sender, MouseEventArgs e)
 		{
             var point = e.GetPosition((System.Windows.IInputElement)sender);
+            LastMousePosition = MousePosition;
+            
+            MousePosition = point;
+
+
             if (MousePanning)
-			{
-                var lastWorld = Camera.ScreenToWorldCoordinates(lastmousepoint.ToVector2());
+            {
+                var lastWorld = Camera.ScreenToWorldCoordinates(LastMousePosition.ToVector2());
 
                 var diff = Camera.ScreenToWorldCoordinates(point.ToVector2()) - lastWorld;
 
                 Camera.Position -= new Vector2(diff.X, diff.Y);
-			}
-            lastmousepoint = point;
+            }
+
+
+
 
         }
 
@@ -252,13 +389,7 @@ namespace Editor
 
         }
 
-		public void MGCC_MouseUp(object sender, MouseButtonEventArgs e)
-		{
-            if (e.ChangedButton == MouseButton.Right)
-            {
-                MousePanning = false;
-            }
-        }
+		
        
 	}
 }
