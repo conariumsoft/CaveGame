@@ -108,7 +108,6 @@
 			<Button x:Name="cancelButton" Click="cancelButton_Click" IsCancel="True" Content="Nevermind" VerticalAlignment="Bottom"/>
 			<Button x:Name="okButton" Click="okButton_Click" IsDefault="True" Content="Confirm" VerticalAlignment="Bottom"/>
 		</StackPanel>
-		
-		
+
 	</Grid >
 </Window>
