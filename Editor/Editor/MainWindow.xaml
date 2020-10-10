@@ -8,6 +8,8 @@
     xmlns:local="clr-namespace:Editor"
     mc:Ignorable="d"
     Title="Editor" 
+	
+	
     WindowStartupLocation="CenterScreen"
     Width="800"
     Height="480">
@@ -15,7 +17,8 @@
 		<local:MainWindowViewModel />
 	</Window.DataContext>
 
-	<DockPanel LastChildFill="True">
+	<DockPanel 
+				  LastChildFill="True">
 		<Menu Name="TopMenu" DockPanel.Dock="Top">
 			<MenuItem Header="_File">
 				<MenuItem Header="_New"  Click="Menu_New"/>
@@ -41,7 +44,14 @@
 				<MenuItem Header="_About Editor" Click="Menu_About" />
 			</MenuItem>
 		</Menu>
-		<StatusBar Name="StatusBar"  Height="14" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Background="Black"/>
+		<StatusBar Name="StatusBar"  Height="24" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Background="#FF3B1463">
+
+			<TextBlock x:Name="tileDisplay"   Text="{Binding Path=TileDisplayInfo, BindsDirectlyToSource=True, FallbackValue=yeet, IsAsync=True, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True, NotifyOnValidationError=True, TargetNullValue=ass, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" FontFamily="Segoe UI" VerticalAlignment="Top" FontSize="12" Foreground="White"/>
+			<Separator></Separator>
+			<TextBlock x:Name="fPSDisplay" Text="{Binding FPSDisplayInfo}" FontFamily="Segoe UI" VerticalAlignment="Center" FontSize="12" Foreground="White"/>
+			<Separator></Separator>
+			<TextBlock x:Name="structureDataDisplay" Text="{Binding StructureDisplayInfo}" FontFamily="Segoe UI" VerticalAlignment="Center" FontSize="12" Foreground="White"/>
+		</StatusBar>
 		<Grid Margin="0,0,-5,0" ScrollViewer.VerticalScrollBarVisibility="Disabled" ShowGridLines="True">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="200" MaxWidth="500" MinWidth="50" />
@@ -61,10 +71,10 @@
 						<RowDefinition Height="*" />
 					</Grid.RowDefinitions>
 
-					<CheckBox Content="Show Walls" Checked="CheckBox_Checked" Grid.Row="0"/>
-					<CheckBox Content="Show Tiles" Checked="CheckBox_Checked" Grid.Row="1"/>
-					<CheckBox Content="Show Air" Checked="CheckBox_Checked" Grid.Row="2"/>
-					<CheckBox Content="Show Grid" Checked="CheckBox_Checked" Grid.Row="3"/>
+					<CheckBox Content="Show Walls" Checked="CheckBox_Checked" Grid.Row="0" IsChecked="{Binding WallsVisible}"/>
+					<CheckBox Content="Show Tiles" Checked="CheckBox_Checked" Grid.Row="1" IsChecked="{Binding TilesVisible}"/>
+					<CheckBox Content="Show Air" Checked="CheckBox_Checked" Grid.Row="2" IsChecked="{Binding AirVisible}"/>
+					<CheckBox Content="Show Grid" Checked="CheckBox_Checked" Grid.Row="3" IsChecked="{Binding GridVisible}"/>
 					<CheckBox Content="CheckBox" Checked="CheckBox_Checked" Grid.Row="4"/>
 				</Grid>
 			</StatusBar>
@@ -72,8 +82,7 @@
 			<monoGameControls:MonoGameContentControl Grid.Column="2" 
 				MouseEnter="MonoGameContentControl_MouseEnter" MouseLeave="MonoGameContentControl_MouseLeave"
 				MouseMove="MonoGameContentControl_MouseMove" MouseDown="MonoGameContentControl_MouseDown" MouseUp="MonoGameContentControl_MouseUp"
-				MouseDoubleClick="MonoGameContentControl_MouseDoubleClick" MouseWheel="MonoGameContentControl_MouseWheel"
-				KeyDown="MonoGameContentControl_KeyDown" KeyUp="MonoGameContentControl_KeyUp"/>
+			    MouseWheel="MonoGameContentControl_MouseWheel" Focusable="True" />
 
 		</Grid>
 

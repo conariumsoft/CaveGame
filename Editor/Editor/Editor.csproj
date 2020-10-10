@@ -4,6 +4,9 @@
     <TargetFramework>net45</TargetFramework>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;EDITOR</DefineConstants>
+  </PropertyGroup>
   
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.7.1.189" />
@@ -13,6 +16,20 @@
 
   <ItemGroup>
     <MonoGameContentReference Include="**\*.mgcb" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Content\Fonts\Arial10.spritefont" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Content\Fonts\Arial10.spritefont" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
 
   <Import Project="..\..\CaveCore\CaveCore.projitems" Label="Shared" />

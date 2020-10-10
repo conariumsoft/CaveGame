@@ -79,7 +79,7 @@ public static TDef Grass       = new TDef { Hardness = 2,  Opacity = 3, Quad = T
 public static TDef Stone       = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Stone,	 Color = new Color(0.7f, 0.7f, 0.7f) };
 public static TDef StoneBrick  = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Brick,	 Color = new Color(0.7f, 0.7f, 0.7f) };
 public static TDef ClayBrick   = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Brick,	 Color = new Color(0.85f, 0.4f, 0.4f) };
-public static TDef Log         = new TDef { Hardness = 5, Opacity = 1, Quad = TileMap.Log, Color = new Color(0.6f, 0.3f, 0.2f) };
+public static TDef OakLog      = new TDef { Hardness = 5, Opacity = 1, Quad = TileMap.Log, Color = new Color(0.6f, 0.3f, 0.2f) };
 public static TDef Leaves      = new TDef { Hardness = 5, Opacity = 0, Quad = TileMap.Leaves, Color = new Color(0.1f, 0.9f, 0.1f) };
 public static TDef Torch	   = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.8f, 0.8f, 0.4f) };
 public static TDef WhiteTorch  = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.8f, 0.8f, 0.8f) };
@@ -159,6 +159,20 @@ public static TDef UraniumOre= new TDef { Hardness = 12, Opacity = 3, Quad = Til
 			{
 				bool exists = Enum.TryParse(type.Name, out TileID id);
 				if (exists && id == (TileID)t)
+					return (Tile)type.GetConstructor(Type.EmptyTypes).Invoke(null);
+			}
+			throw new Exception("ID not valid!");
+		}
+
+		public static Tile FromName(string name)
+		{
+			var basetype = typeof(Tile);
+			var types = basetype.Assembly.GetTypes().Where(type => type.IsSubclassOf(basetype));
+
+
+			foreach (var type in types)
+			{
+				if (name == type.Name)
 					return (Tile)type.GetConstructor(Type.EmptyTypes).Invoke(null);
 			}
 			throw new Exception("ID not valid!");
@@ -795,7 +809,7 @@ public static TDef UraniumOre= new TDef { Hardness = 12, Opacity = 3, Quad = Til
 	public class OakLog : Tile, INonSolid, ITileUpdate
 	{
 		
-		public OakLog() : base(TileDefinitions.Log) {}
+		public OakLog() : base(TileDefinitions.OakLog) {}
 
 		public void TileUpdate(IGameWorld world, int x, int y)
 		{
@@ -820,6 +834,7 @@ public static TDef UraniumOre= new TDef { Hardness = 12, Opacity = 3, Quad = Til
 
 		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
 		{
+			
 			//sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), TileMap.Soil, color.MultiplyAgainst(Color.SaddleBrown));
 			var Plank = new Rectangle(2 * Globals.TileSize, 0, 4, Globals.TileSize);
 			var PlankRight = new Rectangle((2 * Globals.TileSize) + 4, 0 * Globals.TileSize, 4, Globals.TileSize);
@@ -839,7 +854,9 @@ public static TDef UraniumOre= new TDef { Hardness = 12, Opacity = 3, Quad = Til
 			else
 				sb.Draw(tilesheet, position + new Vector2(4, 0), PlankRight, color.MultiplyAgainst(Color), MathHelper.ToRadians(0), Vector2.Zero, 1, SpriteEffects.None, 1);
 
-
+#if EDITOR
+			base.Draw(tilesheet, sb, x, y, color);
+#endif
 		}
 
 		public void LocalTileUpdate(IGameWorld world, int x, int y)

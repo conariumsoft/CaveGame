@@ -3,6 +3,7 @@ using CaveGame.Core.Tiles;
 using CaveGame.Core.Walls;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
@@ -18,6 +19,7 @@ namespace CaveGame.Core.FileUtil
 		public int Width { get; set; }
 		public int Height { get; set; }
 		public string Author { get; set; }
+		public string File { get; set; }
 		public string Name { get; set; }
 		public string Notes { get; set; }
 		[XmlArray("Layers")]
@@ -39,7 +41,6 @@ namespace CaveGame.Core.FileUtil
 		[XmlIgnore]
 		public StructureFile Structure { get; set; }
 		[XmlIgnore]
-		private string path => StructureFile.FolderRoot+ Structure.Metadata.Name + "/" + LayerID;
 
 		public string LayerID { get; set; }
 		public string Notes { get; set; }
@@ -64,17 +65,8 @@ namespace CaveGame.Core.FileUtil
 			Visible = true;
 		}
 
-		private void CreateFolder()
-		{
-			Directory.CreateDirectory(path);
-		}
 
-		public void LoadTiles() {
-			if (!File.Exists(path + "/tiles.l"))
-				throw new Exception("Tile Layer does not exist!");
-
-
-			byte[] TileData = File.ReadAllBytes(path+"/tiles.l");
+		public void LoadTiles(byte[] TileData) {
 
 			int index = 0;
 			for (int x = 0; x < Structure.Metadata.Width; x++)
@@ -88,31 +80,26 @@ namespace CaveGame.Core.FileUtil
 
 		}
 
-		public void LoadWalls()
+		public void LoadWalls(byte[] WallData)
 		{
-			if (!File.Exists(path + "/walls.l"))
-				throw new Exception("Tile Layer does not exist! " + path);
-
-
-			byte[] WallData = File.ReadAllBytes(path + "/walls.l");
 
 			int index = 0;
 			for (int x = 0; x < Structure.Metadata.Width; x++)
 			{
 				for (int y = 0; y < Structure.Metadata.Height; y++)
 				{
-					Walls[x,y] = Wall.FromID(WallData[index]);
+					Wall w = Wall.FromID(WallData[index]);
+					Trace.WriteLine(w);
+					Walls[x,y] = w;
 					index++;
 				}
 			}
 		}
 
-		public void SaveTiles()
+		public byte[] SaveTiles()
 		{
-			CreateFolder();
 
 			byte[] TileData = new byte[Structure.Metadata.Width * Structure.Metadata.Height];
-				
 				
 
 			int index = 0;
@@ -125,12 +112,11 @@ namespace CaveGame.Core.FileUtil
 				}
 			}
 
-			File.WriteAllBytes(path + "/tiles.l", TileData);
+			return TileData;
 		}
 
-		public void SaveWalls()
+		public byte[] SaveWalls()
 		{
-			CreateFolder();
 
 			byte[] WallData = new byte[Structure.Metadata.Width * Structure.Metadata.Height];
 
@@ -144,7 +130,7 @@ namespace CaveGame.Core.FileUtil
 				}
 			}
 
-			File.WriteAllBytes(path + "/walls.l", WallData);
+			return WallData;
 		}
 	}
 
@@ -152,72 +138,76 @@ namespace CaveGame.Core.FileUtil
 	public class StructureFile : Configuration
 	{
 		[XmlIgnore]
-		public static string FolderRoot = "ExtractedStructures/";
+		public string Filepath;
 
 		public StructureMetadata Metadata { get; set; }
 
-		[XmlArray("Structure")]
-		[XmlArrayItem("Layer")]
+		[XmlIgnore]
 		public List<Layer> Layers;
 
 		[XmlInclude(typeof(StructureFile))]
 		public override void Save()
 		{
-			if (!Directory.Exists(FolderRoot))
-				Directory.CreateDirectory(FolderRoot);
 
-
-			if (!Directory.Exists(FolderRoot+Metadata.Name))
-				Directory.CreateDirectory(FolderRoot+Metadata.Name);
-
-			XmlSerializer writer = new XmlSerializer(typeof(StructureFile));
-
-			using (var stream = File.Open(FolderRoot+Metadata.Name + "/structure.xml", FileMode.OpenOrCreate, FileAccess.Write))
-				writer.Serialize(stream, this);
-
-
-			foreach(Layer layer in Layers)
+			using (FileStream fToOpen = new FileStream(Filepath, FileMode.Create))
 			{
-				layer.SaveTiles();
-				layer.SaveWalls();
+				using (ZipArchive archive = new ZipArchive(fToOpen, ZipArchiveMode.Update)) {
+					ZipArchiveEntry structureXmlEntry = archive.CreateEntry("structure.xml");
+
+					XmlSerializer writer = new XmlSerializer(typeof(StructureFile));
+					using (var stream = new StreamWriter(structureXmlEntry.Open()))
+						writer.Serialize(stream, this);
+
+					XmlSerializer furnitureWriter = new XmlSerializer(typeof(List<Furniture>));
+
+					foreach (Layer layer in Layers)
+					{
+
+						using (var tstream = new BinaryWriter(archive.CreateEntry("layers/" + layer.LayerID + "/tiles.l").Open()))
+							tstream.Write(layer.SaveTiles());
+						using (var wstream = new BinaryWriter(archive.CreateEntry("layers/" + layer.LayerID + "/walls.l").Open()))
+							wstream.Write(layer.SaveWalls());
+						using (var fstream = new StreamWriter(archive.CreateEntry("layers/" + layer.LayerID + "/furniture.xml").Open()))
+							furnitureWriter.Serialize(fstream, layer.Furniture);
+					}
+				}
 			}
-
-			Directory.CreateDirectory("Structures");
-
-			if (File.Exists("Structures/" + Metadata.Name + ".structure"))
-				File.Delete("Structures/" + Metadata.Name + ".structure");
-			ZipFile.CreateFromDirectory(FolderRoot + Metadata.Name, "Structures/" + Metadata.Name + ".structure");
 		}
 
+		
 
 		public static StructureFile LoadStructure(string filepath)
 		{
 
-			if (!File.Exists("Structures/" + filepath + ".structure"))
-				throw new Exception();
+			string tempDirectory = Path.GetTempPath()+"structure\\";
+			if (Directory.Exists(tempDirectory))
+				Directory.Delete(tempDirectory, true);
+			ZipFile.ExtractToDirectory(filepath, tempDirectory);
 
-			ZipFile.ExtractToDirectory("Structures/" + filepath + ".structure", FolderRoot + filepath);
 
 			XmlSerializer reader = new XmlSerializer(typeof(StructureFile));
 			StructureFile structure;
 
-			if (!Directory.Exists(filepath))
-				throw new Exception("Structure folder not found!");
-
-			if (!File.Exists(FolderRoot+filepath + "/structure.xml"))
-				throw new Exception("Corrupted structure file: 'structue.xml' is missing");
-
-			using (var stream = File.Open(FolderRoot+filepath + "/structure.xml", FileMode.Open, FileAccess.Read))
+			using (var stream = File.Open(tempDirectory + "/structure.xml", FileMode.Open, FileAccess.Read))
 				structure = (StructureFile)reader.Deserialize(stream);
+			XmlSerializer furnitureReader = new XmlSerializer(typeof(List<Furniture>));
 
-
-			foreach (Layer layer in structure.Layers)
+			foreach (string directory in Directory.GetDirectories(tempDirectory+"layers"))
 			{
+				Layer layer = new Layer(structure);
+				layer.Visible = true;
 				layer.Structure = structure;
-				layer.LoadTiles();
-				layer.LoadWalls();
-			}
+				layer.LoadTiles(File.ReadAllBytes(directory+"/tiles.l"));
+				layer.LoadWalls(File.ReadAllBytes(directory+"/walls.l"));
 
+				using (var stream = File.Open(directory + "/furniture.xml", FileMode.Open, FileAccess.Read))
+					layer.Furniture = (List<Furniture>)furnitureReader.Deserialize(stream);
+
+				structure.Layers.Add(layer);
+
+			}
+			structure.Filepath = filepath;
+			Directory.Delete(Path.GetTempPath() + "structure\\", true);
 			return structure;				
 		}
 
@@ -229,7 +219,9 @@ namespace CaveGame.Core.FileUtil
 			Layers = new List<Layer>();
 		}
 
-		public StructureFile() { }
+		public StructureFile() {
+			Layers = new List<Layer>();
+		}
 	}
 
 }

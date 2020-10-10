@@ -79,6 +79,7 @@ namespace CaveGame.Core.Walls
 			}
 		}
 		public string Namespace => data.Namespace;
+		public string WallName => this.GetType().Name;
 
 		private WDef data;
 
@@ -139,16 +140,23 @@ namespace CaveGame.Core.Walls
 				Quad, color.MultiplyAgainst(Color)
 			);
 		}
-
 	}
 
 
 	public class Void : Wall
 	{
 		public Void(): base(WallDefinitions.Void) { }
+		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		{
+			
+		}
 	}
 	public class Air : Wall, INonSolid {
 		public Air() : base(WallDefinitions.Air) { }
+		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		{
+
+		}
 	}
 	public class Stone : Wall {
 		public Stone() : base(WallDefinitions.Stone) { }

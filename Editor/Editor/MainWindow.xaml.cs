@@ -2,6 +2,8 @@
 using CaveGame.Core.Tiles;
 using Microsoft.Win32;
 using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
@@ -24,11 +26,15 @@ namespace Editor
 
         public MainWindow()
         {
-
-            InitializeComponent();
-			
+			EventManager.RegisterClassHandler(typeof(MainWindow),
+			 Keyboard.KeyUpEvent, new KeyEventHandler(MonoGameContentControl_KeyUp), true);
+			EventManager.RegisterClassHandler(typeof(MainWindow),
+			 Keyboard.KeyDownEvent, new KeyEventHandler(MonoGameContentControl_KeyDown), true);
+			System.Windows.Forms.Integration.ElementHost.EnableModelessKeyboardInterop(this);
+			InitializeComponent();
 			DataContext = ViewModel;
 		}
+
 
 		protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
 		{
@@ -44,14 +50,14 @@ namespace Editor
 			{
 				for (int y = 0; y < md.Height; y++)
 				{
-					brug.Tiles[x, y] = new CaveGame.Core.Tiles.Dirt();
+					brug.Tiles[x, y] = new CaveGame.Core.Tiles.Air();
 				}
 			}
 			for (int x = 0; x < md.Width; x++)
 			{
 				for (int y = 0; y < md.Height; y++)
 				{
-					brug.Walls[x, y] = new CaveGame.Core.Walls.Stone();
+					brug.Walls[x, y] = new CaveGame.Core.Walls.Air();
 				}
 			}
 			LoadedStructure.Layers.Add(brug);
@@ -65,6 +71,7 @@ namespace Editor
 			if (openFileDialog.ShowDialog() == true)
 			{
 				
+				ViewModel.LoadedStructure = StructureFile.LoadStructure(openFileDialog.FileName);
 			}
 
 		}
@@ -80,8 +87,41 @@ namespace Editor
 
 		private void Menu_About(object sender, RoutedEventArgs e) { }
 
-		private void Menu_Save(object sender, RoutedEventArgs e) { }
-		private void Menu_SaveAs(object sender, RoutedEventArgs e) { }
+		private void Menu_Save(object sender, RoutedEventArgs e) {
+			if (ViewModel.LoadedStructure != null)
+			{
+				if (ViewModel.LoadedStructure.Metadata.File == null)
+				{
+					SaveFileDialog saveFileDialog = new SaveFileDialog();
+					saveFileDialog.Filter = "Structure file (*.structure)|*.structure";
+					if (saveFileDialog.ShowDialog() == true)
+					{
+						ViewModel.LoadedStructure.Metadata.File = saveFileDialog.FileName;
+						ViewModel.LoadedStructure.Filepath = saveFileDialog.FileName;
+						ViewModel.LoadedStructure?.Save();
+					}
+				} else
+				{
+					ViewModel.LoadedStructure?.Save();
+				}
+				
+			}
+		}
+		private void Menu_SaveAs(object sender, RoutedEventArgs e) {
+			SaveFileDialog saveFileDialog = new SaveFileDialog();
+			saveFileDialog.Filter = "Structure file (*.structure)|*.structure";
+			if (saveFileDialog.ShowDialog() == true)
+			{
+				if (ViewModel.LoadedStructure != null)
+				{
+					ViewModel.LoadedStructure.Metadata.File = saveFileDialog.FileName;
+					ViewModel.LoadedStructure.Filepath = saveFileDialog.FileName;
+					ViewModel.LoadedStructure?.Save();
+				}
+				
+			}
+				
+		}
 		private void Menu_Exit(object sender, RoutedEventArgs e) { }
 		private void Menu_Undo(object sender, RoutedEventArgs e) { }
 		private void Menu_Redo(object sender, RoutedEventArgs e) { }
@@ -134,12 +174,15 @@ namespace Editor
 
 		private void MonoGameContentControl_KeyDown(object sender, KeyEventArgs e)
 		{
+			if (e.Key == Key.Escape)
+				MessageBox.Show("There is no escape.");
 			ViewModel.MGCC_KeyDown(sender, e);
+
 		}
 
 		private void MonoGameContentControl_KeyUp(object sender, KeyEventArgs e)
 		{
-
+			ViewModel.MGCC_KeyU
 		}
 		#endregion
 
