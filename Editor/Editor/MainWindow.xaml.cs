@@ -182,7 +182,7 @@ namespace Editor
 
 		private void MonoGameContentControl_KeyUp(object sender, KeyEventArgs e)
 		{
-			ViewModel.MGCC_KeyU
+			ViewModel.MGCC_KeyUp(sender, e);
 		}
 		#endregion
 
