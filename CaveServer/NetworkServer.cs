@@ -31,7 +31,7 @@ namespace CaveGame.Server
 		private ConcurrentQueue<NetworkMessage> incomingMessages;
 		private ConcurrentQueue<Tuple<Packet, IPEndPoint>> outgoingMessages;
 
-		private ThreadSafe<bool> listening = new ThreadSafe<bool>(false);
+		private ThreadSafeValue<bool> listening = new ThreadSafeValue<bool>(false);
 
 		public NetworkServer(int port)
 		{

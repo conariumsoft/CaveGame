@@ -18,7 +18,9 @@ namespace CaveGame.Core.Entities
 		Right
 	}
 
-	public class Player : Entity, IPhysicsObject, IPositional, IVelocity, INextPosition
+	
+
+	public abstract class Player : Entity, IPhysicsObject, IPositional, IVelocity, INextPosition, IHorizontalDirectionState
 	{
 		public User User { get; set; }
 		public string DisplayName;
@@ -33,8 +35,6 @@ namespace CaveGame.Core.Entities
 		public bool OnGround;
 
 		public bool Walking { get; set; }
-
-		public bool NotMyProblem { get; set; }
 
 		protected float walkingAnimationTimer;
 
@@ -53,17 +53,10 @@ namespace CaveGame.Core.Entities
 
 		public virtual void PhysicsStep(IGameWorld world, float step)
 		{
-			if (NotMyProblem)
-			{
-
-				Position = Position.Lerp(NextPosition, 0.5f);
-
-				return;
-			}
+			
 
 			OnGround = false;
 			var tilePosition = new Vector2(Position.X / Globals.TileSize, Position.Y / Globals.TileSize);
-			//tilePosition = Vector2.Floor(tilePosition);
 
 			int bb = 4;
 			for (int x = -bb; x < bb; x++)
@@ -123,8 +116,13 @@ namespace CaveGame.Core.Entities
 			base.Update(world, gt);
 		}
 
-	#if CLIENT
-		public void Draw(SpriteBatch sb) {
+		public void OnCollide(IGameWorld world, Tile t, Vector2 separation, Vector2 normal)
+		{
+			throw new NotImplementedException();
+		}
+
+#if CLIENT
+		public virtual void Draw(SpriteBatch sb) {
 
 			Rectangle spriteFrame = new Rectangle(0, 0, 16, 24);
 
@@ -158,20 +156,25 @@ namespace CaveGame.Core.Entities
 
 			sb.Draw(GameTextures.Player, TopLeft, spriteFrame, Color, 0, new Vector2(0,0), 1, (SpriteEffects)flipSprite, 0);
 		}
+#endif
 
+	}
 
-	#endif
-
+	public class PeerPlayer : Player
+	{
+		public override void PhysicsStep(IGameWorld world, float step)
+		{
+	
+			Position = Position.Lerp(NextPosition, 0.5f);
+		}
 	}
 
 	public class LocalPlayer : Player
 	{
-
 		float jumpEnergy;
 
 		public override void PhysicsStep(IGameWorld world, float step)
 		{
-			
 			KeyboardState kb = Keyboard.GetState();
 
 			float velX = 0;

@@ -10,10 +10,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Camera.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Class1.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DelayedTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Generic\DelayedTask.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileUtil\StructureFile.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Furniture\Furniture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Generic\CircularArray.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Generic\ThreadSafeValue.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\User.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Particles\ParticleEmitter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\Chunk.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\ChunkCoordinates.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CollisionSolver.cs" />
@@ -36,7 +40,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Noise\OctaveNoise.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Noise\PerlinNoise.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Noise\SimplexNoise.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ThreadSafe.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tiles\TileMap.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tiles\Tiles.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Walls\Walls.cs" />

@@ -109,34 +109,6 @@ namespace CaveGame.Client.Menu
 			GameSounds.MenuBlip?.Play(0.8f, 1, 0.0f);
 		}
 
-		private void OpenUrl(string url)
-		{
-			try
-			{
-				Process.Start(url);
-			}
-			catch
-			{
-				// hack because of this: https://github.com/dotnet/corefx/issues/10361
-				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				{
-					url = url.Replace("&", "^&");
-					Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
-				}
-				else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-				{
-					Process.Start("xdg-open", url);
-				}
-				else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-				{
-					Process.Start("open", url);
-				}
-				else
-				{
-					throw;
-				}
-			}
-		}
 
 		private void ConstructMainMenu()
 		{
@@ -289,7 +261,7 @@ namespace CaveGame.Client.Menu
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
 			buttons.Children.Add(steamPageButton);
-			steamPageButton.OnLeftClick += (btn, mouse) => OpenUrl(@"https://steamcommunity.com/app/1238250");
+			steamPageButton.OnLeftClick += (btn, mouse) => CaveGame.Core.SystemUtil.OpenUrl(@"https://steamcommunity.com/app/1238250");
 
 			discordButton = new TextButton
 			{
@@ -306,7 +278,7 @@ namespace CaveGame.Client.Menu
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
 			buttons.Children.Add(discordButton);
-			discordButton.OnLeftClick += (btn, mouse) => OpenUrl(@"https://discord.gg/6mDmYqs");
+			discordButton.OnLeftClick += (btn, mouse) => CaveGame.Core.SystemUtil.OpenUrl(@"https://discord.gg/6mDmYqs");
 
 
 			creditsButton = new TextButton
@@ -324,7 +296,6 @@ namespace CaveGame.Client.Menu
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
 			buttons.Children.Add(creditsButton);
-
 			settingsButton = new TextButton
 			{
 				TextColor = Color.White,

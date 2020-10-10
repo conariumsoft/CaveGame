@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CaveGame.Core
+namespace CaveGame.Core.Generic
 {
 	public enum TimeStepProcedure
 	{

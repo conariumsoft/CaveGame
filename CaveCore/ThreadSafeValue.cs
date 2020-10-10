@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CaveGame.Core
 {
-	public class ThreadSafe<T>
+	public class ThreadSafeValue<T>
 	{
 		private T _value;
 		private object _lock = new object();
@@ -23,7 +23,7 @@ namespace CaveGame.Core
 			}
 		}
 
-		public ThreadSafe(T value = default(T))
+		public ThreadSafeValue(T value = default(T))
 		{
 			Value = value;
 		}

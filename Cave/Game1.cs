@@ -54,7 +54,6 @@ namespace CaveGame.Client
 			SteamManager = new SteamManager(this);
 			Components.Add(SteamManager);
 
-			//Steamworks.SteamAPI.Init();
 			graphics = new GraphicsDeviceManager(this) 
 			{
 				PreferredBackBufferWidth = 1280,
@@ -69,40 +68,6 @@ namespace CaveGame.Client
 			Window.AllowUserResizing = true;
 			Window.AllowAltF4 = true;
 
-
-			StructureMetadata meta = new StructureMetadata
-			{
-				Width = 32,
-				Height = 16,
-				Author = "jms",
-				Name = "Dungon1",
-				Notes = "ff",
-			};
-			StructureFile str = new StructureFile(meta);
-			Layer brug = new Layer(str) { LayerID = "Brug" };
-			str.Layers.Add(brug);
-			brug.Tiles = new Core.Tiles.Tile[32, 16];
-			for (int x = 0; x <32;x++)
-			{
-				for (int y = 0; y < 16;y++)
-				{
-					brug.Tiles[x, y] = new Air();
-				}
-			}
-			brug.Walls = new Core.Walls.Wall[32, 16];
-			for (int x = 0; x < 32; x++)
-			{
-				for (int y = 0; y <16; y++)
-				{
-					brug.Walls[x, y] = new Core.Walls.Air();
-				}
-			}
-			brug.Tiles[5, 5] = new Stone();
-			brug.Tiles[5, 5] = new Stone();
-			brug.Tiles[5, 6] = new Stone();
-			brug.Walls[10, 10] = new Core.Walls.Stone();
-			brug.Walls[1, 1] = new Core.Walls.Stone();
-			str.Save();
 		}
 
 		private void OnSteamOverlayOpened() {}

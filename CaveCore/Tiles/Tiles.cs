@@ -200,7 +200,14 @@ namespace CaveGame.Core.Tiles
 	#region stuff
 	public interface IWaterBreakable { }
 	public interface INonSolid { }
+
 	// Property interfaces
+	public interface INonStandardCollision
+	{
+		bool CollisionCheck(IGameWorld world);
+		void OnCollide();
+	}
+	
 	public interface ILightEmitter
 	{
 		Light3 Light { get; }
