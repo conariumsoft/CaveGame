@@ -1062,6 +1062,12 @@
 /processorParam:TextureFormat=Color
 /build:../Assets/Items/workbench.png;Items/workbench.png
 
+#begin ../Assets/Shaders/idkwhatthisisgoingtodo.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:../Assets/Shaders/idkwhatthisisgoingtodo.fx;Shaders/idkwhatthisisgoingtodo.fx
+
 #begin ../Assets/Sound/ambient/birds1.ogg
 /importer:OggImporter
 /processor:SongProcessor

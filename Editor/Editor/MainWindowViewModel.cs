@@ -15,6 +15,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using Editor.Actions;
 
 namespace Editor
 {
@@ -130,6 +131,8 @@ namespace Editor
         public bool LeftMouseDown { get; set; }
         public bool ShiftDown { get; set; }
         public bool CtrlDown { get; set; }
+
+        public bool ZDown { get; set; }
         public bool MousePanning { get; set; }
         public bool EditorFocused { get; set; }
 
@@ -330,6 +333,9 @@ namespace Editor
             return finalID;
         }
 
+
+        ActionStack Actions = new ActionStack();
+
         private Point GetMouseGridPoint()
 		{
             var mp = Camera.ScreenToWorldCoordinates(MousePosition.ToVector2());
@@ -351,6 +357,7 @@ namespace Editor
 
         }
 
+
         public override void Update(GameTime gameTime)
         {
             updateBarTask.Update(gameTime);
@@ -361,12 +368,16 @@ namespace Editor
             if (LeftMouseDown && LoadedStructure!=null && IsMouseOnGrid())
             {
                 if (LayerActivity == EditorActivity.EditTile)
-				{
-                    Tile insert = Tile.FromID(internalTileList[GetSelectedTileID()].ID);
+                {
+                    if (((int)mp.X < LoadedStructure.Layers[0].Tiles.GetUpperBound(0) || (int)mp.Y < LoadedStructure.Layers[0].Tiles.GetUpperBound(1)) && ((int)mp.X > LoadedStructure.Layers[0].Tiles.GetLowerBound(0) || (int)mp.Y > LoadedStructure.Layers[0].Tiles.GetLowerBound(1)))
+                    {
+                        Tile newTile = Tile.FromID(internalTileList[GetSelectedTileID()].ID);
+                        
 
-                    if (CtrlDown)
-                        insert = new CaveGame.Core.Tiles.Void();
-                    LoadedStructure.Layers[0].Tiles[mouse.X, mouse.Y] = insert;
+                        if (CtrlDown)
+                            newTile = new Void();
+                        Actions.AddAction(new TileChangeAction(LoadedStructure.Layers[0], mouse, newTile));
+                    }
                 } else
 				{
                     Wall insert = Wall.FromID(internalWallList[GetSelectedWallID()].ID);
@@ -375,6 +386,16 @@ namespace Editor
                     LoadedStructure.Layers[0].Walls[mouse.X, mouse.Y] = insert;
                 }
                     
+            }
+
+            if (CtrlDown == true && ZDown == true && ShiftDown == false)
+            {
+                Actions.Undo();
+            }
+
+            if (CtrlDown == true && ShiftDown == true && ZDown == true)
+            {
+                Actions.Redo();
             }
 
             Camera.Zoom = Camera.Zoom.Lerp(_cameraZoom, 0.3f);
@@ -517,6 +538,16 @@ namespace Editor
             if (e.Key == Key.LeftShift)
                 ShiftDown = true;
 
+
+            if (e.Key == Key.Z)
+            {
+                ZDown = true;
+            }
+
+
+            //  if (e.Key == Key.LeftShift) { ShiftDown = true; }
+            // if (e.Key == Key.LeftCtrl) { CtrlDown = true; }
+
         }
         public void MGCC_KeyUp(object sender, KeyEventArgs e)
 		{
@@ -526,6 +557,15 @@ namespace Editor
 
             if (e.Key == Key.LeftShift)
                 ShiftDown = false;
+
+            // if (e.Key == Key.LeftShift) { ShiftDown = false; }
+            // if (e.Key == Key.LeftCtrl) { CtrlDown = false; }
+
+            if (e.Key == Key.Z)
+            {
+                ZDown = false;
+            }
+
         }
 
 

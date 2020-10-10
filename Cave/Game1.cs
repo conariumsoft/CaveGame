@@ -17,9 +17,6 @@ using CaveGame.Core.Tiles;
 
 namespace CaveGame.Client
 {
-
-
-
 	public static class GameGlobals
 	{
 		public static int Width;
@@ -193,7 +190,6 @@ namespace CaveGame.Client
 			GameFonts.LoadAssets(Content);
 			GameSounds.LoadAssets(Content);
 			GameTextures.LoadAssets(Content);
-			
 
 			HomePageContext = new HomePage(this);
 			//HomePageContext.Load();

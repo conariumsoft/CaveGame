@@ -55,9 +55,6 @@
       <PackagePath></PackagePath>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Content\bin\" />
-  </ItemGroup>
   <Import Project="..\CaveServer\CaveServer.projitems" Label="Shared" />
   <Import Project="..\CaveCore\CaveCore.projitems" Label="Shared" />
   <Import Project="..\Client\Client.projitems" Label="Shared" />

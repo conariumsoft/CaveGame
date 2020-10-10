@@ -133,17 +133,20 @@ namespace CaveGame.Client
 
 		private DelayedTask chunkUnloadingTask;
 		DelayedTask playerStateReplicationTask;
+
+		private int IntitalScrollValue;
+
 		public GameClient(CaveGameGL _game)
 		{
 			Game = _game;
 
-
+			MouseState mouse = Mouse.GetState();
 
 
 			World = new LocalWorld();
 			Camera = new Camera2D(Game.GraphicsDevice.Viewport) { Zoom = CameraZoom };
 			Chat = new GameChat(this);
-
+			IntitalScrollValue = mouse.ScrollWheelValue;
 
 			playerStateReplicationTask = new DelayedTask(ReplicatePlayerState, 1 / 10.0f);
 			chunkUnloadingTask = new DelayedTask(ChunkUnloadingCheck, 1/20.0f);
@@ -528,9 +531,7 @@ namespace CaveGame.Client
 			DrawChunks(sb);
 
 			Game.GraphicsDevice.Clear(Color.CornflowerBlue);
-			sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
-
-			DrawChunkBGTextures(sb);
+			sb.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
 			EntityRendering(sb);
 			DrawChunkFGTextures(sb);
 
@@ -643,11 +644,24 @@ namespace CaveGame.Client
 			}
 		}
 
-		private void UpdateCameraFollow(GameTime gt)
+
+
+		private void UpdateCamera(GameTime gt)
 		{
+			MouseState mouse = Mouse.GetState();
+
+
+			float Senitivity = (float)0.05;
+			float ZoomFactor = ((mouse.ScrollWheelValue - IntitalScrollValue) * (Senitivity / 120)) + 2;
+
+			Vector2 MouseCameraMovement = ((mouse.Position.ToVector2() / Camera._screenSize) - new Vector2((float)0.5, (float)0.5)) * (float)0.1;
+
+			Camera.Zoom = ZoomFactor;
+			Camera.Position += MouseCameraMovement;
+
 			if (myPlayer != null)
 			{
-				if ((Camera.Position - myPlayer.Position).Length() < 500f)
+				if (((Camera.Position - MouseCameraMovement) - myPlayer.Position).Length() < 500f)
 				{
 					float speed = (float)(gt.ElapsedGameTime.TotalSeconds * 10.0);
 					Camera.Position = Camera.Position.Lerp(myPlayer.Position, speed);
@@ -674,7 +688,7 @@ namespace CaveGame.Client
 
 			
 			TilePlacementUpdate(gt);
-			UpdateCameraFollow(gt);
+			UpdateCamera(gt);
 			//gameServer?.Update(gt);
 			ChunkLoadingCheckUpdate(gt);
 			//ChunkUnloadingCheckUpdate(gt);
