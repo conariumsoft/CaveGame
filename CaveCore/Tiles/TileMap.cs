@@ -27,7 +27,7 @@ namespace CaveGame.Core.Tiles
 		public static Rectangle StoneSpot = Quad(9, 0);
 		public static Rectangle StoneMossy = Quad(10, 0);
 		public static Rectangle StoneLight = Quad(11, 0);
-		public static Rectangle Tile = Quad(12, 0);
+		public static Rectangle StoneCubes = Quad(12, 0);
 		public static Rectangle Carved = Quad(13, 0);
 		public static Rectangle SideBrick = Quad(14, 0);
 		public static Rectangle BrickStep = Quad(15, 0);
@@ -38,13 +38,24 @@ namespace CaveGame.Core.Tiles
 		public static Rectangle Ore = Quad(1, 1);
 		public static Rectangle TNT = Quad(2, 1);
 
+		public static Rectangle Cobweb = Quad(6, 3);
+
 		public static Rectangle StoneFading = Quad(7, 6);
 		public static Rectangle DirtFading = Quad(7, 7);
 
 		public static Rectangle Torch = Quad(11, 7);
 		public static Rectangle SideTorch = Quad(12, 7);
 		public static Rectangle WallTorch = Quad(13, 7);
-		
+		public static Rectangle Platform = Quad(1, 2);
+		public static Rectangle Ladder = Quad(1, 3);
+		public static Rectangle Rope = Quad(3, 2);
+		public static Rectangle TallGrass = Quad(8, 5);
+
+		public static Rectangle BMPY_LongBrick = Quad(0, 3);
+		public static Rectangle BMPY_WoodGrain = Quad(0, 4);
+		public static Rectangle BMPY_Stone = Quad(3, 3);
+		public static Rectangle BMPY_DarkStone = Quad(1, 4);
+
 
 		public static Dictionary<string, Rectangle> Atlas = new Dictionary<string, Rectangle> {
 			

@@ -44,6 +44,7 @@
 			</MenuItem>
 			<MenuItem Header="_Help">
 				<MenuItem Header="_About Editor" Click="Menu_About" />
+				<MenuItem Header="_Emergency TOOL Button" Click="TOOL_Time" />
 			</MenuItem>
 		</Menu>
 		<StatusBar Name="StatusBar"  Height="24" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Background="#FF3B1463">

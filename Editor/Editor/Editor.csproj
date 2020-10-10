@@ -12,6 +12,7 @@
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.7.1.189" />
     <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.8" />
     <PackageReference Include="SharpDX" Version="4.2.0" />
+    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>

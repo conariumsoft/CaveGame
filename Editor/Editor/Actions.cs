@@ -1,5 +1,6 @@
 ﻿using CaveGame.Core.FileUtil;
 using CaveGame.Core.Tiles;
+using CaveGame.Core.Walls;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 
@@ -87,4 +88,36 @@ namespace Editor.Actions
             StructureLayer.Tiles[Position.X, Position.Y] = tile;
         }
     }
+
+	public class WallChangeAction : IAction
+	{
+        private Layer structureLayer;
+        private Point position;
+        private Wall wall;
+        private Wall previousWall;
+        public WallChangeAction(Layer _strLayer, Point pos, Wall donaldTrump)
+		{
+            wall = donaldTrump;
+            structureLayer = _strLayer;
+            position = pos;
+            previousWall = structureLayer.Walls[pos.X, pos.Y];
+            structureLayer.Walls[pos.X, pos.Y] = wall;
+		}
+		public void Redo()
+		{
+            structureLayer.Walls[position.X, position.Y] = wall;
+		}
+
+		public void Undo()
+		{
+            structureLayer.Walls[position.X, position.Y] = previousWall;
+        }
+	}
+	/*public class StructureResizeAction : IAction { }
+    public class LayerAddAction: IAction { }
+    public class LayerRemoveAction: IAction { }
+    public class LayerRenameAction: IAction { }
+    public class TileSelectionTranslateAction: IAction { }
+    public class TileSelectionCutAction: IAction { }
+    public class TileSelectionPasteAction: IAction { }*/
 }

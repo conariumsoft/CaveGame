@@ -22,6 +22,7 @@ namespace CaveGame.Core.FileUtil
 		public string File { get; set; }
 		public string Name { get; set; }
 		public string Notes { get; set; }
+		public int EditorVersion { get; set; }
 		[XmlArray("Layers")]
 		[XmlArrayItem("ID")]
 		public List<string> LayerList { get; set; }
@@ -199,6 +200,7 @@ namespace CaveGame.Core.FileUtil
 				Layer layer = new Layer(structure);
 				layer.Visible = true;
 				layer.Structure = structure;
+				layer.LayerID = directory.Replace(tempDirectory + "layers", "");
 				layer.LoadTiles(File.ReadAllBytes(directory+"/tiles.l"));
 				layer.LoadWalls(File.ReadAllBytes(directory+"/walls.l"));
 

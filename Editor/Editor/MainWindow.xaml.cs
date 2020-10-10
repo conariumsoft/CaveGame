@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -71,7 +72,9 @@ namespace Editor
 			if (openFileDialog.ShowDialog() == true)
 			{
 				
+
 				ViewModel.LoadedStructure = StructureFile.LoadStructure(openFileDialog.FileName);
+				ViewModel.LoadedStructure.Metadata.EditorVersion = ViewModel.EditorVersion;
 			}
 
 		}
@@ -90,12 +93,72 @@ namespace Editor
 					Notes = dialog.notesTextBox.Text,
 					Width = Int32.Parse(dialog.widthTextBox.Text),
 					Height = Int32.Parse(dialog.heightTextBox.Text),
+					EditorVersion = ViewModel.EditorVersion,
 				});
 			}
 			
 		}
 
-		private void Menu_About(object sender, RoutedEventArgs e) { }
+		private void OpenUrl(string url)
+		{
+			try
+			{
+				Process.Start(url);
+			}
+			catch
+			{
+				// hack because of this: https://github.com/dotnet/corefx/issues/10361
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				{
+					url = url.Replace("&", "^&");
+					Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+				}
+				else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+				{
+					Process.Start("xdg-open", url);
+				}
+				else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				{
+					Process.Start("open", url);
+				}
+				else
+				{
+					throw;
+				}
+			}
+		}
+
+		private string[] TOOLS =
+		{
+			"https://www.youtube.com/watch?v=Y7JG63IuaWs", // Lateralus
+			"https://www.youtube.com/watch?v=GIuZUCpm9hc", // Forty Six & 2
+			"https://www.youtube.com/watch?v=HQqjHechnj4", // Prison Sex
+		};
+
+		Random r = new Random();
+
+		private void TOOL_Time(object sender, RoutedEventArgs e)
+		{
+			int n = r.Next(TOOLS.Length);
+			OpenUrl(TOOLS[n]);
+		}
+
+		private void Menu_About(object sender, RoutedEventArgs e) {
+			MessageBox.Show(@"CaveGame2.0 Dungeon Editor
+Copyright 2019-2020 Conarium Software
+
+Controls:
+1 - Edit Tile Layer
+2 - Edit Wall Layer
+Ctrl+Z - Undo
+Ctrl+Shift+Z - Redo
+LeftClick - Set Tile/Wall
+Ctrl+LeftClick - Clear Tile/Wall
+RightClick - Pan
+RightClick+ScrollWheel - Zoom
+ScrollWheel - Change selected Tile/Wall
+			");
+		}
 
 		private void Menu_Save(object sender, RoutedEventArgs e) {
 			if (ViewModel.LoadedStructure != null)
@@ -132,9 +195,9 @@ namespace Editor
 			}
 				
 		}
-		private void Menu_Exit(object sender, RoutedEventArgs e) { }
-		private void Menu_Undo(object sender, RoutedEventArgs e) { }
-		private void Menu_Redo(object sender, RoutedEventArgs e) { }
+		private void Menu_Exit(object sender, RoutedEventArgs e) { this.Close(); }
+		private void Menu_Undo(object sender, RoutedEventArgs e) { ViewModel.ActionUndo(); }
+		private void Menu_Redo(object sender, RoutedEventArgs e) { ViewModel.ActionRedo(); }
 		private void Menu_Copy(object sender, RoutedEventArgs e) { }
 		private void Menu_Cut(object sender, RoutedEventArgs e) { }
 		private void Menu_Delete(object sender, RoutedEventArgs e) { }

@@ -21,6 +21,9 @@ namespace CaveGame.Core.Walls
 		OakPlank, 
 		StoneBrick, 
 		ClayBrick,
+		SandstoneBrick,
+		MossyStone, CarvedStoneBrick, CarvedSandstoneBrick,
+		MossyStoneBrick, CubedStone, CubedSandstone
 	}
 
 	public class WDef : ILightEmitter // TileData
@@ -45,13 +48,67 @@ namespace CaveGame.Core.Walls
 	public static class WallDefinitions
 	{
 		public static WDef Void		  = new WDef { };
-		public static WDef Air		  = new WDef { Hardness = 0, Opacity = 0, Quad = TileMap.Default };
-		public static WDef Dirt		  = new WDef { Hardness = 2, Quad = TileMap.Soil, Color = new Color(40, 20, 5) };
-		public static WDef Stone	  = new WDef { Hardness = 5, Quad = TileMap.Stone, Color = TileDefinitions.Stone.Color.Sub(Wall.BGDarken) };
-		public static WDef RockyDirt  = new WDef { Hardness = 5, Quad = TileMap.StoneSpot, Color = TileDefinitions.Dirt.Color.Sub(Wall.BGDarken) };
-		public static WDef OakPlank	  = new WDef { Hardness = 5, Quad = TileMap.Plank, Color = TileDefinitions.OakPlank.Color.Sub(Wall.BGDarken) };
-		public static WDef ClayBrick  = new WDef { Hardness = 5, Quad = TileMap.Brick, Color = TileDefinitions.ClayBrick.Color.Sub(Wall.BGDarken) };
-		public static WDef StoneBrick = new WDef { Hardness = 5, Quad = TileMap.Brick, Color = TileDefinitions.StoneBrick.Color.Sub(Wall.BGDarken) };
+		public static WDef Air		  = new WDef {
+			Hardness = 0, Opacity = 0, Quad = TileMap.Default };
+		public static WDef Dirt		  = new WDef { 
+			Hardness = 2, Quad = TileMap.Soil, Color = new Color(40, 20, 5) 
+		};
+		public static WDef Stone	  = new WDef {
+			Hardness = 5, Quad = TileMap.Stone, Color = TileDefinitions.Stone.Color*0.3f
+		};
+		public static WDef RockyDirt  = new WDef {
+			Hardness = 5, Quad = TileMap.StoneSpot, Color = TileDefinitions.Dirt.Color.Sub(Wall.BGDarken) 
+		};
+		public static WDef OakPlank	  = new WDef { 
+			Hardness = 5, Quad = TileMap.Plank, Color = TileDefinitions.OakPlank.Color*0.3f
+		};
+		public static WDef ClayBrick  = new WDef {
+			Hardness = 5, Quad = TileMap.Brick, Color = TileDefinitions.ClayBrick.Color*0.3f
+		};
+		public static WDef StoneBrick = new WDef { 
+			Hardness = 5, Quad = TileMap.Brick, Color = new Color(0.3f, 0.3f, 0.3f)
+		};
+		public static WDef SandstoneBrick = new WDef {
+			Hardness = 5,
+			Quad = TileMap.Brick,
+			Color = new Color(0.3f, 0.3f, 0.0f)
+		};
+		public static WDef MossyStone = new WDef
+		{
+			Hardness = 5,
+			Quad = TileMap.StoneMossy,
+			Color = new Color(0.3f, 0.3f, 0.3f)
+		};
+		public static WDef CarvedStoneBrick = new WDef
+		{
+			Hardness = 5,
+			Quad = TileMap.Carved,
+			Color = new Color(0.3f, 0.3f, 0.3f)
+		};
+		public static WDef CarvedSandstoneBrick = new WDef
+		{
+			Hardness = 5,
+			Quad = TileMap.Carved,
+			Color = new Color(0.3f, 0.3f, 0.0f)
+		};
+		public static WDef MossyStoneBrick = new WDef
+		{
+			Hardness = 5,
+			Quad = TileMap.MossyBrick,
+			Color = new Color(0.3f, 0.3f, 0.3f)
+		};
+		public static WDef CubedStone = new WDef
+		{
+			Color = new Color(0.3f, 0.3f, 0.3f),
+			Quad = TileMap.StoneCubes,
+			Hardness = 5,
+		};
+		public static WDef CubedSandstone = new WDef
+		{
+			Color = new Color(0.3f, 0.3f, 0.0f),
+			Quad = TileMap.StoneCubes,
+			Hardness = 5,
+		};
 	}
 
 	public class Wall
@@ -178,5 +235,32 @@ namespace CaveGame.Core.Walls
 
 		public ClayBrick() : base(WallDefinitions.ClayBrick) { }
 	}
-
+	public class SandstoneBrick: Wall
+	{
+		public SandstoneBrick() : base(WallDefinitions.SandstoneBrick) { }
+	}
+	public class MossyStone : Wall
+	{
+		public MossyStone() : base(WallDefinitions.MossyStone) { }
+	}
+	public class MossyStoneBrick : Wall
+	{
+		public MossyStoneBrick() : base(WallDefinitions.MossyStoneBrick) { }
+	}
+	public class CarvedStoneBrick : Wall
+	{
+		public CarvedStoneBrick() : base(WallDefinitions.CarvedStoneBrick) { }
+	}
+	public class CarvedSandstoneBrick : Wall
+	{
+		public CarvedSandstoneBrick() : base(WallDefinitions.CarvedSandstoneBrick) { }
+	}
+	public class CubedStone : Wall
+	{
+		public CubedStone() : base(WallDefinitions.CubedStone) { }
+	}
+	public class CubedSandstone : Wall
+	{
+		public CubedSandstone(): base(WallDefinitions.CubedSandstone) { }
+	}
 }

@@ -151,6 +151,7 @@ namespace Editor
         public Color BackgroundColor => new Color(10, 10, 10);
         public Color UnfocusedBackground => new Color(25, 25, 25);
         public Color GridLineColor => new Color(45, 45, 45);
+        public int EditorVersion => 2;
 
         public static Texture2D TileSheet;
         public static Texture2D Pixel;
@@ -164,7 +165,7 @@ namespace Editor
             {
                 _struct = value;
                 StructureDisplayInfo = String.Format(
-                    "file: {0} w:{1} h:{2} author:{3} notes[{4}] layers: {4}",
+                    "file: {0} w:{1} h:{2} author:{3} notes[{4}] layers: {5}",
                     _struct.Metadata.Name, _struct.Metadata.Width,_struct.Metadata.Height,
                     _struct.Metadata.Author, _struct.Metadata.Notes, _struct.Layers.Count
                 );
@@ -188,14 +189,17 @@ namespace Editor
             TileCount = 0;
             foreach (var type in types)
             {
+
+                Trace.WriteLine(type.Name);
                 bool exists = Enum.TryParse(type.Name, out TileID id);
                 if (exists && type.Name != "Void")
                 {
+                    Trace.WriteLine(type.Name + " exists: "+exists);
                     TileCount++;
                 }
 
             }
-            internalTileList = new Tile[TileCount + 1];
+            internalTileList = new Tile[TileCount];
             foreach (var type in types)
             {
                 bool exists = Enum.TryParse(type.Name, out TileID id);
@@ -336,6 +340,9 @@ namespace Editor
 
         ActionStack Actions = new ActionStack();
 
+        public void ActionUndo() { Actions.Undo(); }
+        public void ActionRedo() { Actions.Redo(); }
+
         private Point GetMouseGridPoint()
 		{
             var mp = Camera.ScreenToWorldCoordinates(MousePosition.ToVector2());
@@ -377,12 +384,12 @@ namespace Editor
                             newTile = new CaveGame.Core.Tiles.Void();
                         Actions.AddAction(new TileChangeAction(LoadedStructure.Layers[0], mouse, newTile));
                     
-                } else
-				{
-                    Wall insert = Wall.FromID(internalWallList[GetSelectedWallID()].ID);
+                } else {
+                    Wall newWall = Wall.FromID(internalWallList[GetSelectedWallID()].ID);
                     if (CtrlDown)
-                        insert = new CaveGame.Core.Walls.Void();
-                    LoadedStructure.Layers[0].Walls[mouse.X, mouse.Y] = insert;
+                        newWall = new CaveGame.Core.Walls.Void();
+                    Actions.AddAction(new WallChangeAction(LoadedStructure.Layers[0], mouse, newWall));
+
                 }
                     
             }
@@ -625,10 +632,6 @@ namespace Editor
 
                 Camera.Position -= new Vector2(diff.X, diff.Y);
             }
-
-
-
-
         }
 
 		public void MGCC_MouseLeave(object sender, MouseEventArgs e)
