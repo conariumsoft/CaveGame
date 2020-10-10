@@ -369,15 +369,14 @@ namespace Editor
             {
                 if (LayerActivity == EditorActivity.EditTile)
                 {
-                    if (((int)mp.X < LoadedStructure.Layers[0].Tiles.GetUpperBound(0) || (int)mp.Y < LoadedStructure.Layers[0].Tiles.GetUpperBound(1)) && ((int)mp.X > LoadedStructure.Layers[0].Tiles.GetLowerBound(0) || (int)mp.Y > LoadedStructure.Layers[0].Tiles.GetLowerBound(1)))
-                    {
+                    
                         Tile newTile = Tile.FromID(internalTileList[GetSelectedTileID()].ID);
                         
 
                         if (CtrlDown)
-                            newTile = new Void();
+                            newTile = new CaveGame.Core.Tiles.Void();
                         Actions.AddAction(new TileChangeAction(LoadedStructure.Layers[0], mouse, newTile));
-                    }
+                    
                 } else
 				{
                     Wall insert = Wall.FromID(internalWallList[GetSelectedWallID()].ID);
