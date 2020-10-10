@@ -36,18 +36,13 @@ namespace Editor
 		private void okButton_Click(object sender, RoutedEventArgs e)
 		{
 
-			_window.GetNewStructure(new StructureMetadata { 
-				Author = this.authorTextBox.Text,
-				Name = this.authorTextBox.Text,
-				//Notes = this.authorTextBox.Notes,
-				Width = Int32.Parse(this.widthTextBox.Text),
-				Height = Int32.Parse(this.heightTextBox.Text),
-			});
+			this.DialogResult = true;
 			this.Close();
 		}
 
 		private void cancelButton_Click(object sender, RoutedEventArgs e)
 		{
+			this.DialogResult = false;
 			this.Close();
 		}
 	}

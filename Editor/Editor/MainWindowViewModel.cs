@@ -78,15 +78,26 @@ namespace Editor
         EditWall
 	}
 
+    public class ResizeAction // TODO: interface
+	{
+        public void Undo()
+		{
 
+		}
+        public void Redo()
+		{
+
+		}
+	}
 
     public class MainWindowViewModel : MonoGameViewModel, I_MGCCInput, INotifyPropertyChanged
     {
+
         private Tile[] internalTileList;
         private Wall[] internalWallList;
 
-        // Data Bindings
-        private string _tileDisplayInfo;
+		#region BottomBar Bindings
+		private string _tileDisplayInfo;
         public string TileDisplayInfo
         {
             get { return _tileDisplayInfo; }
@@ -112,6 +123,7 @@ namespace Editor
                 OnPropertyChanged("StructureDisplayInfo");    
             }
         }
+        #endregion
 
         public System.Windows.Point MousePosition { get; set; }
         System.Windows.Point LastMousePosition = new System.Windows.Point(0, 0);
@@ -224,7 +236,7 @@ namespace Editor
             TilesVisible = true;
             WallsVisible = true;
             GridVisible = true;
-            updateBarTask = new DelayedTask(UpdateBar, (1 / 5.0f));
+            updateBarTask = new DelayedTask(UpdateBar, (1 / 10.0f));
             TileDisplayInfo = "Awaiting Data";
             FPSDisplayInfo = "Awaiting FPS";
             StructureDisplayInfo = "Awaiting Structure";
@@ -239,7 +251,8 @@ namespace Editor
             if (LayerActivity == EditorActivity.EditTile)
 			{
                 var t = internalTileList[GetSelectedTileID()];
-                TileDisplayInfo = String.Format("<tile>selected {0}:{1} {2}, lookat: {3}:{4} {5}, mouse: {6},{7}", t.Namespace, t.TileName, t.ID, 0, 0, 0, 0, 0);
+                Point mouse = GetMouseGridPoint();
+                TileDisplayInfo = String.Format("<tile>selected {0}:{1} {2}, lookat: {3}:{4} {5}, mouse: {6},{7}", t.Namespace, t.TileName, t.ID, 0, 0, 0, mouse.X, mouse.Y, 0);
             } else
 			{
                 var w = internalWallList[GetSelectedWallID()];
@@ -255,6 +268,20 @@ namespace Editor
         private float _rotation;
         private Vector2 _origin;
         private Vector2 _scale;
+
+        public void ResizeStructure(StructureMetadata newMetadata)
+		{
+            foreach(Layer layer in LoadedStructure.Layers)
+			{
+                var oldTileArray = layer.Tiles.Clone();
+                layer.Tiles = new Tile[newMetadata.Width, newMetadata.Height];
+
+                int greatX = Math.Min(LoadedStructure.Metadata.Width, newMetadata.Width);
+                int greatY = Math.Min(LoadedStructure.Metadata.Height, newMetadata.Height);
+
+            }
+            
+		}
 
         public override void Initialize()
 		{
@@ -303,15 +330,35 @@ namespace Editor
             return finalID;
         }
 
+        private Point GetMouseGridPoint()
+		{
+            var mp = Camera.ScreenToWorldCoordinates(MousePosition.ToVector2());
+
+            int x = (int)Math.Floor(mp.X / 8);
+            int y = (int)Math.Floor(mp.Y / 8);
+
+            
+            return new Point(x, y);
+            
+        }
+
+        private bool IsMouseOnGrid()
+		{
+            Point mp = GetMouseGridPoint();
+            if (LoadedStructure == null)
+                return false;
+            return (mp.X >= 0 && mp.Y >= 0 && mp.X < LoadedStructure.Metadata.Width && mp.Y < LoadedStructure.Metadata.Height);
+
+        }
+
         public override void Update(GameTime gameTime)
         {
             updateBarTask.Update(gameTime);
 
-            var mp = Camera.ScreenToWorldCoordinates(MousePosition.ToVector2());
+            var mouse = GetMouseGridPoint();
+            
 
-            mp /= 8;
-            var dp = new Vector2((int)mp.X, (int)mp.Y);
-            if (LeftMouseDown && LoadedStructure!=null && dp.X <= LoadedStructure.Metadata.Width && dp.Y<=LoadedStructure.Metadata.Height)
+            if (LeftMouseDown && LoadedStructure!=null && IsMouseOnGrid())
             {
                 if (LayerActivity == EditorActivity.EditTile)
 				{
@@ -319,13 +366,13 @@ namespace Editor
 
                     if (CtrlDown)
                         insert = new CaveGame.Core.Tiles.Void();
-                    LoadedStructure.Layers[0].Tiles[(int)dp.X, (int)dp.Y] = insert;
+                    LoadedStructure.Layers[0].Tiles[mouse.X, mouse.Y] = insert;
                 } else
 				{
                     Wall insert = Wall.FromID(internalWallList[GetSelectedWallID()].ID);
                     if (CtrlDown)
                         insert = new CaveGame.Core.Walls.Void();
-                    LoadedStructure.Layers[0].Walls[(int)dp.X, (int)dp.Y] = insert;
+                    LoadedStructure.Layers[0].Walls[mouse.X, mouse.Y] = insert;
                 }
                     
             }
@@ -470,9 +517,6 @@ namespace Editor
             if (e.Key == Key.LeftShift)
                 ShiftDown = true;
 
-
-            //  if (e.Key == Key.LeftShift) { ShiftDown = true; }
-            // if (e.Key == Key.LeftCtrl) { CtrlDown = true; }
         }
         public void MGCC_KeyUp(object sender, KeyEventArgs e)
 		{
@@ -482,8 +526,6 @@ namespace Editor
 
             if (e.Key == Key.LeftShift)
                 ShiftDown = false;
-            // if (e.Key == Key.LeftShift) { ShiftDown = false; }
-            // if (e.Key == Key.LeftCtrl) { CtrlDown = false; }
         }
 
 

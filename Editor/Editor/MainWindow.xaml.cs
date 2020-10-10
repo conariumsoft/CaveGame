@@ -81,7 +81,17 @@ namespace Editor
 			NewFileDialog dialog = new NewFileDialog(this);
 
 			dialog.Owner = this;
-			dialog.ShowDialog();
+			if (dialog.ShowDialog() == true)
+			{
+				GetNewStructure(new StructureMetadata
+				{
+					Author = dialog.authorTextBox.Text,
+					Name = dialog.authorTextBox.Text,
+					Notes = dialog.notesTextBox.Text,
+					Width = Int32.Parse(dialog.widthTextBox.Text),
+					Height = Int32.Parse(dialog.heightTextBox.Text),
+				});
+			}
 			
 		}
 
@@ -130,6 +140,34 @@ namespace Editor
 		private void Menu_Delete(object sender, RoutedEventArgs e) { }
 		private void Menu_Paste(object sender, RoutedEventArgs e) { }
 		private void Menu_SelectAll(object sender, RoutedEventArgs e) { }
+		private void Menu_Resize(object sender, RoutedEventArgs e)
+		{
+			if (ViewModel.LoadedStructure!=null)
+			{
+				NewFileDialog dialog = new NewFileDialog(this);
+				dialog.authorTextBox.Text = ViewModel.LoadedStructure.Metadata.Author;
+				dialog.nameTextBox.Text = ViewModel.LoadedStructure.Metadata.Name;
+				dialog.notesTextBox.Text = ViewModel.LoadedStructure.Metadata.Notes;
+				dialog.widthTextBox.Text = ViewModel.LoadedStructure.Metadata.Width.ToString();
+				dialog.heightTextBox.Text = ViewModel.LoadedStructure.Metadata.Width.ToString();
+				dialog.Owner = this;
+				if (dialog.ShowDialog() == true)
+				{
+
+					StructureMetadata newMetadata = new StructureMetadata
+					{
+						Author = dialog.authorTextBox.Text,
+						Name = dialog.nameTextBox.Text,
+						Notes = dialog.notesTextBox.Text,
+						Width = Int32.Parse(dialog.widthTextBox.Text),
+						Height = Int32.Parse(dialog.heightTextBox.Text),
+					};
+
+					ViewModel.ResizeStructure(newMetadata);
+				}
+			}
+			
+		}
 
 		private void CheckBox_Checked(object sender, RoutedEventArgs e)
 		{

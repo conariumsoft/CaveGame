@@ -73,7 +73,9 @@ namespace CaveGame.Core.FileUtil
 			{
 				for (int y = 0; y < Structure.Metadata.Height; y++)
 				{
-					Tiles[x,y] = Tile.FromID(TileData[index]);
+					Tile t = Tile.FromID(TileData[index]);
+					Trace.WriteLine(t);
+					Tiles[x,y] = t;
 					index++;
 				}
 			}
