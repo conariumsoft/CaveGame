@@ -33,6 +33,10 @@ namespace CaveGame.Core.Generic
 		{
 			return buffer[index % Size];
 		}
+		public void Get(int index, out T obj)
+		{
+			obj = buffer[index % Size];
+		}
 
 		public void Set(int index, T obj)
 		{

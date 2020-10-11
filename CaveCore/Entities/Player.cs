@@ -56,26 +56,38 @@ namespace CaveGame.Core.Entities
 			
 
 			OnGround = false;
-			var tilePosition = new Vector2(Position.X / Globals.TileSize, Position.Y / Globals.TileSize);
+			var tilePosition = new Point(
+				(int)Math.Floor(Position.X / Globals.TileSize), 
+				(int)Math.Floor(Position.Y / Globals.TileSize)
+			);
+
+
 
 			int bb = 4;
 			for (int x = -bb; x < bb; x++)
 			{
 				for (int y = -bb; y < bb; y++)
 				{
-					Vector2 tileBoxPos = new Vector2(tilePosition.X + x, tilePosition.Y + y);
+					Point tileBoxPos = new Point(tilePosition.X + x, tilePosition.Y + y);
 
-					var tile = world.GetTile((int)tileBoxPos.X, (int)tileBoxPos.Y);
+					var tile = world.GetTile(tileBoxPos.X, tileBoxPos.Y);
 
 					if (tile.ID != 0 && !(tile is INonSolid))
 					{
-						var tileChec = (tileBoxPos * Globals.TileSize) + new Vector2(4, 4);
+						var tileChec = (tileBoxPos.ToVector2() * Globals.TileSize) + new Vector2(4, 4);
 						var tileBoxSize = new Vector2(4, 4);
 						if (CollisionSolver.CheckAABB(NextPosition, BoundingBox, tileChec, tileBoxSize))
 						{
 							var separation = CollisionSolver.GetSeparationAABB(NextPosition, BoundingBox, tileChec, tileBoxSize);
 
 							var normal = CollisionSolver.GetNormalAABB(separation, Velocity);
+
+							if (tile.ID == 255)
+							{
+								NextPosition = Position;
+								Velocity = Vector2.Zero;
+								continue;
+							}
 
 							if (normal.X != 0 && normal.Y != 0)
 							{
@@ -164,7 +176,6 @@ namespace CaveGame.Core.Entities
 	{
 		public override void PhysicsStep(IGameWorld world, float step)
 		{
-	
 			Position = Position.Lerp(NextPosition, 0.5f);
 		}
 	}
@@ -221,8 +232,6 @@ namespace CaveGame.Core.Entities
 				velX += step * horizspeed;
 				Facing = HorizontalDirection.Right;
 			}
-				
-
 			
 			Velocity += new Vector2(velX, velY);
 

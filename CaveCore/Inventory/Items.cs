@@ -5,11 +5,12 @@ using System.Text;
 namespace CaveGame.Core.Inventory
 {
 
+
+
 	public interface IITem
 	{
 		int MaxStack { get; }
 		string Name { get; }
-
 	}
 	// items
 	public class CopperIngot { }
