@@ -142,7 +142,7 @@ namespace CaveGame.Client.Menu
 
 			
 
-			MainMenu.Children.Add(title);
+			//MainMenu.Children.Add(title);
 
 			Label copyright = new Label
 			{
@@ -160,7 +160,7 @@ namespace CaveGame.Client.Menu
 				TextYAlign = TextYAlignment.Bottom,
 				TextXAlign = TextXAlignment.Left,
 			};
-			MainMenu.Children.Add(copyright);
+			//MainMenu.Children.Add(copyright);
 
 			Label version = new Label
 			{
@@ -178,7 +178,7 @@ namespace CaveGame.Client.Menu
 				TextYAlign = TextYAlignment.Bottom,
 				TextXAlign = TextXAlignment.Right,
 			};
-			MainMenu.Children.Add(version);
+			//MainMenu.Children.Add(version);
 
 			UIRect buttonList = new UIRect
 			{
@@ -193,7 +193,7 @@ namespace CaveGame.Client.Menu
 				Padding = 1,
 				Parent = buttonList,
 			};
-			buttonList.Children.Add(buttons);
+			//buttonList.Children.Add(buttons);
 
 
 			singleplayerButton = new TextButton
@@ -209,7 +209,7 @@ namespace CaveGame.Client.Menu
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
-			buttons.Children.Add(singleplayerButton);
+			//buttons.Children.Add(singleplayerButton);
 			singleplayerButton.OnLeftClick += (b, m) => CurrentPage = SingleplayerMenu;
 
 			multiplayerButton = new TextButton
@@ -226,7 +226,7 @@ namespace CaveGame.Client.Menu
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
-			buttons.Children.Add(multiplayerButton);
+			//buttons.Children.Add(multiplayerButton);
 			multiplayerButton.OnLeftClick += (b, m) => CurrentPage = MultiplayerMenu;
 			//multiplayerButton.OnLeftClick += (b, m) => Game.CurrentGameContext = Game.InWorldContext;
 
@@ -244,7 +244,7 @@ namespace CaveGame.Client.Menu
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
-			buttons.Children.Add(statsButton);
+			//buttons.Children.Add(statsButton);
 
 			steamPageButton = new TextButton
 			{
@@ -260,7 +260,7 @@ namespace CaveGame.Client.Menu
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
-			buttons.Children.Add(steamPageButton);
+			//buttons.Children.Add(steamPageButton);
 			steamPageButton.OnLeftClick += (btn, mouse) => CaveGame.Core.SystemUtil.OpenUrl(@"https://steamcommunity.com/app/1238250");
 
 			discordButton = new TextButton
@@ -277,7 +277,7 @@ namespace CaveGame.Client.Menu
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
-			buttons.Children.Add(discordButton);
+			//buttons.Children.Add(discordButton);
 			discordButton.OnLeftClick += (btn, mouse) => CaveGame.Core.SystemUtil.OpenUrl(@"https://discord.gg/6mDmYqs");
 
 
@@ -295,7 +295,8 @@ namespace CaveGame.Client.Menu
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
-			buttons.Children.Add(creditsButton);
+			creditsButton.OnLeftClick += (btn, mouse) => Game.CurrentGameContext = Game.CreditsContext;
+			//buttons.Children.Add(creditsButton);
 			settingsButton = new TextButton
 			{
 				TextColor = Color.White,
@@ -310,7 +311,7 @@ namespace CaveGame.Client.Menu
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
-			buttons.Children.Add(settingsButton);
+			//buttons.Children.Add(settingsButton);
 
 			quitButton = new TextButton
 			{
@@ -326,7 +327,7 @@ namespace CaveGame.Client.Menu
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
-			buttons.Children.Add(quitButton);
+			//buttons.Children.Add(quitButton);
 			quitButton.OnLeftClick += (btn, mouse) => Game.Exit();
 
 
@@ -344,8 +345,8 @@ namespace CaveGame.Client.Menu
 				Parent = MainMenu,
 				BGColor = Color.DarkBlue,
 			};
-			MainMenu.Children.Add(buttonList);
-			MainMenu.Children.Add(homeContent);
+			//MainMenu.Children.Add(buttonList);
+			//MainMenu.Children.Add(homeContent);
 		}
 		private void ConstructSingleplayerMenu()
 		{
@@ -553,7 +554,7 @@ namespace CaveGame.Client.Menu
 				TextXAlign = TextXAlignment.Center,
 			};
 
-			MultiplayerMenu.Children.Add(title);
+			//MultiplayerMenu.Children.Add(title);
 
 			UIRect buttonList = new UIRect
 			{
@@ -568,8 +569,8 @@ namespace CaveGame.Client.Menu
 				Padding = 1,
 				Parent = buttonList,
 			};
-			buttonList.Children.Add(buttons);
-			MultiplayerMenu.Children.Add(buttonList);
+			//buttonList.Children.Add(buttons);
+			//MultiplayerMenu.Children.Add(buttonList);
 
 			var serverInputBox = new TextInputLabel
 			{
@@ -588,7 +589,7 @@ namespace CaveGame.Client.Menu
 				TextXAlign = TextXAlignment.Center,
 			};
 			serverInputBox.Input.inputBuffer = persistence.IPAddress;
-			buttons.Children.Add(serverInputBox);
+			//buttons.Children.Add(serverInputBox);
 
 			var usernameInputBox = new TextInputLabel
 			{
@@ -608,7 +609,7 @@ namespace CaveGame.Client.Menu
 			};
 			usernameInputBox.Input.inputBuffer = persistence.Username;
 			usernameInputBox.Input.BlacklistedCharacters.Add(' ');
-			buttons.Children.Add(usernameInputBox);
+			//buttons.Children.Add(usernameInputBox);
 
 			var connect = new TextButton
 			{
@@ -630,7 +631,7 @@ namespace CaveGame.Client.Menu
 			connect.OnMouseEnter += WhenMouseOverButton;
 			connect.OnMouseExit += WhenMouseOffButton;
 			connect.OnLeftClick += (b, m) => OnJoinServer(serverInputBox.Input.InternalText, usernameInputBox.Input.InternalText);
-			buttons.Children.Add(connect);
+			//buttons.Children.Add(connect);
 
 			var back = new TextButton
 			{
@@ -652,7 +653,7 @@ namespace CaveGame.Client.Menu
 			back.OnMouseEnter += WhenMouseOverButton;
 			back.OnMouseExit += WhenMouseOffButton;
 			back.OnLeftClick += (b, m) => CurrentPage = MainMenu;
-			MultiplayerMenu.Children.Add(back);
+			//MultiplayerMenu.Children.Add(back);
 		}
 
 		private void ConstructCreditsMenu() { }

@@ -30,11 +30,13 @@ namespace CaveGame.Client
 
 		public IGameContext CurrentGameContext { get; set; }
 		private IGameContext PreviousGameContext { get;  set; }
-		
 
+		#region Game States
 		public HomePage HomePageContext;
 		public GameClient InWorldContext;
 		public ServerKickedPage ServerKickedContext;
+		public Credits CreditsContext;
+		#endregion
 
 		private GraphicsDeviceManager graphics;
 		private SpriteBatch spriteBatch;
@@ -147,6 +149,15 @@ namespace CaveGame.Client
 			base.Initialize();
 		}
 
+		private void CreateGameStates()
+		{
+			HomePageContext = new HomePage(this);
+			InWorldContext = new GameClient(this);
+			CreditsContext = new Credits(this);
+
+			CurrentGameContext = HomePageContext;
+		}
+
 		protected override void LoadContent()
 		{
 			spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -155,11 +166,7 @@ namespace CaveGame.Client
 			GameFonts.LoadAssets(Content);
 			GameSounds.LoadAssets(Content);
 			GameTextures.LoadAssets(Content);
-
-			HomePageContext = new HomePage(this);
-			//HomePageContext.Load();
-			InWorldContext = new GameClient(this);
-			CurrentGameContext = HomePageContext;
+			CreateGameStates();
 		}
 
 		

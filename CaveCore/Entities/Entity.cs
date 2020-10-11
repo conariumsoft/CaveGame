@@ -29,6 +29,9 @@ namespace CaveGame.Core.Entities
 		void OnCollide(IGameWorld world, Tiles.Tile t, Vector2 separation, Vector2 normal);
 	}
 	public interface IEntity {
+		int EntityNetworkID { get; }
+		float TicksAlive { get; }
+		bool Dead { get; }
 		void Update(IGameWorld world, GameTime gt);
 	}
 	public interface IServerUpdate {

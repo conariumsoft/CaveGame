@@ -18,7 +18,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)FrameCounter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LocalWorld.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Menu\Credits.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\Settings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Menu\UITheme.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Particles\ParticleEmitter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SteamManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NetworkClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IGameContext.cs" />

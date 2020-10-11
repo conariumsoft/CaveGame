@@ -14,9 +14,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)FileUtil\StructureFile.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Furniture\Furniture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generic\CircularArray.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Generic\QuadTree.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generic\ThreadSafeValue.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\User.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Particles\ParticleEmitter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\Chunk.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\ChunkCoordinates.cs" />

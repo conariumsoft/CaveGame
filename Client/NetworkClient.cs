@@ -1,4 +1,5 @@
 ﻿using CaveGame.Core;
+using CaveGame.Core.Generic;
 using CaveGame.Core.Network;
 using Microsoft.Xna.Framework;
 using System;
@@ -36,7 +37,7 @@ namespace CaveGame.Client
 		private long lastPacketReceivedTimestamp = 0; // from server
 		private TimeSpan heartbeatTimeout = TimeSpan.FromSeconds(20);
 
-		private ThreadSafe<bool> running = new ThreadSafe<bool>(false);
+		private ThreadSafeValue<bool> running = new ThreadSafeValue<bool>(false);
 		
 		public readonly string ServerHostname;
 		public readonly int ServerPort;

@@ -1,4 +1,5 @@
 ﻿using CaveGame.Core;
+using CaveGame.Core.Generic;
 using CaveGame.Core.Tiles;
 using CaveGame.Core.Walls;
 using Microsoft.Xna.Framework;
@@ -76,7 +77,7 @@ namespace CaveGame.Client
 
 
 		private LocalWorld World;
-		private ThreadSafe<bool> running = new ThreadSafe<bool>(false);
+		private ThreadSafeValue<bool> running = new ThreadSafeValue<bool>(false);
 		public LightingEngine(LocalWorld world)
 		{
 			World = world;

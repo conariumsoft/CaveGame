@@ -39,7 +39,19 @@ namespace CaveGame.Client.UI
 	{
 		public bool Visible { get; set; }
 		public bool Active { get; set; }
-		public UINode Parent { get; set; }
+
+		private UINode _parent;
+		public UINode Parent
+		{
+			get { return _parent; }
+			set
+			{
+				if (_parent != null)
+					_parent.Children.Remove(this);
+				_parent = value;
+				_parent.Children.Add(this);
+			}
+		}
 		public List<UINode> Children { get; set; }
 		public Vector2 AnchorPoint { get; set; }
 		public Vector2 AbsoluteSize
@@ -139,7 +151,19 @@ namespace CaveGame.Client.UI
 
 		public UICoords Size { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-		public UINode Parent => throw new NotImplementedException();
+		private UINode _parent;
+		public UINode Parent
+		{
+			get { return _parent; }
+			set
+			{
+				if (_parent != null)
+					_parent.Children.Remove(this);
+
+				_parent = value;
+				_parent.Children.Add(this);
+			}
+		}
 
 		public UIRoot(GraphicsDevice device)
 		{

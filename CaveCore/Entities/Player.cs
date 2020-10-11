@@ -20,7 +20,7 @@ namespace CaveGame.Core.Entities
 
 	
 
-	public abstract class Player : Entity, IPhysicsObject, IPositional, IVelocity, INextPosition, IHorizontalDirectionState
+	public class Player : Entity, IPhysicsObject, IPositional, IVelocity, INextPosition, IHorizontalDirectionState
 	{
 		public User User { get; set; }
 		public string DisplayName;

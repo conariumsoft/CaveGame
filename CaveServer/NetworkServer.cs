@@ -1,6 +1,7 @@
 ﻿//#define PACKETDEBUG
 
 using CaveGame.Core;
+using CaveGame.Core.Generic;
 using CaveGame.Core.Network;
 using Microsoft.Xna.Framework;
 using System;

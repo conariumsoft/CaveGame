@@ -9,7 +9,19 @@ namespace CaveGame.Client.UI
 {
 	public class UIListContainer : UINode
 	{
-		public UINode Parent { get; set; }
+		private UINode _parent;
+		public UINode Parent
+		{
+			get { return _parent; }
+			set
+			{
+				if (_parent != null)
+					_parent.Children.Remove(this);
+
+				_parent = value;
+				_parent.Children.Add(this);
+			}
+		}
 
 		public List<UINode> Children { get; set; }
 

@@ -4,6 +4,7 @@ using Cave;
 using CaveGame.Client.UI;
 using CaveGame.Core;
 using CaveGame.Core.Entities;
+using CaveGame.Core.Generic;
 using CaveGame.Core.Inventory;
 using CaveGame.Core.Network;
 using CaveGame.Core.Tiles;
@@ -121,6 +122,8 @@ namespace CaveGame.Client
 		public Hotbar Hotbar { get; set; }
 
 		public LocalWorld World { get; private set; }
+
+
 		private NetworkClient gameClient;
 		private GameServer gameServer;
 
@@ -254,12 +257,12 @@ namespace CaveGame.Client
 		{
 			PlayerJoinedPacket packet = new PlayerJoinedPacket(message.Packet.GetBytes());
 
-			var player = new Player()
+			var player = new PeerPlayer()
 			{
 				EntityNetworkID = packet.EntityID,
 				Color = packet.PlayerColor,
 				DisplayName = packet.Username,
-				NotMyProblem = true
+				RemoteControlled = true
 			};
 			World.Entities.Add(player);
 		}
