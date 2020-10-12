@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Assets.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SteamManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameChat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LightingEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clipboard.cs" />
@@ -22,7 +23,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Menu\Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\UITheme.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Particles\ParticleEmitter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SteamManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NetworkClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IGameContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\Homepage.cs" />

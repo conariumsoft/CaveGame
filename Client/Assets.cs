@@ -17,15 +17,10 @@ namespace CaveGame.Client
 		public static SpriteFont Arial16 { get; private set; }
 		public static SpriteFont Arial20 { get; private set; }
 		public static SpriteFont Arial30 { get; private set; }
-
-
 		public static SpriteFont Arial10Italic { get; private set; }
-
 		public static SpriteFont Consolas10 { get; private set; }
 		public static SpriteFont Consolas12 { get; private set; }
-
 		public static SpriteFont ComicSans10 { get; private set; }
-
 
 		public static void LoadAssets(ContentManager Content)
 		{
@@ -36,12 +31,9 @@ namespace CaveGame.Client
 			Arial16 = Content.Load<SpriteFont>("Fonts/Arial16");
 			Arial20 = Content.Load<SpriteFont>("Fonts/Arial20");
 			Arial30 = Content.Load<SpriteFont>("Fonts/Arial30");
-
 			Arial10Italic = Content.Load<SpriteFont>("Fonts/Arial10Italic");
-
 			Consolas10 = Content.Load<SpriteFont>("Fonts/Consolas10");
 			Consolas12 = Content.Load<SpriteFont>("Fonts/Consolas12");
-
 			ComicSans10 = Content.Load<SpriteFont>("Fonts/ComicSans10");
 		}
 	}
@@ -76,7 +68,6 @@ namespace CaveGame.Client
 		public static Song AmbientBirds5 { get; private set; }
 		public static Song AmbientBirds6 { get; private set; }
 		public static Song AmbientBirds7 { get; private set; }
-
 		public static Song AmbientCreepy1 { get; private set; }
 		public static Song AmbientCreepy2 { get; private set; }
 		public static Song AmbientCreepy3 { get; private set; }
@@ -86,7 +77,6 @@ namespace CaveGame.Client
 		{
 			MenuBlip = Content.Load<SoundEffect>("Sound/click1");
 			MenuBlip2 = Content.Load<SoundEffect>("Sound/menu1");
-
 			AmbientLava = Content.Load<Song>("Sound/ambient/lava");
 			AmbientBirds1 = Content.Load<Song>("Sound/ambient/birds1");
 			AmbientBirds2 = Content.Load<Song>("Sound/ambient/birds2");
@@ -95,7 +85,6 @@ namespace CaveGame.Client
 			AmbientBirds5 = Content.Load<Song>("Sound/ambient/birds5");
 			AmbientBirds6 = Content.Load<Song>("Sound/ambient/birds6");
 			AmbientBirds7 = Content.Load<Song>("Sound/ambient/birds7");
-
 			AmbientCreepy1 = Content.Load<Song>("Sound/ambient/birds1");
 			AmbientBirds7 = Content.Load<Song>("Sound/ambient/birds1");
 		}

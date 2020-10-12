@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
 namespace CaveGame.Core.Generic
 {
-	public class CircularArray<T>
+	public class CircularArray<T> : IEnumerable<T>
 	{
 		private T[] buffer;
 
@@ -52,6 +53,16 @@ namespace CaveGame.Core.Generic
 		public T[] GetBuffer()
 		{
 			return buffer;
+		}
+
+		public IEnumerator<T> GetEnumerator()
+		{
+			return ((IEnumerable<T>)buffer).GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return buffer.GetEnumerator();
 		}
 	}
 }

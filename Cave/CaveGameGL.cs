@@ -14,6 +14,8 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
 using CaveGame.Core.FileUtil;
 using CaveGame.Core.Tiles;
+using CaveGame.Core.Generic;
+using Steamworks;
 
 namespace CaveGame.Client
 {
@@ -22,6 +24,27 @@ namespace CaveGame.Client
 		public static int Width;
 		public static int Height;
 		public static GraphicsDevice GraphicsDevice;
+	}
+
+	public class DelayedTaskContainer
+	{
+		List<DelayedTask> tasks;
+
+		public DelayedTaskContainer()
+		{
+			tasks = new List<DelayedTask>();
+		}
+
+		public void Update(GameTime gt)
+		{
+			foreach (var task in tasks)
+				task.Update(gt);
+		}
+
+		public void Add(DelayedTask task)
+		{
+			tasks.Add(task);
+		}
 	}
 
 	public class CaveGameGL : Game
@@ -48,13 +71,55 @@ namespace CaveGame.Client
 
 		public static float ClickTimer;
 
-		public SteamManager SteamManager;
 
+		DelayedTaskContainer taskManager;
+
+
+		#region Steam Callbacks
+		private void Steam_OnOverlayActivated(Steamworks.GameOverlayActivated_t pCallback)
+		{
+
+		}
+		private void Steam_OnShutdown(Steamworks.SteamShutdown_t callback) { }
+		private void Steam_OnScreenshotRequested(Steamworks.ScreenshotRequested_t callback) { }
+
+		protected Steamworks.Callback<Steamworks.GameOverlayActivated_t> m_OverlayActivated;
+		#endregion
+
+		private void Steam_EnsureDLLExists()
+		{
+			try
+			{
+				if (Steamworks.SteamAPI.RestartAppIfNecessary((Steamworks.AppId_t)1238250))
+				{
+					Exit();
+					return;
+				}
+			} catch (System.DllNotFoundException e)
+			{
+				throw new Exception("Missing steam_api64.dll");
+			}
+		}
+
+		private void Steam_InitAPI()
+		{
+			if (!Steamworks.SteamAPI.Init())
+			{
+				throw new Exception("Steam API Failed to initialize!");
+			}
+		}
 		public CaveGameGL()
 		{
-			Steamworks.SteamAPI.Init();
-			SteamManager = new SteamManager(this);
-			Components.Add(SteamManager);
+			Steam_EnsureDLLExists();
+			Steam_InitAPI();
+
+
+			m_OverlayActivated = Steamworks.Callback<Steamworks.GameOverlayActivated_t>.Create(Steam_OnOverlayActivated);
+			Steamworks.Callback<Steamworks.SteamShutdown_t>.Create(Steam_OnShutdown);
+			Steamworks.Callback<Steamworks.ScreenshotRequested_t>.Create(Steam_OnScreenshotRequested);
+			taskManager = new DelayedTaskContainer();
+
+			taskManager.Add(new DelayedTask(() => Steamworks.SteamAPI.RunCallbacks(), 1 / 20.0f));
 
 			graphics = new GraphicsDeviceManager(this) 
 			{
@@ -69,6 +134,7 @@ namespace CaveGame.Client
 			Content.RootDirectory = "Content";
 			Window.AllowUserResizing = true;
 			Window.AllowAltF4 = true;
+
 
 		}
 
@@ -173,7 +239,7 @@ namespace CaveGame.Client
 
 		protected override void Update(GameTime gameTime)
 		{
-			
+			taskManager.Update(gameTime);
 
 			if (CurrentGameContext != PreviousGameContext && PreviousGameContext != null)
 			{
@@ -206,6 +272,7 @@ namespace CaveGame.Client
 		protected override void OnExiting(object sender, EventArgs args)
 		{
 			InWorldContext.Disconnect();
+			SteamAPI.Shutdown();
 			base.OnExiting(sender, args);
 		}
 

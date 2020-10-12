@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Intrinsics;
 using System.Text;
 
 namespace CaveGame.Core.Entities
@@ -18,51 +19,59 @@ namespace CaveGame.Core.Entities
 		Right
 	}
 
-	
-
-	public class Player : Entity, IPhysicsObject, IPositional, IVelocity, INextPosition, IHorizontalDirectionState
+	public abstract class PhysicsEntity : Entity, IPhysicsObject, IPositional, IVelocity, INextPosition, IBoundingBox, IFriction
 	{
-		public User User { get; set; }
-		public string DisplayName;
+		public abstract float Mass { get; }
+		public abstract Vector2 BoundingBox { get; }
+		public abstract Vector2 Friction { get; }
 
-		public HorizontalDirection Facing { get; set; }
-		public Vector2 Position { get; set; }
-		public Vector2 Velocity { get; set; }
-		public Vector2 BoundingBox => new Vector2(6, 12);
-		public Vector2 NextPosition { get; set; }
+		public virtual Vector2 Velocity { get; set; }
+		public virtual Vector2 Position { get; set; }
+		public virtual Vector2 NextPosition { get; set; }
+		
 
-		public Color Color;
-		public bool OnGround;
+		public bool OnGround { get; set; }
+		
 
-		public bool Walking { get; set; }
-
-		protected float walkingAnimationTimer;
-
-		public Vector2 TopLeft
+		public virtual void ApplyGravity(IGameWorld world, float step)
 		{
-			get { return Position - BoundingBox; }
+			if (Velocity.Y < World.TerminalVelocity)
+				Velocity = new Vector2(Velocity.X, Velocity.Y + (World.Gravity * Mass * step));
 		}
 
-		public Player()
+		public virtual void ApplyAirResistance(IGameWorld world, float step)
 		{
-			Position = new Vector2(0, -200);
-			Velocity = Vector2.Zero;
-			OnGround = false;
-			Color = Color.White;
+			var xForce = World.AirResistance * Friction.X;
+			var yForce = World.AirResistance * Friction.Y;
+			Velocity = new Vector2(Velocity.X * xForce, Velocity.Y);
 		}
 
-		public virtual void PhysicsStep(IGameWorld world, float step)
+		public virtual void OnCollide(IGameWorld world, Tile t, Vector2 separation, Vector2 normal)
 		{
-			
+			if (normal.Y == 1)
+			{
+				Velocity = new Vector2(Velocity.X, -Velocity.Y * 0.5f);
+			}
+			if (normal.Y == -1)
+			{
+				Velocity = new Vector2(Velocity.X, 0);
+				OnGround = true;
+			}
+			NextPosition += separation;
+		}
 
+		public override void Update(IGameWorld world, GameTime gt)
+		{
+			base.Update(world, gt);
+		}
+
+		public virtual void CollisionTest(IGameWorld world, float step)
+		{
 			OnGround = false;
 			var tilePosition = new Point(
-				(int)Math.Floor(Position.X / Globals.TileSize), 
+				(int)Math.Floor(Position.X / Globals.TileSize),
 				(int)Math.Floor(Position.Y / Globals.TileSize)
 			);
-
-
-
 			int bb = 4;
 			for (int x = -bb; x < bb; x++)
 			{
@@ -88,49 +97,67 @@ namespace CaveGame.Core.Entities
 								Velocity = Vector2.Zero;
 								continue;
 							}
-
-							if (normal.X != 0 && normal.Y != 0)
-							{
-
-							}
-							if (normal.Y == 1)
-							{
-								Velocity = new Vector2(Velocity.X, -Velocity.Y * 0.5f);
-							}
-							if (normal.Y == -1)
-							{
-								Velocity = new Vector2(Velocity.X, 0);
-								OnGround = true;
-							}
-							NextPosition += separation;
-							//return;
+							OnCollide(world, tile, separation, normal);
 						}
 					}
 				}
 			}
+		}
 
-			
-
-
-			Velocity = new Vector2(Velocity.X * 0.92f, Velocity.Y);
-
-			float gravity = 4f;
-			Velocity = new Vector2(Velocity.X, Velocity.Y + gravity * step);
+		public virtual void PhysicsStep(IGameWorld world, float step)
+		{
+			CollisionTest(world, step);
+			ApplyAirResistance(world, step);
+			ApplyGravity(world, step);
 
 			Position = NextPosition;
 			NextPosition += Velocity;
 
+			
 		}
+	}
+	
+
+	public class Player : PhysicsEntity, IPhysicsObject, IPositional, IVelocity, INextPosition, IHorizontalDirectionState
+	{
+		private static Vector2 _boundingBox = new Vector2(6, 12);
+		private static float _mass = 1.5f;
+		private static Vector2 _friction = new Vector2(0.98f, 1.0f);
+
+		public override Vector2 BoundingBox => _boundingBox;
+		public override float Mass => _mass;
+		public override Vector2 Friction => _friction;
+
+		public User User { get; set; }
+		public string DisplayName;
+
+		public HorizontalDirection Facing { get; set; }
+
+		public Color Color;
+
+		public bool Walking { get; set; }
+
+		protected float walkingAnimationTimer;
+
+		public Vector2 TopLeft
+		{
+			get { return Position - BoundingBox; }
+		}
+
+		public Player()
+		{
+			Position = new Vector2(0, -200);
+			Velocity = Vector2.Zero;
+			OnGround = false;
+			Color = Color.White;
+		}
+
+
 
 		public override void Update(IGameWorld world, GameTime gt)
 		{
 			walkingAnimationTimer += (float)gt.ElapsedGameTime.TotalSeconds * 5;
 			base.Update(world, gt);
-		}
-
-		public void OnCollide(IGameWorld world, Tile t, Vector2 separation, Vector2 normal)
-		{
-			throw new NotImplementedException();
 		}
 
 #if CLIENT
@@ -177,6 +204,7 @@ namespace CaveGame.Core.Entities
 		public override void PhysicsStep(IGameWorld world, float step)
 		{
 			Position = Position.Lerp(NextPosition, 0.5f);
+			return;
 		}
 	}
 

@@ -6,6 +6,8 @@ using System.Text;
 
 namespace CaveGame.Core.Entities
 {
+
+
 	public interface IReplicatedProperty { }
 	public interface IPositional: IReplicatedProperty { 
 		Vector2 Position { get; set; }
@@ -27,6 +29,12 @@ namespace CaveGame.Core.Entities
 	public interface IPhysicsObject {
 		void PhysicsStep(IGameWorld world, float step);
 		void OnCollide(IGameWorld world, Tiles.Tile t, Vector2 separation, Vector2 normal);
+		float Mass { get; }
+
+	}
+	public interface IFriction
+	{
+		Vector2 Friction { get; }
 	}
 	public interface IEntity {
 		int EntityNetworkID { get; }

@@ -31,6 +31,15 @@ namespace CaveGame.Core
 
 	public abstract class World : IGameWorld
 	{
+		#region PhysicsConstants
+		public const float PhysicsStepIncrement = 1 / 100.0f;
+		public const float Gravity = 4.0f;
+		public const float AirResistance = 0.95f;
+		public const float TerminalVelocity = 100.0f;
+		
+
+		#endregion
+
 		public ConcurrentDictionary<ChunkCoordinates, Chunk> Chunks;
 		public List<IEntity> Entities { get; protected set; }
 
@@ -43,7 +52,6 @@ namespace CaveGame.Core
 			var tileY = y.Mod(Globals.ChunkSize);
 
 			var coords = new ChunkCoordinates(chunkX, chunkY);
-
 			if (Chunks.ContainsKey(coords))
 			{
 				var chunk = Chunks[coords];

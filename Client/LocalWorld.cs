@@ -1,5 +1,6 @@
 ﻿using CaveGame.Core;
 using CaveGame.Core.Entities;
+using CaveGame.Core.Particles;
 using CaveGame.Core.Tiles;
 using CaveGame.Core.Walls;
 using Microsoft.Xna.Framework;
@@ -37,7 +38,8 @@ namespace CaveGame.Client
 
 	public class LocalWorld : World
 	{
-		const float PhysicsStepIncrement = 1 / 100.0f;
+
+		public ParticleEmitter ParticleSystem;
 
 		float physTiming;
 
@@ -48,6 +50,7 @@ namespace CaveGame.Client
 
 		public LocalWorld() : base()
 		{
+			ParticleSystem = new ParticleEmitter(this);
 			Lighting = new LightingEngine(this);
 			RequestedChunks = new List<ChunkCoordinates>();
 			LoadedChunks = new List<ChunkCoordinates>();
@@ -56,8 +59,26 @@ namespace CaveGame.Client
 
 		public void UnloadChunk(ChunkCoordinates coords) {}
 
+		Random r = new Random();
+
+		private static void Repeat(Action a, int times)
+		{
+			for (int i = 0; i<times; i++)
+			{
+				a.Invoke();
+			}
+		}
+
+
 		public override void SetTile(int x, int y, Tile t)
 		{
+			Repeat(() =>
+			ParticleSystem.Add(new SmokeParticle(
+				new Vector2(x, y) * 8, Color.White, Rotation.FromDeg(r.Next(0, 360)), (float)(r.NextDouble()+0.5f), new Vector2(
+					(float)((r.NextDouble() - 0.5f) * 2),
+					-2
+				)
+			)), 4);
 			Lighting.UpdateTile(x, y, t);
 			base.SetTile(x, y, t);
 		}
@@ -104,6 +125,8 @@ namespace CaveGame.Client
 
 		private void PhysicsStep()
 		{
+			ParticleSystem.PhysicsStep(this, PhysicsStepIncrement);
+
 			foreach (IEntity entity in Entities)
 				if (entity is IPhysicsObject physEntity)
 					physEntity.PhysicsStep(this, PhysicsStepIncrement);
@@ -113,6 +136,7 @@ namespace CaveGame.Client
 		public override void Update(GameTime gt)
 		{
 			float delta = (float)gt.ElapsedGameTime.TotalSeconds;
+			ParticleSystem.Update(gt);
 			Lighting.Update(gt);
 
 			tick += delta;
@@ -184,7 +208,5 @@ namespace CaveGame.Client
 
 
 	}
-
-	
 
 }
