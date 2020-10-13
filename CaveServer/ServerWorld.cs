@@ -152,6 +152,36 @@ namespace CaveGame.Server
 			}
 		}
 
+		public override void Explosion(Vector2 pos, float strength, float radius, bool damageTiles, bool damageEntities)
+		{
+			Server.SendToAll(new ExplosionPacket(pos, radius, strength, damageTiles, damageEntities));
+
+			if (damageTiles)
+			{
+				for(int x = -10; x < 10; x++)
+				{
+					for (int y = -10; y < 10; y++)
+					{
+						Vector2 thisPosVec = pos + new Vector2(x * Globals.TileSize, y * Globals.TileSize);
+
+						float dist = (thisPosVec - pos).Length()/Globals.TileSize;
+
+						var damage = Math.Max(strength - dist, 0);
+
+						var centroid = new Point((int)pos.X / Globals.TileSize, (int)pos.Y / Globals.TileSize)+new Point(x, y);
+						var tile = GetTile(centroid.X, centroid.Y);
+						tile.Damage += (byte)damage;
+						
+						if (tile.Damage > tile.Hardness)
+						{
+							SetTile(centroid.X, centroid.Y, new Air());
+						}
+					}
+				}
+			}
+
+		}
+
 		public override void Update(GameTime gt)
 		{
 			internalTimer += (float)gt.ElapsedGameTime.TotalSeconds;

@@ -72,13 +72,6 @@ namespace CaveGame.Client
 
 		public override void SetTile(int x, int y, Tile t)
 		{
-			Repeat(() =>
-			ParticleSystem.Add(new SmokeParticle(
-				new Vector2(x, y) * 8, Color.White, Rotation.FromDeg(r.Next(0, 360)), (float)(r.NextDouble()+0.5f), new Vector2(
-					(float)((r.NextDouble() - 0.5f) * 2),
-					-2
-				)
-			)), 4);
 			Lighting.UpdateTile(x, y, t);
 			base.SetTile(x, y, t);
 		}

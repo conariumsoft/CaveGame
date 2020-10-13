@@ -22,7 +22,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)World\ChunkCoordinates.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CollisionSolver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Entity.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Entities\Explosion.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\ItemstackEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Entities\Player.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileUtil\Configuration.cs" />

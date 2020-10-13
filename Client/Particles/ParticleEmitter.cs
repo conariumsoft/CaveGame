@@ -66,11 +66,11 @@ namespace CaveGame.Core.Particles
 
 	public class SmokeParticle : Particle
 	{
-		public static Rectangle Quad = new Rectangle(7, 0, 4, 4);
+		public static Rectangle Quad = new Rectangle(8, 0, 4, 4);
 		public static Vector2 Origin = new Vector2(2, 2);
-		public static Vector2 Friction = new Vector2(0.98f, 0.98f);
+		public static Vector2 Friction = new Vector2(0.95f, 0.95f);
 		public static float Mass = 0.1f;
-		public override float MaxParticleAge => 2.5f;
+		public override float MaxParticleAge => 1.0f;
 
 		private Rotation rotation;
 		private Vector2 position;
@@ -110,7 +110,10 @@ namespace CaveGame.Core.Particles
 		}
 		public override void Draw(SpriteBatch sb)
 		{
-			sb.Draw(GameTextures.ParticleSet, position, Quad, color, rotation.Radians, Origin, scale, SpriteEffects.None, 0);
+			float alpha = Math.Min(1, (1- (ParticleAge / MaxParticleAge))*2);
+
+
+			sb.Draw(GameTextures.ParticleSet, position, Quad, color*alpha, rotation.Radians, Origin, scale, SpriteEffects.None, 0);
 		}
 
 		public override void OnCollide(IGameWorld world, Tile t, Vector2 separation, Vector2 Normal)

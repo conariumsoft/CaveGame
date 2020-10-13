@@ -54,10 +54,12 @@ namespace CaveGame.Core.Entities
 
 	public class Entity: IEntity
 	{
+
 		public float TicksAlive { get; set; }
 		public bool Dead { get; set; } // Gets collected on death
 		public bool RemoteControlled { get; set; }
 		public int EntityNetworkID { get; set; }
+
 
 		public Entity()
 		{

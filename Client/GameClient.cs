@@ -7,6 +7,7 @@ using CaveGame.Core.Entities;
 using CaveGame.Core.Generic;
 using CaveGame.Core.Inventory;
 using CaveGame.Core.Network;
+using CaveGame.Core.Particles;
 using CaveGame.Core.Tiles;
 using CaveGame.Server;
 using Microsoft.Xna.Framework;
@@ -53,6 +54,7 @@ namespace CaveGame.Client
 			new TempItemDef{ Quad=TileMap.Ore, Color = TileDefinitions.CobaltOre.Color, TileID = (byte)TileID.CobaltOre},
 			new TempItemDef{ Quad=TileMap.Ore, Color = TileDefinitions.LeadOre.Color, TileID = (byte)TileID.LeadOre},
 			new TempItemDef{ Quad=TileMap.Ore, Color = TileDefinitions.UraniumOre.Color, TileID = (byte)TileID.UraniumOre},
+			new TempItemDef{ Quad=TileMap.TNT, Color = TileDefinitions.TNT.Color, TileID = (byte)TileID.TNT},
 		};
 
 		private int lastScroll = 0;
@@ -348,6 +350,24 @@ namespace CaveGame.Client
 			World.Entities.Add(myplayer);
 		}
 
+		Random r = new Random();
+		private void OnExplosion(NetworkMessage msg)
+		{
+			ExplosionPacket packet = new ExplosionPacket(msg.Packet.GetBytes());
+
+			Vector2 pos = new Vector2(packet.X, packet.Y);
+
+			for (int i = 0; i<360; i+=10)
+			{
+				float randy = r.Next(0, 20)-10;
+				Rotation rotation = Rotation.FromDeg(i+randy);
+				Vector2 direction = new Vector2((float)Math.Sin(rotation.Radians), (float)Math.Cos(rotation.Radians));
+				float size = 0.25f + ((float)r.NextDouble() *0.25f) + (packet.Strength*0.25f);
+				World.ParticleSystem.Add(new SmokeParticle(pos, Color.White, Rotation.FromDeg(0), size, direction* (packet.Radius*0.6f+((float)r.NextDouble()))));
+			}
+
+			
+		}
 
 		#endregion
 
@@ -375,6 +395,8 @@ namespace CaveGame.Client
 					OnPeerLeft(msg);
 				if (msg.Packet.Type == PacketType.SPlayerPosition)
 					OnPeerPosition(msg);
+				if (msg.Packet.Type == PacketType.SExplosion)
+					OnExplosion(msg);
 			}
 		}
 
@@ -534,8 +556,8 @@ namespace CaveGame.Client
 			DrawChunks(sb);
 
 			Game.GraphicsDevice.Clear(Color.CornflowerBlue);
-			sb.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
-			//DrawChunkBGTextures(sb);
+			sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
+			DrawChunkBGTextures(sb);
 			EntityRendering(sb);
 			DrawChunkFGTextures(sb);
 			World.ParticleSystem.Draw(sb);

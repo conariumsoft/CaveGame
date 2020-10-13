@@ -1,5 +1,6 @@
 ﻿#if CLIENT
 using CaveGame.Client;
+using CaveGame.Core.Entities;
 #endif
 using CaveGame.Core.Walls;
 using Microsoft.Xna.Framework;
@@ -47,7 +48,7 @@ namespace CaveGame.Core.Tiles
 		LeadOre, MudBrick, SandBrick, IceBrick, CarvedStoneBrick,
 		CarvedSandBrick, MossyStoneBrick, MossyStone,
 		CubedStone, CubedSandstone,
-		Cobweb, Tallgrass, Rope, Vine, Ladder, Platform
+		Cobweb, Tallgrass, Rope, Vine, Ladder, Platform, TNT
 	}
 	public class TDef : ILightEmitter // TileData
 	{
@@ -67,8 +68,6 @@ namespace CaveGame.Core.Tiles
 			Quad = TileMap.Brick;
 			Friction = 1;
 		}
-
-
 	}
 
 	public static class TileDefinitions
@@ -195,6 +194,12 @@ namespace CaveGame.Core.Tiles
 			Hardness = 2,
 			Opacity = 1,
 			Color = new Color(0.8f, 0.5f, 0.3f)
+		};
+		public static TDef TNT = new TDef
+		{
+			Quad = TileMap.TNT,
+			Color = Color.White,
+			Hardness = 1
 		};
 	}
 	#region stuff
@@ -1174,7 +1179,22 @@ namespace CaveGame.Core.Tiles
 	public class BleedingHeart { }
 	public class EnglishBluebell { }
 	public class Poppy { }
-	public class TNT { }
+	public class TNT : Tile, ITileUpdate
+	{
+		public TNT() : base(TileDefinitions.TNT)
+		{
+
+		}
+
+		public void TileUpdate(IGameWorld world, int x, int y)
+		{
+			world.SetTile(x, y, new Air());
+			world.Explosion(
+				new Vector2(x, y) * 8,
+				8.0f, 2.0f, true, true
+			);
+		}
+	}
 	public class Switch { }
 	public class ANDGate { }
 	public class ORGate { }

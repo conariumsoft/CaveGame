@@ -50,9 +50,8 @@ namespace CaveGame.Client
 	public class CaveGameGL : Game
 	{
 
-
 		public IGameContext CurrentGameContext { get; set; }
-		private IGameContext PreviousGameContext { get;  set; }
+		private IGameContext PreviousGameContext { get; set; }
 
 		#region Game States
 		public HomePage HomePageContext;
@@ -82,9 +81,30 @@ namespace CaveGame.Client
 		}
 		private void Steam_OnShutdown(Steamworks.SteamShutdown_t callback) { }
 		private void Steam_OnScreenshotRequested(Steamworks.ScreenshotRequested_t callback) { }
+		private void Steam_OnUserStatsReceived(Steamworks.UserStatsReceived_t callback) { }
+		private void Steam_OnUserStatsStored(UserStatsStored_t param)
+		{
 
+		}
+		private void Steam_OnAchievementsStored(UserAchievementStored_t param)
+		{
+		}
 		protected Steamworks.Callback<Steamworks.GameOverlayActivated_t> m_OverlayActivated;
 		#endregion
+
+		private void Steam_LoadAchievements()
+		{
+			foreach(Achievement ach in Achievements.List)
+			{
+				bool ret = SteamUserStats.GetAchievement(ach.SteamAcheivementID, out ach.Achieved);
+
+				if (ret)
+				{
+					ach.Name = SteamUserStats.GetAchievementDisplayAttribute(ach.SteamAcheivementID, "name");
+					ach.Description = SteamUserStats.GetAchievementDisplayAttribute(ach.SteamAcheivementID, "desc");
+				}
+			}
+		}
 
 		private void Steam_EnsureDLLExists()
 		{
@@ -113,10 +133,18 @@ namespace CaveGame.Client
 			Steam_EnsureDLLExists();
 			Steam_InitAPI();
 
+			
 
 			m_OverlayActivated = Steamworks.Callback<Steamworks.GameOverlayActivated_t>.Create(Steam_OnOverlayActivated);
 			Steamworks.Callback<Steamworks.SteamShutdown_t>.Create(Steam_OnShutdown);
 			Steamworks.Callback<Steamworks.ScreenshotRequested_t>.Create(Steam_OnScreenshotRequested);
+			Steamworks.Callback<Steamworks.UserStatsReceived_t>.Create(Steam_OnUserStatsReceived);
+			Steamworks.Callback<Steamworks.UserStatsStored_t>.Create(Steam_OnUserStatsStored);
+			Steamworks.Callback<Steamworks.UserAchievementStored_t>.Create(Steam_OnAchievementsStored);
+
+			bool statsSuccess = SteamUserStats.RequestCurrentStats();
+
+
 			taskManager = new DelayedTaskContainer();
 
 			taskManager.Add(new DelayedTask(() => Steamworks.SteamAPI.RunCallbacks(), 1 / 20.0f));
@@ -137,9 +165,6 @@ namespace CaveGame.Client
 
 
 		}
-
-		private void OnSteamOverlayOpened() {}
-		private void OnSteamOverlayClosed() { }
 
 
 		void Window_ClientSizeChanged(object sender, EventArgs e)

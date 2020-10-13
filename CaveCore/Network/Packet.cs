@@ -37,7 +37,8 @@ namespace CaveGame.Core.Network
 		SPlayerPosition,
 		SDestroyEntity,
 		ClientQuit,
-		PlayerState
+		PlayerState,
+		SExplosion
 	}
 
 
@@ -131,6 +132,59 @@ namespace CaveGame.Core.Network
 
 	}
 
+	public class ExplosionPacket : Packet
+	{
+		public ExplosionPacket(Vector2 pos, float radius, float strength, bool harmtiles, bool harmentities) : base(PacketType.SExplosion) {
+			Payload = new byte[20];
+			X = pos.X;
+			Y = pos.Y;
+			Strength = strength;
+			Radius = radius;
+			DamageEntities = harmentities;
+			DamageTiles = harmtiles;
+		}
+		public ExplosionPacket(byte[] data) : base(data) { }
+
+
+		public float X
+		{
+			get { return TypeSerializer.ToFloat(Payload, 0); }
+			set { TypeSerializer.FromFloat(ref Payload, 0, value); }
+		}
+
+		public float Y
+		{
+			get { return TypeSerializer.ToFloat(Payload, 4); }
+			set { TypeSerializer.FromFloat(ref Payload, 4, value); }
+		}
+
+
+		public float Radius
+		{
+			get { return TypeSerializer.ToFloat(Payload, 8); }
+			set { TypeSerializer.FromFloat(ref Payload, 8, value); }
+		}
+
+		public float Strength
+		{
+			get { return TypeSerializer.ToFloat(Payload, 12); }
+			set { TypeSerializer.FromFloat(ref Payload, 12, value); }
+		}
+
+		public bool DamageTiles
+		{
+			get { return Payload[16].Get(0); }
+			set { Payload[16].Set(0, value); }
+		}
+
+		public bool DamageEntities
+		{
+			get { return Payload[16].Get(1); }
+			set { Payload[16].Set(1, value); }
+		}
+
+		
+	}
 
 	public class KickPacket : Packet
 	{

@@ -13,6 +13,7 @@ namespace CaveGame.Core
 
 	public interface IGameWorld
 	{
+		void Explosion(Vector2 pos, float strength, float radius, bool damageTiles, bool damageEntities);
 		List<IEntity> Entities { get; }
 		Tile GetTile(int x, int y);
 		void SetTile(int x, int y, Tile t);
@@ -94,6 +95,8 @@ namespace CaveGame.Core
 				chunk.SetTileUpdated(tileX, tileY);
 			}
 		}
+
+
 
 		public void DoUpdatePropogation(int x, int y)
 		{
@@ -179,6 +182,11 @@ namespace CaveGame.Core
 		}
 
 		public virtual void Update(GameTime gt) { }
+
+		public virtual void Explosion(Vector2 pos, float strength, float radius, bool damageTiles, bool damageEntities)
+		{
+			
+		}
 
 		public World()
 		{

@@ -393,6 +393,8 @@ namespace CaveGame.Server
 				ticker = 0;
 				foreach(var entity in World.Entities)
 				{
+
+
 					if (entity is Player player)
 					{
 						var pos = new EntityPositionPacket(player.EntityNetworkID, 
