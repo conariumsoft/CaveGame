@@ -55,6 +55,39 @@ namespace CaveGame.Client
 		}
 	}
 
+	public class TextureWrap {
+		public string Name;
+		public string File;
+
+		public TextureWrap(string name, string file)
+		{
+			Name = name;
+			File = file;
+		}
+	}
+
+	public static class ItemTextures
+	{
+		public static Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
+
+		private static string[] Items =
+		{
+			"Items/arrow",
+			"Items/bomb",
+
+		};
+		public static Texture2D Arrow;
+
+		public static void LoadAssets(ContentManager Content)
+		{
+			foreach(string item in Items)
+			{
+				Texture2D loaded = Content.Load<Texture2D>(item);
+				Textures.Add(loaded.Name.Replace("Items/", ""), loaded);
+			}
+		}
+	}
+
 	public static class GameSounds
 	{
 		public static SoundEffect MenuBlip { get; private set; }

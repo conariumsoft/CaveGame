@@ -48,7 +48,7 @@ namespace CaveGame.Core.Tiles
 		LeadOre, MudBrick, SandBrick, IceBrick, CarvedStoneBrick,
 		CarvedSandBrick, MossyStoneBrick, MossyStone,
 		CubedStone, CubedSandstone,
-		Cobweb, Tallgrass, Rope, Vine, Ladder, Platform, TNT
+		Cobweb, Tallgrass, Rope, Vine, Ladder, Platform, TNT, Lava, Sludge
 	}
 	public class TDef : ILightEmitter // TileData
 	{
@@ -76,6 +76,20 @@ namespace CaveGame.Core.Tiles
 		public static TDef Air = new TDef { Hardness = 0, Opacity = 1, Quad = TileMap.Default };
 		public static TDef Dirt = new TDef { Hardness = 2, Opacity = 3, Quad = TileMap.Soil, Color = Color.SaddleBrown };
 		public static TDef Water = new TDef { Hardness = 0, Opacity = 2, Quad = TileMap.Default, Color = Color.Blue };
+		public static TDef Lava = new TDef
+		{
+			Hardness = 0,
+			Opacity = 2,
+			Quad = TileMap.Default,
+			Color = Color.Red
+		};
+		public static TDef Sludge = new TDef
+		{
+			Hardness = 0,
+			Opacity = 2,
+			Quad = TileMap.Default,
+			Color = Color.Green
+		};
 		public static TDef Grass = new TDef { Hardness = 2, Opacity = 3, Quad = TileMap.Soil, Color = Color.Green };
 		public static TDef Stone = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Stone, Color = new Color(0.7f, 0.7f, 0.7f) };
 		public static TDef StoneBrick = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Brick, Color = new Color(0.7f, 0.7f, 0.7f) };
@@ -233,7 +247,9 @@ namespace CaveGame.Core.Tiles
 	}
 	public interface ISoil { }
 	public interface IGas { }
-	public interface ILiquid { }
+	public interface ILiquid {
+		float Viscosity { get; }
+	}
 	public interface IVegetation { }
 	public interface IOre { }
 	public interface IMineral { }
@@ -544,9 +560,11 @@ namespace CaveGame.Core.Tiles
 #endregion
 #region Liquids
 
-	public class Water : Tile, ILiquid, INonSolid, ITileUpdate, IRandomTick, ILocalTileUpdate
+	public abstract class Liquid : Tile, ILiquid, INonSolid
 	{
-		public Water() : base(TileDefinitions.Water) { TileState = 8; }
+		public Liquid(TDef def) : base(def) { }
+
+		public abstract float Viscosity { get;}
 
 		private bool EvaporationCheck(IGameWorld world, int x, int y)
 		{
@@ -558,14 +576,8 @@ namespace CaveGame.Core.Tiles
 			return false;
 		}
 
-		public void RandomTick(IGameWorld world, int x, int y)
-		{
-			//world.SetTileUpdated(x, y);
-		}
 
-		public void TileUpdate(IGameWorld world, int x, int y) { }
-
-		public void LocalTileUpdate(IGameWorld world, int x, int y)
+		public void LiquidUpdate<TLiquid>(IGameWorld world, int x, int y) where TLiquid : Liquid, new()
 		{
 			EvaporationCheck(world, x, y);
 
@@ -573,7 +585,7 @@ namespace CaveGame.Core.Tiles
 
 			if (below is IWaterBreakable s)
 			{
-				world.SetTile(x, y + 1, new Water { TileState = this.TileState });
+				world.SetTile(x, y + 1, new TLiquid { TileState = this.TileState });
 				world.SetTile(x, y, new Air());
 				world.DoUpdatePropogation(x, y);
 				world.SetTileNetworkUpdated(x, y);
@@ -581,7 +593,7 @@ namespace CaveGame.Core.Tiles
 				return;
 			}
 
-			if (below is Water wbelow)
+			if (below is TLiquid wbelow)
 			{
 				var most = 8 - below.TileState;
 
@@ -590,8 +602,8 @@ namespace CaveGame.Core.Tiles
 				below.TileState += taken;
 				world.DoUpdatePropogation(x, y);
 				world.DoUpdatePropogation(x, y + 1);
-				world.SetTileNetworkUpdated(x, y);
-				world.SetTileNetworkUpdated(x, y + 1);
+				//world.SetTileNetworkUpdated(x, y);
+				//world.SetTileNetworkUpdated(x, y + 1);
 				//return;
 			}
 
@@ -600,34 +612,35 @@ namespace CaveGame.Core.Tiles
 			if (left is IWaterBreakable && TileState > 0)
 			{
 
-				world.SetTile(x - 1, y, new Water { TileState = 1 });
+				world.SetTile(x - 1, y, new TLiquid { TileState = 1 });
 				this.TileState--;
 				world.DoUpdatePropogation(x, y);
 				world.DoUpdatePropogation(x - 1, y);
 
-				world.SetTileNetworkUpdated(x, y);
-				world.SetTileNetworkUpdated(x - 1, y);
+				//world.SetTileNetworkUpdated(x, y);
+				//world.SetTileNetworkUpdated(x - 1, y);
 			}
 
 			var right = world.GetTile(x + 1, y);
 
 			if (right is IWaterBreakable && TileState > 0)
 			{
-				world.SetTile(x + 1, y, new Water { TileState = 1 });
+				world.SetTile(x + 1, y, new TLiquid { TileState = 1 });
 				this.TileState--;
 				world.DoUpdatePropogation(x, y);
 				world.DoUpdatePropogation(x + 1, y);
-				world.SetTileNetworkUpdated(x, y);
-				world.SetTileNetworkUpdated(x + 1, y);
+				//world.SetTileNetworkUpdated(x, y);
+				//world.SetTileNetworkUpdated(x + 1, y);
 			}
 
-			if (left is Water wleft && TileState > wleft.TileState)
+			if (left is TLiquid wleft && TileState > wleft.TileState)
 			{
 				if (TileState > wleft.TileState + 1)
 				{
 					TileState--;
 					wleft.TileState++;
-				} else if (TileState - wleft.TileState == 1)
+				}
+				else if (TileState - wleft.TileState == 1)
 				{
 					if (RNG.NextDouble() > 0.5)
 
@@ -638,11 +651,11 @@ namespace CaveGame.Core.Tiles
 				world.DoUpdatePropogation(x, y);
 				world.DoUpdatePropogation(x - 1, y);
 
-				world.SetTileNetworkUpdated(x, y);
-				world.SetTileNetworkUpdated(x - 1, y);
+				//world.SetTileNetworkUpdated(x, y);
+				//world.SetTileNetworkUpdated(x - 1, y);
 			}
 
-			if (right is Water wright && TileState > wright.TileState)
+			if (right is TLiquid wright && TileState > wright.TileState)
 			{
 				if (TileState > wright.TileState + 1)
 				{
@@ -659,21 +672,80 @@ namespace CaveGame.Core.Tiles
 				}
 				world.DoUpdatePropogation(x, y);
 				world.DoUpdatePropogation(x + 1, y);
-				world.SetTileNetworkUpdated(x, y);
-				world.SetTileNetworkUpdated(x + 1, y);
+				//world.SetTileNetworkUpdated(x, y);
+				//world.SetTileNetworkUpdated(x + 1, y);
 			}
 			EvaporationCheck(world, x, y);
 		}
+	}
+
+	public class Lava: Liquid, ITileUpdate, ILocalTileUpdate, ILightEmitter
+	{
+		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 light)
+		{
+			var rect = new Rectangle(0, 15 * Globals.TileSize, Globals.TileSize, TileState);
+			sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, (y * Globals.TileSize) + (8 - TileState)), rect, light.MultiplyAgainst(Color.Red));
+		}
+
+		public override float Viscosity => 3.0f;
+		public Lava() : base(TileDefinitions.Lava) { TileState = 8; }
+
+		public Light3 Light => new Light3(48, 16, 16);
+
+		public void TileUpdate(IGameWorld world, int x, int y)
+		{
+			//LiquidUpdate<Lava>(world, x, y);
+		}
+
+		public void LocalTileUpdate(IGameWorld world, int x, int y)
+		{
+			LiquidUpdate<Lava>(world, x, y);
+		}
+	}
+
+	public class Water : Liquid, ILiquid, INonSolid, ITileUpdate, ILocalTileUpdate
+	{
+		public override float Viscosity => 1.0f;
+		public Water() : base(TileDefinitions.Water) { TileState = 8; }
+
+		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 light)
+		{
+
+			float brug = Math.Max(0.5f, (1 - (light.Blue/16.0f))*2.0f);
+
+			var rect = new Rectangle(0, 15 * Globals.TileSize, Globals.TileSize, TileState);
+			sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, (y * Globals.TileSize) + (8 - TileState)), rect, light.MultiplyAgainst(Color.Blue) * brug);
+
+
+
+		}
+
+		public void TileUpdate(IGameWorld world, int x, int y) {
+			//LiquidUpdate<Water>(world, x, y);
+		}
+
+		public void LocalTileUpdate(IGameWorld world, int x, int y) {
+			LiquidUpdate<Water>(world, x, y);
+		}
+	}
+	public class Sludge : Liquid, ILightEmitter, ILocalTileUpdate
+	{
+		public override float Viscosity => 2.0f;
+		public Sludge() : base(TileDefinitions.Sludge) { TileState = 8; }
+		public Light3 Light => new Light3(14, 32, 8);
 
 		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 light)
 		{
 
 			var rect = new Rectangle(0, 15 * Globals.TileSize, Globals.TileSize, TileState);
-			sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, (y * Globals.TileSize) + (8 - TileState)), rect, light.MultiplyAgainst(Color.Blue));
+			sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, (y * Globals.TileSize) + (8 - TileState)), rect, light.MultiplyAgainst(new Color(0.6f, 0.9f, 0.3f)));
+		}
+
+		public void LocalTileUpdate(IGameWorld world, int x, int y)
+		{
+			LiquidUpdate<Sludge>(world, x, y);
 		}
 	}
-	public class Magma { }
-	public class Sludge { }
 	public class Ectoplasm { }
 	public class Oil { }
 	public class LiquidOxygen { }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -11,8 +13,14 @@ namespace CaveGame.Core.Inventory
 	{
 		int MaxStack { get; }
 		string Name { get; }
+		void Draw(SpriteBatch sb, Vector2 position);
 	}
 	// items
+	public abstract class Ingot
+	{
+
+	}
+
 	public class CopperIngot { }
 	public class LeadIngot { }
 	public class TinIngot { }

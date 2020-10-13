@@ -257,6 +257,7 @@ namespace CaveGame.Client
 			GameFonts.LoadAssets(Content);
 			GameSounds.LoadAssets(Content);
 			GameTextures.LoadAssets(Content);
+			ItemTextures.LoadAssets(Content);
 			CreateGameStates();
 		}
 
@@ -301,6 +302,8 @@ namespace CaveGame.Client
 			base.OnExiting(sender, args);
 		}
 
+
+
 		protected override void Draw(GameTime gameTime)
 		{
 			GraphicsDevice.Clear(Color.Black);
@@ -311,7 +314,11 @@ namespace CaveGame.Client
 			}
 			FPSGraph.Draw(spriteBatch);
 			DrawDebugOverlay();
-			
+
+			spriteBatch.Begin();
+			spriteBatch.Draw(ItemTextures.Textures["bomb"], new Vector2(4, 4), Color.White);
+			spriteBatch.End();
+
 			Console.Draw(spriteBatch);
 			base.Draw(gameTime);
 		}

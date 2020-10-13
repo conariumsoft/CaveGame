@@ -42,6 +42,8 @@ namespace CaveGame.Client
 			new TempItemDef{ Quad=TileMap.Brick, Color = TileDefinitions.ClayBrick.Color, TileID = (byte)TileID.ClayBrick},
 			new TempItemDef{ Quad=TileMap.Brick, Color = TileDefinitions.StoneBrick.Color, TileID = (byte)TileID.StoneBrick},
 			new TempItemDef{ Quad=TileMap.Default, Color = Color.Blue, TileID = (byte)TileID.Water},
+			new TempItemDef{ Quad=TileMap.Default, Color = Color.Red, TileID = (byte)TileID.Lava},
+			new TempItemDef{ Quad=TileMap.Default, Color = Color.Green, TileID = (byte)TileID.Sludge},
 			new TempItemDef{ Quad=Torch.AnimStates[0], Color = TileDefinitions.Torch.Color, TileID = (byte)TileID.Torch},
 			new TempItemDef{ Quad=Torch.AnimStates[0], Color = TileDefinitions.RedTorch.Color, TileID = (byte)TileID.RedTorch},
 			new TempItemDef{ Quad=Torch.AnimStates[0], Color = TileDefinitions.BlueTorch.Color, TileID = (byte)TileID.BlueTorch},
