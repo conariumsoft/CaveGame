@@ -316,7 +316,7 @@ namespace CaveGame.Client
 			DrawDebugOverlay();
 
 			spriteBatch.Begin();
-			spriteBatch.Draw(ItemTextures.Textures["bomb"], new Vector2(4, 4), Color.White);
+			spriteBatch.Draw(ItemTextures.Bomb, new Vector2(4, 4), Color.White);
 			spriteBatch.End();
 
 			Console.Draw(spriteBatch);

@@ -223,7 +223,7 @@ namespace CaveGame.Core.Entities
 
 			if (OnGround)
 			{
-				jumpEnergy = 0.2f;
+				jumpEnergy = 0.22f;
 			}
 
 
@@ -237,7 +237,7 @@ namespace CaveGame.Core.Entities
 					jumpEnergy -= step;
 					if (jumpEnergy > 0)
 					{
-						velY -= step * speed * 1.0f;
+						velY -= step * speed * 1.2f;
 					}
 					
 				}

@@ -48,7 +48,7 @@ namespace CaveGame.Core.Tiles
 		LeadOre, MudBrick, SandBrick, IceBrick, CarvedStoneBrick,
 		CarvedSandBrick, MossyStoneBrick, MossyStone,
 		CubedStone, CubedSandstone,
-		Cobweb, Tallgrass, Rope, Vine, Ladder, Platform, TNT, Lava, Sludge
+		Cobweb, Tallgrass, Rope, Vine, Ladder, Platform, TNT, Lava, Sludge, Obsidian
 	}
 	public class TDef : ILightEmitter // TileData
 	{
@@ -115,7 +115,7 @@ namespace CaveGame.Core.Tiles
 		public static TDef GreenTorch = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.2f, 0.9f, 0.2f) };
 
 		public static TDef Mud = new TDef { Hardness = 2, Opacity = 3, Quad = TileMap.Soil, Color = new Color(0.3f, 0.1f, 0.1f) };
-		public static TDef Sand = new TDef { Hardness = 2, Opacity = 3, Quad = TileMap.Soil, Color = new Color(0.9f, 0.8f, 0.3f) };
+		public static TDef Sand = new TDef { Hardness = 2, Opacity = 3, Quad = TileMap.Soil, Color = new Color(1f, 0.7f, 0.7f) };
 		public static TDef Granite = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Soil, Color = new Color(0.8f, 0.7f, 0.7f) };
 		public static TDef Sandstone = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Stone, Color = new Color(1.0f, 1.0f, 0.3f) };
 		public static TDef Clay = new TDef { Hardness = 3, Opacity = 3, Quad = TileMap.Soil, Color = new Color(0.6f, 0.2f, 0.2f) };
@@ -214,6 +214,12 @@ namespace CaveGame.Core.Tiles
 			Quad = TileMap.TNT,
 			Color = Color.White,
 			Hardness = 1
+		};
+		public static TDef Obsidian = new TDef
+		{
+			Color = new Color(0.5f, 0.1f, 0.5f),
+			Quad = TileMap.StoneLight,
+			Hardness = 20,
 		};
 	}
 	#region stuff
@@ -320,6 +326,7 @@ namespace CaveGame.Core.Tiles
 				return (byte)Enum.Parse(typeof(TileID), name);
 			}
 		}
+
 		public string Namespace => "CaveGame";
 		public string TileName => this.GetType().Name;
 
@@ -344,6 +351,15 @@ namespace CaveGame.Core.Tiles
 			datagram[1 + pushIndex] = Damage;
 			datagram[2 + pushIndex] = TileState;
 			datagram[3 + pushIndex] = 0; // reserved for future uses
+		}
+
+		public static Tile Deserialize(ref byte[] datagram, int pullIndex)
+		{
+			Tile t = FromID(datagram[pullIndex]);
+			t.Damage = datagram[pullIndex + 1];
+			t.TileState = datagram[pullIndex + 2];
+
+			return t;
 		}
 
 
@@ -568,9 +584,9 @@ namespace CaveGame.Core.Tiles
 
 		private bool EvaporationCheck(IGameWorld world, int x, int y)
 		{
-			if (TileState < 1)
+			if (TileState < 1 && RNG.NextDouble() > 0.1)
 			{
-				world.SetTile(x, y, new Air());
+				world.SetTileNoLight(x, y, new Air());
 				return true;
 			}
 			return false;
@@ -585,12 +601,14 @@ namespace CaveGame.Core.Tiles
 
 			if (below is IWaterBreakable s)
 			{
-				world.SetTile(x, y + 1, new TLiquid { TileState = this.TileState });
-				world.SetTile(x, y, new Air());
-				world.DoUpdatePropogation(x, y);
-				world.SetTileNetworkUpdated(x, y);
-				world.SetTileNetworkUpdated(x, y + 1);
-				return;
+
+				world.SetTileNoLight(x, y + 1, new TLiquid { TileState = this.TileState });
+				world.SetTileNoLight(x, y, new Air());
+				TileState = 0;
+				//world.DoUpdatePropogation(x, y);
+				//world.SetTileNetworkUpdated(x, y);
+				//world.SetTileNetworkUpdated(x, y + 1);
+				//return;
 			}
 
 			if (below is TLiquid wbelow)
@@ -605,32 +623,34 @@ namespace CaveGame.Core.Tiles
 				//world.SetTileNetworkUpdated(x, y);
 				//world.SetTileNetworkUpdated(x, y + 1);
 				//return;
+				//return;
 			}
 
 			var left = world.GetTile(x - 1, y);
-
-			if (left is IWaterBreakable && TileState > 0)
-			{
-
-				world.SetTile(x - 1, y, new TLiquid { TileState = 1 });
-				this.TileState--;
-				world.DoUpdatePropogation(x, y);
-				world.DoUpdatePropogation(x - 1, y);
-
-				//world.SetTileNetworkUpdated(x, y);
-				//world.SetTileNetworkUpdated(x - 1, y);
-			}
-
 			var right = world.GetTile(x + 1, y);
 
-			if (right is IWaterBreakable && TileState > 0)
+			if (left is IWaterBreakable && right is IWaterBreakable && TileState >= 2)
 			{
-				world.SetTile(x + 1, y, new TLiquid { TileState = 1 });
-				this.TileState--;
+				if (TileState % 2 == 0)
+				{
+					world.SetTileNoLight(x - 1, y, new TLiquid { TileState = 1 });
+					world.SetTileNoLight(x + 1, y, new TLiquid { TileState = 1 });
+					TileState -= 2;
+				}
+			} else if (left is IWaterBreakable && TileState > 0)
+			{
+
+				
+				world.SetTileNoLight(x - 1, y, new TLiquid { TileState = 1 });
 				world.DoUpdatePropogation(x, y);
-				world.DoUpdatePropogation(x + 1, y);
-				//world.SetTileNetworkUpdated(x, y);
-				//world.SetTileNetworkUpdated(x + 1, y);
+				TileState--;
+			}else if (right is IWaterBreakable && TileState > 0)
+			{
+				
+				world.SetTileNoLight(x + 1, y, new TLiquid { TileState = 1 });
+				world.DoUpdatePropogation(x, y);
+				TileState--;
+
 			}
 
 			if (left is TLiquid wleft && TileState > wleft.TileState)
@@ -690,7 +710,7 @@ namespace CaveGame.Core.Tiles
 		public override float Viscosity => 3.0f;
 		public Lava() : base(TileDefinitions.Lava) { TileState = 8; }
 
-		public Light3 Light => new Light3(48, 16, 16);
+		public Light3 Light => new Light3(32, 4, 4);
 
 		public void TileUpdate(IGameWorld world, int x, int y)
 		{
@@ -699,7 +719,39 @@ namespace CaveGame.Core.Tiles
 
 		public void LocalTileUpdate(IGameWorld world, int x, int y)
 		{
+			var below = world.GetTile(x, y+1);
+
+			if (below is Water _)
+			{
+				world.SetTile(x, y+1, new Obsidian());
+				TileState--;
+			}
+			var left = world.GetTile(x-1, y);
+
+			if (left is Water _)
+			{
+				world.SetTile(x-1, y, new Obsidian());
+				TileState--;
+			}
+			var right = world.GetTile(x+1, y);
+
+			if (right is Water _)
+			{
+				world.SetTile(x+1, y, new Obsidian());
+				TileState--;
+			}
+			var top = world.GetTile(x, y-1);
+
+			if (top is Water _)
+			{
+				world.SetTile(x, y-1, new Obsidian());
+				TileState--;
+			}
+
 			LiquidUpdate<Lava>(world, x, y);
+
+			
+
 		}
 	}
 
@@ -793,7 +845,12 @@ namespace CaveGame.Core.Tiles
 	}
 	public class Glass { }
 	public class Limestone { }
-	public class Obsidian { }
+	public class Obsidian : Tile {
+		public Obsidian() : base(TileDefinitions.Obsidian)
+		{
+
+		}
+	}
 	public class Brimstone { }
 	public class Snow { }
 	public class Ice { }

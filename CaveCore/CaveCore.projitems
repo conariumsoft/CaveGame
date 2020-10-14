@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Generic\CircularArray.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generic\QuadTree.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generic\ThreadSafeValue.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\User.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\Chunk.cs" />
@@ -31,6 +32,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Inventory\Items.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Inventory\ItemStack.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)World\Generator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\Light3.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Message.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\NetworkMessage.cs" />
@@ -48,6 +50,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Chat\" />
-    <Folder Include="$(MSBuildThisFileDirectory)World\" />
   </ItemGroup>
 </Project>

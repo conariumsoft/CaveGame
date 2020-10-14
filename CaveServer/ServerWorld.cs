@@ -4,7 +4,9 @@ using CaveGame.Core.Tiles;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace CaveGame.Server
@@ -21,11 +23,14 @@ namespace CaveGame.Server
 		public string WorldName { get; }
 		public GameServer Server { get; set; }
 
+		public Generator Generator { get; set; }
+
 
 		public Dictionary<ChunkCoordinates, bool> LoadedChunks;
 
 		private ServerWorld() : base()
 		{
+			Generator = new Generator();
 		}
 
 
@@ -36,7 +41,7 @@ namespace CaveGame.Server
 
 			CreateDirectoryIfNull(@"Worlds");
 			CreateDirectoryIfNull(@"Worlds\" + WorldName);
-			CreateDirectoryIfNull(@"Worlds\" + WorldName + @"\Regions");
+			CreateDirectoryIfNull(@"Worlds\" + WorldName + @"\Chunks");
 
 			// Serialize world info into file.
 			XmlWriter worldXml = XmlWriter.Create(@"Worlds\" + WorldName + @"\WorldMetadata.xml");
@@ -75,8 +80,7 @@ namespace CaveGame.Server
 			XmlDocument worldmeta = new XmlDocument();
 			worldmeta.Load(@"Worlds\" + worldname + @"\WorldMetadata.xml");
 
-
-
+			WorldName = worldname;
 			WorldSeed = Int32.Parse(worldmeta["Metadata"]["Seed"].InnerText);
 		}
 
@@ -84,6 +88,81 @@ namespace CaveGame.Server
 		{
 			if (!System.IO.Directory.Exists(fname))
 				System.IO.Directory.CreateDirectory(fname);
+		}
+
+		public void SaveData()
+		{
+			foreach(var kvp in Chunks)
+			{
+				Chunk chunk = kvp.Value;
+				File.WriteAllBytes(@"Worlds\" + WorldName + @"\Chunks\" + kvp.Key.GetHashCode(), chunk.ToData());
+			}
+		}
+
+		private bool HasChunkOnFile(ChunkCoordinates coords)
+		{
+			if (System.IO.File.Exists(@"Worlds\" + WorldName + @"\Chunks\" + coords.GetHashCode()))
+			{
+				return true;
+			}
+			return false;
+		}
+
+		private Chunk RetrieveChunkFromFile(ChunkCoordinates coords)
+		{
+			Chunk chunk = new Chunk(coords.X, coords.Y);
+			chunk.FromData(File.ReadAllBytes(@"Worlds\" + WorldName + @"\Chunks\" + coords.GetHashCode()));
+
+			return chunk;
+		}
+
+		public Chunk RetrieveChunk(ChunkCoordinates coords)
+		{
+			Chunk chunk;
+			if (Chunks.ContainsKey(coords))
+			{
+				chunk = Chunks.GetValueOrDefault(coords);
+			} else if (HasChunkOnFile(coords)) {
+				chunk = RetrieveChunkFromFile(coords);
+
+				Chunks.TryAdd(coords, chunk);
+			}
+			else
+			{
+				chunk = new Chunk(coords.X, coords.Y);
+				Generator.HeightPass(ref chunk);
+				//World.Chunks.Add(coords, chunk);
+				Chunks.TryAdd(coords, chunk);
+			}
+
+			if (!chunk.DungeonPassCompleted)
+			{
+				chunk.DungeonPassCompleted = true;
+				// make sure all adjacent chunks are loaded
+				for (int x = -1; x <= 1; x++)
+				{
+					for (int y = -1; y <= 1; y++)
+					{
+						var newCoords = new ChunkCoordinates(coords.X + x, coords.Y + y);
+						if (!Chunks.ContainsKey(newCoords))
+						{
+							var thischunk = new Chunk(coords.X + x, coords.Y + y);
+							//World.Chunks.Add(newCoords, thischunk);
+							Chunks.TryAdd(newCoords, thischunk);
+							Generator.HeightPass(ref thischunk);
+						}
+					}
+				}
+
+				for (int x = 0; x < Chunk.ChunkSize; x++)
+				{
+					for (int y = 0; y < Chunk.ChunkSize; y++)
+					{
+						Generator.StructurePass(this, coords.X * Chunk.ChunkSize + x, coords.Y * Chunk.ChunkSize + y);
+					}
+				}
+			}
+			return chunk;
 		}
 
 		float internalTimer = 0;
@@ -117,6 +196,7 @@ namespace CaveGame.Server
 
 		private void ApplyTileUpdates(GameTime gt)
 		{
+			
 			foreach (var chunkKeyValuePair in Chunks)
 			{
 				Chunk chunk = chunkKeyValuePair.Value;
@@ -129,27 +209,31 @@ namespace CaveGame.Server
 		
 		}
 
-		private void ApplyRandomTileTicksToLoadedChunks(GameTime gt)
+		private async void ApplyRandomTileTicksToLoadedChunks(GameTime gt)
 		{
-			Random rng = new Random();
-			int UpdatesPerChunk = 10;
-			foreach (var chunkKeyValuePair in Chunks)
-			{
-				Chunk chunk = chunkKeyValuePair.Value;
+			await (Task.Run(() =>
+		{
+				 Random rng = new Random();
+				 int UpdatesPerChunk = 15;
+				 foreach (var chunkKeyValuePair in Chunks)
+				 {
+					 Chunk chunk = chunkKeyValuePair.Value;
 
-				for (int i = 0; i < UpdatesPerChunk; i++)
-				{
-					int x = rng.Next(Globals.ChunkSize);
-					int y = rng.Next(Globals.ChunkSize);
-					Tile t = chunk.GetTile(x, y);
+					 for (int i = 0; i < UpdatesPerChunk; i++)
+					 {
+						 int x = rng.Next(Globals.ChunkSize);
+						 int y = rng.Next(Globals.ChunkSize);
+						 Tile t = chunk.GetTile(x, y);
 
-					int worldX = (chunk.Coordinates.X * Globals.ChunkSize) + x;
-					int worldY = (chunk.Coordinates.Y * Globals.ChunkSize) + y;
+						 int worldX = (chunk.Coordinates.X * Globals.ChunkSize) + x;
+						 int worldY = (chunk.Coordinates.Y * Globals.ChunkSize) + y;
 
-					if (t is IRandomTick valid)
-						valid.RandomTick(this, worldX, worldY);
-				}
+						 if (t is IRandomTick valid)
+							 valid.RandomTick(this, worldX, worldY);
+					 }
+				 }
 			}
+			));
 		}
 
 		public override void Explosion(Vector2 pos, float strength, float radius, bool damageTiles, bool damageEntities)
@@ -186,7 +270,7 @@ namespace CaveGame.Server
 		{
 			internalTimer += (float)gt.ElapsedGameTime.TotalSeconds;
 			tileUpdateTimer += (float)gt.ElapsedGameTime.TotalSeconds;
-			if (internalTimer > (1 / 1.0f))
+			if (internalTimer > (1 / 5.0f))
 			{
 				internalTimer = 0;
 				ApplyRandomTileTicksToLoadedChunks(gt);

@@ -55,5 +55,21 @@ namespace CaveGame.Core
 		{
 			return new Color(a.R + b.R, a.G + b.G, a.B + b.B);
 		}
+
+
+		public static string DumpHex(this byte[] data, int index = 0)
+		{
+			return DumpHex(data, index, data.Length);
+		}
+
+		public static string DumpHex(this byte[] data, int index, int length)
+		{
+			StringBuilder bob = new StringBuilder();
+			for (int i = 0; i < length; i++)
+			{
+				bob.Append(String.Format("{0:X2}", data[i + index]));
+			}
+			return bob.ToString();
+		}
 	}
 }

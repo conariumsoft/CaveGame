@@ -27,11 +27,15 @@ namespace CaveGame.Core
 		void DoUpdatePropogation(int x, int y);
 		void SetTileUpdated(int x, int y);
 
+		void SetTileNoLight(int x, int y, Tile t);
+
 		void Update(GameTime gt);
 	}
 
 	public abstract class World : IGameWorld
 	{
+
+
 		#region PhysicsConstants
 		public const float PhysicsStepIncrement = 1 / 100.0f;
 		public const float Gravity = 4.0f;
@@ -60,6 +64,11 @@ namespace CaveGame.Core
 			}
 		}
 
+		public virtual void SetTileNoLight(int x, int y, Tile t)
+		{
+			throw new NotImplementedException();
+		}
+
 		public virtual void SetTile(int x, int y, Tile t)
 		{
 			
@@ -78,6 +87,8 @@ namespace CaveGame.Core
 			}
 			DoUpdatePropogation(x, y);
 		}
+
+
 
 		public void SetTileUpdated(int x, int y)
 		{

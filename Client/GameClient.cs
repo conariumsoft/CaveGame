@@ -440,13 +440,12 @@ namespace CaveGame.Client
 					spriteBatch.Print(GameFonts.Arial8, new Color(1, 1, 1, 0.5f), pos, (camChunkX + x) + ", " + (camChunkY + y));
 				}
 			}
-
 		}
 
 		
 		private void DrawChunks(SpriteBatch sb)
 		{
-			if (drawTimer > (1/2.0f))
+			if (drawTimer > (1/5.0f))
 			{
 				drawTimer = 0;
 				Chunk.RefreshedThisFrame = false;

@@ -69,6 +69,10 @@ namespace CaveGame.Client
 			}
 		}
 
+		public override void SetTileNoLight(int x, int y, Tile t)
+		{
+			base.SetTile(x, y, t);
+		}
 
 		public override void SetTile(int x, int y, Tile t)
 		{

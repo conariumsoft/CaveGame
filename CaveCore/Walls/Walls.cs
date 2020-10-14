@@ -167,6 +167,13 @@ namespace CaveGame.Core.Walls
 			datagram[3 + pushIndex] = 0; // reserved for future uses
 		}
 
+		public static Wall Deserialize(ref byte[] datagram, int pullIndex)
+		{
+			Wall w = Wall.FromID(datagram[pullIndex]);
+			w.Damage = datagram[pullIndex+1];
+			return w;
+		}
+
 		public static byte IDOf<T>()
 		{
 			var type = typeof(T);

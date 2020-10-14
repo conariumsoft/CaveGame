@@ -50,6 +50,13 @@ namespace CaveGame.Server
 			set;
 		}
 
+		public void OnShutdown()
+		{
+			Console.WriteLine("Shutting Down!");
+			World.SaveData();
+			Thread.Sleep(100);
+		}
+
 		public int TickRate { get; private set; }
 
 		public List<User> ConnectedUsers { get; private set; }
@@ -126,29 +133,11 @@ namespace CaveGame.Server
 		}
 
 
-		Random rng = new Random();
+		
 		private void StructureGeneration(IGameWorld world, int x, int y)
 		{
 
-			if (rng.Next(64) == 2 && world.GetTile(x, y) is Grass && world.GetTile(x, y - 1) is Air)
-			{
-
-
-				for (int dx = -3; dx <= 3; dx++)
-				{
-					for (int dy = -3; dy <= 3; dy++)
-					{
-						world.SetTile(dx + x, dy + y - 7, new Leaves());
-					}
-				}
-				world.SetTile(x, y - 1, new OakLog());
-				world.SetTile(x, y - 2, new OakLog());
-				world.SetTile(x, y - 3, new OakLog());
-				world.SetTile(x, y - 4, new OakLog());
-				world.SetTile(x, y - 5, new OakLog());
-
-				//world.SetTile(x, y - 1, new Stone());
-			}
+			
 		}
 
 		#region NetworkListenerMethods
@@ -271,43 +260,10 @@ namespace CaveGame.Server
 
 			Chunk chunk;
 			ChunkCoordinates coords = new ChunkCoordinates(packet.X, packet.Y);
-			if (World.Chunks.ContainsKey(coords))
-			{
-				chunk = World.Chunks.GetValueOrDefault(coords);
-			}
-			else
-			{
-				chunk = new Chunk(packet.X, packet.Y);
-				//World.Chunks.Add(coords, chunk);
-				World.Chunks.TryAdd(coords, chunk);
-			}
 
-			if (!chunk.DungeonPassCompleted)
-			{
-				chunk.DungeonPassCompleted = true;
-				// make sure all adjacent chunks are loaded
-				for (int x = -1; x <= 1; x++)
-				{
-					for (int y = -1; y <= 1; y++)
-					{
-						var newCoords = new ChunkCoordinates(packet.X + x, packet.Y + y);
-						if (!World.Chunks.ContainsKey(newCoords))
-						{
-							var thischunk = new Chunk(packet.X + x, packet.Y + y);
-							//World.Chunks.Add(newCoords, thischunk);
-							World.Chunks.TryAdd(newCoords, thischunk);
-						}
-					}
-				}
+			chunk = World.RetrieveChunk(coords);
 
-				for (int x = 0; x < Chunk.ChunkSize; x++)
-				{
-					for (int y = 0; y < Chunk.ChunkSize; y++)
-					{
-						StructureGeneration(World, coords.X * Chunk.ChunkSize + x, coords.Y * Chunk.ChunkSize + y);
-					}
-				}
-			}
+		
 
 			Debug.WriteLine(packet.X + ", " + packet.Y);
 			ChunkDownloadPacket chunkpacket = new ChunkDownloadPacket(chunk);

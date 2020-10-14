@@ -68,7 +68,44 @@ namespace CaveGame.Client
 
 	public static class ItemTextures
 	{
-		public static Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
+		public static Texture2D Bomb;
+		public static Texture2D Bong;
+		public static Texture2D Arrow;
+		public static Texture2D Bucket;
+		public static Texture2D BigPickaxe;
+		public static Texture2D Helmet;
+		public static Texture2D Chestplate;
+		public static Texture2D Sword;
+		public static Texture2D WalLScraper;
+		public static Texture2D PickaxeNew;
+		public static Texture2D Scroll;
+		public static Texture2D Dynamite;
+		public static Texture2D Workbench;
+		public static Texture2D Potion;
+		public static Texture2D Jetpack;
+		public static Texture2D Door;
+		public static Texture2D ForestPainting;
+		public static Texture2D Ingot;
+		public static Texture2D Leggings;
+
+		
+
+		public static void LoadAssets(ContentManager mgr) 
+		{
+			Texture2D Load(string file)
+			{
+				return mgr.Load<Texture2D>(file);
+			}
+
+			Arrow = Load("Items/arrow");
+			Bomb = Load("Items/bomb");
+			Bong = Load("Items/bong");
+			Ingot = Load("Items/ingot");
+
+
+		}
+
+		/*public static Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
 
 		private static string[] Items =
 		{
@@ -85,7 +122,7 @@ namespace CaveGame.Client
 				Texture2D loaded = Content.Load<Texture2D>(item);
 				Textures.Add(loaded.Name.Replace("Items/", ""), loaded);
 			}
-		}
+		}*/
 	}
 
 	public static class GameSounds

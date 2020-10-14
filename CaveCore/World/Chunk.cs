@@ -54,8 +54,72 @@ namespace CaveGame.Core
 			FillNoise();
 			NetworkUpdated = new bool[ChunkSize, ChunkSize];
 			NetworkUpdated.Initialize();
-		//	TileUpdate.Initialize();
+			TileUpdate.Initialize();
+			//Logger.Log(ToData().DumpHex());
 
+		}
+
+		public void FromData(byte[] data)
+		{
+			int dIndex = 0;
+
+			byte header = data[0];
+
+			TerrainPassCompleted = header.Get(0);
+			DungeonPassCompleted = header.Get(1);
+			DecorationPassCompleted = header.Get(2);
+
+			dIndex++;
+			// load tiles
+			for (int x = 0; x<Chunk.ChunkSize; x++)
+			{
+				for(int y = 0; y<Globals.ChunkSize; y++)
+				{
+					Tiles[x, y] = Tile.Deserialize(ref data, dIndex);
+					dIndex += 4;
+				}
+			}
+			// load walls
+			for (int x = 0; x < Chunk.ChunkSize; x++)
+			{
+				for (int y = 0; y < Globals.ChunkSize; y++)
+				{
+					Walls[x, y] = Wall.Deserialize(ref data, dIndex);
+					dIndex += 4;
+				}
+			}
+		}
+
+		public byte[] ToData()
+		{
+			byte[] data = new byte[4096*2 + 1];
+			int dIndex = 0;
+
+			byte header = 0;
+			header.Set(0, TerrainPassCompleted);
+			header.Set(1, DungeonPassCompleted);
+			header.Set(2, DecorationPassCompleted);
+			data[0] = header;
+			dIndex++;
+			// load tiles
+			for (int x = 0; x < Chunk.ChunkSize; x++)
+			{
+				for (int y = 0; y < Globals.ChunkSize; y++)
+				{
+					Tiles[x, y].Serialize(ref data, dIndex);
+					dIndex += 4;
+				}
+			}
+			// load walls
+			for (int x = 0; x < Chunk.ChunkSize; x++)
+			{
+				for (int y = 0; y < Globals.ChunkSize; y++)
+				{
+					Walls[x, y].Serialize(ref data, dIndex);
+					dIndex += 4;
+				}
+			}
+			return data;
 		}
 
 
@@ -111,6 +175,18 @@ namespace CaveGame.Core
 						}
 					}
 
+					if (depth > 0)
+					{
+						if (simplex.Noise(curX/50.0f, (curY/60.0f) +4848) > 0.65f) {
+							SetTile(x, y, new Clay());
+						}
+
+						if (simplex.Noise((curX+444) / 45.0f, (curY / 22.0f) + 458) > 0.75f)
+						{
+							SetTile(x, y, new Granite());
+						}
+					}
+
 					// caves
 					if (depth >= 0)
 					{
@@ -131,9 +207,23 @@ namespace CaveGame.Core
 							SetTile(x, y, new Tiles.Air());
 						}
 
-						if (cavetiny > 0.18f)
+						if (depth > 50 && GetTile(x, y) is Tiles.Air && simplex.Noise(curX/5.0f, curY/8.0f) > 0.98f)
 						{
+							
+							SetTile(x, y, new Cobweb());
+						}
+
+
+						if (cavetiny > 0.2f)
+						{
+
 							SetTile(x, y, new Water { TileState = 8 });
+							//TileUpdate[x, y] = true;
+						}
+
+						if (simplex.Noise(curX/100.0f, curY/100.0f) > 0.75f && depth > 100)
+						{
+							SetTile(x, y, new Lava { TileState = 8 });
 							//TileUpdate[x, y] = true;
 						}
 					}
