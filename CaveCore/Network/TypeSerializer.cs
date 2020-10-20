@@ -87,7 +87,6 @@ namespace CaveGame.Core.Network
 			if (type == typeof(double)) return ToDouble(data);
 			if (type == typeof(ushort)) return ToUShort(data);
 			if (type == typeof(uint)) return ToUInt(data);
-			if (type == typeof(string)) return ToString(data);
 			if (type == typeof(Guid)) return ToGuid(data);
 			throw new Exception("Type conversion not defined: " + type.ToString());
 		}
@@ -111,9 +110,13 @@ namespace CaveGame.Core.Network
 			if (t == typeof(double)) return FromDouble((double)obj);
 			if (t == typeof(ushort)) return FromUShort((ushort)obj);
 			if (t == typeof(uint)) return FromUInt((uint)obj);
-			if (t == typeof(string)) return FromString((string)obj, length);
 			if (t == typeof(Guid)) return FromGuid((Guid)obj);
 			throw new Exception("Type conversion not defined: " + t.ToString());
+		}
+
+		public static byte[] FromChar(char input)
+		{
+			return BitConverter.GetBytes(input);
 		}
 
 		public static byte[] FromShort(short input)
@@ -160,17 +163,22 @@ namespace CaveGame.Core.Network
 			}
 			return data;
 		}
-		public static byte[] FromString(string input, int blength = 32)
+		public static byte[] FromString(Encoding encoder, string input, int blength = 32)
 		{
 			byte[] data = new byte[blength];
-			byte[] str = Encoding.ASCII.GetBytes(input + char.MinValue);
+			byte[] str = encoder.GetBytes(input + char.MinValue);
 			Array.Copy(str, 0, data, 0, Math.Min(blength, str.Length));
 			return data;
+		}
+		public static void FromString(ref byte[] data, Encoding encoder, string value, int index, int blength = 32)
+		{
+			FromString(encoder, value, blength).CopyTo(data, index);
 		}
 		public static byte[] FromGuid(Guid input)
 		{
 			return input.ToByteArray();
 		}
+
 
 		public static short ToShort(byte[] input)
 		{
@@ -230,13 +238,16 @@ namespace CaveGame.Core.Network
 			}
 			return BitConverter.ToDouble(input, 0);
 		}
-		public static string ToString(byte[] input)
+		public static string ToString(Encoding encoder, byte[] input, int index, int blength = 32)
 		{
-			return Encoding.ASCII.GetString(input).TrimEnd((char)0);
+			return encoder.GetString(input, index, blength).TrimEnd((char)0);
 		}
 		public static Guid ToGuid(byte[] input)
 		{
 			return new Guid(input);
 		}
+
+
+
 	}
 }

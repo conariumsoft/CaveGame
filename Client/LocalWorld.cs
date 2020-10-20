@@ -1,5 +1,6 @@
 ﻿using CaveGame.Core;
 using CaveGame.Core.Entities;
+using CaveGame.Core.Generic;
 using CaveGame.Core.Particles;
 using CaveGame.Core.Tiles;
 using CaveGame.Core.Walls;
@@ -22,7 +23,6 @@ namespace CaveGame.Client
 		public LightMatrix(int size)
 		{
 			Lights = new Light3[size, size];
-
 		}
 
 		public Light3 this[int x, int y]
@@ -36,20 +36,24 @@ namespace CaveGame.Client
 	
 
 
-	public class LocalWorld : World
+	public class LocalWorld : World, IClientWorld
 	{
 
 		public ParticleEmitter ParticleSystem;
 
-		float physTiming;
 
 		public List<ChunkCoordinates> RequestedChunks;
 		public List<ChunkCoordinates> LoadedChunks;
 
 		public LightingEngine Lighting;
 
+		protected DelayedTask localTileUpdateTask;
+		protected DelayedTask localLightingUpdateTask;
+
 		public LocalWorld() : base()
 		{
+			localTileUpdateTask = new DelayedTask(ApplyVisualTileUpdates, 1 / 10.0f);
+			localLightingUpdateTask = new DelayedTask(GetLatestDataFromLightingThread, 1 / 20.0f);
 			ParticleSystem = new ParticleEmitter(this);
 			Lighting = new LightingEngine(this);
 			RequestedChunks = new List<ChunkCoordinates>();
@@ -66,6 +70,23 @@ namespace CaveGame.Client
 			for (int i = 0; i<times; i++)
 			{
 				a.Invoke();
+			}
+		}
+
+		public Light3 Ambience
+		{ 
+			get {
+				int wrapped = ((int)Math.Floor(TimeOfDay)).Mod(24);
+				return AmbientLights[wrapped];
+			}
+		}
+		public Color SkyColor
+		{
+			get {
+				int wrapped = ((int)Math.Floor(TimeOfDay)).Mod(24);
+				int last = ((int)Math.Floor(TimeOfDay) - 1).Mod(24);
+				float diff = TimeOfDay % 1;
+				return Color.Lerp(SkyColors[last], SkyColors[wrapped], diff);
 			}
 		}
 
@@ -120,51 +141,30 @@ namespace CaveGame.Client
 			}
 		}
 
-		private void PhysicsStep()
+		protected override void PhysicsStep()
 		{
 			ParticleSystem.PhysicsStep(this, PhysicsStepIncrement);
-
-			foreach (IEntity entity in Entities)
-				if (entity is IPhysicsObject physEntity)
-					physEntity.PhysicsStep(this, PhysicsStepIncrement);
+			base.PhysicsStep();
 		}
 
-		float tick = 0;
+		private void GetLatestDataFromLightingThread()
+		{
+			foreach (var kvp in Chunks)
+				kvp.Value.Lights = Lighting.GetLightsForChunk(kvp.Key);
+		}
+
 		public override void Update(GameTime gt)
 		{
-			float delta = (float)gt.ElapsedGameTime.TotalSeconds;
+			localTileUpdateTask.Update(gt);
+			localLightingUpdateTask.Update(gt);
 			ParticleSystem.Update(gt);
 			Lighting.Update(gt);
 
-			tick += delta;
-
-			if (tick > (1/20.0f))
-			{
-				tick = 0;
-				foreach(var kvp in Chunks)
-				{
-					kvp.Value.Lights = Lighting.GetLightsForChunk(kvp.Key);
-				}
-			}
-
-			physTiming += delta;
-
-			while (physTiming >= PhysicsStepIncrement)
-			{
-				physTiming -= PhysicsStepIncrement;
-				PhysicsStep();
-			}
 
 			foreach (IEntity entity in Entities)
-				entity.Update(this, gt);
+				entity.ClientUpdate(this, gt);
 
-
-			tileUpdateTimer += (float)gt.ElapsedGameTime.TotalSeconds;
-			if (tileUpdateTimer > (1 / 10.0f))
-			{
-				tileUpdateTimer = 0;
-				ApplyTileUpdates(gt);
-			}
+			base.Update(gt);
 		}
 
 		private void LocalTileUpdates(Chunk chunk)
@@ -191,19 +191,12 @@ namespace CaveGame.Client
 			}
 		}
 
-		private void ApplyTileUpdates(GameTime gt)
+		private void ApplyVisualTileUpdates()
 		{
-			Chunk chunk;
-			foreach (var chunkKeyValuePair in Chunks)
+			foreach (var kvp in Chunks)
 			{
-				chunk = chunkKeyValuePair.Value;
-				LocalTileUpdates(chunk);
-
+				LocalTileUpdates(kvp.Value);
 			}
 		}
-		float tileUpdateTimer = 0;
-
-
 	}
-
 }

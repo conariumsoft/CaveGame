@@ -315,29 +315,32 @@ namespace CaveGame.Client
 					bool have = ChangedTiles.TryDequeue(out recvdata);
 					if (have)
 					{
-
+						var prevTile = GetTile(recvdata.Item1, recvdata.Item2);
 						SetTile(recvdata.Item1, recvdata.Item2, recvdata.Item3);
 						//var prevLight = GetLight(recvdata.Item1, recvdata.Item2);
 						//var postOpacity = recvdata.Item3.Opacity;
-						
+						int resetRadius = 4;
+						int recalcRadius = 6;
 
-						//byte r = (byte)(prevLight.Red - postOpacity);
-						//byte g = (byte)(prevLight.Green - postOpacity);
-						//byte b = (byte)(prevLight.Blue - postOpacity);
-
+						if (prevTile is ILightEmitter)
+						{
+							resetRadius = 10;
+							recalcRadius = 12;
+						}
+							
 						//var newL = new Light3(r, g, b);
-						for (int x = -6; x < 6; x++)
+						for (int x = -resetRadius; x < resetRadius; x++)
 						{
-						for (int y = -6; y < 6; y++)
-						{
-							SetLight(recvdata.Item1+x, recvdata.Item2+y, Light3.Dark);
+							for (int y = -resetRadius; y < resetRadius; y++)
+							{
+								SetLight(recvdata.Item1+x, recvdata.Item2+y, Light3.Dark);
 								//UpdatedCells.Enqueue(new Cell(recvdata.Item1+x, recvdata.Item2+y, Light3.Dark));
 							}
 						}
 
-						for (int x = -8; x < 8; x++)
+						for (int x = -recalcRadius; x < recalcRadius; x++)
 						{
-							for (int y = -8; y < 8; y++)
+							for (int y = -recalcRadius; y < recalcRadius; y++)
 							{
 								int mx = recvdata.Item1+x;
 								int my = recvdata.Item2+y;
@@ -377,18 +380,18 @@ namespace CaveGame.Client
 						//byte b = (byte)(prevLight.Blue - postOpacity);
 
 						//var newL = new Light3(r, g, b);
-						for (int x = -6; x < 6; x++)
+						for (int x = -2; x < 2; x++)
 						{
-							for (int y = -6; y < 6; y++)
+							for (int y = -2; y < 2; y++)
 							{
 								SetLight(recv2.Item1 + x, recv2.Item2 + y, Light3.Dark);
 								//UpdatedCells.Enqueue(new Cell(recvdata.Item1+x, recvdata.Item2+y, Light3.Dark));
 							}
 						}
 
-						for (int x = -8; x < 8; x++)
+						for (int x = -3; x < 3; x++)
 						{
-							for (int y = -8; y < 8; y++)
+							for (int y = -3; y < 3; y++)
 							{
 								int mx = recv2.Item1 + x;
 								int my = recv2.Item2 + y;
@@ -416,14 +419,14 @@ namespace CaveGame.Client
 				Iterate();
 				stopwatch.Stop();
 
-				if (iterationCount > 50)
+				if (iterationCount > 100)
 				{
 					//Debug.WriteLine("LTTstore.com " + stopwatch.Elapsed.TotalSeconds + "s, " + UpdatedCells.Count);
 					iterationCount = 0;
 					OutputLights.Clear();
 					foreach (var kvp in LightCells)
 						OutputLights[kvp.Key] = kvp.Value;
-					Thread.Sleep(1);
+					Thread.Sleep(5);
 					//UpdatedCells.TrimExcess();
 					//GC.Collect();
 					

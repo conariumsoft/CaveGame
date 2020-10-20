@@ -28,6 +28,12 @@ namespace CaveGame.Client.Menu
 
 	}
 
+	[Serializable]
+	public class StoredServerData : Configuration
+	{
+		public string[] IPAddress;
+	}
+
 
 	public class ServerKickedPage : IGameContext
 	{

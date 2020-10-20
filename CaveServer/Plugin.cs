@@ -17,18 +17,6 @@ namespace CaveGame.Server
 		public Player Sender { get; set; }
 	}
 
-
-	public interface IPluginGameServer {
-		public IMessageOutlet Output { get; }
-		
-		public DateTime Time { get; }
-
-
-		public void Chat(string text);
-		public void Chat(string text, Color color);
-		public void Print(string text);
-	}
-
 	[Serializable]
 	public class PluginDefinition : Configuration {
 
@@ -53,6 +41,12 @@ namespace CaveGame.Server
 		{
 			foreach (Plugin plugin in Plugins)
 				plugin.OnPluginLoaded?.Call();
+		}
+
+		public void CallOnServerShutdown()
+		{
+			foreach(Plugin plugin in Plugins)
+				plugin.OnServerShutdown?.Call();
 		}
 
 		public void CallOnPlayerJoined(Player player)
@@ -104,9 +98,10 @@ namespace CaveGame.Server
 		public LuaFunction OnPlayerJoined;
 		public LuaFunction OnChatMessage;
 		public LuaFunction OnPlayerPlaceTile;
+		public LuaFunction OnServerShutdown;
 
 		#endregion
-		public Plugin(PluginDefinition def, IPluginGameServer server, string contents)
+		public Plugin(PluginDefinition def, IPluginAPIServer server, string contents)
 		{
 			pluginDef = def;
 			Lua state = new Lua();
@@ -135,6 +130,7 @@ function OnPluginLoaded() end
 function OnPlayerJoined(player) end
 function OnChatMessage(chatEvent) end
 function OnPlayerPlaceTile(player, tile, x, y) end
+function OnServerShutdown() end
 
 server.Output:Out(plugin.PluginName..' Loaded');
 ");
@@ -144,6 +140,7 @@ server.Output:Out(plugin.PluginName..' Loaded');
 			OnPlayerJoined = state["OnPlayerJoined"] as LuaFunction;
 			OnChatMessage = state["OnChatMessage"] as LuaFunction;
 			OnPlayerPlaceTile = state["OnPlayerPlaceTile"] as LuaFunction;
+			OnServerShutdown = state["OnServerShutdown"] as LuaFunction;
 		}
 	}
 }

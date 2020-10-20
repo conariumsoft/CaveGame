@@ -11,46 +11,7 @@ using System.Text;
 
 namespace CaveGame.Core.Particles
 {
-	public struct Rotation : IEquatable<Rotation>
-	{
-		public const float PI = MathHelper.Pi;
-		private float _radians;
-
-		public float Radians
-		{
-			get { return _radians; }
-			set { _radians = value; }
-		}
-		public float Degrees
-		{
-			get { return _radians * (180.0f / PI); }
-			set { _radians = value * (PI / 180.0f); }
-		}
-
-		public static Rotation FromRad(float radians)
-		{
-			return new Rotation { Radians = radians };
-		}
-
-		public static Rotation FromDeg(float degree)
-		{
-			return new Rotation { Degrees = degree };
-		}
-
-		public bool EqualsRadians(float rad, float toleranceDegrees = 1.0f)
-		{
-			return Math.Abs(Radians - rad) < (toleranceDegrees * (PI / 180.0f));
-		}
-		public bool EqualsDegrees(float deg, float toleranceDegrees = 1.0f)
-		{
-			return Math.Abs(Degrees - deg) < toleranceDegrees;
-		}
-
-		public bool Equals(Rotation other)
-		{
-			return EqualsRadians(other.Radians);
-		}
-	}
+	
 
 	public abstract class Particle
 	{
@@ -61,6 +22,25 @@ namespace CaveGame.Core.Particles
 		public bool Dead { get; set; }
 		public float ParticleAge { get; set; }
 		public virtual float MaxParticleAge { get;  }
+
+
+		private bool _disposed = false;
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (_disposed)
+				return;
+
+
+			if (disposing)
+				_disposed = true;
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 	}
 
 
@@ -168,7 +148,11 @@ namespace CaveGame.Core.Particles
 					particle.Dead = true;
 
 				if (particle.Dead)
+				{
+					particle.Dispose();
 					continue;
+				}
+					
 					
 
 				

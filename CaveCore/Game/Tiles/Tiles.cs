@@ -20,35 +20,20 @@ namespace CaveGame.Core.Tiles
 	{
 		Void = 255,
 		Air = 0,
-		Stone,
-		Dirt,
-		Grass,
-		OakLog,
-		Leaves,
-		Water,
-		StoneBrick,
-		ClayBrick,
-		Torch,
-		Clay,
-		OakPlank,
-		Granite,
-		Sandstone,
-		Mud,
-		Sand,
-		RedTorch,
-		BlueTorch,
-		GreenTorch,
-		YellowTorch,
-		WhiteTorch,
-		CopperOre,
-		IronOre,
+		Stone,Dirt,Grass,OakLog,Leaves,Water,StoneBrick,ClayBrick,Torch,Clay,
+		OakPlank,EbonyPlank,PinePlank,RedwoodPlank,
+		Granite,Sandstone,Mud,
+		Sand,RedTorch,BlueTorch,GreenTorch,YellowTorch,WhiteTorch,CopperOre,IronOre,
 		GoldOre,
 		UraniumOre,
 		CobaltOre,
 		LeadOre, MudBrick, SandBrick, IceBrick, CarvedStoneBrick,
 		CarvedSandBrick, MossyStoneBrick, MossyStone,
 		CubedStone, CubedSandstone,
-		Cobweb, Tallgrass, Rope, Vine, Ladder, Platform, TNT, Lava, Sludge, Obsidian
+		Cobweb, Tallgrass, Rope, Vine, Ladder, Platform, TNT, Lava, Sludge, Obsidian,
+		Snow, Ice,
+
+		GermanOccupiedTerritory,
 	}
 	public class TDef : ILightEmitter // TileData
 	{
@@ -74,12 +59,12 @@ namespace CaveGame.Core.Tiles
 	{
 		public static TDef Void = new TDef { };
 		public static TDef Air = new TDef { Hardness = 0, Opacity = 1, Quad = TileMap.Default };
-		public static TDef Dirt = new TDef { Hardness = 2, Opacity = 3, Quad = TileMap.Soil, Color = Color.SaddleBrown };
-		public static TDef Water = new TDef { Hardness = 0, Opacity = 2, Quad = TileMap.Default, Color = Color.Blue };
+		public static TDef Dirt = new TDef { Hardness = 2, Quad = TileMap.Soil, Color = Color.SaddleBrown };
+		public static TDef Water = new TDef { Hardness = 0, Opacity = 2,Quad = TileMap.Default, Color = Color.Blue };
 		public static TDef Lava = new TDef
 		{
 			Hardness = 0,
-			Opacity = 2,
+			Opacity = 3,
 			Quad = TileMap.Default,
 			Color = Color.Red
 		};
@@ -90,9 +75,9 @@ namespace CaveGame.Core.Tiles
 			Quad = TileMap.Default,
 			Color = Color.Green
 		};
-		public static TDef Grass = new TDef { Hardness = 2, Opacity = 3, Quad = TileMap.Soil, Color = Color.Green };
-		public static TDef Stone = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Stone, Color = new Color(0.7f, 0.7f, 0.7f) };
-		public static TDef StoneBrick = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Brick, Color = new Color(0.7f, 0.7f, 0.7f) };
+		public static TDef Grass = new TDef { Hardness = 2, Quad = TileMap.Soil, Color = Color.Green };
+		public static TDef Stone = new TDef { Hardness = 4,  Quad = TileMap.Stone, Color = new Color(0.7f, 0.7f, 0.7f) };
+		public static TDef StoneBrick = new TDef { Hardness = 6,  Quad = TileMap.Brick, Color = new Color(0.7f, 0.7f, 0.7f) };
 		public static TDef MudBrick = new TDef {
 			Hardness = 12,
 			Quad = TileMap.Brick,
@@ -104,29 +89,55 @@ namespace CaveGame.Core.Tiles
 			Color = new Color(0.8f, 0.8f, 0.3f)
 		};
 
-		public static TDef ClayBrick = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Brick, Color = new Color(0.85f, 0.4f, 0.4f) };
-		public static TDef OakLog = new TDef { Hardness = 5, Opacity = 1, Quad = TileMap.Log, Color = new Color(0.6f, 0.3f, 0.2f) };
-		public static TDef Leaves = new TDef { Hardness = 5, Opacity = 0, Quad = TileMap.Leaves, Color = new Color(0.1f, 0.9f, 0.1f) };
-		public static TDef Torch = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.8f, 0.8f, 0.4f) };
-		public static TDef WhiteTorch = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.8f, 0.8f, 0.8f) };
-		public static TDef YellowTorch = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.9f, 0.9f, 0.2f) };
-		public static TDef RedTorch = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.9f, 0.2f, 0.2f) };
-		public static TDef BlueTorch = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.2f, 0.2f, 0.9f) };
-		public static TDef GreenTorch = new TDef { Hardness = 2, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.2f, 0.9f, 0.2f) };
+		public static TDef ClayBrick = new TDef { Hardness = 6, Quad = TileMap.Brick, Color = new Color(0.85f, 0.4f, 0.4f) };
+		public static TDef OakLog = new TDef { Hardness = 3, Opacity = 1, Quad = TileMap.Log, Color = new Color(0.6f, 0.3f, 0.2f) };
+		public static TDef Leaves = new TDef { Hardness = 1, Opacity = 0, Quad = TileMap.Leaves, Color = new Color(0.1f, 0.9f, 0.1f) };
+		public static TDef Torch = new TDef { Hardness = 1, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.8f, 0.8f, 0.4f) };
+		public static TDef WhiteTorch = new TDef { Hardness = 1, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.8f, 0.8f, 0.8f) };
+		public static TDef YellowTorch = new TDef { Hardness = 1, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.9f, 0.9f, 0.2f) };
+		public static TDef RedTorch = new TDef { Hardness = 1, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.9f, 0.2f, 0.2f) };
+		public static TDef BlueTorch = new TDef { Hardness = 1, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.2f, 0.2f, 0.9f) };
+		public static TDef GreenTorch = new TDef { Hardness = 1, Opacity = 0, Quad = TileMap.Torch, Color = new Color(0.2f, 0.9f, 0.2f) };
 
-		public static TDef Mud = new TDef { Hardness = 2, Opacity = 3, Quad = TileMap.Soil, Color = new Color(0.3f, 0.1f, 0.1f) };
-		public static TDef Sand = new TDef { Hardness = 2, Opacity = 3, Quad = TileMap.Soil, Color = new Color(1f, 0.7f, 0.7f) };
-		public static TDef Granite = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Soil, Color = new Color(0.8f, 0.7f, 0.7f) };
-		public static TDef Sandstone = new TDef { Hardness = 10, Opacity = 3, Quad = TileMap.Stone, Color = new Color(1.0f, 1.0f, 0.3f) };
-		public static TDef Clay = new TDef { Hardness = 3, Opacity = 3, Quad = TileMap.Soil, Color = new Color(0.6f, 0.2f, 0.2f) };
-		public static TDef OakPlank = new TDef { Hardness = 6, Opacity = 3, Quad = TileMap.Plank, Color = new Color(0.8f, 0.5f, 0.3f) };
-		public static TDef CopperOre = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(1.0f, 0.45f, 0f) };
-		public static TDef LeadOre = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(0.35f, 0.35f, 0.4f) };
-		public static TDef TinOre = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(0.65f, 0.4f, 0.4f) };
-		public static TDef IronOre = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(1.0f, 0.75f, 0.75f) };
-		public static TDef CobaltOre = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(0.3f, 0.3f, 1f) };
-		public static TDef GoldOre = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(1f, 1f, 0.5f) };
-		public static TDef UraniumOre = new TDef { Hardness = 12, Opacity = 3, Quad = TileMap.Ore, Color = new Color(0.35f, 0.8f, 0.35f) };
+		public static TDef Mud = new TDef { Hardness = 2,  Quad = TileMap.Soil, Color = new Color(0.3f, 0.1f, 0.1f) };
+		public static TDef Sand = new TDef { Hardness = 2,  Quad = TileMap.Soil, Color = new Color(245, 211, 125) };
+		public static TDef Granite = new TDef { Hardness = 5,  Quad = TileMap.Stone, Color = new Color(1.5f, 1.5f, 1.5f) };
+		public static TDef Sandstone = new TDef { Hardness = 5,  Quad = TileMap.Stone, Color = new Color(1.0f, 1.0f, 0.3f) };
+		public static TDef Clay = new TDef { Hardness = 3,  Quad = TileMap.Soil, Color = new Color(0.6f, 0.2f, 0.2f) };
+
+
+		public static TDef OakPlank = new TDef { 
+			Hardness = 3,  
+			Quad = TileMap.Plank, 
+			Color = new Color(0.8f, 0.55f, 0.25f)
+		};
+		public static TDef RedwoodPlank = new TDef
+		{
+			Hardness = 3,
+			Quad = TileMap.Plank,
+			Color = new Color(163, 82, 65)
+		};
+		public static TDef EbonyPlank = new TDef
+		{
+			Hardness = 3,
+			Quad = TileMap.Plank,
+			Color = new Color(74, 74, 74)
+		};
+		public static TDef PinePlank = new TDef
+		{
+			Hardness = 3,
+			Quad = TileMap.Plank,
+			Color = new Color(148, 109, 92)
+		};
+
+
+		public static TDef CopperOre = new TDef { Hardness = 12, Quad = TileMap.Ore, Color = new Color(1.0f, 0.45f, 0f) };
+		public static TDef LeadOre = new TDef { Hardness = 12,  Quad = TileMap.Ore, Color = new Color(0.35f, 0.35f, 0.4f) };
+		public static TDef TinOre = new TDef { Hardness = 12,  Quad = TileMap.Ore, Color = new Color(0.65f, 0.4f, 0.4f) };
+		public static TDef IronOre = new TDef { Hardness = 12,  Quad = TileMap.Ore, Color = new Color(1.0f, 0.75f, 0.75f) };
+		public static TDef CobaltOre = new TDef { Hardness = 12, Quad = TileMap.Ore, Color = new Color(0.3f, 0.3f, 1f) };
+		public static TDef GoldOre = new TDef { Hardness = 12, Quad = TileMap.Ore, Color = new Color(1f, 1f, 0.5f) };
+		public static TDef UraniumOre = new TDef { Hardness = 12, Quad = TileMap.Ore, Color = new Color(0.35f, 0.8f, 0.35f) };
 		public static TDef IceBrick = new TDef
 		{
 			Hardness = 12,
@@ -221,6 +232,25 @@ namespace CaveGame.Core.Tiles
 			Quad = TileMap.StoneLight,
 			Hardness = 20,
 		};
+
+		public static TDef Ice = new TDef
+		{
+			Quad = TileMap.Soil,
+			Color = new Color(0.9f, 0.9f, 0.9f),
+			Hardness = 6,
+		};
+		public static TDef Snow = new TDef
+		{
+			Quad = TileMap.Soil,
+			Color = new Color(0.9f, 0.9f, 0.9f),
+			Hardness = 3,
+
+		};
+
+		public static TDef SovietOccupiedTerritory = new TDef
+		{
+
+		};
 	}
 	#region stuff
 	public interface IWaterBreakable { }
@@ -259,6 +289,7 @@ namespace CaveGame.Core.Tiles
 	public interface IVegetation { }
 	public interface IOre { }
 	public interface IMineral { }
+	public interface IPlatformTile { }
 	#endregion
 	public class Tile : IEquatable<Tile>
 	{
@@ -391,8 +422,8 @@ namespace CaveGame.Core.Tiles
 		{
 			return (w.GetTile(x, y).ID == ID);
 		}
-
 	}
+
 	public class Void : Tile
 	{
 		public Void() : base(TileDefinitions.Void) { }
@@ -453,6 +484,16 @@ namespace CaveGame.Core.Tiles
 
 				world.SetTile(x, y, new Dirt());
 				return;
+			}
+
+			if (above is Air)
+			{
+				world.SetTile(x, y - 1, new Tallgrass());
+			}
+
+			if (below is Air)
+			{
+				world.SetTile(x, y+1, new Vine());
 			}
 
 
@@ -568,6 +609,10 @@ namespace CaveGame.Core.Tiles
 	public class Sand : Tile
 	{
 		public Sand() : base(TileDefinitions.Sand) { }
+	}
+	public class Snow : Tile
+	{
+		public Snow() : base(TileDefinitions.Snow) { }
 	}
 	public class Clay : Tile
 	{
@@ -810,20 +855,68 @@ namespace CaveGame.Core.Tiles
 	public class Ladder : Tile {
 		public Ladder() : base(TileDefinitions.Ladder) { }
 	}
-	public class Platform : Tile {
+	public class Platform : Tile, IPlatformTile {
 		public Platform() : base(TileDefinitions.Platform) { }
 	}
-	public class Rope : Tile {
-		public Rope() : base(TileDefinitions.Rope) { }
+	public class Rope : Tile, ITileUpdate, INonSolid {
+		public Rope() : base(TileDefinitions.Rope) {
+		
+		}
+
+
+		public void TileUpdate(IGameWorld world, int x, int y)
+		{
+			if (world.IsTile<INonSolid>(x, y - 1) && !world.IsTile<Rope>(x, y - 1))
+				world.SetTile(x, y, new Air());
+		}
 	}
-	public class Vine : Tile { 
+	public class Vine : Tile, IRandomTick, INonSolid, ITileUpdate, IWaterBreakable
+	{ 
 		public Vine() : base(TileDefinitions.Vine) { }
+
+		public void RandomTick(IGameWorld world, int x, int y)
+		{
+			var below = world.GetTile(x, y + 1);
+			if (below is Air)
+			{
+				world.SetTile(x, y + 1, new Vine());
+			}
+		}
+
+		public void TileUpdate(IGameWorld world, int x, int y)
+		{
+			var above = world.GetTile(x, y - 1);
+			if (!(above is Vine || above is Grass))
+			{
+				world.SetTile(x, y, new Air());
+			}
+		}
 	}
-	public class Tallgrass : Tile {
+	public class Tallgrass : Tile, INonSolid, ITileUpdate, IWaterBreakable, IRandomTick
+	{
 		public Tallgrass() : base(TileDefinitions.Tallgrass)
 		{
-
+			
 		}
+
+		public void RandomTick(IGameWorld world, int x, int y)
+		{
+			if (RNG.NextDouble()>0.95f)
+			{
+				world.SetTile(x, y, new Air()); // grass sometimes randomly dies
+			}
+		}
+
+		public void TileUpdate(IGameWorld world, int x, int y)
+		{
+			var below = world.GetTile(x, y + 1);
+			if (!(below is Grass))
+			{
+				world.SetTile(x, y, new Air());
+			}
+		}
+
+
 	}
 
 #endregion
@@ -852,8 +945,9 @@ namespace CaveGame.Core.Tiles
 		}
 	}
 	public class Brimstone { }
-	public class Snow { }
-	public class Ice { }
+	public class Ice : Tile {
+		public Ice() : base(TileDefinitions.Ice) { }
+	}
 	public class IceBrick : Brick {
 		public IceBrick() : base(TileDefinitions.IceBrick) { }
 	}
@@ -1074,9 +1168,6 @@ namespace CaveGame.Core.Tiles
 	public class StoneBrick : Brick
 	{
 		public StoneBrick() : base(TileDefinitions.StoneBrick) {}
-
-		
-
 	}
 	public class ClayBrick: Brick
 	{
@@ -1114,14 +1205,13 @@ namespace CaveGame.Core.Tiles
 	public class EbonyLog { }
 #endregion
 #region Planks
-	public class OakPlank : Tile, ILocalTileUpdate {
 
-		public OakPlank() : base(TileDefinitions.OakPlank) { }
+	public abstract class Plank : Tile, ILocalTileUpdate
+	{
+		public Plank(TDef def) : base(def) { }
 
 		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
 		{
-			
-			//sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), TileMap.Soil, color.MultiplyAgainst(Color.SaddleBrown));
 			var Plank = new Rectangle(2 * Globals.TileSize, 0, 4, Globals.TileSize);
 			var PlankRight = new Rectangle((2 * Globals.TileSize) + 4, 0 * Globals.TileSize, 4, Globals.TileSize);
 			var RPlank = new Rectangle(8 * Globals.TileSize, 0, 4, Globals.TileSize);
@@ -1136,7 +1226,7 @@ namespace CaveGame.Core.Tiles
 				sb.Draw(tilesheet, position, Plank, color.MultiplyAgainst(Color), MathHelper.ToRadians(0), Vector2.Zero, 1, SpriteEffects.None, 1);
 
 			if (TileState.Get(0)) // cornerc
-				sb.Draw(tilesheet, position+new Vector2(4,0), RPlankRight, color.MultiplyAgainst(Color), MathHelper.ToRadians(0), Vector2.Zero, 1, SpriteEffects.None, 1);
+				sb.Draw(tilesheet, position + new Vector2(4, 0), RPlankRight, color.MultiplyAgainst(Color), MathHelper.ToRadians(0), Vector2.Zero, 1, SpriteEffects.None, 1);
 			else
 				sb.Draw(tilesheet, position + new Vector2(4, 0), PlankRight, color.MultiplyAgainst(Color), MathHelper.ToRadians(0), Vector2.Zero, 1, SpriteEffects.None, 1);
 
@@ -1167,9 +1257,19 @@ namespace CaveGame.Core.Tiles
 			}
 		}
 	}
-	public class RedwoodPlank { }
-	public class PinePlank { }
-	public class EbonyPlank { }
+
+	public class OakPlank : Plank {
+		public OakPlank() : base(TileDefinitions.OakPlank) {}
+	}
+	public class RedwoodPlank: Plank { 
+		public RedwoodPlank() : base(TileDefinitions.RedwoodPlank) { }
+	}
+	public class PinePlank: Plank { 
+		public PinePlank() : base(TileDefinitions.PinePlank) { }
+	}
+	public class EbonyPlank: Plank {
+		public EbonyPlank() : base(TileDefinitions.EbonyPlank) { }
+	}
 #endregion
 	public class Leaves : Tile, INonSolid, IRandomTick
 	{
@@ -1187,7 +1287,6 @@ namespace CaveGame.Core.Tiles
 
 		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
 		{
-
 			base.Draw(tilesheet, sb, x, y, color);
 		}
 	}
@@ -1320,7 +1419,7 @@ namespace CaveGame.Core.Tiles
 			world.SetTile(x, y, new Air());
 			world.Explosion(
 				new Vector2(x, y) * 8,
-				8.0f, 2.0f, true, true
+				10.0f, 4.0f, true, true
 			);
 		}
 	}

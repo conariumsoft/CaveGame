@@ -6,6 +6,25 @@ using System.Text;
 
 namespace CaveGame.Core.Inventory
 {
+	public class RecipeResult<T> where T: Item, new()
+	{
+		public int Count;
+
+		public ItemStack Retrieve() {
+			return new ItemStack
+			{
+				Item = new T(),
+				Quantity = Count
+			};
+		}
+	}
+
+	public class Recipe
+	{
+
+	}
+
+
 	public class ItemContainer
 	{
 		private ItemStack[,] slots;

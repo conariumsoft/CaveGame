@@ -1,4 +1,7 @@
 ﻿using CaveGame.Core;
+using CaveGame.Core.Entities;
+using CaveGame.Core.Furniture;
+using CaveGame.Core.Generic;
 using CaveGame.Core.Network;
 using CaveGame.Core.Tiles;
 using Microsoft.Xna.Framework;
@@ -8,6 +11,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace CaveGame.Server
 {
@@ -15,21 +19,32 @@ namespace CaveGame.Server
 	{
 		public int Seed { get; set; }
 		public string Name { get; set; }
+		public float TimeOfDay { get; set; }
+
+		[XmlArray("FurnitureList")]
+		[XmlArrayItem("Furniture")]
+		public List<FurnitureTile> Furniture { get; set; }
 	}
 
-	public class ServerWorld : Core.World
+	public class ServerWorld : Core.World, IServerWorld
 	{
 		public int WorldSeed { get; }
 		public string WorldName { get; }
 		public GameServer Server { get; set; }
-
 		public Generator Generator { get; set; }
-
 
 		public Dictionary<ChunkCoordinates, bool> LoadedChunks;
 
+		protected DelayedTask serverTileUpdateTask;
+		protected DelayedTask serverRandomTileUpdateTask;
+
+
+		public override List<FurnitureTile> Furniture { get; protected set; }
+
 		private ServerWorld() : base()
 		{
+			serverTileUpdateTask = new DelayedTask(ApplyTileUpdates, 1 / 10.0f);
+			serverRandomTileUpdateTask = new DelayedTask(ApplyRandomTileTicksToLoadedChunks, 1 / 5.0f);
 			Generator = new Generator();
 		}
 
@@ -48,17 +63,10 @@ namespace CaveGame.Server
 			worldXml.WriteStartDocument();
 			worldXml.WriteStartElement("Metadata");
 
-			worldXml.WriteStartElement("Name");
-			worldXml.WriteString(WorldName);
-			worldXml.WriteEndElement();
+			worldXml.WriteElementString("Name", WorldName);
+			worldXml.WriteElementString("Seed", WorldSeed.ToString());
+			worldXml.WriteElementString("TimeOfDay", TimeOfDay.ToString());
 
-			worldXml.WriteStartElement("Seed");
-			worldXml.WriteString(WorldSeed.ToString());
-			worldXml.WriteEndElement();
-
-
-			//	worldXml.WriteAttributeString("Name", WorldName);
-			//worldXml.WriteAttributeString("Seed", WorldSeed.ToString());
 
 			worldXml.WriteEndDocument();
 			worldXml.Close();
@@ -67,15 +75,7 @@ namespace CaveGame.Server
 		// Load from file 
 		public ServerWorld(string worldname) : this()
 		{
-			// they should already exist
-			//CreateDirectoryIfNull(@"Worlds");
-			//CreateDirectoryIfNull(@"Worlds\" + worldname);
-			//CreateDirectoryIfNull(@"Worlds\" + worldname + @"\Regions");
 
-			if (System.IO.File.Exists(@"Worlds\" + worldname + @"WorldInfo.Xml"))
-			{
-				// throw error or something?
-			}
 
 			XmlDocument worldmeta = new XmlDocument();
 			worldmeta.Load(@"Worlds\" + worldname + @"\WorldMetadata.xml");
@@ -97,15 +97,19 @@ namespace CaveGame.Server
 				Chunk chunk = kvp.Value;
 				File.WriteAllBytes(@"Worlds\" + WorldName + @"\Chunks\" + kvp.Key.GetHashCode(), chunk.ToData());
 			}
+
+
+			//XmlSerializer writer = new XmlSerializer(typeof(FurnitureList));
+			//using (FileStream furniture = new FileStream(@"Worlds\" + WorldName +@"\furniture.xml", FileMode.Create))
+			//{
+			//	writer.Serialize(furniture, new FurnitureList { Furniture = this.Furniture });
+			//}
+				
 		}
 
 		private bool HasChunkOnFile(ChunkCoordinates coords)
 		{
-			if (System.IO.File.Exists(@"Worlds\" + WorldName + @"\Chunks\" + coords.GetHashCode()))
-			{
-				return true;
-			}
-			return false;
+			return File.Exists(@"Worlds\" + WorldName + @"\Chunks\" + coords.GetHashCode());
 		}
 
 		private Chunk RetrieveChunkFromFile(ChunkCoordinates coords)
@@ -150,6 +154,7 @@ namespace CaveGame.Server
 							//World.Chunks.Add(newCoords, thischunk);
 							Chunks.TryAdd(newCoords, thischunk);
 							Generator.HeightPass(ref thischunk);
+							thischunk.ClearUpdateQueue();
 						}
 					}
 				}
@@ -165,8 +170,15 @@ namespace CaveGame.Server
 			return chunk;
 		}
 
-		float internalTimer = 0;
-		float tileUpdateTimer = 0;
+
+		public override void RemoveFurniture(Core.Furniture.FurnitureTile furn)
+		{
+			
+			Server.SendToAll(new RemoveFurniturePacket(furn.FurnitureNetworkID));
+			Furniture.Remove(furn);
+			//base.RemoveFurniture(furn);
+		}
+
 
 		private void TileUpdates(Chunk chunk)
 		{
@@ -178,38 +190,26 @@ namespace CaveGame.Server
 					{
 						chunk.TileUpdate[x, y] = false;
 
+						int worldX = (chunk.Coordinates.X * Globals.ChunkSize) + x;
+						int worldY = (chunk.Coordinates.Y * Globals.ChunkSize) + y;
+						foreach (var furn in Furniture.ToArray())
+							furn.OnTileUpdate(this, worldX, worldY);
+
 
 						if (chunk.GetTile(x, y) is ITileUpdate tile)
-						{
-							int worldX = (chunk.Coordinates.X * Globals.ChunkSize) + x;
-							int worldY = (chunk.Coordinates.Y * Globals.ChunkSize) + y;
-
 							tile.TileUpdate(this, worldX, worldY);
-
-							//var newt = chunk.GetTile(x, y);
-							//Server.SendToAll(new PlaceTilePacket(newt.ID, newt.TileState, newt.Damage, worldX, worldY));// chunk.GetTile(x, y).Serialize);
-						}
 					}
 				}
 			}
 		}
 
-		private void ApplyTileUpdates(GameTime gt)
+		private void ApplyTileUpdates()
 		{
-			
-			foreach (var chunkKeyValuePair in Chunks)
-			{
-				Chunk chunk = chunkKeyValuePair.Value;
-				TileUpdates(chunk);
-				
-			}
+			foreach (var kvp in Chunks)
+				TileUpdates(kvp.Value);
 		}
 
-		private void RandomUpdates(Chunk chunk) {
-		
-		}
-
-		private async void ApplyRandomTileTicksToLoadedChunks(GameTime gt)
+		private async void ApplyRandomTileTicksToLoadedChunks()
 		{
 			await (Task.Run(() =>
 		{
@@ -240,22 +240,40 @@ namespace CaveGame.Server
 		{
 			Server.SendToAll(new ExplosionPacket(pos, radius, strength, damageTiles, damageEntities));
 
+			if (damageEntities)
+			{
+				foreach (var ent in Entities)
+				{
+					if (ent is IPositional entpos && ent is IVelocity vel)
+					{
+
+						var dist = (entpos.Position - pos).Length();
+						var power = Math.Min((1 / dist) * strength * 5, 100);
+						var unitVec = (entpos.Position - pos);
+						unitVec.Normalize();
+
+						vel.Velocity += unitVec * power;// * power);
+
+					}
+				}
+			}
+
 			if (damageTiles)
 			{
-				for(int x = -10; x < 10; x++)
+				for (int x = -10; x < 10; x++)
 				{
 					for (int y = -10; y < 10; y++)
 					{
 						Vector2 thisPosVec = pos + new Vector2(x * Globals.TileSize, y * Globals.TileSize);
 
-						float dist = (thisPosVec - pos).Length()/Globals.TileSize;
+						float dist = (thisPosVec - pos).Length() / Globals.TileSize;
 
 						var damage = Math.Max(strength - dist, 0);
 
-						var centroid = new Point((int)pos.X / Globals.TileSize, (int)pos.Y / Globals.TileSize)+new Point(x, y);
+						var centroid = new Point((int)pos.X / Globals.TileSize, (int)pos.Y / Globals.TileSize) + new Point(x, y);
 						var tile = GetTile(centroid.X, centroid.Y);
-						tile.Damage += (byte)damage;
-						
+						tile.Damage += (byte)Math.Ceiling(damage);
+
 						if (tile.Damage > tile.Hardness)
 						{
 							SetTile(centroid.X, centroid.Y, new Air());
@@ -266,22 +284,21 @@ namespace CaveGame.Server
 
 		}
 
+		public override void OnCollectDeadEntity(IEntity ent)
+		{
+			Server.SendToAll(new DropEntityPacket(ent.EntityNetworkID));
+			base.OnCollectDeadEntity(ent);
+		}
+
 		public override void Update(GameTime gt)
 		{
-			internalTimer += (float)gt.ElapsedGameTime.TotalSeconds;
-			tileUpdateTimer += (float)gt.ElapsedGameTime.TotalSeconds;
-			if (internalTimer > (1 / 5.0f))
-			{
-				internalTimer = 0;
-				ApplyRandomTileTicksToLoadedChunks(gt);
-			}
-			if (tileUpdateTimer > (1/10.0f))
-			{
-				tileUpdateTimer = 0;
-				ApplyTileUpdates(gt);
-			}
+			serverRandomTileUpdateTask.Update(gt);
+			serverTileUpdateTask.Update(gt);
 
+			
 
+			foreach (var ent in Entities)
+				ent.ServerUpdate(this, gt);
 
 			base.Update(gt);
 		}

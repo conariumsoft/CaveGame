@@ -17,15 +17,18 @@ namespace CaveGame.Server
 			World = "World1";
 			MaxPlayers = 40;
 			ServerName = "Standalone";
+			ServerMOTD = "A";
 			TickRate = 20;
 		}
 
 		public int TickRate;
 		public string ServerName;
+		public string ServerMOTD;
 		public int Port;
 		public int MaxPlayers;
 		public string World;
 		public string IPAddress;
+
 
 		[NonSerialized]
 		public int Based;

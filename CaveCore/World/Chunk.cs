@@ -42,6 +42,7 @@ namespace CaveGame.Core
 			TileUpdate = new bool[ChunkSize, ChunkSize];
 			Walls = new Wall[ChunkSize, ChunkSize];
 			Lights = new Light3[ChunkSize, ChunkSize];
+			NetworkUpdated = new bool[ChunkSize, ChunkSize];
 
 			for (int x = 0; x < ChunkSize; x++)
 			{
@@ -51,12 +52,14 @@ namespace CaveGame.Core
 					SetWall(x, y, new Walls.Air());
 				}
 			}
-			FillNoise();
-			NetworkUpdated = new bool[ChunkSize, ChunkSize];
+			
+			
+		}
+
+		public void ClearUpdateQueue()
+		{
 			NetworkUpdated.Initialize();
 			TileUpdate.Initialize();
-			//Logger.Log(ToData().DumpHex());
-
 		}
 
 		public void FromData(byte[] data)
@@ -129,108 +132,6 @@ namespace CaveGame.Core
 			UpdateRenderBuffer = true;
 		}
 
-
-		public void FillNoise()
-		{
-			var simplex = new SimplexNoise();
-			var octave = new OctaveNoise(5, 4);
-
-			for (int x = 0; x < Chunk.ChunkSize; x++)
-			{
-				for (int y = 0; y < Chunk.ChunkSize; y++)
-				{
-					int curX = ((Coordinates.X * Globals.ChunkSize) + x);
-					int curY = ((Coordinates.Y * Globals.ChunkSize) + y);
-
-
-					var surface = octave.Noise2D(curX / 20.0, curY / 20.0)*10 + (octave.Noise2D(curX / 201.0, curY / 199.0) * 40);
-
-					var depth = (curY - surface - 15);
-
-					if (depth < 0)
-					{
-						SetTile(x, y, new Tiles.Air());
-					}
-					else if (depth <= 1.5f)
-					{
-						SetTile(x, y, new Tiles.Grass());
-					}
-					else if (depth <= 5)
-					{
-						SetTile(x, y, new Tiles.Dirt());
-						SetWall(x, y, new Walls.Dirt());
-					}
-					else {
-						SetWall(x, y, new Walls.Stone());
-						var noise = simplex.Noise(curX / 4.0f, curY / 4.0f)*30;
-						if (noise+depth > 30.5)
-						{
-							SetTile(x, y, new Tiles.Stone());
-							
-						}
-						else
-						{
-							
-							SetTile(x, y, new Tiles.Dirt());
-						}
-					}
-
-					if (depth > 0)
-					{
-						if (simplex.Noise(curX/50.0f, (curY/60.0f) +4848) > 0.65f) {
-							SetTile(x, y, new Clay());
-						}
-
-						if (simplex.Noise((curX+444) / 45.0f, (curY / 22.0f) + 458) > 0.75f)
-						{
-							SetTile(x, y, new Granite());
-						}
-					}
-
-					// caves
-					if (depth >= 0)
-					{
-						// jagged caves
-						var cavetiny = octave.Noise2D(curX / 5.0f, curY / 5.0f) * 0.5f;
-						var cave1 = (octave.Noise2D(curX / 30.0f, curY / 30.0f));
-						var cave2 = (octave.Noise2D((curX + 11) / 200.0f, (curY + 50) / 200.0f) * 0.6f) + (cave1 * 1.5f) - 0.3f + (cavetiny);
-						if (cave1 > 0.8f)
-						{
-							SetTile(x, y, new Tiles.Air());
-						}
-						if (cavetiny > 0.8f)
-						{
-							SetTile(x, y, new Tiles.Air());
-						}
-						if (cave2 > -0.08f && cave2 < 0.08f)
-						{
-							SetTile(x, y, new Tiles.Air());
-						}
-
-						if (depth > 50 && GetTile(x, y) is Tiles.Air && simplex.Noise(curX/5.0f, curY/8.0f) > 0.98f)
-						{
-							
-							SetTile(x, y, new Cobweb());
-						}
-
-
-						if (cavetiny > 0.2f)
-						{
-
-							SetTile(x, y, new Water { TileState = 8 });
-							//TileUpdate[x, y] = true;
-						}
-
-						if (simplex.Noise(curX/100.0f, curY/100.0f) > 0.75f && depth > 100)
-						{
-							SetTile(x, y, new Lava { TileState = 8 });
-							//TileUpdate[x, y] = true;
-						}
-					}
-				}
-			}
-		}
-
 		public void SetTile(int x, int y, Tile t)
 		{
 			//Debug.WriteLine("TT " + t.TileState);
@@ -252,12 +153,12 @@ namespace CaveGame.Core
 		}
 
 		public void SetWall(int x, int y, Wall w) {
-			if (Walls[x, y] == null || Walls[x, y].Equals(w) == false)
-			{
+		//	if (Walls[x, y] == null)
+		//	{
 				Walls[x, y] = w;
 				NetworkUpdated[x, y] = true; // TODO: Create WallReplicate and TileReplicate queues
 				UpdateRenderBuffer = true; 
-			}
+		//	}
 		}
 
 		private void DrawForegroundBuffer(Texture2D tilesheet, GraphicsDevice device, SpriteBatch sb)

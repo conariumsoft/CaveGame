@@ -40,7 +40,7 @@ namespace CaveGame.Core.Walls
 		{
 			Color = Color.White;
 			Hardness = 4;
-			Opacity = 2;
+			Opacity = 1;
 			Namespace = "CaveGame";
 		}
 	}
@@ -54,16 +54,16 @@ namespace CaveGame.Core.Walls
 			Hardness = 2, Quad = TileMap.Soil, Color = new Color(40, 20, 5) 
 		};
 		public static WDef Stone	  = new WDef {
-			Hardness = 5, Quad = TileMap.Stone, Color = TileDefinitions.Stone.Color*0.3f
+			Hardness = 5, Quad = TileMap.Stone, Color = TileDefinitions.Stone.Color*0.5f
 		};
 		public static WDef RockyDirt  = new WDef {
 			Hardness = 5, Quad = TileMap.StoneSpot, Color = TileDefinitions.Dirt.Color.Sub(Wall.BGDarken) 
 		};
 		public static WDef OakPlank	  = new WDef { 
-			Hardness = 5, Quad = TileMap.Plank, Color = TileDefinitions.OakPlank.Color*0.3f
+			Hardness = 5, Quad = TileMap.Plank, Color = TileDefinitions.OakPlank.Color*0.7f
 		};
 		public static WDef ClayBrick  = new WDef {
-			Hardness = 5, Quad = TileMap.Brick, Color = TileDefinitions.ClayBrick.Color*0.3f
+			Hardness = 5, Quad = TileMap.Brick, Color = TileDefinitions.ClayBrick.Color*0.5f
 		};
 		public static WDef StoneBrick = new WDef { 
 			Hardness = 5, Quad = TileMap.Brick, Color = new Color(0.3f, 0.3f, 0.3f)
@@ -234,15 +234,46 @@ namespace CaveGame.Core.Walls
 	public class OakPlank : Wall {
 		public OakPlank() : base(WallDefinitions.OakPlank) { }
 	}
-	public class StoneBrick : Wall {
+
+	public abstract class Brick : Wall
+	{
+		public Brick(WDef def) : base(def) { }
+		
+		
+
+		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		{
+			Rectangle quad = TileMap.BGBrickTL;
+
+			if (x.Mod(2) == 0 && y.Mod(2) == 0)
+				quad = TileMap.BGBrickTL;
+			if (x.Mod(2) != 0 && y.Mod(2) == 0)
+				quad = TileMap.BGBrickTR;
+			if (x.Mod(2) == 0 && y.Mod(2) != 0)
+				quad = TileMap.BGBrickBL;
+			if (x.Mod(2) != 0 && y.Mod(2) != 0)
+				quad = TileMap.BGBrickBR;
+
+			//base.Draw(tilesheet, sb, x, y, color);
+
+			sb.Draw(
+				tilesheet,
+				new Vector2(x * Globals.TileSize, y * Globals.TileSize),
+				quad, color.MultiplyAgainst(Color)
+			);
+		}
+	}
+
+	public class StoneBrick : Brick {
 
 		public StoneBrick() : base(WallDefinitions.StoneBrick) { }
 	}
-	public class ClayBrick : Wall {
+	public class ClayBrick : Brick
+	{
 
 		public ClayBrick() : base(WallDefinitions.ClayBrick) { }
 	}
-	public class SandstoneBrick: Wall
+	public class SandstoneBrick: Brick
 	{
 		public SandstoneBrick() : base(WallDefinitions.SandstoneBrick) { }
 	}

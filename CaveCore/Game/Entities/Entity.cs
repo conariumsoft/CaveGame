@@ -28,7 +28,7 @@ namespace CaveGame.Core.Entities
 	}
 	public interface IPhysicsObject {
 		void PhysicsStep(IGameWorld world, float step);
-		void OnCollide(IGameWorld world, Tiles.Tile t, Vector2 separation, Vector2 normal);
+		void OnCollide(IGameWorld world, Tiles.Tile t, Vector2 separation, Vector2 normal, Point tilePos);
 		float Mass { get; }
 
 	}
@@ -40,13 +40,9 @@ namespace CaveGame.Core.Entities
 		int EntityNetworkID { get; }
 		float TicksAlive { get; }
 		bool Dead { get; }
-		void Update(IGameWorld world, GameTime gt);
-	}
-	public interface IServerUpdate {
-		void ServerUpdate(IGameWorld world, GameTime gt);
-	}
-	public interface IClientUpdate {
-		void ClientUpdate(IGameWorld world, GameTime gt);
+		//void Update(IGameWorld world, GameTime gt);
+		void ClientUpdate(IClientWorld world, GameTime gt);
+		void ServerUpdate(IServerWorld world, GameTime gt);
 	}
 	public interface IExpirationTime{
 		float ExpirationTicks { get; set; }
@@ -63,12 +59,13 @@ namespace CaveGame.Core.Entities
 
 		public Entity()
 		{
-			//EntityNetworkID = this.GetHashCode();
+
 		}
 
-		public virtual void Update(IGameWorld world, GameTime gt) { }
-		//public virtual void ServerUpdate(IGameWorld world, GameTime gt) { }
-		//public virtual void ClientUpdate(IGameWorld world, GameTime gt) { }
+
+		public virtual void ClientUpdate(IClientWorld world, GameTime gt) { }
+		public virtual void ServerUpdate(IServerWorld world, GameTime gt) { }
+		public virtual void Draw(SpriteBatch sb) { }
 	}
 
 	public class Thinker : Entity

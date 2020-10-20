@@ -10,28 +10,32 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Camera.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Bomb.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\PhysicsEntity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Inventory\FurnitureItems.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generic\DelayedTask.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileUtil\StructureFile.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Furniture\Furniture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Furniture\Furniture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generic\CircularArray.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generic\QuadTree.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generic\ThreadSafeValue.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Logger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\User.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rotation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\Chunk.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\ChunkCoordinates.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CollisionSolver.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Entities\Entity.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Entities\ItemstackEntity.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Entities\Player.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Entity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\ItemstackEntity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Player.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileUtil\Configuration.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\GameWorld.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Globals.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IMessageOutlet.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Inventory\Items.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Inventory\ItemStack.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Inventory\Items.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Inventory\ItemStack.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\Generator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\Light3.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Message.cs" />
@@ -41,9 +45,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Noise\OctaveNoise.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Noise\PerlinNoise.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Noise\SimplexNoise.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tiles\TileMap.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tiles\Tiles.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Walls\Walls.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Tiles\TileMap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Tiles\Tiles.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Walls\Walls.cs" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />

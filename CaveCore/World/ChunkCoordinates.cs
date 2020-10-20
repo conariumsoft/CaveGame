@@ -5,6 +5,66 @@ using System.Text;
 
 namespace CaveGame.Core
 {
+	public struct Coordinates6D : IEquatable<Coordinates6D>
+	{
+
+
+		public int WorldX { get; set; }
+		public int WorldY { get; set; }
+		public int ChunkX { get; set; }
+		public int ChunkY { get; set; }
+		public int TileX { get; set; }
+		public int TileY { get; set; }
+
+		public static Coordinates6D FromWorld(int wx, int wy)
+		{
+			int chunkX = (int)Math.Floor((double)wx / Globals.ChunkSize);
+			int chunkY = (int)Math.Floor((double)wy / Globals.ChunkSize);
+
+			var tileX = wx.Mod(Globals.ChunkSize);
+			var tileY = wy.Mod(Globals.ChunkSize);
+
+			return new Coordinates6D
+			{
+				ChunkX = chunkX,
+				ChunkY = chunkY,
+				TileX = tileX,
+				TileY = tileY,
+				WorldX = wx,
+				WorldY = wy
+			};
+		}
+
+		public static Coordinates6D FromQuad(int cx, int cy, int tx, int ty)
+		{
+			return new Coordinates6D
+			{
+				ChunkX = cx,
+				ChunkY = cy,
+				TileX = tx,
+				TileY = ty,
+				WorldX = (cx * Globals.ChunkSize) + tx,
+				WorldY = (cy * Globals.ChunkSize) + ty
+			};
+		}
+		public bool Equals(Coordinates6D other)
+		{
+			return (other.WorldX == WorldX && other.WorldX == WorldY);
+		}
+
+		public override int GetHashCode()
+		{
+			var hash = 42069;
+			hash = hash * -666 + WorldX.GetHashCode();
+			hash = hash * 9929 + WorldY.GetHashCode();
+			return hash;
+		}
+		// No LINQ for performance reasons
+
+
+
+	}
+
 	public struct ChunkCoordinates: IEquatable<ChunkCoordinates>
 	{
 		public int X { get; set; }

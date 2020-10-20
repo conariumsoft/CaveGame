@@ -26,12 +26,12 @@ namespace StandaloneServer
 			//GameServer server = new GameServer(config);
 
 			ServerConfig config = Configuration.Load<ServerConfig>("Config.xml", true);
-			GameServer server = new GameServer(config);
+			StandaloneGameServer server = new StandaloneGameServer(config);
 			server.Output = consoleWrapper;
 
 			_consoleCtrlHandler += s =>
 			{
-				server.OnShutdown();
+				server.Shutdown();
 				return false;
 			};
 			SetConsoleCtrlHandler(_consoleCtrlHandler, true);

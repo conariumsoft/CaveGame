@@ -112,11 +112,13 @@ namespace CaveGame.Client
 			{
 				if (Steamworks.SteamAPI.RestartAppIfNecessary((Steamworks.AppId_t)1238250))
 				{
+					Debug.WriteLine("Steam restarting?");
 					Exit();
-					return;
+					//return false;
 				}
 			} catch (System.DllNotFoundException e)
 			{
+				Debug.WriteLine("Missing steam_api64.dll");
 				throw new Exception("Missing steam_api64.dll");
 			}
 		}
@@ -180,6 +182,12 @@ namespace CaveGame.Client
 
 		protected void CommandBarEvent(CommandBar sender, Command command, params string[] args)
 		{
+			//InWorldContext.myPlayer.God = !InWorldContext.myPlayer.God;
+			if (command.Keyword == "god")
+			{
+				InWorldContext.myPlayer.God = !InWorldContext.myPlayer.God;
+				return;
+			}
 			if (command.Keyword == "teleport")
 			{
 
@@ -225,6 +233,7 @@ namespace CaveGame.Client
 
 			Console.BindCommandInformation(new Command("test", "it does a thing", new List<string>{"argA", "argB", "argC"}));
 			Console.BindCommandInformation(new Command("teleport", "", new List<string> { "x", "y" }));
+			Console.BindCommandInformation(new Command("god", "AAOKSOKADFOS", new List<string> {"n"}));
 			Console.Handler += CommandBarEvent;
 
 			#endregion

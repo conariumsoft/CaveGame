@@ -76,7 +76,7 @@ namespace CaveGame.Client
 		public static Texture2D Helmet;
 		public static Texture2D Chestplate;
 		public static Texture2D Sword;
-		public static Texture2D WalLScraper;
+		public static Texture2D WallScraper;
 		public static Texture2D PickaxeNew;
 		public static Texture2D Scroll;
 		public static Texture2D Dynamite;
@@ -101,8 +101,10 @@ namespace CaveGame.Client
 			Bomb = Load("Items/bomb");
 			Bong = Load("Items/bong");
 			Ingot = Load("Items/ingot");
-
-
+			BigPickaxe = Load("Items/bigpickaxe");
+			WallScraper = Load("Items/wallscraper");
+			Door = Load("Items/door");
+			Workbench = Load("Items/workbench");
 		}
 
 		/*public static Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();

@@ -56,6 +56,10 @@ namespace CaveGame.Core.Tiles
 		public static Rectangle BMPY_Stone = Quad(3, 3);
 		public static Rectangle BMPY_DarkStone = Quad(1, 4);
 
+		public static Rectangle BGBrickTL = Quad(10, 1);
+		public static Rectangle BGBrickTR = Quad(11, 1);
+		public static Rectangle BGBrickBL = Quad(10, 2);
+		public static Rectangle BGBrickBR = Quad(11, 2);
 
 		public static Dictionary<string, Rectangle> Atlas = new Dictionary<string, Rectangle> {
 			
