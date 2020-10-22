@@ -42,7 +42,7 @@ namespace CaveGame.Core
 			TileUpdate = new bool[ChunkSize, ChunkSize];
 			Walls = new Wall[ChunkSize, ChunkSize];
 			Lights = new Light3[ChunkSize, ChunkSize];
-			NetworkUpdated = new bool[ChunkSize, ChunkSize];
+	
 
 			for (int x = 0; x < ChunkSize; x++)
 			{
@@ -58,8 +58,8 @@ namespace CaveGame.Core
 
 		public void ClearUpdateQueue()
 		{
-			NetworkUpdated.Initialize();
-			TileUpdate.Initialize();
+			NetworkUpdated = new bool[ChunkSize, ChunkSize];
+			TileUpdate = new bool[ChunkSize, ChunkSize];
 		}
 
 		public void FromData(byte[] data)

@@ -14,32 +14,25 @@ namespace CaveGame.Client.Menu
 		{
 			">>CAVE GAME",
 			"",
-			">Programming",
-			"JoshMadScientist",
-			"ConcurrentSquared",
-			"dodeadam",
-			">Game Design",
-			"JoshMadScientist",
-			"dodeadam",
-			">Art and Music",
-			"Mescalyne",
-			"JoshMadScientist",
-			"WheezyBackports",
-			"Bumpylegoman02",
+			">Lead Developer",
+			"Josh O'Leary 'MadScientist'",
+			">Contributing Developers",
+			"dodeadam - Programming",
+			"ConcurrentSquared - Programming & Design",
+			"Mescalyne - Music",
+			"WheezyBackports - Art",
+			"Bumpylegoman02 - Security Testing & Design",
 			">Testing",
-			"Bumpylegoman02",
-			"WheezyBackports",
-			"AndrewJ",
+			"Andrew J.",
 			"squidthonkv2",
-			">Community Management",
-			"N/A",
+			"Billy J.",
 			">Biz",
-			"Tyler S.",
+			"Tyler Stewart",
 			"Copyright Conarium Software 2020",
 		};
 
-		public Game Game { get; set; }
-
+		Game IGameContext.Game => Game;
+		public CaveGameGL Game { get; set; }
 		public bool Active { get; set; }
 
 		static UIRoot CreditsPage;
@@ -55,8 +48,25 @@ namespace CaveGame.Client.Menu
 				Size = new UICoords(0, 0, 1.0f, 1.0f),
 				Position = new UICoords(0, 0, 0, 0),
 				Parent = CreditsPage,
-				BGColor = Color.DarkBlue,
+				BGColor = Color.Black*0.5f,
 			};
+
+			TextButton backButton = new TextButton
+			{
+				TextColor = Color.White,
+				Text = "BACK",
+				Font = GameFonts.Arial14,
+				Size = new UICoords(100, 20, 0, 0),
+				Position = new UICoords(-10, -30, 0, 1.0f),
+				AnchorPoint = new Vector2(0, 1),
+				TextWrap = true,
+				TextYAlign = TextYAlignment.Center,
+				TextXAlign = TextXAlignment.Center,
+				Parent = creditslist,
+				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
+				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
+			};
+			backButton.OnLeftClick += (btn, mouse) => Game.CurrentGameContext = Game.HomePageContext;
 
 			UIListContainer container = new UIListContainer
 			{
@@ -67,7 +77,7 @@ namespace CaveGame.Client.Menu
 			foreach(string text in credits)
 			{
 				string displayedText = text;
-				SpriteFont font = GameFonts.Arial10;
+				SpriteFont font = GameFonts.Arial14;
 				int size = 16;
 				if (text.StartsWith(">>"))
 				{
@@ -76,7 +86,7 @@ namespace CaveGame.Client.Menu
 					displayedText = text.Replace(">>", "");
 				} else if (text.StartsWith(">"))
 				{
-					font = GameFonts.Arial14;
+					font = GameFonts.Arial16;
 					size = 20;
 					displayedText = text.Replace(">", "");
 				}
@@ -96,7 +106,7 @@ namespace CaveGame.Client.Menu
 
 		}
 
-		public Credits(Game _game)
+		public Credits(CaveGameGL _game)
 		{
 			Game = _game;
 		}

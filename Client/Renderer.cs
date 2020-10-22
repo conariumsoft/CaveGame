@@ -1,4 +1,4 @@
-﻿using Cave;
+﻿using CaveGame;
 using CaveGame.Core.Entities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

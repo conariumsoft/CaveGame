@@ -140,6 +140,9 @@ namespace CaveGame.Client.UI
 		public bool TextWrap { get; set; }
 		public bool ProviderShowInternal { get; set; }
 
+		public bool TextWrapping { get; private set; }
+		public int TextWrappingCount { get; private set; }
+
 		public Label() : base()
 		{
 			Font = GameFonts.ComicSans10;
@@ -172,8 +175,9 @@ namespace CaveGame.Client.UI
 			float lineWidth = 0f;
 			float spaceWidth = spriteFont.MeasureString(" ").X;
 
+			TextWrappingCount = 0;
 
-			
+
 
 			foreach (string word in words)
 			{
@@ -188,6 +192,7 @@ namespace CaveGame.Client.UI
 				{
 					sb.Append("\n" + word + " ");
 					lineWidth = size.X + spaceWidth;
+					TextWrappingCount++;
 				}
 			}
 

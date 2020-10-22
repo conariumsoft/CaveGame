@@ -637,11 +637,8 @@ namespace CaveGame.Core.Tiles
 			return false;
 		}
 
-
-		public void LiquidUpdate<TLiquid>(IGameWorld world, int x, int y) where TLiquid : Liquid, new()
+		protected virtual void FlowBelow<TLiquid>(IGameWorld world, int x, int y) where TLiquid : Liquid, new()
 		{
-			EvaporationCheck(world, x, y);
-
 			var below = world.GetTile(x, y + 1);
 
 			if (below is IWaterBreakable s)
@@ -650,10 +647,6 @@ namespace CaveGame.Core.Tiles
 				world.SetTileNoLight(x, y + 1, new TLiquid { TileState = this.TileState });
 				world.SetTileNoLight(x, y, new Air());
 				TileState = 0;
-				//world.DoUpdatePropogation(x, y);
-				//world.SetTileNetworkUpdated(x, y);
-				//world.SetTileNetworkUpdated(x, y + 1);
-				//return;
 			}
 
 			if (below is TLiquid wbelow)
@@ -665,11 +658,15 @@ namespace CaveGame.Core.Tiles
 				below.TileState += taken;
 				world.DoUpdatePropogation(x, y);
 				world.DoUpdatePropogation(x, y + 1);
-				//world.SetTileNetworkUpdated(x, y);
-				//world.SetTileNetworkUpdated(x, y + 1);
-				//return;
-				//return;
 			}
+		}
+
+		public void LiquidUpdate<TLiquid>(IGameWorld world, int x, int y) where TLiquid : Liquid, new()
+		{
+			EvaporationCheck(world, x, y);
+
+			FlowBelow<TLiquid>(world, x, y);
+
 
 			var left = world.GetTile(x - 1, y);
 			var right = world.GetTile(x + 1, y);
@@ -713,6 +710,19 @@ namespace CaveGame.Core.Tiles
 					else
 						TileState = wleft.TileState;
 				}
+				if (TileState > wleft.TileState + 1)
+				{
+					TileState--;
+					wleft.TileState++;
+				}
+				else if (TileState - wleft.TileState == 1)
+				{
+					if (RNG.NextDouble() > 0.5)
+
+						wleft.TileState = TileState;
+					else
+						TileState = wleft.TileState;
+				}
 				world.DoUpdatePropogation(x, y);
 				world.DoUpdatePropogation(x - 1, y);
 
@@ -722,6 +732,19 @@ namespace CaveGame.Core.Tiles
 
 			if (right is TLiquid wright && TileState > wright.TileState)
 			{
+				if (TileState > wright.TileState + 1)
+				{
+					TileState--;
+					wright.TileState++;
+				}
+				else if (TileState - wright.TileState == 1)
+				{
+					if (RNG.NextDouble() > 0.5)
+
+						wright.TileState = TileState;
+					else
+						TileState = wright.TileState;
+				}
 				if (TileState > wright.TileState + 1)
 				{
 					TileState--;

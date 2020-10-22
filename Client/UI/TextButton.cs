@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using CaveGame.Client.Menu;
-using Cave;
+using CaveGame;
 
 namespace CaveGame.Client.UI
 {

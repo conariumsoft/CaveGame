@@ -137,6 +137,7 @@ namespace CaveGame.Server
 				Generator.HeightPass(ref chunk);
 				//World.Chunks.Add(coords, chunk);
 				Chunks.TryAdd(coords, chunk);
+				chunk.ClearUpdateQueue();
 			}
 
 			if (!chunk.DungeonPassCompleted)
@@ -248,7 +249,7 @@ namespace CaveGame.Server
 					{
 
 						var dist = (entpos.Position - pos).Length();
-						var power = Math.Min((1 / dist) * strength * 5, 100);
+						var power = Math.Min((1 / dist) * strength * 8, 300);
 						var unitVec = (entpos.Position - pos);
 						unitVec.Normalize();
 
@@ -260,15 +261,15 @@ namespace CaveGame.Server
 
 			if (damageTiles)
 			{
-				for (int x = -10; x < 10; x++)
+				for (int x = -12; x < 12; x++)
 				{
-					for (int y = -10; y < 10; y++)
+					for (int y = -12; y < 12; y++)
 					{
 						Vector2 thisPosVec = pos + new Vector2(x * Globals.TileSize, y * Globals.TileSize);
 
 						float dist = (thisPosVec - pos).Length() / Globals.TileSize;
 
-						var damage = Math.Max(strength - dist, 0);
+						var damage = Math.Max((strength*3) - (dist*3), 0);
 
 						var centroid = new Point((int)pos.X / Globals.TileSize, (int)pos.Y / Globals.TileSize) + new Point(x, y);
 						var tile = GetTile(centroid.X, centroid.Y);

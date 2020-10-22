@@ -1,5 +1,6 @@
 ﻿using CaveGame.Client;
 using System;
+using System.Diagnostics;
 
 namespace Cave
 {
@@ -10,9 +11,13 @@ namespace Cave
 		static void Main()
 		{
 			using (var game = new CaveGameGL())
+			{
 				game.Run();
+				game.Exit();
+			}
+			Process.GetCurrentProcess().CloseMainWindow();
+			Environment.Exit(Environment.ExitCode);
 
-			
 		}
 	}
 }

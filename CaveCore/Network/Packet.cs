@@ -365,10 +365,11 @@ namespace CaveGame.Core.Network
 	{
 		public string RejectReason
 		{
-			get { return Encoding.UTF8.GetString(Payload); }
-			set { Payload = Encoding.UTF8.GetBytes(value); }
+			get { return TypeSerializer.ToString(Encoding.ASCII, Payload, 0, 128); }
+			set { TypeSerializer.FromString(ref Payload, Encoding.ASCII, value, 0, 128); }
 		}
 		public RejectJoinPacket(string reason) : base(PacketType.SDenyJoin) {
+			Payload = new byte[192];
 			RejectReason = reason;
 		}
 		public RejectJoinPacket(byte[] bytes) : base(bytes) { }
@@ -631,6 +632,8 @@ namespace CaveGame.Core.Network
 		public ClientChatMessagePacket(byte[] bytes) : base(bytes) { }
 	}
 
+
+	// TODO: new payload
 	public class ServerChatMessagePacket: Packet
 	{
 		// Payload array offsets

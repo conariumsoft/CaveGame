@@ -34,6 +34,42 @@ namespace CaveGame.Client
 		}
 	}
 
+	public struct TileChangedCell : IDisposable
+	{
+		public int X;
+		public int Y;
+		public Tile Tile;
+		public TileChangedCell(int x, int y, Tile t)
+		{
+			X = x;
+			Y = y;
+			Tile = t;
+		}
+
+		public void Dispose()
+		{
+			System.GC.SuppressFinalize(this);
+		}
+	}
+
+	public struct WallChangedCell : IDisposable
+	{
+		public int X;
+		public int Y;
+		public Wall Wall;
+		public WallChangedCell(int x, int y, Wall w)
+		{
+			X = x;
+			Y = y;
+			Wall = w;
+		}
+
+		public void Dispose()
+		{
+			System.GC.SuppressFinalize(this);
+		}
+	}
+
 	public class LightingEngine
 	{
 		public Thread LightThread;
@@ -52,12 +88,12 @@ namespace CaveGame.Client
 
 		public void UpdateTile(int worldx, int worldy, Tile tile)
 		{
-			ChangedTiles.Enqueue(new Tuple<int, int, Tile>(worldx, worldy, tile));
+			ChangedTiles.Enqueue(new TileChangedCell(worldx, worldy, tile));
 		}
 
 		public void UpdateWall(int worldx, int worldy, Wall wall)
 		{
-			ChangedWalls.Enqueue(new Tuple<int, int, Wall>(worldx, worldy, wall));
+			ChangedWalls.Enqueue(new WallChangedCell(worldx, worldy, wall));
 		}
 
 		public Light3[,] GetLightsForChunk(ChunkCoordinates coords)
@@ -84,8 +120,8 @@ namespace CaveGame.Client
 
 			AddedChunkQueue = new ConcurrentQueue<Chunk>();
 			RemovedChunkQueue = new ConcurrentQueue<ChunkCoordinates>();
-			ChangedTiles = new ConcurrentQueue<Tuple<int, int, Tile>>();
-			ChangedWalls = new ConcurrentQueue<Tuple<int, int, Wall>>();
+			ChangedTiles = new ConcurrentQueue<TileChangedCell>();
+			ChangedWalls = new ConcurrentQueue<WallChangedCell>();
 			OutputLights = new Dictionary<ChunkCoordinates, Light3[,]>();
 			LocalChunks = new Dictionary<ChunkCoordinates, Chunk>();
 			LightCells = new Dictionary<ChunkCoordinates, Light3[,]>();
@@ -94,8 +130,8 @@ namespace CaveGame.Client
 
 		private ConcurrentQueue<Chunk> AddedChunkQueue;
 		private ConcurrentQueue<ChunkCoordinates> RemovedChunkQueue;
-		private ConcurrentQueue<Tuple<int, int, Tile>> ChangedTiles;
-		private ConcurrentQueue<Tuple<int, int, Wall>> ChangedWalls;
+		private ConcurrentQueue<TileChangedCell> ChangedTiles;
+		private ConcurrentQueue<WallChangedCell> ChangedWalls;
 		private Dictionary<ChunkCoordinates, Light3[,]> OutputLights;
 
 		private Dictionary<ChunkCoordinates, Chunk> LocalChunks;
@@ -309,23 +345,23 @@ namespace CaveGame.Client
 					}
 				}
 
-				Tuple<int, int, Tile> recvdata;
+				TileChangedCell recvdata;
 				for (int i = 0; i < ChangedTiles.Count; i++)
 				{
 					bool have = ChangedTiles.TryDequeue(out recvdata);
 					if (have)
 					{
-						var prevTile = GetTile(recvdata.Item1, recvdata.Item2);
-						SetTile(recvdata.Item1, recvdata.Item2, recvdata.Item3);
+						//var prevTile = GetTile(recvdata.Item1, recvdata.Item2);
+						SetTile(recvdata.X, recvdata.Y, recvdata.Tile);
 						//var prevLight = GetLight(recvdata.Item1, recvdata.Item2);
 						//var postOpacity = recvdata.Item3.Opacity;
-						int resetRadius = 4;
-						int recalcRadius = 6;
+						int resetRadius = 5;
+						int recalcRadius = 7;
 
-						if (prevTile is ILightEmitter)
+						//if (prevTile is ILightEmitter)
 						{
-							resetRadius = 10;
-							recalcRadius = 12;
+					//		resetRadius = 10;
+					//		recalcRadius = 12;
 						}
 							
 						//var newL = new Light3(r, g, b);
@@ -333,7 +369,7 @@ namespace CaveGame.Client
 						{
 							for (int y = -resetRadius; y < resetRadius; y++)
 							{
-								SetLight(recvdata.Item1+x, recvdata.Item2+y, Light3.Dark);
+								SetLight(recvdata.X+x, recvdata.Y+y, Light3.Dark);
 								//UpdatedCells.Enqueue(new Cell(recvdata.Item1+x, recvdata.Item2+y, Light3.Dark));
 							}
 						}
@@ -342,8 +378,8 @@ namespace CaveGame.Client
 						{
 							for (int y = -recalcRadius; y < recalcRadius; y++)
 							{
-								int mx = recvdata.Item1+x;
-								int my = recvdata.Item2+y;
+								int mx = recvdata.X+x;
+								int my = recvdata.Y+y;
 
 								byte absorb = 0;
 
@@ -363,14 +399,14 @@ namespace CaveGame.Client
 					}
 				}
 
-				Tuple<int, int, Wall> recv2;
+				WallChangedCell recv2;
 				for (int i = 0; i < ChangedWalls.Count; i++)
 				{
 					bool have = ChangedWalls.TryDequeue(out recv2);
 					if (have)
 					{
 
-						SetWall(recv2.Item1, recv2.Item2, recv2.Item3);
+						SetWall(recv2.X, recv2.Y, recv2.Wall);
 						//var prevLight = GetLight(recvdata.Item1, recvdata.Item2);
 						//var postOpacity = recvdata.Item3.Opacity;
 
@@ -384,7 +420,7 @@ namespace CaveGame.Client
 						{
 							for (int y = -2; y < 2; y++)
 							{
-								SetLight(recv2.Item1 + x, recv2.Item2 + y, Light3.Dark);
+								SetLight(recv2.X + x, recv2.Y + y, Light3.Dark);
 								//UpdatedCells.Enqueue(new Cell(recvdata.Item1+x, recvdata.Item2+y, Light3.Dark));
 							}
 						}
@@ -393,8 +429,8 @@ namespace CaveGame.Client
 						{
 							for (int y = -3; y < 3; y++)
 							{
-								int mx = recv2.Item1 + x;
-								int my = recv2.Item2 + y;
+								int mx = recv2.X + x;
+								int my = recv2.Y + y;
 
 								byte absorb = 0;
 
@@ -423,10 +459,10 @@ namespace CaveGame.Client
 				{
 					//Debug.WriteLine("LTTstore.com " + stopwatch.Elapsed.TotalSeconds + "s, " + UpdatedCells.Count);
 					iterationCount = 0;
-					OutputLights.Clear();
+					//OutputLights.Clear();
 					foreach (var kvp in LightCells)
 						OutputLights[kvp.Key] = kvp.Value;
-					Thread.Sleep(5);
+					Thread.Sleep(1);
 					//UpdatedCells.TrimExcess();
 					//GC.Collect();
 					
@@ -446,7 +482,8 @@ namespace CaveGame.Client
 		}
 		public void Off()
 		{
-			//running.Value = false;
+			running.Value = false;
+			LightThread.Abort();
 		}
 		float timer = 0;
 		public void Update(GameTime gt)

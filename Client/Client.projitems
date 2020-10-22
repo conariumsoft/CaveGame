@@ -10,6 +10,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Assets.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InputManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Menu\Multiplayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Menu\TimeoutMenu.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SteamManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameChat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LightingEngine.cs" />

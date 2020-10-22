@@ -26,27 +26,6 @@ namespace CaveGame.Client
 		public static GraphicsDevice GraphicsDevice;
 	}
 
-	public class DelayedTaskContainer
-	{
-		List<DelayedTask> tasks;
-
-		public DelayedTaskContainer()
-		{
-			tasks = new List<DelayedTask>();
-		}
-
-		public void Update(GameTime gt)
-		{
-			foreach (var task in tasks)
-				task.Update(gt);
-		}
-
-		public void Add(DelayedTask task)
-		{
-			tasks.Add(task);
-		}
-	}
-
 	public class CaveGameGL : Game
 	{
 
@@ -54,10 +33,12 @@ namespace CaveGame.Client
 		private IGameContext PreviousGameContext { get; set; }
 
 		#region Game States
-		public HomePage HomePageContext;
 		public GameClient InWorldContext;
-		public ServerKickedPage ServerKickedContext;
-		public Credits CreditsContext;
+		public Menu.HomePage HomePageContext;
+		public Menu.Multiplayer MultiplayerPageContext;
+
+		public Menu.TimeoutMenu TimeoutContext;
+		public Menu.Credits CreditsContext;
 		#endregion
 
 		private GraphicsDeviceManager graphics;
@@ -71,86 +52,14 @@ namespace CaveGame.Client
 		public static float ClickTimer;
 
 
-		DelayedTaskContainer taskManager;
 
-
-		#region Steam Callbacks
-		private void Steam_OnOverlayActivated(Steamworks.GameOverlayActivated_t pCallback)
-		{
-
-		}
-		private void Steam_OnShutdown(Steamworks.SteamShutdown_t callback) { }
-		private void Steam_OnScreenshotRequested(Steamworks.ScreenshotRequested_t callback) { }
-		private void Steam_OnUserStatsReceived(Steamworks.UserStatsReceived_t callback) { }
-		private void Steam_OnUserStatsStored(UserStatsStored_t param)
-		{
-
-		}
-		private void Steam_OnAchievementsStored(UserAchievementStored_t param)
-		{
-		}
-		protected Steamworks.Callback<Steamworks.GameOverlayActivated_t> m_OverlayActivated;
-		#endregion
-
-		private void Steam_LoadAchievements()
-		{
-			foreach(Achievement ach in Achievements.List)
-			{
-				bool ret = SteamUserStats.GetAchievement(ach.SteamAcheivementID, out ach.Achieved);
-
-				if (ret)
-				{
-					ach.Name = SteamUserStats.GetAchievementDisplayAttribute(ach.SteamAcheivementID, "name");
-					ach.Description = SteamUserStats.GetAchievementDisplayAttribute(ach.SteamAcheivementID, "desc");
-				}
-			}
-		}
-
-		private void Steam_EnsureDLLExists()
-		{
-			try
-			{
-				if (Steamworks.SteamAPI.RestartAppIfNecessary((Steamworks.AppId_t)1238250))
-				{
-					Debug.WriteLine("Steam restarting?");
-					Exit();
-					//return false;
-				}
-			} catch (System.DllNotFoundException e)
-			{
-				Debug.WriteLine("Missing steam_api64.dll");
-				throw new Exception("Missing steam_api64.dll");
-			}
-		}
-
-		private void Steam_InitAPI()
-		{
-			if (!Steamworks.SteamAPI.Init())
-			{
-				throw new Exception("Steam API Failed to initialize!");
-			}
-		}
+		public SteamManager SteamManager { get; private set; }
+		
 		public CaveGameGL()
 		{
-			Steam_EnsureDLLExists();
-			Steam_InitAPI();
-
+			SteamManager = new SteamManager(this);
 			
-
-			m_OverlayActivated = Steamworks.Callback<Steamworks.GameOverlayActivated_t>.Create(Steam_OnOverlayActivated);
-			Steamworks.Callback<Steamworks.SteamShutdown_t>.Create(Steam_OnShutdown);
-			Steamworks.Callback<Steamworks.ScreenshotRequested_t>.Create(Steam_OnScreenshotRequested);
-			Steamworks.Callback<Steamworks.UserStatsReceived_t>.Create(Steam_OnUserStatsReceived);
-			Steamworks.Callback<Steamworks.UserStatsStored_t>.Create(Steam_OnUserStatsStored);
-			Steamworks.Callback<Steamworks.UserAchievementStored_t>.Create(Steam_OnAchievementsStored);
-
 			bool statsSuccess = SteamUserStats.RequestCurrentStats();
-
-
-			taskManager = new DelayedTaskContainer();
-
-			taskManager.Add(new DelayedTask(() => Steamworks.SteamAPI.RunCallbacks(), 1 / 20.0f));
-
 			graphics = new GraphicsDeviceManager(this) 
 			{
 				PreferredBackBufferWidth = 1280,
@@ -164,8 +73,6 @@ namespace CaveGame.Client
 			Content.RootDirectory = "Content";
 			Window.AllowUserResizing = true;
 			Window.AllowAltF4 = true;
-
-
 		}
 
 
@@ -225,23 +132,26 @@ namespace CaveGame.Client
 		{
 			Window.TextInput += TextInputManager.OnTextInput;
 			Window.ClientSizeChanged += new EventHandler<EventArgs>(Window_ClientSizeChanged);
-			#region CommandBar Setup
-			Console = new CommandBar(this);
-			Components.Add(Console);
-		//	Window.TextInput += Console.OnTextInput;
 			
 
+
+			Console = new CommandBar(this);
 			Console.BindCommandInformation(new Command("test", "it does a thing", new List<string>{"argA", "argB", "argC"}));
 			Console.BindCommandInformation(new Command("teleport", "", new List<string> { "x", "y" }));
 			Console.BindCommandInformation(new Command("god", "AAOKSOKADFOS", new List<string> {"n"}));
 			Console.Handler += CommandBarEvent;
-
-			#endregion
+			Components.Add(Console);
+			
 
 			FPSCounter = new FrameCounter(this);
-			FPSGraph = new FPSGraph(this, 25, 500);
 			Components.Add(FPSCounter);
+
+
+			FPSGraph = new FPSGraph(this, 25, 500);
 			Components.Add(FPSGraph);
+
+			SteamManager.Initialize();
+			Components.Add(SteamManager);
 
 			GameGlobals.Width = Window.ClientBounds.Width;
 			GameGlobals.Height = Window.ClientBounds.Height;
@@ -254,7 +164,8 @@ namespace CaveGame.Client
 			HomePageContext = new HomePage(this);
 			InWorldContext = new GameClient(this);
 			CreditsContext = new Credits(this);
-
+			MultiplayerPageContext = new Multiplayer(this);
+			TimeoutContext = new TimeoutMenu(this);
 			CurrentGameContext = HomePageContext;
 		}
 
@@ -274,7 +185,6 @@ namespace CaveGame.Client
 
 		protected override void Update(GameTime gameTime)
 		{
-			taskManager.Update(gameTime);
 
 			if (CurrentGameContext != PreviousGameContext && PreviousGameContext != null)
 			{
@@ -317,16 +227,20 @@ namespace CaveGame.Client
 		{
 			GraphicsDevice.Clear(Color.Black);
 
+			spriteBatch.Begin();
+
+			Vector2 center = new Vector2(GameGlobals.Width / 2.0f, GameGlobals.Height / 2.0f);
+			Vector2 origin = new Vector2(GameTextures.BG.Width / 2.0f, GameTextures.BG.Height / 2.0f);
+			float scale = GameGlobals.Width / (float)GameTextures.BG.Width;
+			spriteBatch.Draw(GameTextures.BG, center, null, Color.White, 0, origin, scale, SpriteEffects.None, 0);
+			spriteBatch.End();
+
 			if (CurrentGameContext.Active == true)
 			{
 				CurrentGameContext.Draw(spriteBatch);
 			}
 			FPSGraph.Draw(spriteBatch);
 			DrawDebugOverlay();
-
-			spriteBatch.Begin();
-			spriteBatch.Draw(ItemTextures.Bomb, new Vector2(4, 4), Color.White);
-			spriteBatch.End();
 
 			Console.Draw(spriteBatch);
 			base.Draw(gameTime);

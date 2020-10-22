@@ -1,4 +1,4 @@
-﻿using Cave;
+﻿using CaveGame;
 using CaveGame.Client.UI;
 using CaveGame.Core.FileUtil;
 using Microsoft.Xna.Framework;
@@ -14,60 +14,23 @@ using System.Text;
 
 namespace CaveGame.Client.Menu
 {
-	[Serializable]
-	public class GameMenuPersistence: Configuration
-	{
-		public override void FillDefaults()
-		{
-			IPAddress = "";
-			Username = "";
-		}
-
-		public string IPAddress;
-		public string Username;
-
-	}
-
-	[Serializable]
-	public class StoredServerData : Configuration
-	{
-		public string[] IPAddress;
-	}
-
-
-	public class ServerKickedPage : IGameContext
-	{
-		public Game Game { get; private set; }
-
-		public bool Active { get; set; }
-
-		public string Message { get; set; }
-
-		public void Draw(SpriteBatch sb)
-		{
-
-		}
-
-		public void Load()
-		{
-
-		}
-
-		public void Unload()
-		{
-
-		}
-
-		public void Update(GameTime gt)
-		{
-
-		}
-	}
 
 	public class HomePage : IGameContext
 	{
+		static string[] UpdateLogInfo =
+		{
+			">>Open Multiplayer Test",
+			"<Version 2.1.0 - October 31st, 2k20",
+			"",
+			"Thank you for playing! Expect lots of bugs, weird issues, and missing content.",
+			"",
+			"Stay tuned for frequent updates and devlogs!",
+			"",
+			"If you'd like to get in touch, click the discord button to the left.",
+			"",
+			"~ Conarium Software"
+		};
 
-		GameMenuPersistence persistence;
 
 		public CaveGameGL Game { get; private set; }
 
@@ -76,34 +39,26 @@ namespace CaveGame.Client.Menu
 		Game IGameContext.Game => Game;
 
 		UIRoot CurrentPage;
-
 		UIRoot MainMenu;
 		UIRoot SingleplayerMenu;
-		UIRoot MultiplayerMenu;
 		UIRoot WorldCreationMenu;
-		UIRoot CreditsMenu;
-		UIRoot StatsMenu;
-		UIRoot SettingsMenu;
+
+		int buttonHeight = 40;
 
 		TextButton spNewWorldBtn;
 
-
-		// TODO: change this
-		#region patterns
-
-		#endregion
-
-
 		public HomePage(CaveGameGL _game)
 		{
-			persistence = Configuration.Load<GameMenuPersistence>("Mpmenu.xml");
+			
 			Game = _game;
 		}
 
 		public void Draw(SpriteBatch sb)
 		{
 			sb.Begin();
+
 			CurrentPage.Draw(sb);
+			//sb.Draw(GameTextures.TitleScreen, title.AbsolutePosition, null, Color.White, 0, Vector2.Zero, 2, SpriteEffects.None, 0);
 			sb.End();
 		}
 
@@ -115,7 +70,7 @@ namespace CaveGame.Client.Menu
 			GameSounds.MenuBlip?.Play(0.8f, 1, 0.0f);
 		}
 
-
+		Label title;
 		private void ConstructMainMenu()
 		{
 			MainMenu = new UIRoot(Game.GraphicsDevice);
@@ -129,24 +84,22 @@ namespace CaveGame.Client.Menu
 			TextButton settingsButton;
 			TextButton quitButton;
 
-			Label title = new Label
+			title = new Label
 			{
 				BGColor = Color.Transparent,
 				BorderColor = Color.Transparent,
-				Size = new UICoords(0, 0, 0.3f, 0.1f),
-				AnchorPoint = new Vector2(0.5f, 0.5f),
-				Position = new UICoords(0, 0, 0.5f, 0.05f),
+				Size = new UICoords(220, -20, 0f, 0.1f),
+				AnchorPoint = new Vector2(0f, 0f),
+				Position = new UICoords(10, 10, 0f, 0.00f),
 				Parent = MainMenu,
 				TextColor = Color.White,
 				Text = "CAVE GAME",
-				Font = GameFonts.Arial20,
+				Font = GameFonts.Arial30,
 				BorderSize = 0,
 				TextWrap = false,
 				TextYAlign = TextYAlignment.Center,
 				TextXAlign = TextXAlignment.Center,
 			};
-
-			
 
 			//MainMenu.Children.Add(title);
 
@@ -177,7 +130,7 @@ namespace CaveGame.Client.Menu
 				Position = new UICoords(-10, 0, 1f, 1f),
 				Parent = MainMenu,
 				TextColor = Color.White,
-				Text = "Version 2.0.0 Alpha",
+				Text = "Multiplayer Open Beta (v2.1.0)",
 				BorderSize = 0,
 				Font = GameFonts.Arial10,
 				TextWrap = false,
@@ -188,15 +141,16 @@ namespace CaveGame.Client.Menu
 
 			UIRect buttonList = new UIRect
 			{
-				Size = new UICoords(180, -20, 0, 0.9f),
-				Position = new UICoords(10, 0, 0, 0.1f),
+				Size = new UICoords(220, 350, 0, 0f),
+				AnchorPoint = new Vector2(0, 1),
+				Position = new UICoords(10, -10, 0, 1f),
 				Parent = MainMenu,
-				BGColor = Color.DarkBlue,
+				BGColor = Color.Transparent,
 			};
 
 			UIListContainer buttons = new UIListContainer
 			{
-				Padding = 1,
+				Padding = 5,
 				Parent = buttonList,
 			};
 			//buttonList.Children.Add(buttons);
@@ -204,26 +158,26 @@ namespace CaveGame.Client.Menu
 
 			singleplayerButton = new TextButton
 			{
-				TextColor = Color.White,
+				TextColor = Color.Gray,
 				Text = "SINGLEPLAYER",
-				Font = GameFonts.Arial10,
-				Size = new UICoords(0, 30, 1f, 0),
+				Font = GameFonts.Arial14,
+				Size = new UICoords(0, -10, 1f, 0.125f),
 				TextWrap = true,
 				TextYAlign = TextYAlignment.Center,
 				TextXAlign = TextXAlignment.Center,
 				Parent = buttons,
-				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
-				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
+				UnselectedBGColor = new Color(0.05f, 0.05f, 0.05f),
+				SelectedBGColor = new Color(0.05f, 0.05f, 0.05f),
 			};
 			//buttons.Children.Add(singleplayerButton);
-			singleplayerButton.OnLeftClick += (b, m) => CurrentPage = SingleplayerMenu;
+			//singleplayerButton.OnLeftClick += (b, m) => CurrentPage = SingleplayerMenu;
 
 			multiplayerButton = new TextButton
 			{
 				TextColor = Color.White,
 				Text = "MULTIPLAYER",
-				Font = GameFonts.Arial10,
-				Size = new UICoords(0, 30, 1f, 0),
+				Font = GameFonts.Arial14,
+				Size = new UICoords(0, -10, 1f, 0.125f),
 				Position = new UICoords(0, 30, 0, 0),
 				TextWrap = true,
 				TextYAlign = TextYAlignment.Center,
@@ -233,22 +187,22 @@ namespace CaveGame.Client.Menu
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
 			//buttons.Children.Add(multiplayerButton);
-			multiplayerButton.OnLeftClick += (b, m) => CurrentPage = MultiplayerMenu;
+			multiplayerButton.OnLeftClick += (b, m) => Game.CurrentGameContext = Game.MultiplayerPageContext;
 			//multiplayerButton.OnLeftClick += (b, m) => Game.CurrentGameContext = Game.InWorldContext;
 
 			statsButton = new TextButton
 			{
-				TextColor = Color.White,
+				TextColor = Color.Gray,
 				Text = "STATISTICS",
-				Font = GameFonts.Arial10,
-				Size = new UICoords(0, 30, 1f, 0),
+				Font = GameFonts.Arial14,
+				Size = new UICoords(0, -10, 1f, 0.125f),
 				Position = new UICoords(0, 30, 0, 0),
 				TextWrap = true,
 				TextYAlign = TextYAlignment.Center,
 				TextXAlign = TextXAlignment.Center,
 				Parent = buttons,
-				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
-				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
+				UnselectedBGColor = new Color(0.05f, 0.05f, 0.05f),
+				SelectedBGColor = new Color(0.05f, 0.05f, 0.05f),
 			};
 			//buttons.Children.Add(statsButton);
 
@@ -256,8 +210,8 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "STEAM WORKSHOP",
-				Font = GameFonts.Arial10,
-				Size = new UICoords(0, 30, 1f, 0),
+				Font = GameFonts.Arial14,
+				Size = new UICoords(0, -10, 1f, 0.125f),
 				Position = new UICoords(0, 30, 0, 0),
 				TextWrap = true,
 				TextYAlign = TextYAlignment.Center,
@@ -273,8 +227,8 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "DISCORD COMMUNITY",
-				Font = GameFonts.Arial10,
-				Size = new UICoords(0, 30, 1f, 0),
+				Font = GameFonts.Arial14,
+				Size = new UICoords(0, -10, 1f, 0.125f),
 				Position = new UICoords(0, 30, 0, 0),
 				TextWrap = true,
 				TextYAlign = TextYAlignment.Center,
@@ -291,8 +245,8 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "CREDITS",
-				Font = GameFonts.Arial10,
-				Size = new UICoords(0, 30, 1f, 0),
+				Font = GameFonts.Arial14,
+				Size = new UICoords(0, -10, 1f, 0.125f),
 				Position = new UICoords(0, 30, 0, 0),
 				TextWrap = true,
 				TextYAlign = TextYAlignment.Center,
@@ -305,17 +259,17 @@ namespace CaveGame.Client.Menu
 			//buttons.Children.Add(creditsButton);
 			settingsButton = new TextButton
 			{
-				TextColor = Color.White,
+				TextColor = Color.Gray,
 				Text = "SETTINGS",
-				Font = GameFonts.Arial10,
-				Size = new UICoords(0, 30, 1f, 0),
+				Font = GameFonts.Arial14,
+				Size = new UICoords(0, -10, 1f, 0.125f),
 				Position = new UICoords(0, 30, 0, 0),
 				TextWrap = true,
 				TextYAlign = TextYAlignment.Center,
 				TextXAlign = TextXAlignment.Center,
 				Parent = buttons,
-				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
-				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
+				UnselectedBGColor = new Color(0.05f, 0.05f, 0.05f),
+				SelectedBGColor = new Color(0.05f, 0.05f, 0.05f),
 			};
 			//buttons.Children.Add(settingsButton);
 
@@ -323,8 +277,8 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "EXIT TO DESKTOP",
-				Font = GameFonts.Arial10,
-				Size = new UICoords(0, 30, 1f, 0),
+				Font = GameFonts.Arial14,
+				Size = new UICoords(0, -10, 1f, 0.125f),
 				Position = new UICoords(0, 30, 0, 0),
 				TextWrap = true,
 				TextYAlign = TextYAlignment.Center,
@@ -346,11 +300,64 @@ namespace CaveGame.Client.Menu
 
 			UIRect homeContent = new UIRect
 			{
-				Size = new UICoords(-210, -20, 1, 0.9f),
-				Position = new UICoords(200, 0, 0, 0.1f),
+				Size = new UICoords(350, -70, 0, 1f),
+				Position = new UICoords(-20, 20, 1, 0f),
+				AnchorPoint = new Vector2(1, 0),
 				Parent = MainMenu,
-				BGColor = Color.DarkBlue,
+				BGColor = new Color(0.05f, 0.05f, 0.05f)*0.8f,
+				BorderSize = 2,
+				BorderColor = new Color(0.1f, 0.1f, 0.1f),
+				BorderEnabled = true,
 			};
+
+			UIListContainer updateLog = new UIListContainer
+			{
+				Padding = 2,
+				Parent = homeContent,
+			};
+
+			foreach(string text in UpdateLogInfo)
+			{
+				string displayedText = text;
+				SpriteFont font = GameFonts.Arial12;
+				int size = 20;
+				if (text.StartsWith(">>"))
+				{
+					font = GameFonts.Arial16;
+					size = 30;
+					displayedText = text.Replace(">>", "");
+				}
+				else if (text.StartsWith(">"))
+				{
+					font = GameFonts.Arial14;
+					size = 24;
+					displayedText = text.Replace(">", "");
+				}else if (text.StartsWith("<"))
+				{
+					font = GameFonts.Arial10;
+					size = 10;
+					displayedText = text.Replace("<", "");
+				} else if (text.StartsWith("-"))
+				{
+					font = GameFonts.Arial10;
+					size = 12;
+					//displayedText = text.Replace("-", " ");
+				}
+
+
+				var label = new Label
+				{
+					TextColor = UITheme.SmallButtonTextColor,
+					Text = displayedText,
+					Font = font,
+					Size = new UICoords(1, size, 1.0f, 0),
+					BGColor = Color.Black * 0.0f,
+					TextXAlign = TextXAlignment.Left,
+					Parent = updateLog,
+					TextWrap = true,
+				};
+			}
+
 			//MainMenu.Children.Add(buttonList);
 			//MainMenu.Children.Add(homeContent);
 		}
@@ -526,149 +533,6 @@ namespace CaveGame.Client.Menu
 			WorldCreationMenu.Children.Add(cancel);
 		}
 
-		private void OnJoinServer(string address, string username)
-		{
-			Game.CurrentGameContext = Game.InWorldContext;
-			Game.InWorldContext.NetworkUsername = username;
-			Game.InWorldContext.ConnectAddress = address;
-
-			persistence.IPAddress = address;
-			persistence.Username = username;
-			persistence.Save();
-
-		}
-
-		private void ConstructMultiplayerMenu() {
-			
-
-			MultiplayerMenu = new UIRoot(Game.GraphicsDevice);
-
-			Label title = new Label
-			{
-				BGColor = Color.Transparent,
-				BorderColor = Color.Transparent,
-				Size = new UICoords(0, 0, 0.3f, 0.1f),
-				AnchorPoint = new Vector2(0.5f, 0.5f),
-				Position = new UICoords(0, 0, 0.5f, 0.05f),
-				Parent = MultiplayerMenu,
-				TextColor = Color.White,
-				Text = "MULTIPLAYER",
-				Font = GameFonts.Arial20,
-				BorderSize = 0,
-				TextWrap = false,
-				TextYAlign = TextYAlignment.Center,
-				TextXAlign = TextXAlignment.Center,
-			};
-
-			//MultiplayerMenu.Children.Add(title);
-
-			UIRect buttonList = new UIRect
-			{
-				Size = new UICoords(220, -20, 0, 0.8f),
-				Position = new UICoords(10, 0, 0, 0.1f),
-				Parent = MultiplayerMenu,
-				BGColor = Color.DarkBlue,
-			};
-
-			UIListContainer buttons = new UIListContainer
-			{
-				Padding = 1,
-				Parent = buttonList,
-			};
-			//buttonList.Children.Add(buttons);
-			//MultiplayerMenu.Children.Add(buttonList);
-
-			var serverInputBox = new TextInputLabel
-			{
-				//	Size = new UICoords(200, 25, 0, 0),
-				Size = new UICoords(0, 25, 1, 0),
-				AnchorPoint = new Vector2(0, 0),
-				//Position = new UICoords(20, 0, 0, 0.2f),
-				Parent = buttons,
-				BGColor = new Color(0.2f, 0.2f, 0.2f),
-				BorderColor = Color.DarkBlue,
-				//Provider = inputter,
-				Font = GameFonts.Arial10,
-				BackgroundText = "Server Address",
-				BackgroundTextColor = Color.Gray,
-				TextYAlign = TextYAlignment.Center,
-				TextXAlign = TextXAlignment.Center,
-			};
-			serverInputBox.Input.inputBuffer = persistence.IPAddress;
-			//buttons.Children.Add(serverInputBox);
-
-			var usernameInputBox = new TextInputLabel
-			{
-				Size = new UICoords(0, 25, 1, 0),
-				AnchorPoint = new Vector2(0, 0),
-			//	Position = new UICoords(20, 40, 0, 0.2f),
-				Parent = buttons,
-				//Text = "Test1",
-				Font = GameFonts.Arial10,
-				BGColor = new Color(0.2f, 0.2f, 0.2f),
-				BorderColor = Color.DarkBlue,
-				BackgroundText = "Nickname",
-				BackgroundTextColor = Color.Gray,
-				//Provider = inputter2,
-				TextYAlign = TextYAlignment.Center,
-				TextXAlign = TextXAlignment.Center,
-			};
-			usernameInputBox.Input.inputBuffer = persistence.Username;
-			usernameInputBox.Input.BlacklistedCharacters.Add(' ');
-			//buttons.Children.Add(usernameInputBox);
-
-			var connect = new TextButton
-			{
-				Size = new UICoords(0, 30, 1, 0),
-				//AnchorPoint = new Vector2(0, 1),
-				//Position = new UICoords(10, -10, 0, 1f),
-				Parent = buttons,
-				Text = "CONNECT",
-				Font = GameFonts.Arial10,
-				BorderSize = 0,
-				TextColor = Color.White,
-				TextWrap = false,
-				TextYAlign = TextYAlignment.Center,
-				TextXAlign = TextXAlignment.Center,
-
-				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
-				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
-			};
-			connect.OnMouseEnter += WhenMouseOverButton;
-			connect.OnMouseExit += WhenMouseOffButton;
-			connect.OnLeftClick += (b, m) => OnJoinServer(serverInputBox.Input.InternalText, usernameInputBox.Input.InternalText);
-			//buttons.Children.Add(connect);
-
-			var back = new TextButton
-			{
-				Size = new UICoords(180, 30, 0, 0),
-				AnchorPoint = new Vector2(0, 1),
-				Position = new UICoords(10, -10, 0, 1f),
-				Parent = MultiplayerMenu,
-				Text = "BACK",
-				Font = GameFonts.Arial10,
-				BorderSize = 0,
-				TextColor = Color.White,
-				TextWrap = false,
-				TextYAlign = TextYAlignment.Center,
-				TextXAlign = TextXAlignment.Center,
-
-				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
-				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
-			};
-			back.OnMouseEnter += WhenMouseOverButton;
-			back.OnMouseExit += WhenMouseOffButton;
-			back.OnLeftClick += (b, m) => CurrentPage = MainMenu;
-			//MultiplayerMenu.Children.Add(back);
-		}
-
-		private void ConstructCreditsMenu() { }
-		private void ConstructStatsMenu() { }
-		private void ConstructSettingsMenu()
-		{
-
-		}
-
 		public void Load()
 		{
 
@@ -677,8 +541,6 @@ namespace CaveGame.Client.Menu
 			ConstructMainMenu();
 			ConstructSingleplayerMenu();
 			ConstructWorldCreationMenu();
-			ConstructMultiplayerMenu();
-
 
 			CurrentPage = MainMenu;
 		}

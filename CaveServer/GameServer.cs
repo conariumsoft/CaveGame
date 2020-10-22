@@ -192,8 +192,8 @@ namespace CaveGame.Server
 				// username is taken
 				if (user.Username.Equals(packet.RequestedName))
 				{
-					//	server.SendPacket(new RejectJoinPacket("Username is taken!"), msg.Sender);
-					//	break;
+					server.SendPacket(new RejectJoinPacket("Username is taken!"), msg.Sender);
+					break;
 				}
 			}
 
@@ -484,7 +484,6 @@ namespace CaveGame.Server
 				if (user.KeepAlive > 10.0f)
 				{
 					user.Kick("Network Timeout");
-					
 				}
 			}
 

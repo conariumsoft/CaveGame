@@ -6,10 +6,21 @@
     <TieredCompilation>false</TieredCompilation>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <PackageIcon>icon.png</PackageIcon>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>CaveGame</AssemblyName>
+    <RootNamespace>CaveGame</RootNamespace>
+    <Version>2.1.0</Version>
+    <Company>Conarium Software</Company>
+    <Product>Computer Software</Product>
+    <Description>A game of mining, exploration, engineering, and explosive creativity!</Description>
+    <Copyright>Copyright Conarium Software 2019- 2020</Copyright>
+    <PackageLicenseExpression>Copyright Conarium Software 2019- 2020</PackageLicenseExpression>
+    <Authors>Joshua O'Leary, Tyler Stewart, Contributing Developers</Authors>
+    <PackageReleaseNotes>Testing version, not for release!</PackageReleaseNotes>
+    <StartupObject>Cave.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Optimize>false</Optimize>
@@ -23,7 +34,6 @@
     <None Remove="Content\chars.png" />
     <None Remove="Content\tiles.png" />
     <None Remove="Icon.ico" />
-    <None Remove="Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\Textures\chars.png">
@@ -31,8 +41,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Icon.ico" />
-    <EmbeddedResource Include="Icon.bmp" />
+    <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
@@ -62,4 +71,7 @@
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
 	  <!--Exec Command="copy &quot;$(ProjectDir)Content\bin\&quot; &quot;$(TargetDir)Content\&quot;" /-->
   </Target>
+  <ItemGroup>
+    <_DeploymentManifestIconFile Remove="Icon.ico" />
+  </ItemGroup>
 </Project>

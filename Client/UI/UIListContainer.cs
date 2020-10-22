@@ -77,6 +77,20 @@ namespace CaveGame.Client.UI
 
 				child.Update(gt);
 
+				if (child is Label label)
+				{
+					child.Position = new UICoords(0, ypos, 0, 0);
+
+					ypos += (int)child.AbsoluteSize.Y*(label.TextWrappingCount+1);
+					ypos += Padding;
+				} else
+				{
+					child.Position = new UICoords(0, ypos, 0, 0);
+
+					ypos += (int)child.AbsoluteSize.Y;
+					ypos += Padding;
+				}
+
 				/*
 				 * if (child is TextButton text)
 				{
@@ -92,10 +106,7 @@ namespace CaveGame.Client.UI
 				*/
 
 
-				child.Position = new UICoords(0, ypos, 0, 0);
 				
-				ypos += (int)child.AbsoluteSize.Y;
-				ypos += Padding;
 			}
 		}
 	}

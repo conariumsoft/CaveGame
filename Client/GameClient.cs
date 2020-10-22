@@ -1,6 +1,6 @@
 ﻿//#define SERVER
 
-using Cave;
+using CaveGame;
 using CaveGame.Client.UI;
 using CaveGame.Core;
 using CaveGame.Core.Entities;
@@ -121,6 +121,7 @@ namespace CaveGame.Client
 
 	public class GameClient : IGameContext, IGameClient
 	{
+
 		public bool ShowChunkBoundaries { get; set; }
 
 		public static float CameraZoom = 2.0f;
@@ -196,6 +197,8 @@ namespace CaveGame.Client
 			if (myPlayer != null)
 			{
 				gameClient.SendPacket(new QuitPacket(myPlayer.EntityNetworkID));
+				World.Lighting.Off();
+				gameClient.Stop();
 			}
 
 			Thread.Sleep(50);
@@ -280,6 +283,7 @@ namespace CaveGame.Client
 			t.Damage = packet.Damage;
 			t.TileState = packet.TileState;
 			World.SetTile(packet.WorldX, packet.WorldY, t);
+			//Debug.WriteLine("T");
 		}
 		private void UpdateWall(NetworkMessage message)
 		{
@@ -292,6 +296,8 @@ namespace CaveGame.Client
 			w.Damage = packet.Damage;
 			//t.TileState = packet.TileState;
 			World.SetWall(packet.WorldX, packet.WorldY, w);
+
+			//Debug.WriteLine("W");
 		}
 		private void OnPeerJoined(NetworkMessage message)
 		{
@@ -325,7 +331,6 @@ namespace CaveGame.Client
 
 			if (entity == null)
 				return;
-
 
 
 			if (entity is Player plr )
@@ -370,8 +375,8 @@ namespace CaveGame.Client
 			RejectJoinPacket packet = new RejectJoinPacket(message.Packet.GetBytes());
 			// TODO: send player to the rejection screen
 
-			Game.CurrentGameContext = Game.ServerKickedContext;
-			Game.ServerKickedContext.Message = packet.RejectReason;
+			Game.CurrentGameContext = Game.TimeoutContext;
+			Game.TimeoutContext.Message = packet.RejectReason;
 		}
 		private void OnServerAcceptJoining(NetworkMessage message)
 		{

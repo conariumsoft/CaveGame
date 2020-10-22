@@ -41,10 +41,11 @@ namespace CaveGame.Client
 	public static class GameTextures
 	{
 		public static Texture2D Player { get; private set; }
-
+		public static Texture2D TitleScreen { get; private set; }
 		public static Texture2D EyeOfHorus { get; private set; }
 		public static Texture2D ParticleSet { get; private set; }
 		public static Texture2D TileSheet { get; private set; }
+		public static Texture2D BG { get; private set; }
 
 		public static void LoadAssets(ContentManager Content)
 		{
@@ -52,6 +53,8 @@ namespace CaveGame.Client
 			EyeOfHorus = Content.Load<Texture2D>("Textures/csoft");
 			ParticleSet = Content.Load<Texture2D>("Textures/particles");
 			TileSheet = Content.Load<Texture2D>("Textures/tilesheet");
+			BG = Content.Load<Texture2D>("Textures/bg");
+			TitleScreen = Content.Load<Texture2D>("Textures/TitleScreen");
 		}
 	}
 

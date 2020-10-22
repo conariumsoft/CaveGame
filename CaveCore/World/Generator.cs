@@ -139,7 +139,7 @@ namespace CaveGame.Core
 						var cavetiny = octave.Noise2D(curX / 5.0f, curY / 5.0f) * 0.5f;
 						var cave1 = (octave.Noise2D(curX / 30.0f, curY / 30.0f));
 						var cave2 = (octave.Noise2D((curX + 11) / 200.0f, (curY + 50) / 200.0f) * 0.6f) + (cave1 * 1.5f) - 0.3f + (cavetiny);
-						if (cave1 > 0.8f)
+						if (cave1 > 0.75f)
 						{
 							chunk.SetTile(x, y, new Tiles.Air());
 						}
@@ -166,11 +166,21 @@ namespace CaveGame.Core
 							//TileUpdate[x, y] = true;
 						}
 
-						if (simplex.Noise(curX / 100.0f, curY / 100.0f) > 0.75f && depth > 100)
+						if (depth > 150)
 						{
-							chunk.SetTile(x, y, new Lava { TileState = 8 });
-							//TileUpdate[x, y] = true;
+							if (simplex.Noise(curX + 444 / 100.0f, curY / 100.0f) > 0.8f)
+							{
+								chunk.SetTile(x, y, new Lava { TileState = 8 });
+							}
+							if (simplex.Noise(curX / 400.0f, curY / 400.0f) > 0.7f)
+							{
+								if (chunk.GetTile(x, y) is Air)
+									chunk.SetTile(x, y, new Lava { TileState = 8 });
+								//TileUpdate[x, y] = true;
+							}
+
 						}
+						
 					}
 				}
 			}

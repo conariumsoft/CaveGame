@@ -1301,6 +1301,18 @@
 /processorParam:Quality=Best
 /build:../Assets/Sound/wood03.ogg;Sound/wood03.ogg
 
+#begin ../Assets/Textures/bg.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../Assets/Textures/bg.png;Textures/bg.png
+
 #begin ../Assets/Textures/chars.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1384,4 +1396,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../Assets/Textures/tilesheet.png;Textures/tilesheet.png
+
+#begin ../Assets/Textures/TitleScreen.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../Assets/Textures/TitleScreen.png;Textures/TitleScreen.png
 
