@@ -483,7 +483,7 @@ namespace CaveGame.Client
 		public void Off()
 		{
 			running.Value = false;
-			LightThread.Abort();
+			//LightThread.();
 		}
 		float timer = 0;
 		public void Update(GameTime gt)

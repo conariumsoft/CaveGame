@@ -31,7 +31,7 @@ namespace CaveGame.Core.Tiles
 		CarvedSandBrick, MossyStoneBrick, MossyStone,
 		CubedStone, CubedSandstone,
 		Cobweb, Tallgrass, Rope, Vine, Ladder, Platform, TNT, Lava, Sludge, Obsidian,
-		Snow, Ice,
+		Snow, Ice, Mycelium,
 
 		GermanOccupiedTerritory,
 	}
@@ -251,6 +251,12 @@ namespace CaveGame.Core.Tiles
 		{
 
 		};
+		public static TDef Mycelium = new TDef
+		{
+			Hardness = 2,
+			Quad = TileMap.Soil,
+			Color = new Color(0.1f, 0.1f, 1.5f)
+		};
 	}
 	#region stuff
 	public interface IWaterBreakable { }
@@ -441,9 +447,46 @@ namespace CaveGame.Core.Tiles
 	public class Miasma { }
 	#endregion
 	#region Soils
-	public class Grass : Tile, IRandomTick, ITileUpdate, ILocalTileUpdate, ISoil
+	public class BaseGrass : Tile, ISoil
 	{
-		public Grass() : base(TileDefinitions.Grass) { }
+		public BaseGrass(TDef def) : base(def) { }
+
+		public static Rectangle Patch = new Rectangle(8 * Globals.TileSize, 6 * Globals.TileSize, Globals.TileSize, Globals.TileSize);
+
+		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		{
+#if EDITOR
+			sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), Quad, Color);
+			return;
+#endif
+
+			sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), TileMap.Soil, color.MultiplyAgainst(Color.SaddleBrown));
+			var corner = new Rectangle(9 * Globals.TileSize, 6 * Globals.TileSize, Globals.TileSize, Globals.TileSize);
+			Vector2 position = new Vector2(x * Globals.TileSize, y * Globals.TileSize) + new Vector2(4, 4);
+
+			if (TileState.Get(0)) // cornerd
+				sb.Draw(tilesheet, position, corner, color.MultiplyAgainst(Color), MathHelper.ToRadians(270), new Vector2(4, 4), 1, SpriteEffects.None, 1);
+			if (TileState.Get(1)) // cornerc
+				sb.Draw(tilesheet, position, corner, color.MultiplyAgainst(Color), MathHelper.ToRadians(180), new Vector2(4, 4), 1, SpriteEffects.None, 1);
+			if (TileState.Get(2)) // cornerb
+				sb.Draw(tilesheet, position, corner, color.MultiplyAgainst(Color), MathHelper.ToRadians(90), new Vector2(4, 4), 1, SpriteEffects.None, 1);
+
+			if (TileState.Get(3)) // cornera
+				sb.Draw(tilesheet, position, corner, color.MultiplyAgainst(Color), 0, new Vector2(4, 4), 1, SpriteEffects.None, 1);
+
+			if (TileState.Get(4)) // planeright
+				sb.Draw(tilesheet, position, Patch, color.MultiplyAgainst(Color), MathHelper.ToRadians(90), new Vector2(4, 4), 1, SpriteEffects.None, 1);
+
+			if (TileState.Get(5)) // planebottom
+				sb.Draw(tilesheet, position, Patch, color.MultiplyAgainst(Color), MathHelper.ToRadians(0), new Vector2(4, 4), 1, SpriteEffects.FlipVertically, 1);
+
+			if (TileState.Get(6)) // planeleft
+				sb.Draw(tilesheet, position, Patch, color.MultiplyAgainst(Color), MathHelper.ToRadians(270), new Vector2(4, 4), 1, SpriteEffects.None, 1);
+
+			if (TileState.Get(7)) // planetop
+				sb.Draw(tilesheet, position, Patch, color.MultiplyAgainst(Color), MathHelper.ToRadians(0), new Vector2(4, 4), 1, SpriteEffects.None, 1);
+
+		}
 
 		private bool CanBreathe(IGameWorld world, int x, int y)
 		{
@@ -459,18 +502,17 @@ namespace CaveGame.Core.Tiles
 			return (above is INonSolid || below is INonSolid || left is INonSolid || right is INonSolid || tleft is INonSolid || tright is INonSolid || bleft is INonSolid || bright is INonSolid);
 		}
 
-		public static Rectangle Patch = new Rectangle(8 * Globals.TileSize, 6 * Globals.TileSize, Globals.TileSize, Globals.TileSize);
-
-		private bool IsGrass(IGameWorld w, int x, int y)
+		private bool IsMatch<T>(IGameWorld w, int x, int y)
 		{
-			if (w.GetTile(x, y) is Grass)
+			if (w.GetTile(x, y) is T)
 			{
 				return true;
 			}
 			return false;
 		}
 
-		public void RandomTick(IGameWorld world, int x, int y)
+
+		public void Spread<TGrass, TDecay, TAbove, TBelow>(IGameWorld world, int x, int y) where TGrass : Tile, new() where TAbove : Tile, new() where TBelow : Tile, new() where TDecay : Tile, new()
 		{
 			var above = world.GetTile(x, y - 1);
 			var below = world.GetTile(x, y + 1);
@@ -482,87 +524,49 @@ namespace CaveGame.Core.Tiles
 			{
 				// suffocate
 
-				world.SetTile(x, y, new Dirt());
+				world.SetTile(x, y, new TDecay());
 				return;
 			}
 
 			if (above is Air)
 			{
-				world.SetTile(x, y - 1, new Tallgrass());
+				world.SetTile(x, y - 1, new TAbove());
 			}
 
 			if (below is Air)
 			{
-				world.SetTile(x, y+1, new Vine());
+				world.SetTile(x, y + 1, new TBelow());
 			}
 
 
-			if (below is Dirt && CanBreathe(world, x, y + 1))
+			if (below is TDecay && CanBreathe(world, x, y + 1))
 			{
-				world.SetTile(x, y + 1, new Grass());
+				world.SetTile(x, y + 1, new TGrass());
 				//return;
 			}
 
-			if (left is Dirt && CanBreathe(world, x - 1, y))
+			if (left is TDecay && CanBreathe(world, x - 1, y))
 			{
-				world.SetTile(x - 1, y, new Grass());
-				//return;
-			}
-
-
-			if (right is Dirt && CanBreathe(world, x + 1, y))
-			{
-				world.SetTile(x + 1, y, new Grass());
+				world.SetTile(x - 1, y, new TGrass());
 				//return;
 			}
 
 
-			if (above is Dirt && CanBreathe(world, x, y - 1))
+			if (right is TDecay && CanBreathe(world, x + 1, y))
 			{
-				world.SetTile(x, y - 1, new Grass());
+				world.SetTile(x + 1, y, new TGrass());
+				//return;
+			}
+
+
+			if (above is TDecay && CanBreathe(world, x, y - 1))
+			{
+				world.SetTile(x, y - 1, new TGrass());
 				//return;
 			}
 		}
 
-
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
-		{
-#if EDITOR
-			sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), Quad, Color);
-			return;
-#endif
-
-			sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), TileMap.Soil, color.MultiplyAgainst(Color.SaddleBrown));
-			var corner = new Rectangle(9 * Globals.TileSize, 6 * Globals.TileSize, Globals.TileSize, Globals.TileSize);
-			Vector2 position = new Vector2(x * Globals.TileSize, y * Globals.TileSize) + new Vector2(4, 4);
-
-			if (TileState.Get(0)) // cornerd
-				sb.Draw(tilesheet, position, corner, color.MultiplyAgainst(Color.Green), MathHelper.ToRadians(270), new Vector2(4, 4), 1, SpriteEffects.None, 1);
-			if (TileState.Get(1)) // cornerc
-				sb.Draw(tilesheet, position, corner, color.MultiplyAgainst(Color.Green), MathHelper.ToRadians(180), new Vector2(4, 4), 1, SpriteEffects.None, 1);
-			if (TileState.Get(2)) // cornerb
-				sb.Draw(tilesheet, position, corner, color.MultiplyAgainst(Color.Green), MathHelper.ToRadians(90), new Vector2(4, 4), 1, SpriteEffects.None, 1);
-
-			if (TileState.Get(3)) // cornera
-				sb.Draw(tilesheet, position, corner, color.MultiplyAgainst(Color.Green), 0, new Vector2(4, 4), 1, SpriteEffects.None, 1);
-
-			if (TileState.Get(4)) // planeright
-				sb.Draw(tilesheet, position, Patch, color.MultiplyAgainst(Color.Green), MathHelper.ToRadians(90), new Vector2(4, 4), 1, SpriteEffects.None, 1);
-
-			if (TileState.Get(5)) // planebottom
-				sb.Draw(tilesheet, position, Patch, color.MultiplyAgainst(Color.Green), MathHelper.ToRadians(0), new Vector2(4, 4), 1, SpriteEffects.FlipVertically, 1);
-
-			if (TileState.Get(6)) // planeleft
-				sb.Draw(tilesheet, position, Patch, color.MultiplyAgainst(Color.Green), MathHelper.ToRadians(270), new Vector2(4, 4), 1, SpriteEffects.None, 1);
-
-			if (TileState.Get(7)) // planetop
-				sb.Draw(tilesheet, position, Patch, color.MultiplyAgainst(Color.Green), MathHelper.ToRadians(0), new Vector2(4, 4), 1, SpriteEffects.None, 1);
-
-		}
-
-		public void TileUpdate(IGameWorld w, int x, int y) { }
-
-		public void LocalTileUpdate(IGameWorld world, int x, int y)
+		public void LocalTileUpdate<T>(IGameWorld world, int x, int y)
 		{
 			bool planetop = IsEmpty(world, x, y - 1);
 			bool planebottom = IsEmpty(world, x, y + 1);
@@ -572,10 +576,10 @@ namespace CaveGame.Core.Tiles
 			bool air_bl = IsEmpty(world, x - 1, y + 1);
 			bool air_tr = IsEmpty(world, x + 1, y - 1);
 			bool air_br = IsEmpty(world, x + 1, y + 1);
-			bool gabove = IsGrass(world, x, y - 1);
-			bool gbelow = IsGrass(world, x, y + 1);
-			bool gleft = IsGrass(world, x - 1, y);
-			bool gright = IsGrass(world, x + 1, y);
+			bool gabove = IsMatch<T>(world, x, y - 1);
+			bool gbelow = IsMatch<T>(world, x, y + 1);
+			bool gleft = IsMatch<T>(world, x - 1, y);
+			bool gright = IsMatch<T>(world, x + 1, y);
 			bool cornera = (gleft && gabove && air_tl);
 			bool cornerb = (gright && gabove && air_tr);
 			bool cornerc = (gright && gbelow && air_br);
@@ -597,6 +601,51 @@ namespace CaveGame.Core.Tiles
 				world.DoUpdatePropogation(x, y);
 			}
 		}
+	}
+
+	public class Mycelium : BaseGrass, IRandomTick, ITileUpdate, ILocalTileUpdate, ILightEmitter
+	{
+
+		public Light3 Light => new Light3(2, 2, 8);
+		public Mycelium() : base(TileDefinitions.Mycelium) { }
+
+
+		public void RandomTick(IGameWorld world, int x, int y)
+		{
+			Spread<Mycelium, Dirt, Air, Air>(world, x, y);
+		}
+
+
+		public void LocalTileUpdate(IGameWorld world, int x, int y)
+		{
+			base.LocalTileUpdate<Mycelium>(world, x, y);
+		}
+
+		public void TileUpdate(IGameWorld w, int x, int y) { }
+
+
+	}
+
+	public class Grass : BaseGrass, IRandomTick, ITileUpdate, ILocalTileUpdate
+	{
+		public Grass() : base(TileDefinitions.Grass) { }
+
+		
+
+		public void RandomTick(IGameWorld world, int x, int y)
+		{
+			Spread<Grass, Dirt, Tallgrass, Vine>(world, x, y);
+		}
+
+
+		public void LocalTileUpdate(IGameWorld world, int x, int y)
+		{
+			base.LocalTileUpdate<Grass>(world, x, y);
+		}
+
+		public void TileUpdate(IGameWorld w, int x, int y) { }
+
+		
 	}
 	public class Dirt : Tile, ISoil
 	{
@@ -1387,31 +1436,31 @@ namespace CaveGame.Core.Tiles
 	public class Torch: BaseTorch, ILightEmitter
 	{
 
-		public Light3 Light => new Light3(24, 24, 16);
+		public Light3 Light => new Light3(16, 16, 12);
 		public Torch() : base(TileDefinitions.Torch) {}
 	}
 	public class YellowTorch: BaseTorch, ILightEmitter {
-		public Light3 Light => new Light3(24, 24, 0);
+		public Light3 Light => new Light3(16, 16, 0);
 		public YellowTorch() : base(TileDefinitions.YellowTorch) { }
 	}
 	public class WhiteTorch : BaseTorch, ILightEmitter
 	{
-		public Light3 Light => new Light3(24, 24, 24);
+		public Light3 Light => new Light3(16, 16, 16);
 		public WhiteTorch() : base(TileDefinitions.WhiteTorch) { }
 	}
 	public class GreenTorch : BaseTorch, ILightEmitter
 	{
-		public Light3 Light => new Light3(0, 32, 0);
+		public Light3 Light => new Light3(0, 16, 0);
 		public GreenTorch() : base(TileDefinitions.GreenTorch) { }
 	}
 	public class RedTorch : BaseTorch, ILightEmitter
 	{
-		public Light3 Light => new Light3(32, 0, 0);
+		public Light3 Light => new Light3(16, 0, 0);
 		public RedTorch() : base(TileDefinitions.RedTorch) { }
 	}
 	public class BlueTorch : BaseTorch, ILightEmitter
 	{
-		public Light3 Light => new Light3(0, 0, 32);
+		public Light3 Light => new Light3(0, 0, 16);
 		public BlueTorch() : base(TileDefinitions.BlueTorch) { }
 	}
 	public class Cactus { }

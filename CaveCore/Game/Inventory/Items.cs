@@ -359,7 +359,6 @@ namespace CaveGame.Core.Inventory
 	public class PlasticPrinter { }
 	public class Anvil { }
 	public class Campfire { }
-	public class Furnace { }
 	public class ArrowTurret { }
 	public class MGTurret { }
 	public class LaserTurret { }

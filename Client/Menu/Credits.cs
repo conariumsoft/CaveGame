@@ -16,18 +16,22 @@ namespace CaveGame.Client.Menu
 			"",
 			">Lead Developer",
 			"Josh O'Leary 'MadScientist'",
+			"",
 			">Contributing Developers",
 			"dodeadam - Programming",
 			"ConcurrentSquared - Programming & Design",
 			"Mescalyne - Music",
 			"WheezyBackports - Art",
 			"Bumpylegoman02 - Security Testing & Design",
+			"",
 			">Testing",
 			"Andrew J.",
 			"squidthonkv2",
 			"Billy J.",
+			"",
 			">Biz",
 			"Tyler Stewart",
+			"",
 			"Copyright Conarium Software 2020",
 		};
 
@@ -55,9 +59,9 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "BACK",
-				Font = GameFonts.Arial14,
-				Size = new UICoords(100, 20, 0, 0),
-				Position = new UICoords(-10, -30, 0, 1.0f),
+				Font = GameFonts.Arial16,
+				Size = new UICoords(100, 30, 0, 0),
+				Position = new UICoords(10, -30, 0, 1.0f),
 				AnchorPoint = new Vector2(0, 1),
 				TextWrap = true,
 				TextYAlign = TextYAlignment.Center,
@@ -65,7 +69,7 @@ namespace CaveGame.Client.Menu
 				Parent = creditslist,
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
-			};
+			}; 
 			backButton.OnLeftClick += (btn, mouse) => Game.CurrentGameContext = Game.HomePageContext;
 
 			UIListContainer container = new UIListContainer

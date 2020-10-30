@@ -24,7 +24,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Optimize>false</Optimize>
-    <DefineConstants>TRACE;CLIENT STEAMWORKS_WIN</DefineConstants>
+    <DefineConstants>TRACE;CLIENT;STEAMWORKS_WIN</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -74,4 +74,7 @@
   <ItemGroup>
     <_DeploymentManifestIconFile Remove="Icon.ico" />
   </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy &quot;$(ProjectDir)Assets\*.*&quot; &quot;$(TargetDir)Assets\\&quot; /E /I /F /Y" />
+  </Target>
 </Project>

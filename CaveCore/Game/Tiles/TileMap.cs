@@ -49,7 +49,16 @@ namespace CaveGame.Core.Tiles
 		public static Rectangle Platform = Quad(1, 2);
 		public static Rectangle Ladder = Quad(1, 3);
 		public static Rectangle Rope = Quad(3, 2);
+		public static Rectangle Sapling = Quad(4, 2);
+		public static Rectangle Flowers = Quad(5, 2);
+		public static Rectangle BlueMushroom = Quad(6, 2);
+		public static Rectangle RedMushroom = Quad(7, 2);
+		public static Rectangle Poppy = Quad(8, 2);
+		public static Rectangle CryingLilyTop = Quad(9, 2);
+		public static Rectangle CryingLilyBottom = Quad(9, 3);
 		public static Rectangle TallGrass = Quad(8, 5);
+
+		public static Rectangle 
 
 		public static Rectangle BMPY_LongBrick = Quad(0, 3);
 		public static Rectangle BMPY_WoodGrain = Quad(0, 4);
@@ -60,6 +69,8 @@ namespace CaveGame.Core.Tiles
 		public static Rectangle BGBrickTR = Quad(11, 1);
 		public static Rectangle BGBrickBL = Quad(10, 2);
 		public static Rectangle BGBrickBR = Quad(11, 2);
+
+
 
 		public static Dictionary<string, Rectangle> Atlas = new Dictionary<string, Rectangle> {
 			

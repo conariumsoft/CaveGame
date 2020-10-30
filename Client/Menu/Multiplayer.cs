@@ -5,6 +5,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 
 namespace CaveGame.Client.Menu
@@ -65,8 +67,33 @@ namespace CaveGame.Client.Menu
 
 		UIRoot MultiplayerPage;
 
+		private void Timeout(string message)
+		{
+			Game.CurrentGameContext = Game.TimeoutContext;
+			Game.TimeoutContext.Message = message;
+		}
+
 		private void OnJoinServer(string address, string username)
 		{
+			if (address.Length == 0)
+			{
+				Timeout("Server Address is empty! Please enter a valid IP Address!");
+				return;
+			}
+
+			if (username.Length == 0)
+			{
+				Timeout("Please enter a nickname!");
+				return;
+			}
+
+			//if (IPAddress.TryParse(address, out _) == false)
+			//{
+			//	Timeout("Server Address is not valid!");
+			//	return;
+			//}
+
+			
 			Game.CurrentGameContext = Game.InWorldContext;
 			Game.InWorldContext.NetworkUsername = username;
 			Game.InWorldContext.ConnectAddress = address;
@@ -80,7 +107,9 @@ namespace CaveGame.Client.Menu
 
 		private void ConstructUIElements()
 		{
-
+			// what would be epic:
+			// ability to enforce a ui style on
+			// multiple objects
 
 			MultiplayerPage = new UIRoot(Game.GraphicsDevice);
 
@@ -120,14 +149,14 @@ namespace CaveGame.Client.Menu
 			var serverInputBox = new TextInputLabel
 			{
 				//	Size = new UICoords(200, 25, 0, 0),
-				Size = new UICoords(0, 25, 1, 0),
+				Size = new UICoords(0, 30, 1, 0),
 				AnchorPoint = new Vector2(0, 0),
 				//Position = new UICoords(20, 0, 0, 0.2f),
 				Parent = buttons,
-				BGColor = new Color(0.2f, 0.2f, 0.2f),
+				BGColor = new Color(0.2f, 0.2f, 0.3f),
 				BorderColor = Color.DarkBlue,
 				//Provider = inputter,
-				Font = GameFonts.Arial10,
+				Font = GameFonts.Arial12,
 				BackgroundText = "Server Address",
 				BackgroundTextColor = Color.Gray,
 				TextYAlign = TextYAlignment.Center,
@@ -140,13 +169,13 @@ namespace CaveGame.Client.Menu
 
 			var usernameInputBox = new TextInputLabel
 			{
-				Size = new UICoords(0, 25, 1, 0),
+				Size = new UICoords(0, 30, 1, 0),
 				AnchorPoint = new Vector2(0, 0),
 				//	Position = new UICoords(20, 40, 0, 0.2f),
 				Parent = buttons,
 				//Text = "Test1",
-				Font = GameFonts.Arial10,
-				BGColor = new Color(0.2f, 0.2f, 0.2f),
+				Font = GameFonts.Arial12,
+				BGColor = new Color(0.2f, 0.2f, 0.3f),
 				BorderColor = Color.DarkBlue,
 				BackgroundText = "Nickname",
 				BackgroundTextColor = Color.Gray,
@@ -161,12 +190,12 @@ namespace CaveGame.Client.Menu
 
 			var connect = new TextButton
 			{
-				Size = new UICoords(0, 30, 1, 0),
+				Size = new UICoords(0, 35, 1, 0),
 				//AnchorPoint = new Vector2(0, 1),
 				//Position = new UICoords(10, -10, 0, 1f),
 				Parent = buttons,
 				Text = "CONNECT",
-				Font = GameFonts.Arial10,
+				Font = GameFonts.Arial14,
 				BorderSize = 0,
 				TextColor = Color.White,
 				TextWrap = false,
@@ -183,12 +212,12 @@ namespace CaveGame.Client.Menu
 
 			var back = new TextButton
 			{
-				Size = new UICoords(180, 30, 0, 0),
-				AnchorPoint = new Vector2(0, 1),
-				Position = new UICoords(10, -10, 0, 1f),
-				Parent = MultiplayerPage,
+				Size = new UICoords(0, 30, 1, 0),
+				//AnchorPoint = new Vector2(0, 1),
+				//Position = new UICoords(10, -10, 0, 1f),
+				Parent = buttons,
 				Text = "BACK",
-				Font = GameFonts.Arial10,
+				Font = GameFonts.Arial14,
 				BorderSize = 0,
 				TextColor = Color.White,
 				TextWrap = false,

@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Assets.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSettingsData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InputManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\Multiplayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\TimeoutMenu.cs" />
@@ -31,6 +32,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Menu\Homepage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Label.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\Slider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\TextButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\TextInput.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Tooltip.cs" />

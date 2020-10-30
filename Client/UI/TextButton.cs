@@ -28,9 +28,9 @@ namespace CaveGame.Client.UI
 		public event ClickHandler OnMouseEnter;
 		public event ClickHandler OnMouseExit;
 
-		MouseState prevMouse;
+		protected MouseState prevMouse;
 
-		private bool IsMouseInside(MouseState mouse)
+		protected bool IsMouseInside(MouseState mouse)
 		{
 			return (mouse.X > AbsolutePosition.X && mouse.Y > AbsolutePosition.Y
 				&& mouse.X < (AbsolutePosition.X + AbsoluteSize.X)
@@ -46,10 +46,18 @@ namespace CaveGame.Client.UI
 			if (prevMouse != null)
 			{
 				if (Selected && !IsMouseInside(prevMouse))
+				{
 					OnMouseEnter?.Invoke(this, mouse);
+					GameSounds.MenuBlip?.Play(1.0f, 1, 0.0f);
+				}
+					
 
 				if (!Selected && IsMouseInside(prevMouse))
+				{
 					OnMouseExit?.Invoke(this, mouse);
+					GameSounds.MenuBlip?.Play(0.8f, 1, 0.0f);
+				}
+					
 
 				if (Selected && CaveGameGL.ClickTimer > (1/60.0f))
 				{

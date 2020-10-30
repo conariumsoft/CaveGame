@@ -24,6 +24,31 @@ namespace CaveGame.Core.Inventory
 		}
 	}
 
+	public class FurnaceItem : FurnitureItem
+	{
+#if CLIENT
+		public override Texture2D ItemTexture => ItemTextures.Furnace;
+#endif
+		public override void OnClientLMBHeld(LocalPlayer player, IGameClient client)
+		{
+			MouseState mouse = Mouse.GetState();
+
+			var mp = client.Camera.ScreenToWorldCoordinates(mouse.Position.ToVector2());
+			Point pos = new Point(
+				(int)Math.Floor(mp.X / Globals.TileSize),
+				(int)Math.Floor(mp.Y / Globals.TileSize)
+			);
+
+			if (Furnace.CanPlace(client.World, pos.X, pos.Y))
+			{
+				client.Send(new PlaceFurniturePacket((byte)FurnitureID.Furnace, 0, pos.X, pos.Y));
+			}
+		}
+
+
+	}
+
+
 	public class DoorItem : FurnitureItem
 	{
 #if CLIENT

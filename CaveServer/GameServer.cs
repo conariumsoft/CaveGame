@@ -130,7 +130,7 @@ namespace CaveGame.Server
 		{
 			PluginManager.CallOnServerShutdown();
 			Console.WriteLine("Shutting Down. Not Saving while testing worldgen");
-			World.SaveData();
+			//World.SaveData();
 			Thread.Sleep(100);
 		}
 

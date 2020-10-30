@@ -39,6 +39,7 @@ namespace CaveGame.Client
 		{
 			new TileItem(new Core.Tiles.Stone()),
 			new TileItem(new Grass()),
+			new TileItem(new Mycelium()),
 			new TileItem(new Core.Tiles. Dirt()),
 			new TileItem(new Leaves()),
 			new TileItem(new Core.Tiles.ClayBrick()),
@@ -65,9 +66,12 @@ namespace CaveGame.Client
 			new WallItem(new Core.Walls.CarvedStoneBrick()),
 			new WallItem(new Core.Walls.CarvedSandstoneBrick()),
 			new WallItem(new Core.Walls.MossyStoneBrick()),
+			new WallItem(new Core.Walls.Dirt()),
+			new WallItem(new Core.Walls.Stone()),
 			new BombItem(),
 			new DoorItem(),
 			new WorkbenchItem(),
+			new FurnaceItem(),
 			new TileRemoverItem(),
 			new WallRemoverItem(),
 			
@@ -158,10 +162,64 @@ namespace CaveGame.Client
 
 		private int IntitalScrollValue;
 
+		bool pauseMenuOpen;
+		UIRoot pauseMenu;
+
+		private void ConstructPauseMenu()
+		{
+			pauseMenu = new UIRoot(Game.GraphicsDevice);
+
+			UIRect bg = new UIRect
+			{
+				BGColor = Color.Black * 0.5f,
+				Size = new UICoords(0, 0, 1, 1),
+				Position = new UICoords(0, 0, 0, 0),
+				Parent = pauseMenu
+			};
+
+			TextButton resumeButton = new TextButton
+			{
+				Parent = bg,
+				TextColor = Color.White,
+				Text = "Resume",
+				Font = GameFonts.Arial14,
+				Size = new UICoords(150, 25, 0, 0),
+				TextXAlign = TextXAlignment.Center,
+				TextYAlign = TextYAlignment.Center,
+				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
+				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
+				Position = new UICoords(10, -100, 0, 1)
+			};
+			resumeButton.OnLeftClick += (x, y) => pauseMenuOpen = false;
+
+			TextButton exitButton = new TextButton
+			{
+				Parent = bg,
+				TextColor = Color.White,
+				Text = "Disconnect",
+				Font = GameFonts.Arial14,
+				Size = new UICoords(150, 25, 0, 0),
+				TextXAlign = TextXAlignment.Center,
+				TextYAlign = TextYAlignment.Center,
+				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
+				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
+				Position = new UICoords(10, -50, 0, 1)
+			};
+			exitButton.OnLeftClick += onClientExit;	
+		}
+
+		private void onClientExit(TextButton sender, MouseState state)
+		{
+			pauseMenuOpen = false;
+			Disconnect();
+			Game.CurrentGameContext = Game.HomePageContext;
+		}
+
 		public GameClient(CaveGameGL _game)
 		{
 			Game = _game;
 
+			ConstructPauseMenu();
 			MouseState mouse = Mouse.GetState();
 
 
@@ -201,7 +259,7 @@ namespace CaveGame.Client
 				gameClient.Stop();
 			}
 
-			Thread.Sleep(50);
+			//Thread.Sleep(50);
 			//gameClient.Stop();
 		}
 
@@ -699,6 +757,7 @@ namespace CaveGame.Client
 				sbReference = sb;
 
 
+
 			DrawChunks(sb);
 
 			Game.GraphicsDevice.Clear(World.SkyColor);
@@ -745,8 +804,17 @@ namespace CaveGame.Client
 
 			Hotbar.Draw(sb);
 
+
 			DrawDebugInfo(sb);
 			Chat.Draw(sb);
+
+			
+			if (pauseMenuOpen)
+			{
+				sb.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp);
+				pauseMenu.Draw(sb);
+				sb.End();
+			}
 		}
 
 		public void Load()
@@ -771,7 +839,7 @@ namespace CaveGame.Client
 			//	gameClient = new NetworkClient("72.243.56.7", 40269);
 			gameClient = new NetworkClient(ConnectAddress);
 
-			gameClient.Output = Game.Console;
+			//gameClient.Output = Game.Console;
 			gameClient.Start();
 			gameClient.SendPacket(new RequestJoinPacket(NetworkUsername));
 		}
@@ -871,6 +939,12 @@ namespace CaveGame.Client
 		{
 			KeyboardState keyboard = Keyboard.GetState();
 
+			if (keyboard.IsKeyDown(Keys.Escape) && !previousKB.IsKeyDown(Keys.Escape))
+			{
+				pauseMenuOpen = !pauseMenuOpen;
+			}
+
+
 			if (keyboard.IsKeyDown(Keys.F3) && !previousKB.IsKeyDown(Keys.F3))
 				ShowChunkBoundaries = !ShowChunkBoundaries;
 
@@ -880,9 +954,25 @@ namespace CaveGame.Client
 
 			drawTimer += (float)gt.ElapsedGameTime.TotalSeconds;
 			
+
 			playerStateReplicationTask.Update(gt);
 			chunkUnloadingTask.Update(gt);
 			chunkLoadingTask.Update(gt);
+
+			if (myPlayer != null)
+			{
+				if (pauseMenuOpen == true || Chat.Open == true)
+					myPlayer.IgnoreInput = true;
+				else
+					myPlayer.IgnoreInput = false;
+			}
+				
+
+			if (pauseMenuOpen)
+			{
+				pauseMenu.Update(gt);
+				//return;
+			}
 
 			Chat.Update(gt);
 			Hotbar.Update(gt);
@@ -898,8 +988,7 @@ namespace CaveGame.Client
 			ReadIncomingPackets();
 
 
-			if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-				Game.CurrentGameContext = Game.HomePageContext;
+			
 		}
 	}
 }

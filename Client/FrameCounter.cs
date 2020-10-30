@@ -9,7 +9,7 @@ namespace CaveGame.Core
 {
 	public class FrameCounter: GameComponent
 	{
-		static int framecounting = 1000;
+		static int framecounting = 120;
 
 		double framerate;
 		double[] framesamples;

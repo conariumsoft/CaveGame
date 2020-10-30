@@ -62,14 +62,6 @@ namespace CaveGame.Client.Menu
 			sb.End();
 		}
 
-		private void WhenMouseOverButton(TextButton b, MouseState m) {
-			GameSounds.MenuBlip?.Play(1.0f, 1, 0.0f);
-		}
-		private void WhenMouseOffButton(TextButton b, MouseState m)
-		{
-			GameSounds.MenuBlip?.Play(0.8f, 1, 0.0f);
-		}
-
 		Label title;
 		private void ConstructMainMenu()
 		{
@@ -259,7 +251,7 @@ namespace CaveGame.Client.Menu
 			//buttons.Children.Add(creditsButton);
 			settingsButton = new TextButton
 			{
-				TextColor = Color.Gray,
+				TextColor = Color.White,
 				Text = "SETTINGS",
 				Font = GameFonts.Arial14,
 				Size = new UICoords(0, -10, 1f, 0.125f),
@@ -268,9 +260,10 @@ namespace CaveGame.Client.Menu
 				TextYAlign = TextYAlignment.Center,
 				TextXAlign = TextXAlignment.Center,
 				Parent = buttons,
-				UnselectedBGColor = new Color(0.05f, 0.05f, 0.05f),
-				SelectedBGColor = new Color(0.05f, 0.05f, 0.05f),
+				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
+				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
+			settingsButton.OnLeftClick += (btn, mouse) => Game.CurrentGameContext = Game.SettingsContext;
 			//buttons.Children.Add(settingsButton);
 
 			quitButton = new TextButton
@@ -289,13 +282,6 @@ namespace CaveGame.Client.Menu
 			};
 			//buttons.Children.Add(quitButton);
 			quitButton.OnLeftClick += (btn, mouse) => Game.Exit();
-
-
-			foreach (TextButton b in buttons.Children)
-			{
-				b.OnMouseEnter += WhenMouseOverButton;
-				b.OnMouseExit += WhenMouseOffButton;
-			}
 
 
 			UIRect homeContent = new UIRect
@@ -401,8 +387,6 @@ namespace CaveGame.Client.Menu
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
-			spNewWorldBtn.OnMouseEnter += WhenMouseOverButton;
-			spNewWorldBtn.OnMouseExit += WhenMouseOffButton;
 			spNewWorldBtn.OnLeftClick += (x, y) => CurrentPage = WorldCreationMenu;
 			SingleplayerMenu.Children.Add(spNewWorldBtn);
 
@@ -423,8 +407,6 @@ namespace CaveGame.Client.Menu
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
-			spGoBack.OnMouseEnter += WhenMouseOverButton;
-			spGoBack.OnMouseExit += WhenMouseOffButton;
 			spGoBack.OnLeftClick += (b, m) => CurrentPage = MainMenu;
 			SingleplayerMenu.Children.Add(spGoBack);
 
@@ -448,11 +430,7 @@ namespace CaveGame.Client.Menu
 			savelist.Children.Add(buttons);
 
 
-			foreach (TextButton b in buttons.Children)
-			{
-				b.OnMouseEnter += WhenMouseOverButton;
-				b.OnMouseExit += WhenMouseOffButton;
-			}
+
 
 
 			UIRect homeContent = new UIRect
@@ -506,8 +484,6 @@ namespace CaveGame.Client.Menu
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
-			create.OnMouseEnter += WhenMouseOverButton;
-			create.OnMouseExit += WhenMouseOffButton;
 			WorldCreationMenu.Children.Add(create);
 
 			var cancel = new TextButton
@@ -527,8 +503,6 @@ namespace CaveGame.Client.Menu
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
-			cancel.OnMouseEnter += WhenMouseOverButton;
-			cancel.OnMouseExit += WhenMouseOffButton;
 			cancel.OnLeftClick += (b, m) => CurrentPage = SingleplayerMenu;
 			WorldCreationMenu.Children.Add(cancel);
 		}

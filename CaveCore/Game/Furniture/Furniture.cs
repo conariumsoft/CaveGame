@@ -14,7 +14,7 @@ namespace CaveGame.Core.Furniture
 {
 	public enum FurnitureID : byte
 	{
-		Workbench, WoodenDoor, TrapDoor, Furnace, Anvil, OakBookshelf, OakBed
+		Workbench, WoodenDoor, TrapDoor, Furnace, Anvil, OakBookshelf, OakBed, Chest
 	}
 	public interface ILayerOccupant
 	{
@@ -72,11 +72,57 @@ namespace CaveGame.Core.Furniture
 		public virtual void OnTileUpdate(IGameWorld world, int x, int y) { }
 	}
 
+	public class Furnace : FurnitureTile
+	{
+		public override Vector2 BoundingBox => new Vector2(16, 16);
+
+		public override Color Color => Color.White;
+
+		public override Rectangle Quad => new Rectangle(56, 88, 16, 16);
+
+		public override FurnitureID ID => FurnitureID.Furnace;
+
+		public override Point OccupationBox => new Point(2, 2);
+
+
+		public static bool CanPlace(IGameWorld world, int x, int y)
+		{
+			if (world.IsCellOccupied(x, y))
+				return false;
+			if (world.IsCellOccupied(x + 1, y))
+				return false;
+			if (world.IsCellOccupied(x, y+1))
+				return false;
+			if (world.IsCellOccupied(x + 1, y+1))
+				return false;
+			if ((world.GetTile(x, y + 2) is INonSolid))
+				return false;
+			if ((world.GetTile(x + 1, y + 2) is INonSolid))
+				return false;
+
+			return true;
+		}
+	}
+
+	public class Chest : FurnitureTile
+	{
+		public override Vector2 BoundingBox => throw new NotImplementedException();
+
+		public override Color Color => throw new NotImplementedException();
+
+		public override Rectangle Quad => new Rectangle(112, 96, 16, 16);
+
+		public override FurnitureID ID => throw new NotImplementedException();
+
+		public override Point OccupationBox => throw new NotImplementedException();
+	}
+
+
 	public class Workbench : FurnitureTile
 	{
 
 		public override FurnitureID ID => FurnitureID.Workbench;
-		public override Vector2 BoundingBox => new Vector2(8, 4);
+		public override Vector2 BoundingBox => new Vector2(8, 0);
 		public override Color Color => TileDefinitions.OakPlank.Color;
 		public override Rectangle Quad => new Rectangle(56, 104, 16, 8);
 

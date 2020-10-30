@@ -2,23 +2,17 @@
 using CaveGame.Core.Tiles;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace CaveGame.Core
 {
 	public enum SurfaceBiome
 	{
-		Forest,
 		Plains,
-		ColdForest,
-		RainForest,
-		Swamp,
 		Mountains,
-		SnowyMountains,
 		Desert,
-		DesertMountains,
-		Redwoods,
-		Wasteland,
+		Forest,
 	}
 
 	public enum RegionBiome
@@ -55,12 +49,12 @@ namespace CaveGame.Core
 
 			biomemap = new int[256];
 			int previous = 0;
-			for (int i = 0; i < 128; i++)
+			for (int i = 0; i < 256; i++)
 			{
 				
 				if (terrainRNG.NextDouble() > 0.5)
 				{
-					biomemap[i] = terrainRNG.Next(8);
+					biomemap[i] = terrainRNG.Next(4);
 					previous = biomemap[i];
 				}else
 				{
@@ -73,12 +67,25 @@ namespace CaveGame.Core
 
 		private SurfaceBiome GetSurfaceBiome(int x)
 		{
-			int dj = (int)Math.Floor(x / 256.0);
+			int dj = (int)Math.Floor(x / 16.0f);
 
-
+			//Debug.Write(dj);
 			return (SurfaceBiome)biomemap[dj.Mod(256)];
 		}
 
+		private float GetDesertHeight(int x)
+		{
+			return 0;
+		}
+		private float GetForestHeight(int x)
+		{
+			return 0;
+		}
+
+		private float GetMountainHeight(int x)
+		{
+			return 0;
+		}
 
 		public void HeightPass(ref Chunk chunk)
 		{
@@ -91,7 +98,6 @@ namespace CaveGame.Core
 				for (int y = 0; y < Chunk.ChunkSize; y++)
 				{
 
-					SurfaceBiome biome = GetSurfaceBiome(x);
 					int curX = ((chunk.Coordinates.X * Globals.ChunkSize) + x);
 					int curY = ((chunk.Coordinates.Y * Globals.ChunkSize) + y);
 
@@ -99,28 +105,94 @@ namespace CaveGame.Core
 					var surface = octave.Noise2D(curX / 20.0, curY / 20.0) * 10 + (octave.Noise2D(curX / 201.0, curY / 199.0) * 40);
 
 					var depth = (curY - surface - 15);
+					SurfaceBiome biome = GetSurfaceBiome(x);
 
-					if (depth < 0)
+				/*	if (biome == SurfaceBiome.Mountains)
 					{
-						chunk.SetTile(x, y, new Tiles.Air());
-					}
-					else if (depth <= 1.5f)
-					{
-						chunk.SetTile(x, y, new Tiles.Grass());
-					}
-					else if (depth <= 5)
-					{
-						chunk.SetTile(x, y, new Tiles.Dirt());
-						chunk.SetWall(x, y, new Walls.Dirt());
-					}
-					else
-					{
-						chunk.SetWall(x, y, new Walls.Stone());
-						var noise = simplex.Noise(curX / 4.0f, curY / 4.0f) * 30;
-						if (noise + depth > 30.5)
-							chunk.SetTile(x, y, new Tiles.Stone());
+						if (depth < 0)
+						{
+							chunk.SetTile(x, y, new Tiles.Air());
+						}
 						else
+						{
+							chunk.SetTile(x, y, new Tiles.Stone());
+						}
+					}
+					if (biome == SurfaceBiome.Forest)
+					{
+						if (depth < 0)
+						{
+							chunk.SetTile(x, y, new Tiles.Air());
+						}
+						else
+						{
+							chunk.SetTile(x, y, new Tiles.Mud());
+						}
+					}
+
+					if (biome == SurfaceBiome.Desert)
+					{
+						if (depth < 0)
+						{
+							chunk.SetTile(x, y, new Tiles.Air());
+						}
+						else if (depth <= 1.5f)
+						{
+							chunk.SetTile(x, y, new Tiles.Sand());
+						}
+						else if (depth <= 5)
+						{
+							chunk.SetTile(x, y, new Tiles.Sand());
+							chunk.SetWall(x, y, new Walls.Sandstone());
+						}
+						else
+						{
+							chunk.SetWall(x, y, new Walls.Sandstone());
+							var noise = simplex.Noise(curX / 4.0f, curY / 4.0f) * 30;
+							if (noise + depth > 30.5)
+								chunk.SetTile(x, y, new Tiles.Sandstone());
+							else
+								chunk.SetTile(x, y, new Tiles.Sand());
+						}
+					}*/
+					
+					//if (biome == SurfaceBiome.Plains)
+					//{
+						if (depth < 0)
+						{
+							chunk.SetTile(x, y, new Tiles.Air());
+						}
+						else if (depth <= 1.5f)
+						{
+							chunk.SetTile(x, y, new Tiles.Grass());
+						}
+						else if (depth <= 5)
+						{
 							chunk.SetTile(x, y, new Tiles.Dirt());
+							chunk.SetWall(x, y, new Walls.Dirt());
+						}
+						else
+						{
+							chunk.SetWall(x, y, new Walls.Stone());
+							var noise = simplex.Noise(curX / 4.0f, curY / 4.0f) * 30;
+							if (noise + depth > 30.5)
+								chunk.SetTile(x, y, new Tiles.Stone());
+							else
+								chunk.SetTile(x, y, new Tiles.Dirt());
+						}
+					//}
+					
+					if (depth > 100)
+					{
+						float noise = simplex.Noise((curX - 999) / 400.0f, (curY + 420) / 400.0f);
+						float n2 = (float)octave.Noise2D((curX - 999) / 4.0f, (curY + 420) / 4.0f);
+						if (noise > 0.75f)
+						{
+							if (n2 < 0.10f)
+								chunk.SetTile(x, y, new Mycelium());
+							else
+								chunk.SetTile(x, y, new Air());
+						}
 					}
 
 					if (depth > 0)
@@ -135,6 +207,9 @@ namespace CaveGame.Core
 					// caves
 					if (depth >= 0)
 					{
+
+
+
 						// jagged caves
 						var cavetiny = octave.Noise2D(curX / 5.0f, curY / 5.0f) * 0.5f;
 						var cave1 = (octave.Noise2D(curX / 30.0f, curY / 30.0f));
@@ -168,7 +243,8 @@ namespace CaveGame.Core
 
 						if (depth > 150)
 						{
-							if (simplex.Noise(curX + 444 / 100.0f, curY / 100.0f) > 0.8f)
+							// lava tubes
+							if (simplex.Noise( (curX + 444) / 100.0f, curY / 100.0f) > 0.8f)
 							{
 								chunk.SetTile(x, y, new Lava { TileState = 8 });
 							}
@@ -178,16 +254,11 @@ namespace CaveGame.Core
 									chunk.SetTile(x, y, new Lava { TileState = 8 });
 								//TileUpdate[x, y] = true;
 							}
-
 						}
-						
 					}
 				}
 			}
 		}
-
-
-
 		
 		public void StructurePass(IGameWorld world, int x, int y)
 		{

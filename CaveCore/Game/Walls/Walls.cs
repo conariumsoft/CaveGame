@@ -23,7 +23,7 @@ namespace CaveGame.Core.Walls
 		ClayBrick,
 		SandstoneBrick,
 		MossyStone, CarvedStoneBrick, CarvedSandstoneBrick,
-		MossyStoneBrick, CubedStone, CubedSandstone
+		MossyStoneBrick, CubedStone, CubedSandstone, Sandstone
 	}
 
 	public class WDef : ILightEmitter // TileData
@@ -40,7 +40,7 @@ namespace CaveGame.Core.Walls
 		{
 			Color = Color.White;
 			Hardness = 4;
-			Opacity = 1;
+			Opacity = 0;
 			Namespace = "CaveGame";
 		}
 	}
@@ -67,6 +67,12 @@ namespace CaveGame.Core.Walls
 		};
 		public static WDef StoneBrick = new WDef { 
 			Hardness = 5, Quad = TileMap.Brick, Color = new Color(0.3f, 0.3f, 0.3f)
+		};
+		public static WDef Sandstone = new WDef
+		{
+			Hardness = 5,
+			Quad = TileMap.Stone,
+			Color = new Color(0.3f, 0.3f, 0.0f),
 		};
 		public static WDef SandstoneBrick = new WDef {
 			Hardness = 5,
@@ -225,6 +231,10 @@ namespace CaveGame.Core.Walls
 	public class Stone : Wall {
 		public Stone() : base(WallDefinitions.Stone) { }
 	}
+	public class Sandstone : Wall
+	{
+		public Sandstone() : base(WallDefinitions.Sandstone) { }
+	}
 	public class Dirt : Wall {
 		public Dirt() : base(WallDefinitions.Dirt) { }
 	}
@@ -241,7 +251,7 @@ namespace CaveGame.Core.Walls
 		
 		
 
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		/*public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
 		{
 			Rectangle quad = TileMap.BGBrickTL;
 
@@ -261,7 +271,7 @@ namespace CaveGame.Core.Walls
 				new Vector2(x * Globals.TileSize, y * Globals.TileSize),
 				quad, color.MultiplyAgainst(Color)
 			);
-		}
+		}*/
 	}
 
 	public class StoneBrick : Brick {

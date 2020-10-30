@@ -61,14 +61,19 @@ namespace CaveGame.Client
 			Steam_EnsureDLLExists();
 			Steam_InitAPI();
 
-			callbackRun = new DelayedTask(() => Steamworks.SteamAPI.RunCallbacks(), 1 / 20.0f);
+			
 
-			m_OverlayActivated = Steamworks.Callback<Steamworks.GameOverlayActivated_t>.Create(Steam_OnOverlayActivated);
-			Steamworks.Callback<Steamworks.SteamShutdown_t>.Create(Steam_OnShutdown);
-			Steamworks.Callback<Steamworks.ScreenshotRequested_t>.Create(Steam_OnScreenshotRequested);
-			Steamworks.Callback<Steamworks.UserStatsReceived_t>.Create(Steam_OnUserStatsReceived);
-			Steamworks.Callback<Steamworks.UserStatsStored_t>.Create(Steam_OnUserStatsStored);
-			Steamworks.Callback<Steamworks.UserAchievementStored_t>.Create(Steam_OnAchievementsStored);
+			if (SteamInitialized)
+			{
+				callbackRun = new DelayedTask(() => Steamworks.SteamAPI.RunCallbacks(), 1 / 20.0f);
+				m_OverlayActivated = Steamworks.Callback<Steamworks.GameOverlayActivated_t>.Create(Steam_OnOverlayActivated);
+				Steamworks.Callback<Steamworks.SteamShutdown_t>.Create(Steam_OnShutdown);
+				Steamworks.Callback<Steamworks.ScreenshotRequested_t>.Create(Steam_OnScreenshotRequested);
+				Steamworks.Callback<Steamworks.UserStatsReceived_t>.Create(Steam_OnUserStatsReceived);
+				Steamworks.Callback<Steamworks.UserStatsStored_t>.Create(Steam_OnUserStatsStored);
+				Steamworks.Callback<Steamworks.UserAchievementStored_t>.Create(Steam_OnAchievementsStored);
+			}
+				
 		}
 
 
@@ -124,17 +129,32 @@ namespace CaveGame.Client
 
 		private void Steam_InitAPI()
 		{
-			if (!Steamworks.SteamAPI.Init())
+			try
+			{
+				if (!Steamworks.SteamAPI.Init())
+				{
+					Debug.WriteLine("Steam API Failed to initialize!");
+					//throw new Exception("Steam API Failed to initialize!");
+					SteamInitialized = false;
+				}
+			} catch(Exception e)
 			{
 				Debug.WriteLine("Steam API Failed to initialize!");
 				//throw new Exception("Steam API Failed to initialize!");
 				SteamInitialized = false;
 			}
+			
 		}
 
 		public void OnUserStatsReceived(UserStatsReceived_t pCallback)
 		{
 
+		}
+
+		public void Shutdown()
+		{
+			if (SteamInitialized)
+				SteamAPI.Shutdown();
 		}
 
 		private void PollStats()

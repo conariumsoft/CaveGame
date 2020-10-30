@@ -99,25 +99,29 @@ namespace CaveGame.Core.Entities
 	{
 		float jumpEnergy;
 
+		public bool IgnoreInput { get; set; }
+
 		private void GodPhysicsStep(IGameWorld world, float step)
 		{
 			KeyboardState kb = Keyboard.GetState();
-
+#if CLIENT
 			float moveX=0;
 			float moveY = 0;
-			if (kb.IsKeyDown(Keys.W))
+			if (kb.IsKeyDown(CaveGameGL.GameSettings.MoveUpKey))
 				moveY--;
 
-			if (kb.IsKeyDown(Keys.S))
+			if (kb.IsKeyDown(CaveGameGL.GameSettings.MoveDownKey))
 				moveY++;
 
-			if (kb.IsKeyDown(Keys.A))
+			if (kb.IsKeyDown(CaveGameGL.GameSettings.MoveLeftKey))
 				moveX--;
-			if (kb.IsKeyDown(Keys.D))
+			if (kb.IsKeyDown(CaveGameGL.GameSettings.MoveRightKey))
 				moveX++;
 
-			NextPosition += new Vector2(moveX, moveY) / (2.0f);
-			Position += new Vector2(moveX, moveY) / (2.0f);
+			NextPosition += new Vector2(moveX, moveY) *(4.0f);
+			Position += new Vector2(moveX, moveY) * (4.0f);
+#endif
+
 		}
 
 		public override void OnCollide(IGameWorld world, Tile t, Vector2 separation, Vector2 normal, Point tilePos)
@@ -164,41 +168,45 @@ namespace CaveGame.Core.Entities
 			float horizspeed = 13;
 			float velY = 0;
 			float jump = 150;
-
+#if CLIENT
 			if (OnRope)
 			{
 				
 				OnGround = true;
-
-				if (kb.IsKeyDown(Keys.S))
-					velY -= 0.1f;
-				if (kb.IsKeyDown(Keys.W))
-					velY += 0.1f;
+				if (!IgnoreInput) 
+				{
+					if (kb.IsKeyDown(CaveGameGL.GameSettings.MoveDownKey))
+						velY -= 0.1f;
+					if (kb.IsKeyDown(CaveGameGL.GameSettings.MoveUpKey))
+						velY += 0.1f;
+				}
 			} else {
 				Walking = false;
 				
-
-				if (kb.IsKeyDown(Keys.A))
-				{
-					Walking = true;
-					if (velX > -1.0f)
+				if (!IgnoreInput) {
+					if (kb.IsKeyDown(CaveGameGL.GameSettings.MoveLeftKey))
 					{
-						velX -= step * horizspeed;
+						Walking = true;
+						if (velX > -1.0f)
+						{
+							velX -= step * horizspeed;
+						}
+
+						Facing = HorizontalDirection.Left;
 					}
 
-					Facing = HorizontalDirection.Left;
-				}
 
-
-				if (kb.IsKeyDown(Keys.D))
-				{
-					Walking = true;
-					if (velX < 1.0f)
+					if (kb.IsKeyDown(CaveGameGL.GameSettings.MoveRightKey))
 					{
-						velX += step * horizspeed;
+						Walking = true;
+						if (velX < 1.0f)
+						{
+							velX += step * horizspeed;
+						}
+						Facing = HorizontalDirection.Right;
 					}
-					Facing = HorizontalDirection.Right;
 				}
+				
 
 				
 			}
@@ -208,26 +216,30 @@ namespace CaveGame.Core.Entities
 			{
 				jumpEnergy = 0.22f;
 			}
+			if (IgnoreInput) {
+				FallThrough = false;
+			} else {
 
-			FallThrough = kb.IsKeyDown(Keys.S);
+				FallThrough = kb.IsKeyDown(CaveGameGL.GameSettings.MoveDownKey);
 
-			if (kb.IsKeyDown(Keys.Space))
-			{
-				if (OnGround)
+				if (kb.IsKeyDown(CaveGameGL.GameSettings.JumpKey))
 				{
-					velY -= step * jump;
-					OnRope = false;
-				} else
-				{
-					jumpEnergy -= step;
-					if (jumpEnergy > 0)
+					if (OnGround)
 					{
-						velY -= step * jump * 0.07f;
+						velY -= step * jump;
+						OnRope = false;
+					} else
+					{
+						jumpEnergy -= step;
+						if (jumpEnergy > 0)
+						{
+							velY -= step * jump * 0.07f;
+						}
 					}
 				}
 			}
 
-
+#endif
 
 			Velocity += new Vector2(velX, velY);
 

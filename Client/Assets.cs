@@ -1,9 +1,11 @@
-﻿using Microsoft.Xna.Framework.Audio;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace CaveGame.Client
@@ -40,22 +42,33 @@ namespace CaveGame.Client
 
 	public static class GameTextures
 	{
-		public static Texture2D Player { get; private set; }
-		public static Texture2D TitleScreen { get; private set; }
-		public static Texture2D EyeOfHorus { get; private set; }
-		public static Texture2D ParticleSet { get; private set; }
-		public static Texture2D TileSheet { get; private set; }
-		public static Texture2D BG { get; private set; }
+		public static bool ContentLoaded = false;
 
-		public static void LoadAssets(ContentManager Content)
+		public static Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
+
+		public static Texture2D Player => Textures["Entities/player.png"];
+		public static Texture2D TitleScreen => Textures["TitleScreen.png"];
+		public static Texture2D EyeOfHorus => Textures["csoft.png"];
+		public static Texture2D ParticleSet => Textures["particles.png"];
+		public static Texture2D TileSheet => Textures["tilesheet.png"];
+		public static Texture2D BG => Textures["bg.png"];
+
+
+		public static void LoadAssets(GraphicsDevice graphicsDevice)
 		{
-			Player = Content.Load<Texture2D>("Entities/player");
-			EyeOfHorus = Content.Load<Texture2D>("Textures/csoft");
-			ParticleSet = Content.Load<Texture2D>("Textures/particles");
-			TileSheet = Content.Load<Texture2D>("Textures/tilesheet");
-			BG = Content.Load<Texture2D>("Textures/bg");
-			TitleScreen = Content.Load<Texture2D>("Textures/TitleScreen");
+			foreach (var tex in Directory.GetFiles("Assets/Textures/", "*.png"))
+			{
+				Texture2D loaded = AssetLoader.LoadTexture(graphicsDevice, tex);
+				Textures.Add(tex.Replace("Assets/Textures/", ""), loaded);
+			}
+			foreach (var tex in Directory.GetFiles("Assets/Entities/", "*.png"))
+			{
+				Texture2D loaded = AssetLoader.LoadTexture(graphicsDevice, tex);
+				Textures.Add(tex.Replace("Assets/", ""), loaded);
+			}
+			ContentLoaded = true;
 		}
+
 	}
 
 	public class TextureWrap {
@@ -69,65 +82,91 @@ namespace CaveGame.Client
 		}
 	}
 
-	public static class ItemTextures
+	public static class AssetLoader
 	{
-		public static Texture2D Bomb;
-		public static Texture2D Bong;
-		public static Texture2D Arrow;
-		public static Texture2D Bucket;
-		public static Texture2D BigPickaxe;
-		public static Texture2D Helmet;
-		public static Texture2D Chestplate;
-		public static Texture2D Sword;
-		public static Texture2D WallScraper;
-		public static Texture2D PickaxeNew;
-		public static Texture2D Scroll;
-		public static Texture2D Dynamite;
-		public static Texture2D Workbench;
-		public static Texture2D Potion;
-		public static Texture2D Jetpack;
-		public static Texture2D Door;
-		public static Texture2D ForestPainting;
-		public static Texture2D Ingot;
-		public static Texture2D Leggings;
-
-		
-
-		public static void LoadAssets(ContentManager mgr) 
+		public static Texture2D FromStream(GraphicsDevice GraphicsProcessor, Stream DataStream)
 		{
-			Texture2D Load(string file)
-			{
-				return mgr.Load<Texture2D>(file);
-			}
 
-			Arrow = Load("Items/arrow");
-			Bomb = Load("Items/bomb");
-			Bong = Load("Items/bong");
-			Ingot = Load("Items/ingot");
-			BigPickaxe = Load("Items/bigpickaxe");
-			WallScraper = Load("Items/wallscraper");
-			Door = Load("Items/door");
-			Workbench = Load("Items/workbench");
+			Texture2D Asset = Texture2D.FromStream(GraphicsProcessor, DataStream);
+			// Fix Alpha Premultiply
+			Color[] data = new Color[Asset.Width * Asset.Height];
+			Asset.GetData(data);
+			for (int i = 0; i != data.Length; ++i)
+				data[i] = Color.FromNonPremultiplied(data[i].ToVector4());
+			Asset.SetData(data);
+			return Asset;
 		}
 
-		/*public static Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
-
-		private static string[] Items =
+		public static Texture2D LoadTexture(GraphicsDevice device, string filepath)
 		{
-			"Items/arrow",
-			"Items/bomb",
+			return FromStream(device, TitleContainer.OpenStream(filepath));
+		}
 
+
+	}
+
+
+	public static class ItemTextures
+	{
+		public static Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
+
+		private static TextureMeta[] texturelist =
+		{
+			//new TextureMeta("Arrow",	   "Assets/Items/arrow.png"),
+			//new TextureMeta("Bomb",		   "Assets/Items/bomb.png"),
+			//new TextureMeta("Bong",		   "Assets/Items/bong.png"),
+			////new TextureMeta("Ingot",	   "Assets/Items/ingot.png"),
+			//new TextureMeta("BigPickaxe",  "Assets/Items/bigpickaxe"),
+		//	new TextureMeta("WallScraper", "Assets/Items/wallscraper"),
 		};
-		public static Texture2D Arrow;
 
-		public static void LoadAssets(ContentManager Content)
+		public static void LoadAssets(GraphicsDevice graphicsDevice)
 		{
-			foreach(string item in Items)
+			foreach (var tex in Directory.GetFiles("Assets/Items/", "*.png"))
 			{
-				Texture2D loaded = Content.Load<Texture2D>(item);
-				Textures.Add(loaded.Name.Replace("Items/", ""), loaded);
+				Texture2D loaded = AssetLoader.LoadTexture(graphicsDevice, tex);
+				Textures.Add(tex.Replace("Assets/Items/", ""), loaded);
 			}
-		}*/
+
+			// if you want to hardcode textures like a dumbass
+			foreach (TextureMeta textureMeta in texturelist)
+			{
+				Texture2D loaded = AssetLoader.LoadTexture(graphicsDevice, textureMeta.FilePath);
+				Textures.Add(textureMeta.Name, loaded);
+			}
+		}
+
+		public static Texture2D Bomb		=> Textures["bomb.png"];
+		public static Texture2D Bong		=> Textures["bong.png"];
+		public static Texture2D Arrow		=> Textures["arrow.png"];
+		public static Texture2D Bucket		=> Textures["bucket.png"];
+		public static Texture2D BigPickaxe	=> Textures["bigpickaxe.png"];
+		public static Texture2D Helmet		=> Textures["helmet.png"];
+		public static Texture2D Chestplate  => Textures["chestplate.png"];
+		public static Texture2D Sword       => Textures["sword.png"];
+		public static Texture2D WallScraper => Textures["wallscraper.png"];
+		public static Texture2D PickaxeNew  => Textures["pickaxenew.png"];
+		public static Texture2D Scroll		=> Textures["scroll.png"];
+		public static Texture2D Dynamite	=> Textures["dynamite.png"];
+		public static Texture2D Workbench	=> Textures["workbench.png"];
+		public static Texture2D Potion		=> Textures["potion.png"];
+		public static Texture2D Jetpack		=> Textures["jetpack.png"];
+		public static Texture2D Door		=> Textures["door.png"];
+		public static Texture2D ForestPainting=>Textures["forestpainting.png"];
+		public static Texture2D Ingot		=> Textures["ingot.png"];
+		public static Texture2D Leggings	=> Textures["leggings.png"];
+		public static Texture2D Furnace => Textures["furnace.png"];
+	}
+
+	public struct TextureMeta
+	{
+		public string Name { get; private set; }
+		public string FilePath { get; private set; }
+		public TextureMeta(string name, string file)
+		{
+			Name = name;
+			FilePath = file;
+		}
 	}
 
 	public static class GameSounds
