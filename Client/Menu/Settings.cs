@@ -182,6 +182,35 @@ namespace CaveGame.Client.Menu
 			fpsCapSlider.OnValueChanged += onFpsCapSliderChanged;
 			fpsCapSlider.SetIndex(CaveGameGL.GameSettings.FPSCapIndex);
 
+			Label chatSizeText = new Label
+			{
+				TextColor = Color.White,
+				Parent = container,
+				Size = new UICoords(0, 25, 1, 0),
+				Font = GameFonts.Arial14,
+				Text = "Chat Size: " + GameSettingsData.ChatSizeSlider[(int)CaveGameGL.GameSettings.ChatSize].Display,
+			};
+			Slider<SliderIndex<GameChatSize>> chatSizeSlider = new UI.Slider<SliderIndex<GameChatSize>>
+			{
+				DataSet = GameSettingsData.ChatSizeSlider,
+				Parent = container,
+				Size = new UICoords(0, 25, 0.5f, 0),
+				AnchorPoint = new Vector2(0.0f, 0.0f),
+				UnselectedBGColor = new Color(0.6f, 0.6f, 0.6f),
+				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
+				Scrubber = new Scrubber { Width = 20 },
+				BGColor = new Color(0.25f, 0.25f, 0.25f),
+			};
+			void onChatSliderChanged(Slider<SliderIndex<GameChatSize>> sl, SliderIndex<GameChatSize> val, int index)
+			{
+				CaveGameGL.GameSettings.ChatSize = val.Value;
+				chatSizeText.Text = "Chat Size:" + val.Display;
+				Game.OnSetChatSize(val.Value);
+				GameSounds.MenuBlip?.Play(0.8f, 1, 0.0f);
+			}
+			chatSizeSlider.OnValueChanged += onChatSliderChanged;
+			chatSizeSlider.SetIndex((int)CaveGameGL.GameSettings.ChatSize);
+
 			void bindButtonClick(TextButton b, MouseState m)
 			{
 				rebinding = (BindButton)b;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CaveGame.Core;
 using CaveGame.Core.Entities;
 using CaveGame.Core.FileUtil;
@@ -27,8 +28,37 @@ namespace CaveGame.Server
 		public string Version;
 	}
 
+	public static class LuaExtensions
+	{
+
+		public static LuaTable ListToTable<T>(this Lua state, T[] list)
+		{
+			LuaTable table = (LuaTable)state.DoString("return {}")[0];
+			for (int i = 0; i < list.Length; i++)
+			{
+
+				table[i+1] = list[i];
+			}
+
+			return table;
+		}
+	}
+
 	public class PluginManager
 	{
+
+		private LuaTable MarshalDictionaryToTable<A, B>(Dictionary<A, B> dict)
+		{
+			using (Lua state = new Lua())
+			{
+				LuaTable table = (LuaTable)state.DoString("return{}")[0];
+				foreach (KeyValuePair<A, B> kv in dict)
+					table[kv.Key] = kv.Value;
+				return table;
+			}
+				
+		}
+
 		public List<Plugin> Plugins;
 
 		public PluginManager()
@@ -79,6 +109,15 @@ namespace CaveGame.Server
 			}
 			return true;
 		}
+
+		public void CallOnCommand(string command, List<string> args)
+		{
+			foreach (Plugin plugin in Plugins)
+			{
+				plugin.OnCommand?.Call(command, plugin.LuaState.ListToTable(args.ToArray()));
+			}
+				
+		}
 	}
 
 
@@ -99,12 +138,16 @@ namespace CaveGame.Server
 		public LuaFunction OnChatMessage;
 		public LuaFunction OnPlayerPlaceTile;
 		public LuaFunction OnServerShutdown;
+		public LuaFunction OnCommand;
+
+		public Lua LuaState;
 
 		#endregion
 		public Plugin(PluginDefinition def, IPluginAPIServer server, string contents)
 		{
 			pluginDef = def;
 			Lua state = new Lua();
+			LuaState = state;
 			state.LoadCLRPackage();
 
 			#region Defined Properties
@@ -124,6 +167,16 @@ function print(v)
 end
 
 
+function list(clrlist)
+	local it = clrlist:GetEnumerator()
+    return function ()
+		local has = it:MoveNext()
+		if has then
+			return it.Current
+        end
+    end
+end
+
 
 -- plugin callback defaults;
 function OnPluginLoaded() end
@@ -131,8 +184,13 @@ function OnPlayerJoined(player) end
 function OnChatMessage(chatEvent) end
 function OnPlayerPlaceTile(player, tile, x, y) end
 function OnServerShutdown() end
+function OnCommand(command, args) end
 
 server.Output:Out(plugin.PluginName..' Loaded');
+
+
+--server:BindCommand('tim', 'jim', {'a'});
+
 ");
 			state.DoString(contents);
 			//state.DoFile("Plugins/" + PluginFolder + "/main.lua");
@@ -141,6 +199,7 @@ server.Output:Out(plugin.PluginName..' Loaded');
 			OnChatMessage = state["OnChatMessage"] as LuaFunction;
 			OnPlayerPlaceTile = state["OnPlayerPlaceTile"] as LuaFunction;
 			OnServerShutdown = state["OnServerShutdown"] as LuaFunction;
+			OnCommand = state["OnCommand"] as LuaFunction;
 		}
 	}
 }

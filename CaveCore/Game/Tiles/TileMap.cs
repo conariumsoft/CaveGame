@@ -56,19 +56,41 @@ namespace CaveGame.Core.Tiles
 		public static Rectangle Poppy = Quad(8, 2);
 		public static Rectangle CryingLilyTop = Quad(9, 2);
 		public static Rectangle CryingLilyBottom = Quad(9, 3);
+		public static Rectangle CryingLily = Quad(9, 2, 1, 2);
 		public static Rectangle TallGrass = Quad(8, 5);
 
-		public static Rectangle 
+		public static Rectangle SmallMushroom = Quad(8, 3);
+		public static Rectangle Reeds = Quad(9, 4);
+		public static Rectangle ReedsTop = Quad(8, 4);
 
 		public static Rectangle BMPY_LongBrick = Quad(0, 3);
 		public static Rectangle BMPY_WoodGrain = Quad(0, 4);
 		public static Rectangle BMPY_Stone = Quad(3, 3);
 		public static Rectangle BMPY_DarkStone = Quad(1, 4);
 
-		public static Rectangle BGBrickTL = Quad(10, 1);
-		public static Rectangle BGBrickTR = Quad(11, 1);
-		public static Rectangle BGBrickBL = Quad(10, 2);
-		public static Rectangle BGBrickBR = Quad(11, 2);
+		public static Rectangle BGBrickTL = Quad(11, 1);
+		public static Rectangle BGBrickTR = Quad(12, 1);
+		public static Rectangle BGBrickML = Quad(11, 2);
+		public static Rectangle BGBrickMR = Quad(12, 2);
+		public static Rectangle BGBrickBL = Quad(11, 3);
+		public static Rectangle BGBrickBR = Quad(12, 3);
+
+		public static Rectangle BGStoneTL = Quad(13, 1);
+		public static Rectangle BGStoneTR = Quad(14, 1);
+		public static Rectangle BGStoneBL = Quad(13, 2);
+		public static Rectangle BGStoneBR = Quad(14, 2);
+
+		public static Rectangle Pot = Quad(7, 3);
+		public static Rectangle Obsidian = Quad(10, 1);
+
+		public static Rectangle Cactus = Quad(0, 8);
+		public static Rectangle CactusFlowering = Quad(1, 8);
+		public static Rectangle CactusTop = Quad(2, 8);
+
+		public static Rectangle LeadPipeCorner = Quad(3, 8);
+		public static Rectangle LeadPipe = Quad(4, 8);
+		public static Rectangle CopperPipeCorner = Quad(5, 8);
+		public static Rectangle CopperPipe = Quad(6, 8);
 
 
 

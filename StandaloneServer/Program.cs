@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace StandaloneServer
 {
@@ -18,10 +19,13 @@ namespace StandaloneServer
 
 		static ConsoleCtrlHandlerDelegate _consoleCtrlHandler;
 
+		static int maxlines = 50;
 
 		[STAThread]
 		static void Main()
 		{
+			Console.Title = "CaveGameServer";
+			Console.CursorVisible = false;
 			ConsoleOuputWrapper consoleWrapper = new ConsoleOuputWrapper();
 			//GameServer server = new GameServer(config);
 
@@ -35,10 +39,50 @@ namespace StandaloneServer
 				return false;
 			};
 			SetConsoleCtrlHandler(_consoleCtrlHandler, true);
+			Task.Run(() => {
+				server.LoadPlugins();
+				server.Start();
+				server.Run();
+			});
+			string inputBuf = "";
 
-			server.LoadPlugins();
-			server.Start();
-			server.Run();
+			while (true)
+			{
+				if (Console.KeyAvailable)
+				{
+					char c = Console.ReadKey(true).KeyChar;
+					switch (c)
+					{
+						case '\r': server.OnCommand(inputBuf); inputBuf = ""; break;
+						case '\b': if (inputBuf.Length > 0) { inputBuf = inputBuf.Remove(inputBuf.Length - 1); }break;
+						default: inputBuf += c; break;
+					}
+					Console.BackgroundColor = ConsoleColor.White;
+					Console.ForegroundColor = ConsoleColor.Black;
+					Console.SetCursorPosition(Console.WindowLeft, Console.WindowHeight-2);
+					for (int i = 0; i<Console.WindowWidth-1; i++)
+					{
+						Console.Write(" ");
+					}
+					
+					Console.SetCursorPosition(Console.WindowLeft, Console.WindowHeight - 2);
+					
+					Console.Write("> " + inputBuf);
+
+					Console.BackgroundColor = ConsoleColor.Black;
+					Console.ForegroundColor = ConsoleColor.White;
+					
+				}
+				Console.SetCursorPosition(Console.WindowLeft, Console.WindowHeight - 1);
+
+				Console.Write(server.Information.PadRight(Console.WindowWidth-1));
+				// now lets handle our "output stream"
+				for (int i = 0; i < Math.Min(Console.WindowHeight-3, consoleWrapper.Messages.Count); i++)
+				{
+					Console.SetCursorPosition(Console.WindowLeft, i);
+					Console.Write(consoleWrapper.Messages[i].Text.PadRight(Console.WindowWidth - 1));
+				}
+			}
 		}
 	}
 }

@@ -11,9 +11,20 @@ using System.Linq;
 
 namespace CaveGame.Client
 {
+
+	public enum GameChatSize
+	{
+		Small,
+		Normal,
+		Large
+	}
+
 	public class GameChat
 	{
+		public const int OpenMessageHistory = 15;
+		public const int ClosedMessageHistory = 5;
 		public bool Open { get; set; }
+		public GameChatSize ChatSize => CaveGameGL.GameSettings.ChatSize;
 		public GameChat(GameClient client) {
 
 			inputBox = new TextInput();
@@ -69,10 +80,33 @@ namespace CaveGame.Client
 
 		public void Draw(SpriteBatch spriteBatch)
 		{
+			int textHeight = 14;
+			SpriteFont font = GameFonts.Arial10;
+
+			if (ChatSize == GameChatSize.Small)
+			{
+
+			}
+
+			if (ChatSize == GameChatSize.Normal)
+			{
+				font = GameFonts.Arial14;
+				textHeight = 20;
+
+			}
+
+			if (ChatSize == GameChatSize.Large)
+			{
+				font = GameFonts.Arial16;
+				textHeight = 24;
+			}
+
+
+
 			#region Draw box
 			Color backgroundColor = new Color(0, 0, 0, 0.75f);
 			Vector2 chatsize = new Vector2(400, 15*14);
-			Vector2 chatpos = new Vector2(0, GameGlobals.Height - 20 - (15 * 14));
+			Vector2 chatpos = new Vector2(0, GameGlobals.Height - 20 - (15 * textHeight));
 
 			Color inputBoxColor = new Color(0.15f, 0.15f, 0.25f);
 			Vector2 inputBoxPosition = new Vector2(0, GameGlobals.Height-20);
@@ -93,21 +127,21 @@ namespace CaveGame.Client
 			lock (MessageHistory)
 				foreach (Message message in MessageHistory.ToArray().Reverse())
 				{
-					var pos = new Vector2(0, GameGlobals.Height - 20 - ((count+1)*14));
-					spriteBatch.Print(message.TextColor, pos, message.Text);
+					var pos = new Vector2(0, GameGlobals.Height - 20 - ((count+1)*textHeight));
+					spriteBatch.Print(font, message.TextColor, pos, message.Text);
 					iter--;
 					count++;
 
-					if (Open && count > 14)
+					if (Open && count > OpenMessageHistory)
 						break;
 
-					if (!Open && count > 5)
+					if (!Open && count > ClosedMessageHistory)
 						break;
 				}
 
 			if (Open)
 			{
-				spriteBatch.Print(new Color(1.0f, 1.0f, 1.0f), inputBoxPosition, inputBox.DisplayText);
+				spriteBatch.Print(font, new Color(1.0f, 1.0f, 1.0f), inputBoxPosition, inputBox.DisplayText);
 			}
 			
 

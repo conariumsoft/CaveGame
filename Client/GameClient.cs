@@ -210,6 +210,10 @@ namespace CaveGame.Client
 
 		private void onClientExit(TextButton sender, MouseState state)
 		{
+			OverrideDisconnect();
+		}
+		public void OverrideDisconnect()
+		{
 			pauseMenuOpen = false;
 			Disconnect();
 			Game.CurrentGameContext = Game.HomePageContext;

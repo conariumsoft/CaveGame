@@ -66,7 +66,7 @@ namespace CaveGame.Core.Walls
 			Hardness = 5, Quad = TileMap.Brick, Color = TileDefinitions.ClayBrick.Color*0.5f
 		};
 		public static WDef StoneBrick = new WDef { 
-			Hardness = 5, Quad = TileMap.Brick, Color = new Color(0.3f, 0.3f, 0.3f)
+			Hardness = 5, Quad = TileMap.Brick, Color = new Color(0.4f, 0.4f, 0.4f)
 		};
 		public static WDef Sandstone = new WDef
 		{
@@ -228,10 +228,36 @@ namespace CaveGame.Core.Walls
 
 		}
 	}
-	public class Stone : Wall {
+
+	public abstract class RockWall : Wall
+	{
+		public RockWall(WDef def) : base(def) { }
+		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		{
+			Rectangle quad = TileMap.BGBrickTL;
+
+			if (x.Mod(2) == 0 && y.Mod(2) == 0)
+				quad = TileMap.BGStoneTL;
+			if (x.Mod(2) == 1 && y.Mod(2) == 0)
+				quad = TileMap.BGStoneTR;
+			if (x.Mod(2) == 0 && y.Mod(2) == 1)
+				quad = TileMap.BGStoneBL;
+			if (x.Mod(2) == 1 && y.Mod(2) == 1)
+				quad = TileMap.BGStoneBR;
+			//base.Dquad = TileMap.BGStoneBL;raw(tilesheet, sb, x, y, color);
+
+			sb.Draw(
+				tilesheet,
+				new Vector2(x * Globals.TileSize, y * Globals.TileSize),
+				quad, color.MultiplyAgainst(Color)
+			);
+		}
+	}
+
+	public class Stone : RockWall {
 		public Stone() : base(WallDefinitions.Stone) { }
 	}
-	public class Sandstone : Wall
+	public class Sandstone : RockWall
 	{
 		public Sandstone() : base(WallDefinitions.Sandstone) { }
 	}
@@ -251,17 +277,21 @@ namespace CaveGame.Core.Walls
 		
 		
 
-		/*public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
 		{
 			Rectangle quad = TileMap.BGBrickTL;
 
-			if (x.Mod(2) == 0 && y.Mod(2) == 0)
+			if (x.Mod(2) == 0 && y.Mod(3) == 0)
 				quad = TileMap.BGBrickTL;
-			if (x.Mod(2) != 0 && y.Mod(2) == 0)
+			if (x.Mod(2) == 1 && y.Mod(3) == 0)
 				quad = TileMap.BGBrickTR;
-			if (x.Mod(2) == 0 && y.Mod(2) != 0)
+			if (x.Mod(2) == 0 && y.Mod(3) == 1)
+				quad = TileMap.BGBrickML;
+			if (x.Mod(2) == 1 && y.Mod(3) == 1)
+				quad = TileMap.BGBrickMR;
+			if (x.Mod(2) == 0 && y.Mod(3) == 2)
 				quad = TileMap.BGBrickBL;
-			if (x.Mod(2) != 0 && y.Mod(2) != 0)
+			if (x.Mod(2) == 1 && y.Mod(3) == 2)
 				quad = TileMap.BGBrickBR;
 
 			//base.Draw(tilesheet, sb, x, y, color);
@@ -271,7 +301,7 @@ namespace CaveGame.Core.Walls
 				new Vector2(x * Globals.TileSize, y * Globals.TileSize),
 				quad, color.MultiplyAgainst(Color)
 			);
-		}*/
+		}
 	}
 
 	public class StoneBrick : Brick {

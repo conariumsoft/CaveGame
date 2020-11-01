@@ -59,14 +59,16 @@ namespace CaveGame.Client
 			JumpKey = Keys.Space;
 			MoveLeftKey = Keys.A;
 			MoveRightKey = Keys.D;
-
+			ChatSize = GameChatSize.Normal;
 		}
 
-		public Keys MoveLeftKey { get; set; }
-		public Keys MoveRightKey { get; set; }
-		public Keys MoveDownKey { get; set; }
-		public Keys MoveUpKey { get; set; }
-		public Keys JumpKey { get; set; }
+		public Keys MoveLeftKey;
+		public Keys MoveRightKey;
+		public Keys MoveDownKey;
+		public Keys MoveUpKey;
+		public Keys JumpKey;
+
+		public GameChatSize ChatSize;
 
 	}
 
@@ -81,6 +83,13 @@ namespace CaveGame.Client
 			new SliderIndex<int>("90", 90),
 			new SliderIndex<int>("60", 60),
 			new SliderIndex<int>("30", 30),
+		};
+
+		public static SliderIndex<GameChatSize>[] ChatSizeSlider =
+		{
+			new SliderIndex<GameChatSize>("Large", GameChatSize.Large),
+			new SliderIndex<GameChatSize>("Normal", GameChatSize.Normal),
+			new SliderIndex<GameChatSize>("Small", GameChatSize.Small)
 		};
 	}
 }

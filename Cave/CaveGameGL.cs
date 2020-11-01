@@ -64,6 +64,11 @@ namespace CaveGame.Client
 			}
 		}
 
+		public void OnSetChatSize(GameChatSize size)
+		{
+
+		}
+
 		public void OnSetFullscreen(bool full)
 		{
 
@@ -109,6 +114,7 @@ namespace CaveGame.Client
 		}
 
 
+
 		void Window_ClientSizeChanged(object sender, EventArgs e)
 		{
 			GameGlobals.Width = Window.ClientBounds.Width;
@@ -120,68 +126,87 @@ namespace CaveGame.Client
 			}
 			
 		}
-
-		protected void CommandBarEvent(CommandBar sender, Command command, params string[] args)
+		private void OnTestCommand(CommandBar sender, Command command, params string[] args)
 		{
-			//InWorldContext.myPlayer.God = !InWorldContext.myPlayer.God;
-			if (command.Keyword == "god")
+
+		}
+
+		private void OnTeleportCommand(CommandBar sender, Command command, params string[] args)
+		{
+			if (args.Length < 2)
 			{
-				InWorldContext.myPlayer.God = !InWorldContext.myPlayer.God;
+				sender.Out("Please provide a valid coordinate!", Color.Red);
+
 				return;
 			}
-			if (command.Keyword == "teleport")
+
+			bool successX = Int32.TryParse(args[0], out int x);
+
+			if (!successX)
 			{
+				sender.Out(String.Format("Invalid parameter: X {0}", args[0]), Color.Red);
+				// TODO: yell at player
+				return;
+			}
 
-				if (args.Length < 2)
-				{
-					sender.Out("Please provide a valid coordinate!", Color.Red);
+			bool successY = Int32.TryParse(args[1], out int y);
 
-					return;
-				}
+			if (!successY)
+			{
+				sender.Out("Invalid parameter: Y", Color.Red);
+				// TODO: yell at player
+				return;
+			}
 
-				bool successX = Int32.TryParse(args[0], out int x);
-
-				if (!successX)
-				{
-					sender.Out(String.Format("Invalid parameter: X {0}", args[0]), Color.Red);
-					// TODO: yell at player
-					return;
-				}
-
-				bool successY = Int32.TryParse(args[1], out int y);
-
-				if (!successY)
-				{
-					sender.Out("Invalid parameter: Y", Color.Red);
-					// TODO: yell at player
-					return;
-				}
-
-				if (InWorldContext.myPlayer != null) {
-					InWorldContext.myPlayer.NextPosition = new Vector2(x, y);
-				}
+			if (InWorldContext.myPlayer != null)
+			{
+				InWorldContext.myPlayer.NextPosition = new Vector2(x, y);
 			}
 		}
+		private void OnGodCommand(CommandBar sender, Command command, params string[] args)
+		{
+			InWorldContext.myPlayer.God = !InWorldContext.myPlayer.God;
+		}
+		private void OnDisconnectCommand(CommandBar sender, Command command, params string[] args)
+		{
+			if (CurrentGameContext == InWorldContext)
+			{
+				InWorldContext.OverrideDisconnect();
+
+			} else
+			{
+				sender.Out("Not connected to a server!", Color.Red);
+				return;
+			}
+		}
+		private void OnGraphCommand(CommandBar sender, Command command, params string[] args)
+		{
+			if (args.Length > 0)
+			{
+
+			}
+		}
+
 		protected override void Initialize()
 		{
 			Window.TextInput += TextInputManager.OnTextInput;
-			
 			Window.ClientSizeChanged += new EventHandler<EventArgs>(Window_ClientSizeChanged);
-
-			
 			OnSetFullscreen(GameSettings.Fullscreen);
 
+
 			Console = new CommandBar(this);
-			Console.BindCommandInformation(new Command("test", "it does a thing", new List<string>{"argA", "argB", "argC"}));
-			Console.BindCommandInformation(new Command("teleport", "", new List<string> { "x", "y" }));
-			Console.BindCommandInformation(new Command("god", "AAOKSOKADFOS", new List<string> {}));
-			Console.Handler += CommandBarEvent;
+			Console.BindCommandInformation(new Command("test", "it does a thing", new List<string>{"argA", "argB", "argC"}, OnGodCommand));
+			Console.BindCommandInformation(new Command("teleport", "", new List<string> { "x", "y" }, OnTeleportCommand));
+			Console.BindCommandInformation(new Command("god", "AAOKSOKADFOS", new List<string> {}, OnGodCommand));
+			Console.BindCommandInformation(new Command("disconnect", "", new List<string> { }, OnDisconnectCommand));
+			Console.BindCommandInformation(new Command("connect", "", new List<string> { }, OnDisconnectCommand));
+			Console.BindCommandInformation(new Command("graph", "", new List<string> { }, OnGraphCommand));
+			//Console.Handler += CommandBarEvent;
 			Components.Add(Console);
 			
 
 			FPSCounter = new FrameCounter(this);
 			Components.Add(FPSCounter);
-
 
 			FPSGraph = new FPSGraph(this, 25, 500);
 			Components.Add(FPSGraph);
@@ -270,9 +295,12 @@ namespace CaveGame.Client
 			SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
 			Vector2 center = new Vector2(GameGlobals.Width / 2.0f, GameGlobals.Height / 2.0f);
 			Vector2 origin = new Vector2(GameTextures.EyeOfHorus.Width / 2.0f, GameTextures.EyeOfHorus.Height / 2.0f);
-			float scale = 4;
+			float scale = 8;
+
+			Vector2 bounds = GameFonts.Arial30.MeasureString("CONARIUM SOFTWARE");
+
 			SpriteBatch.Draw(GameTextures.EyeOfHorus, center-new Vector2(0, (float)Math.Sin(splashTimer*2)*10), null, Color.White, 0, origin, scale, SpriteEffects.None, 0);
-			SpriteBatch.Print(GameFonts.Arial30, Color.White, center - new Vector2(220, -100), "CONARIUM SOFTWARE");
+			SpriteBatch.Print(GameFonts.Arial30, Color.White, center - new Vector2(bounds.X/2, -bounds.Y*2), "CONARIUM SOFTWARE");
 			SpriteBatch.End();
 
 		}

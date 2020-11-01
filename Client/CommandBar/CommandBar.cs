@@ -24,20 +24,38 @@ namespace CaveGame.Core
 	public delegate void ArgsCallback(params string[] args);
 
 	
-	// TODO: Create Argument struct
-
-	public struct Command
+	public class Command
 	{
-
+		public delegate void CommandHandler(CommandBar sender, Command command, params string[] args);
 		public string Keyword;
 		public string Description;
 		public List<string> Args;
+		public event CommandHandler OnCommand;
 
-		public Command(string cmd, string desc = "", List<string> args = default)
+		public Command(string cmd, string desc, List<string> args)
 		{
 			Keyword = cmd;
 			Description = desc;
 			Args = args;
+		}
+		public Command(string cmd, string desc, List<string> args, CommandHandler callback)
+		{
+			Keyword = cmd;
+			Description = desc;
+			Args = args;
+			OnCommand += callback;
+		}
+		public Command(string cmd, string desc, CommandHandler callback)
+		{
+			Keyword = cmd;
+			Description = desc;
+			Args = new List<string> { };
+			OnCommand += callback;
+		}
+
+		public void InvokeCommand(CommandBar sender, params string[] args)
+		{
+			OnCommand?.Invoke(sender, this, args);
 		}
 	}
 
@@ -54,12 +72,12 @@ namespace CaveGame.Core
 		public event CommandHandler Handler;
 
 		#region Command Methods
-		private void QuitGame(params string[] _)
+		private void QuitGame(params string[] args)
 		{
 			_game.Exit();
 		}
 
-		private void ClearConsole(params string[] _)
+		private void ClearConsole(params string[] args)
 		{
 			MessageHistory.Clear();
 		}
@@ -70,7 +88,7 @@ namespace CaveGame.Core
 			consoleLua.DoString(expression);
 		}
 
-		private void CommandList(params string[] _)
+		private void CommandList(params string[] args)
 		{
 			foreach(Command cmd in Commands)
 			{
@@ -82,10 +100,10 @@ namespace CaveGame.Core
 
 
 		#region Command Definitions
-		public static Command C_Quit = new Command("quit", "Closes the game session", null);
-		public static Command C_Clear = new Command("clear", "Resets the console", null);
+		public static Command C_Quit = new Command("quit", "Closes the game session", new List<string> { });
+		public static Command C_Clear = new Command("clear", "Resets the console", new List<string> { });
 		public static Command C_LuaExec = new Command("lua", "", new List<string> { "expression" });
-		public static Command C_List = new Command("list", "", null);
+		public static Command C_List = new Command("list", "", new List<string> { });
 
 		public List<Command> Commands = new List<Command> { 
 			C_Quit, C_Clear, C_LuaExec, C_List
@@ -116,7 +134,8 @@ namespace CaveGame.Core
 				CommandList(args);
 				return;
 			}
-
+			command.InvokeCommand(this, args);
+			// the primary handler
 			Handler?.Invoke(this, command, args);
 
 		}

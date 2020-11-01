@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Bomb.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\PhysicsEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Inventory\FurnitureItems.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Tiles\BaseGrass.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generic\DelayedTask.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileUtil\StructureFile.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Furniture\Furniture.cs" />

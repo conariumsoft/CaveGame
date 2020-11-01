@@ -6,7 +6,9 @@ using CaveGame.Core.FileUtil;
 using CaveGame.Core.Furniture;
 using CaveGame.Core.Network;
 using CaveGame.Core.Tiles;
+using KeraLua;
 using Microsoft.Xna.Framework;
+using NLua;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
@@ -38,12 +40,51 @@ namespace CaveGame.Server
 
 	}
 
+
+	public class ServerCommand
+	{
+		public delegate void SCommandHandler(ServerCommand command, params string[] args);
+		public string Keyword;
+		public string Description;
+		public List<string> Args;
+
+		public ServerCommand(string cmd, string desc, List<string> args)
+		{
+			Keyword = cmd;
+			Description = desc;
+			Args = args;
+		}
+
+	}
+
 	public class GameServer : IPluginAPIServer, IGameServer
 	{
+		public List<ServerCommand> Commands { get; set; }
+		public void BindCommand(ServerCommand command)
+		{
+			Commands.Add(command);
+		}
+		public void BindCommand(string cmd, string descr, LuaTable args)
+		{
+			var argsList = new List<string>();
+
+			foreach (var arg in args)
+			{
+				if (arg is string strArg)
+				{
+					argsList.Add(strArg);
+				}
+			}
+
+			ServerCommand command = new ServerCommand(cmd, descr, argsList);
+			Commands.Add(command);
+		}
+
+
 
 		#region Lua API Members
 		public DateTime Time => DateTime.Now;
-
+		
 		public void Chat(string msg)
 		{
 			SendToAll(new ServerChatMessagePacket(msg));
@@ -67,10 +108,28 @@ namespace CaveGame.Server
 		private NetworkServer server;
 
 		public PluginManager PluginManager;
-
+		public string Information = "";
 		public bool Running { get; set; }
 
+		public void OnCommand(string msg)
+		{
+			Output.Out("> "+msg);
 
+			string cleaned = msg.Trim();
+
+			string[] keywords = cleaned.Split(' ');
+
+			foreach (ServerCommand cmdDef in Commands)
+			{
+				if (keywords[0] == cmdDef.Keyword)
+				{
+					//cmdDef.InvokeCommand(keywords.Skip(1).ToArray());
+					PluginManager.CallOnCommand(cmdDef.Keyword, keywords.Skip(1).ToList());
+					return;
+				}
+			}
+			Output.Out("No command " + keywords[0] + " found!", new Color(1.0f, 0, 0));
+		}
 		
 
 		public int TickRate { get; private set; }
@@ -86,6 +145,7 @@ namespace CaveGame.Server
 
 		public GameServer(ServerConfig config) {
 
+			Commands = new List<ServerCommand>();
 			ServerName = config.ServerName;
 			ServerMOTD = config.ServerMOTD;
 			MaxPlayers = config.MaxPlayers;
@@ -464,6 +524,7 @@ namespace CaveGame.Server
 
 		public void Update(GameTime gt)
 		{
+			Information = String.Format("{0} Players", ConnectedUsers.Count);
 			float delta = (float)gt.ElapsedGameTime.TotalSeconds;
 
 
