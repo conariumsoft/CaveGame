@@ -16,14 +16,19 @@ namespace StandaloneServer
 		public ConsoleColor Color;
 	}
 
-
 	public static class Program
 	{
 		private delegate bool ConsoleCtrlHandlerDelegate(int sig);
 
+#if WINDOZE
 		[DllImport("Kernel32")]
 		private static extern bool SetConsoleCtrlHandler(ConsoleCtrlHandlerDelegate handler, bool add);
-
+#else
+		private static bool SetConsoleCtrlHandler(ConsoleCtrlHandlerDelegate useless, bool shit)
+		{
+			return false;
+		}
+#endif
 		static ConsoleCtrlHandlerDelegate _consoleCtrlHandler;
 
 		static int maxlines = 50;

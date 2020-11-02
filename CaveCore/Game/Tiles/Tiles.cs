@@ -33,8 +33,8 @@ namespace CaveGame.Core.Tiles
 		Cobweb, Tallgrass, Rope, Vine, Ladder, Platform, TNT, Lava, Sludge, Obsidian,
 		Snow, Ice, Mycelium, CryingLily, BlueMushroom, Poppy, BlueTallgrass, BlueVine,
 
-		GermanOccupiedTerritory,
-		FurniturePointer = 254
+		//GermanOccupiedTerritory,
+		//FurniturePointer = 254
 	}
 	public class TDef : ILightEmitter // TileData
 	{
