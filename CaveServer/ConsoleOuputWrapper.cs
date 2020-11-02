@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace CaveGame.Server
 {
@@ -40,6 +41,11 @@ namespace CaveGame.Server
 			Text = text;
 			Color = color.ToConsoleColor();
 		}
+		public ConsoleMsg(string text, ConsoleColor color)
+		{
+			Text = text;
+			Color = color;
+		}
 	}
 
 	public class ConsoleOuputWrapper : IMessageOutlet
@@ -47,9 +53,42 @@ namespace CaveGame.Server
 
 		public List<ConsoleMsg> Messages { get; set; }
 
+		public List<ConsoleMsg> BufferMessages { get; set; }
+
 		public ConsoleOuputWrapper()
 		{
 			Messages = new List<ConsoleMsg>();
+			BufferMessages = new List<ConsoleMsg>();
+		}
+
+		public void Import(ConsoleMsg message)
+		{
+			string text = message.Text;
+
+			if (Regex.IsMatch(text, @"%\d"))
+			{
+
+				int cnum = 15;
+
+				while (Regex.IsMatch(text, @"%\d"))
+				{
+					int idx = text.IndexOf("%");
+					char code = text[idx + 1];
+
+					
+
+					
+					BufferMessages.Add(new ConsoleMsg(text.Substring(0, idx), (ConsoleColor)cnum));
+					bool worked = Int32.TryParse(code.ToString(), out cnum);
+					text = text.Substring(idx + 2);
+				}
+				BufferMessages.Add(new ConsoleMsg(text, (ConsoleColor)cnum));
+			} else
+			{
+				BufferMessages.Add(new ConsoleMsg(text, Color.White));
+			}
+
+			
 		}
 
 		public void Out(string message, Color color)
@@ -57,13 +96,18 @@ namespace CaveGame.Server
 			//Console.ForegroundColor = color.ToConsoleColor();
 			//Console.WriteLine(message);
 			//Console.ForegroundColor = ConsoleColor.White;
-			Messages.Add(new ConsoleMsg(message, color));
+			var msg = new ConsoleMsg(message, color);
+			Messages.Add(msg);
+			Import(msg);
+
 		}
 
 		public void Out(string message)
 		{
 			//Console.WriteLine(message);
-			Messages.Add(new ConsoleMsg(message, Color.White));
+			var msg = new ConsoleMsg(message, Color.White);
+			Messages.Add(msg);
+			Import(msg);
 		}
 	}
 }

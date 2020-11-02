@@ -42,7 +42,7 @@ namespace CaveGame.Core.Tiles
 
 		}
 
-		private bool CanBreathe(IGameWorld world, int x, int y)
+		protected bool CanBreathe(IGameWorld world, int x, int y)
 		{
 			var above = world.GetTile(x, y - 1);
 			var below = world.GetTile(x, y + 1);
@@ -56,7 +56,7 @@ namespace CaveGame.Core.Tiles
 			return (above is INonSolid || below is INonSolid || left is INonSolid || right is INonSolid || tleft is INonSolid || tright is INonSolid || bleft is INonSolid || bright is INonSolid);
 		}
 
-		private bool IsMatch<T>(IGameWorld w, int x, int y)
+		protected bool IsMatch<T>(IGameWorld w, int x, int y)
 		{
 			if (w.GetTile(x, y) is T)
 			{
@@ -66,59 +66,7 @@ namespace CaveGame.Core.Tiles
 		}
 
 
-		public void Spread<TGrass, TDecay, TAbove, TBelow>(IGameWorld world, int x, int y) where TGrass : Tile, new() where TAbove : Tile, new() where TBelow : Tile, new() where TDecay : Tile, new()
-		{
-			var above = world.GetTile(x, y - 1);
-			var below = world.GetTile(x, y + 1);
-			var left = world.GetTile(x - 1, y);
-			var right = world.GetTile(x + 1, y);
-
-
-			if (!CanBreathe(world, x, y))
-			{
-				// suffocate
-
-				world.SetTile(x, y, new TDecay());
-				return;
-			}
-
-			if (above is Air)
-			{
-				world.SetTile(x, y - 1, new TAbove());
-			}
-
-			if (below is Air)
-			{
-				world.SetTile(x, y + 1, new TBelow());
-			}
-
-
-			if (below is TDecay && CanBreathe(world, x, y + 1))
-			{
-				world.SetTile(x, y + 1, new TGrass());
-				//return;
-			}
-
-			if (left is TDecay && CanBreathe(world, x - 1, y))
-			{
-				world.SetTile(x - 1, y, new TGrass());
-				//return;
-			}
-
-
-			if (right is TDecay && CanBreathe(world, x + 1, y))
-			{
-				world.SetTile(x + 1, y, new TGrass());
-				//return;
-			}
-
-
-			if (above is TDecay && CanBreathe(world, x, y - 1))
-			{
-				world.SetTile(x, y - 1, new TGrass());
-				//return;
-			}
-		}
+		
 
 		public void LocalTileUpdate<T>(IGameWorld world, int x, int y)
 		{
@@ -155,5 +103,177 @@ namespace CaveGame.Core.Tiles
 				world.DoUpdatePropogation(x, y);
 			}
 		}
+	}
+	public class Mycelium : BaseGrass, IRandomTick, ITileUpdate, ILocalTileUpdate, ILightEmitter
+	{
+
+		public Light3 Light => new Light3(1,1,4);
+		public Mycelium() : base(TileDefinitions.Mycelium) { }
+
+		public void Spread(IGameWorld world, int x, int y)
+		{
+			var above = world.GetTile(x, y - 1);
+			var below = world.GetTile(x, y + 1);
+			var left = world.GetTile(x - 1, y);
+			var right = world.GetTile(x + 1, y);
+
+
+			if (!CanBreathe(world, x, y))
+			{
+				// suffocate
+
+				world.SetTile(x, y, new Dirt());
+				return;
+			}
+
+			if (above is Air)
+			{
+				double rand = RNG.NextDouble();
+				if (rand > 0.6)
+				{
+					world.SetTile(x, y - 1, new BlueMushroom());
+				} else
+				{
+					world.SetTile(x, y - 1, new BlueTallgrass());
+				}
+				
+			}
+
+			if (below is Air)
+			{
+				if (y % 3 == 0)
+				{
+					double rand = RNG.NextDouble();
+					if (rand > 0.4)
+					{
+						//world.SetTile(x, y + 1, new Vine());
+					}
+					else
+					{
+						world.SetTile(x, y + 1, new CryingLily());
+					}
+				}
+				
+			}
+
+
+			if (below is Dirt && CanBreathe(world, x, y + 1))
+			{
+				world.SetTile(x, y + 1, new Mycelium());
+				//return;
+			}
+
+			if (left is Dirt && CanBreathe(world, x - 1, y))
+			{
+				world.SetTile(x - 1, y, new Mycelium());
+				//return;
+			}
+
+
+			if (right is Dirt && CanBreathe(world, x + 1, y))
+			{
+				world.SetTile(x + 1, y, new Mycelium());
+				//return;
+			}
+
+
+			if (above is Dirt && CanBreathe(world, x, y - 1))
+			{
+				world.SetTile(x, y - 1, new Mycelium());
+				//return;
+			}
+		}
+
+		public void RandomTick(IGameWorld world, int x, int y)
+		{
+			Spread(world, x, y);
+
+
+
+		}
+
+
+		public void LocalTileUpdate(IGameWorld world, int x, int y)
+		{
+			base.LocalTileUpdate<Mycelium>(world, x, y);
+		}
+
+		public void TileUpdate(IGameWorld w, int x, int y) { }
+
+
+	}
+
+	public class Grass : BaseGrass, IRandomTick, ITileUpdate, ILocalTileUpdate
+	{
+		public Grass() : base(TileDefinitions.Grass) { }
+
+		public void Spread(IGameWorld world, int x, int y)
+		{
+			var above = world.GetTile(x, y - 1);
+			var below = world.GetTile(x, y + 1);
+			var left = world.GetTile(x - 1, y);
+			var right = world.GetTile(x + 1, y);
+
+
+			if (!CanBreathe(world, x, y))
+			{
+				// suffocate
+
+				world.SetTile(x, y, new Dirt());
+				return;
+			}
+
+			if (above is Air)
+			{
+				world.SetTile(x, y - 1, new Tallgrass());
+			}
+
+			if (below is Air)
+			{
+				world.SetTile(x, y + 1, new Vine());
+			}
+
+
+			if (below is Dirt && CanBreathe(world, x, y + 1))
+			{
+				world.SetTile(x, y + 1, new Grass());
+				//return;
+			}
+
+			if (left is Dirt && CanBreathe(world, x - 1, y))
+			{
+				world.SetTile(x - 1, y, new Grass());
+				//return;
+			}
+
+
+			if (right is Dirt && CanBreathe(world, x + 1, y))
+			{
+				world.SetTile(x + 1, y, new Grass());
+				//return;
+			}
+
+
+			if (above is Dirt && CanBreathe(world, x, y - 1))
+			{
+				world.SetTile(x, y - 1, new Grass());
+				//return;
+			}
+		}
+
+		public void RandomTick(IGameWorld world, int x, int y)
+		{
+			Spread(world, x, y);
+		}
+
+
+		public void LocalTileUpdate(IGameWorld world, int x, int y)
+		{
+			base.LocalTileUpdate<Grass>(world, x, y);
+		}
+
+		public void TileUpdate(IGameWorld w, int x, int y) { }
+
+
 	}
 }

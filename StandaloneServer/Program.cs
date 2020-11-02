@@ -4,14 +4,21 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace StandaloneServer
 {
+	public struct BufferMessage
+	{
+		public string Text;
+		public ConsoleColor Color;
+	}
+
+
 	public static class Program
 	{
-
 		private delegate bool ConsoleCtrlHandlerDelegate(int sig);
 
 		[DllImport("Kernel32")]
@@ -77,11 +84,14 @@ namespace StandaloneServer
 
 				Console.Write(server.Information.PadRight(Console.WindowWidth-1));
 				// now lets handle our "output stream"
-				for (int i = 0; i < Math.Min(Console.WindowHeight-3, consoleWrapper.Messages.Count); i++)
+				for (int i = 0; i < Math.Min(Console.WindowHeight - 3, consoleWrapper.BufferMessages.Count); i++)
 				{
+
 					Console.SetCursorPosition(Console.WindowLeft, i);
-					Console.Write(consoleWrapper.Messages[i].Text.PadRight(Console.WindowWidth - 1));
+					Console.ForegroundColor = consoleWrapper.BufferMessages[i].Color;
+					Console.Write(consoleWrapper.BufferMessages[i].Text);
 				}
+				Console.ForegroundColor = ConsoleColor.White;
 			}
 		}
 	}

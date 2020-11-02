@@ -31,9 +31,10 @@ namespace CaveGame.Core.Tiles
 		CarvedSandBrick, MossyStoneBrick, MossyStone,
 		CubedStone, CubedSandstone,
 		Cobweb, Tallgrass, Rope, Vine, Ladder, Platform, TNT, Lava, Sludge, Obsidian,
-		Snow, Ice, Mycelium, CryingLily, BlueMushroom,
+		Snow, Ice, Mycelium, CryingLily, BlueMushroom, Poppy, BlueTallgrass, BlueVine,
 
 		GermanOccupiedTerritory,
+		FurniturePointer = 254
 	}
 	public class TDef : ILightEmitter // TileData
 	{
@@ -193,6 +194,13 @@ namespace CaveGame.Core.Tiles
 			Quad = TileMap.TallGrass,
 			Color = Color.Green,
 		};
+		public static TDef BlueTallgrass = new TDef
+		{
+			Hardness = 1,
+			Opacity = 1,
+			Quad = TileMap.TallGrass,
+			Color = Color.Blue,
+		};
 		public static TDef Rope = new TDef
 		{
 			Hardness = 2,
@@ -212,6 +220,13 @@ namespace CaveGame.Core.Tiles
 			Hardness = 1,
 			Opacity = 2,
 			Color = Color.Green,
+		};
+		public static TDef BlueVine = new TDef
+		{
+			Quad = TileMap.Vine,
+			Hardness = 1,
+			Opacity = 2,
+			Color =  new Color(0, 0, 2.5f),
 		};
 		public static TDef Platform = new TDef
 		{
@@ -256,7 +271,7 @@ namespace CaveGame.Core.Tiles
 			Opacity = 2,
 			Hardness = 2,
 			Quad = TileMap.Soil,
-			Color = new Color(0.1f, 0.1f, 1.5f)
+			Color = new Color(0.1f, 0.1f, 2.5f)
 		};
 
 		public static TDef BlueMushroom = new TDef
@@ -272,6 +287,21 @@ namespace CaveGame.Core.Tiles
 			Hardness = 1,
 			Quad = TileMap.CryingLilyTop,
 			Color = Color.White
+		};
+		public static TDef Poppy = new TDef
+		{
+			Opacity = 0,
+			Hardness = 1,
+			Quad = TileMap.Poppy,
+			Color = Color.White
+		};
+
+		public static TDef FurniturePointer = new TDef
+		{
+			Opacity = 0,
+			Hardness = 0,
+			Quad = TileMap.Default,
+			Color = Color.White,
 		};
 	}
 	#region stuff
@@ -446,6 +476,14 @@ namespace CaveGame.Core.Tiles
 		}
 	}
 
+	public class FurniturePointer : Tile
+	{
+		public FurniturePointer() : base(TileDefinitions.FurniturePointer) { }
+		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 light) {
+			
+		} // leave empty
+	}
+
 	public class Void : Tile
 	{
 		public Void() : base(TileDefinitions.Void) { }
@@ -465,53 +503,7 @@ namespace CaveGame.Core.Tiles
 	#region Soils
 	
 
-	public class Mycelium : BaseGrass, IRandomTick, ITileUpdate, ILocalTileUpdate, ILightEmitter
-	{
-
-		public Light3 Light => new Light3(2, 2, 8);
-		public Mycelium() : base(TileDefinitions.Mycelium) { }
-
-
-		public void RandomTick(IGameWorld world, int x, int y)
-		{
-			Spread<Mycelium, Dirt, BlueMushroom, CryingLily>(world, x, y);
-
-
-
-		}
-
-
-		public void LocalTileUpdate(IGameWorld world, int x, int y)
-		{
-			base.LocalTileUpdate<Mycelium>(world, x, y);
-		}
-
-		public void TileUpdate(IGameWorld w, int x, int y) { }
-
-
-	}
-
-	public class Grass : BaseGrass, IRandomTick, ITileUpdate, ILocalTileUpdate
-	{
-		public Grass() : base(TileDefinitions.Grass) { }
-
-		
-
-		public void RandomTick(IGameWorld world, int x, int y)
-		{
-			Spread<Grass, Dirt, Tallgrass, Vine>(world, x, y);
-		}
-
-
-		public void LocalTileUpdate(IGameWorld world, int x, int y)
-		{
-			base.LocalTileUpdate<Grass>(world, x, y);
-		}
-
-		public void TileUpdate(IGameWorld w, int x, int y) { }
-
-		
-	}
+	
 	public class Dirt : Tile, ISoil
 	{
 		public Dirt() : base(TileDefinitions.Dirt) { }
@@ -820,10 +812,18 @@ namespace CaveGame.Core.Tiles
 			}
 		}
 
+		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		{
+			Vector2 position = new Vector2((x * Globals.TileSize)+(x.Mod(4)), (y * Globals.TileSize));
+
+			sb.Draw(tilesheet, position, Quad, color.MultiplyAgainst(Color));
+			//base.Draw(tilesheet, sb, x, y, color);
+		}
+
 		public void TileUpdate(IGameWorld world, int x, int y)
 		{
 			var above = world.GetTile(x, y - 1);
-			if (!(above is Vine || above is Grass))
+			if (!(above is Vine || above is Grass || above is Mycelium))
 			{
 				world.SetTile(x, y, new Air());
 			}
@@ -844,8 +844,25 @@ namespace CaveGame.Core.Tiles
 			}
 		}
 
+		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		{
+			Vector2 position = new Vector2(x * Globals.TileSize, y * Globals.TileSize);
+			Rectangle quad = TileMap.TallGrass;
+
+			int state = ((int)x).Mod(3);
+
+			if (state == 2)
+				quad = TileMap.TallGrass2;
+			if (state == 1)
+				quad = TileMap.TallGrass3;
+
+			sb.Draw(tilesheet, position, quad, color.MultiplyAgainst(Color));
+			//base.Draw(tilesheet, sb, x, y, color);
+		}
+
 		public void TileUpdate(IGameWorld world, int x, int y)
 		{
+			TileState++;
 			var below = world.GetTile(x, y + 1);
 			if (!(below is Grass))
 			{
@@ -855,9 +872,52 @@ namespace CaveGame.Core.Tiles
 
 
 	}
+	public class BlueTallgrass : Tile, INonSolid, ITileUpdate, IWaterBreakable, IRandomTick
+	{
+		public BlueTallgrass() : base(TileDefinitions.BlueTallgrass)
+		{
 
-#endregion
-#region Plastics
+		}
+
+		public void RandomTick(IGameWorld world, int x, int y)
+		{
+			if (RNG.NextDouble() > 0.95f)
+			{
+				world.SetTile(x, y, new Air()); // grass sometimes randomly dies
+			}
+		}
+
+		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		{
+			Vector2 position = new Vector2(x * Globals.TileSize, y * Globals.TileSize);
+			Rectangle quad = TileMap.TallGrass;
+
+			int state = ((int)x).Mod(3);
+
+			if (state == 2)
+				quad = TileMap.TallGrass2;
+			if (state == 1)
+				quad = TileMap.TallGrass3;
+
+			sb.Draw(tilesheet, position, quad, color.MultiplyAgainst(Color));
+			//base.Draw(tilesheet, sb, x, y, color);
+		}
+
+		public void TileUpdate(IGameWorld world, int x, int y)
+		{
+			TileState++;
+			var below = world.GetTile(x, y + 1);
+			if (!(below is Mycelium))
+			{
+				world.SetTile(x, y, new Air());
+			}
+		}
+
+
+	}
+
+	#endregion
+	#region Plastics
 	public abstract class Plastic { }
 	public class RedPlastic : Plastic { }
 	public class BluePlastic : Plastic { }
@@ -1328,7 +1388,7 @@ namespace CaveGame.Core.Tiles
 		public Light3 Light => new Light3(0, 0, 20);
 		public BlueTorch() : base(TileDefinitions.BlueTorch) { }
 	}
-	public class BlueMushroom : Tile, ILightEmitter, INonSolid, ITileUpdate
+	public class BlueMushroom : Tile, ILightEmitter, INonSolid, ITileUpdate, IWaterBreakable
 	{
 		public void TileUpdate(IGameWorld world, int x, int y)
 		{
@@ -1342,20 +1402,28 @@ namespace CaveGame.Core.Tiles
 	}
 	public class Cactus { }
 	public class CactusFlower { }
-	public class CryingLily : Tile, ILightEmitter, INonSolid, ITileUpdate {
+	public class CryingLily : Tile, ILightEmitter, INonSolid, ITileUpdate, IWaterBreakable {
 		public Light3 Light => new Light3(2, 4, 6);
 
 		public void TileUpdate(IGameWorld world, int x, int y)
 		{
 			if (!(world.GetTile(x, y - 1) is Mycelium))
 				world.SetTile(x, y, new Air());
+
+			
 		}
 
 		public CryingLily() : base(TileDefinitions.CryingLily) { }
 		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
 		{
-			Vector2 position = new Vector2(Globals.TileSize * x, Globals.TileSize * (y));
-			sb.Draw(tilesheet, position, TileMap.CryingLily, color.MultiplyAgainst(Color));
+			SpriteEffects effects = SpriteEffects.None;
+			Vector2 position = new Vector2((Globals.TileSize * x) + (x%3)-(y%6), (Globals.TileSize * y));
+
+			if ((x+y).Mod(2)==0)
+			{
+				effects = SpriteEffects.FlipHorizontally;
+			}
+			sb.Draw(tilesheet, position, TileMap.CryingLily, color.MultiplyAgainst(Color), 0, Vector2.Zero, Vector2.One, effects, 0);
 			//base.Draw(tilesheet, sb, x, y, color);
 		}
 	}
@@ -1371,7 +1439,14 @@ namespace CaveGame.Core.Tiles
 	public class Begonia { }
 	public class BleedingHeart { }
 	public class EnglishBluebell { }
-	public class Poppy { }
+	public class Poppy : Tile, INonSolid, ITileUpdate, IWaterBreakable
+	{
+		public Poppy() : base(TileDefinitions.Poppy) { }
+		public void TileUpdate(IGameWorld world, int x, int y)
+		{
+			
+		}
+	}
 	public class TNT : Tile, ITileUpdate
 	{
 		public TNT() : base(TileDefinitions.TNT)

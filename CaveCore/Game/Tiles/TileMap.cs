@@ -58,6 +58,8 @@ namespace CaveGame.Core.Tiles
 		public static Rectangle CryingLilyBottom = Quad(9, 3);
 		public static Rectangle CryingLily = Quad(9, 2, 1, 2);
 		public static Rectangle TallGrass = Quad(8, 5);
+		public static Rectangle TallGrass2 = Quad(9, 5);
+		public static Rectangle TallGrass3 = Quad(10, 5);
 
 		public static Rectangle SmallMushroom = Quad(8, 3);
 		public static Rectangle Reeds = Quad(9, 4);

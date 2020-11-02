@@ -68,12 +68,9 @@ namespace CaveGame.Server
 		{
 			var argsList = new List<string>();
 
-			foreach (var arg in args)
+			foreach (var arg in args.Values)
 			{
-				if (arg is string strArg)
-				{
-					argsList.Add(strArg);
-				}
+				argsList.Add((string)arg);
 			}
 
 			ServerCommand command = new ServerCommand(cmd, descr, argsList);
@@ -92,6 +89,14 @@ namespace CaveGame.Server
 		public void Chat(string msg, Color color)
 		{
 			SendToAll(new ServerChatMessagePacket(msg, color));
+		}
+		public void Message(User user, string msg)
+		{
+			SendTo(new ServerChatMessagePacket(msg), user);
+		}
+		public void Message(User user, string msg, Color color)
+		{
+			SendTo(new ServerChatMessagePacket(msg, color), user);
 		}
 
 		public IMessageOutlet Output
@@ -224,8 +229,6 @@ namespace CaveGame.Server
 		}
 
 		#region NetworkListenerMethods
-
-
 		private void OnServerInfoRequested(NetworkMessage msg)
 		{
 
@@ -240,9 +243,6 @@ namespace CaveGame.Server
 				),
 			msg.Sender);
 		}
-
-		
-
 		private void OnPlayerConnects(NetworkMessage msg)
 		{
 			RequestJoinPacket packet = new RequestJoinPacket(msg.Packet.GetBytes());
@@ -409,7 +409,12 @@ namespace CaveGame.Server
 		private void OnRemoveFurniture(NetworkMessage msg, User user)
 		{
 			RemoveFurniturePacket packet = new RemoveFurniturePacket(msg.Packet.GetBytes());
-
+			var match = World.Furniture.FirstOrDefault(t => t.FurnitureNetworkID == packet.FurnitureNetworkID);
+			if (match != null)
+			{
+				World.Furniture.Remove(match);
+				SendToAllExcept(packet, user);
+			}
 		}
 		private void OnPlayerClosesDoor(NetworkMessage msg, User user) {
 			CloseDoorPacket packet = new CloseDoorPacket(msg.Packet.GetBytes());
@@ -527,7 +532,6 @@ namespace CaveGame.Server
 			Information = String.Format("{0} Players", ConnectedUsers.Count);
 			float delta = (float)gt.ElapsedGameTime.TotalSeconds;
 
-
 			foreach(var user in ConnectedUsers.ToArray())
 			{
 				if (user.Kicked)
@@ -555,7 +559,6 @@ namespace CaveGame.Server
 				ticker = 0;
 				foreach(var entity in World.Entities)
 				{
-
 
 					if (entity is Player player)
 					{
