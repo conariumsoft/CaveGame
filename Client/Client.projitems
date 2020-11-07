@@ -10,15 +10,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Assets.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GameSettingsData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\LocalPlayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\PeerPlayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\ClientPlayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InputManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\Multiplayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\TimeoutMenu.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NetGraph.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SteamManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ISteamManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameChat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LightingEngine.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Clipboard.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CommandBar\CommandBar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FPSGraph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FrameCounter.cs" />
@@ -43,8 +45,5 @@
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Entities\" />
   </ItemGroup>
 </Project>

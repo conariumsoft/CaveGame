@@ -14,28 +14,32 @@ namespace CaveGame.Client.Menu
 		{
 			">>CAVE GAME",
 			"",
-			">Lead Developer",
-			"Josh O'Leary 'MadScientist'",
+			">Josh O'Leary",
+			"Programming, Game Design",
+			"",
+			">invinciblespeed",
+			"Art",
+			"",
+			">Tyler Stewart",
+			"Biz",
 			"",
 			">Contributing Developers",
 			"dodeadam - Programming",
 			"ConcurrentSquared - Programming & Design",
 			"Mescalyne - Music",
-			"WheezyBackports - Art",
 			"Bumpylegoman02 - Security Testing & Design",
+			"WheezyBackports - Community Multiplayer Servers",
 			"",
 			">Testing",
 			"Andrew J.",
 			"squidthonkv2",
 			"Billy J.",
-			"",
-			">Biz",
-			"Tyler Stewart",
+			"WheezyBackports",
 			"",
 			"Copyright Conarium Software 2020",
 		};
 
-		Game IGameContext.Game => Game;
+		Microsoft.Xna.Framework.Game IGameContext.Game => Game;
 		public CaveGameGL Game { get; set; }
 		public bool Active { get; set; }
 

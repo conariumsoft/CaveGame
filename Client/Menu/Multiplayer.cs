@@ -44,7 +44,7 @@ namespace CaveGame.Client.Menu
 		MultiplayerInputHistory inputHistory;
 
 		public CaveGameGL Game { get; set; }
-		Game IGameContext.Game => Game;
+		Microsoft.Xna.Framework.Game IGameContext.Game => Game;
 
 		public bool Active { get; set; }
 
@@ -87,11 +87,11 @@ namespace CaveGame.Client.Menu
 				return;
 			}
 
-			//if (IPAddress.TryParse(address, out _) == false)
-			//{
+			if (IPAddress.TryParse(address, out IPAddress _) == false)
+			{
 			//	Timeout("Server Address is not valid!");
 			//	return;
-			//}
+			}
 
 			
 			Game.CurrentGameContext = Game.InWorldContext;
@@ -162,9 +162,9 @@ namespace CaveGame.Client.Menu
 				TextYAlign = TextYAlignment.Center,
 				TextXAlign = TextXAlignment.Center,
 			};
-			serverInputBox.Input.inputBuffer = inputHistory.IPAddress;
+			serverInputBox.Input.InputBuffer = inputHistory.IPAddress;
 			serverInputBox.Input.Focused = false;
-			serverInputBox.Input.cursorPosition = inputHistory.IPAddress.Length;
+			serverInputBox.Input.CursorPosition = inputHistory.IPAddress.Length;
 			//buttons.Children.Add(serverInputBox);
 
 			var usernameInputBox = new TextInputLabel
@@ -183,7 +183,7 @@ namespace CaveGame.Client.Menu
 				TextYAlign = TextYAlignment.Center,
 				TextXAlign = TextXAlignment.Center,
 			};
-			usernameInputBox.Input.inputBuffer = inputHistory.Username;
+			usernameInputBox.Input.InputBuffer = inputHistory.Username;
 			usernameInputBox.Input.BlacklistedCharacters.Add(' ');
 			usernameInputBox.Input.Focused = false;
 			//buttons.Children.Add(usernameInputBox);

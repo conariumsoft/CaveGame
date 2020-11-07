@@ -1,5 +1,5 @@
 ﻿using CaveGame.Client;
-using CaveGame.Core.Entities;
+using CaveGame.Core.Game.Entities;
 using CaveGame.Core.Generic;
 using CaveGame.Core.Tiles;
 using Microsoft.Xna.Framework;

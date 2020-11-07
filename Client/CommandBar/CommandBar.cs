@@ -154,7 +154,7 @@ namespace CaveGame.Core
 
 		TextInput inputBox;
 
-		Game _game;
+		Microsoft.Xna.Framework.Game _game;
 
 		public void LuaPrint(string data)
 		{
@@ -179,7 +179,7 @@ namespace CaveGame.Core
 
 		public bool Open { get; set; }
 
-		public CommandBar(Game game): base(game)
+		public CommandBar(Microsoft.Xna.Framework.Game game): base(game)
 		{
 			inputBox = new TextInput();
 			inputBox.ClearOnReturn = true;
@@ -235,9 +235,9 @@ namespace CaveGame.Core
 
 		public string InputBufferProcess(string s)
 		{
-			if (Math.Floor(inputBox.cursorTimer * 4) % 2 == 0)
+			if (Math.Floor(inputBox.CursorBlinkTimer * 4) % 2 == 0)
 			{
-				return s.Insert(inputBox.cursorPosition, "|");
+				return s.Insert(inputBox.CursorPosition, "|");
 			}
 			return s;
 		}
@@ -273,50 +273,84 @@ namespace CaveGame.Core
 			#endregion
 
 			//Draw message history
-			int iter = MessageHistory.Count;
-			lock(MessageHistory)
-			foreach (Message message in MessageHistory.ToArray())
+			
+			lock (MessageHistory)
 			{
-				spriteBatch.Print(message.TextColor, consolePosition + new Vector2(0,  (consoleSize.Y-20)-(iter*14)), message.Text);
-				iter--;
-			}
-
-			// Autocomplete suggestion
-			if (inputBox.inputBuffer != "" || autocompletemenuOpen == true) {
-				string cleaned = inputBox.inputBuffer;
-
-				foreach (Command cmd in Commands)
+				int iter = MessageHistory.Count;
+				int visIter = 1;
+				var history = MessageHistory.ToArray();
+				//history.Reverse();
+			//	foreach (Message message in history)
+				for (int i = MessageHistory.Count-1; i >= 0; i--)
 				{
-					if (cmd.Keyword.StartsWith(cleaned))
-					{
-						
-						spriteBatch.Print(new Color(0.5f, 0.5f, 0.0f), inputBoxPosition, InputBufferProcess(cmd.Keyword) + " " + GetArgsInfo(cmd));
-						break;
-					}
+					var message = history[i];
+					string text = message.Text.WrapText(GameFonts.Arial10, consoleSize.X);
+					visIter++;
+					visIter += text.Count(c => c == '\n');
+					spriteBatch.Print(message.TextColor, consolePosition + new Vector2(0, (consoleSize.Y - 20) - (visIter * 14)), text);
+					
 				}
-
-				// Command options
-				int autocompleteOptionIndex = 0;
-				foreach (Command cmd in Commands)
-					if (cmd.Keyword.StartsWith(cleaned))
-						autocompleteOptionIndex++;
-
-				if (autocompleteOptionIndex > 0)
-					spriteBatch.Rect(new Color(0.0f, 0.0f, 0.0f, 0.5f), inputBoxPosition - new Vector2(-5, (autocompleteOptionIndex+1) * 14), new Vector2(200, autocompleteOptionIndex * 14));
+			}
 				
-				var iterator2 = 0;
-				foreach (Command cmd in Commands)
-				{
-					if (cmd.Keyword.StartsWith(cleaned))
+				
+				
+			// Autocomplete suggestion
+			if (inputBox.SpecialSelection == false && (inputBox.InputBuffer != "" || autocompletemenuOpen == true)) {
+
+					string cleaned = inputBox.InputBuffer;
+
+					foreach (Command cmd in Commands)
 					{
-						spriteBatch.Print(new Color(1.0f, 1.0f, 0), inputBoxPosition - new Vector2(-5, (iterator2 + 2) * 14), cmd.Keyword + " " + GetArgsInfo(cmd));
-						iterator2++;
+						if (cmd.Keyword.StartsWith(cleaned))
+						{
+
+							spriteBatch.Print(new Color(0.5f, 0.5f, 0.0f), inputBoxPosition, InputBufferProcess(cmd.Keyword) + " " + GetArgsInfo(cmd));
+							break;
+						}
 					}
+
+					// Command options
+					int autocompleteOptionIndex = 0;
+					foreach (Command cmd in Commands)
+						if (cmd.Keyword.StartsWith(cleaned))
+							autocompleteOptionIndex++;
+
+					if (autocompleteOptionIndex > 0)
+						spriteBatch.Rect(new Color(0.0f, 0.0f, 0.0f, 0.2f), inputBoxPosition - new Vector2(-5, (autocompleteOptionIndex + 1) * 14), new Vector2(300, autocompleteOptionIndex * 14));
+
+					var iterator2 = 0;
+					foreach (Command cmd in Commands)
+					{
+						if (cmd.Keyword.StartsWith(cleaned))
+						{
+							spriteBatch.Print(new Color(1.0f, 1.0f, 0), inputBoxPosition - new Vector2(-5, (iterator2 + 2) * 14), cmd.Keyword + " " + GetArgsInfo(cmd));
+							iterator2++;
+						}
 				}
 			}
+				
 
-			// Input buffer
-			spriteBatch.Print(new Color(1.0f, 1.0f, 1.0f), inputBoxPosition, inputBox.DisplayText);
+			if (inputBox.SpecialSelection)
+			{
+				var font = GameFonts.Arial10;
+				var beforeText = inputBox.GetScissorTextBefore();
+				var middleText = inputBox.GetScissorTextDuring();
+				var afterText = inputBox.GetScissorTextAfter();
+				var start = font.MeasureString(beforeText);
+				var end = font.MeasureString(middleText);
+
+				spriteBatch.Rect(Color.Blue, inputBoxPosition + new Vector2(start.X, 0), end);
+
+				// first section
+				spriteBatch.Print(Color.White, inputBoxPosition, beforeText);
+				spriteBatch.Print(Color.Black, inputBoxPosition + new Vector2(start.X, 0), middleText);
+				spriteBatch.Print(Color.White, inputBoxPosition + new Vector2(start.X + end.X, 0), afterText);
+			} else
+			{
+				// Input buffer
+				spriteBatch.Print(new Color(1.0f, 1.0f, 1.0f), inputBoxPosition, inputBox.DisplayText);
+			}
+			
 
 			spriteBatch.End();
 		}
@@ -337,7 +371,7 @@ namespace CaveGame.Core
 
 				if (keyboard.IsKeyDown(Keys.Tab) && !previousKBState.IsKeyDown(Keys.Tab))
 				{
-					if (inputBox.inputBuffer == "")
+					if (inputBox.InputBuffer == "")
 					{
 						autocompletemenuOpen = !autocompletemenuOpen;
 					}
@@ -345,10 +379,10 @@ namespace CaveGame.Core
 					{
 						foreach (Command cmd in Commands)
 						{
-							if (cmd.Keyword.StartsWith(inputBox.inputBuffer))
+							if (cmd.Keyword.StartsWith(inputBox.InputBuffer))
 							{
-								inputBox.inputBuffer = cmd.Keyword;
-								inputBox.cursorPosition = inputBox.inputBuffer.Length;
+								inputBox.InputBuffer = cmd.Keyword;
+								inputBox.CursorPosition = inputBox.InputBuffer.Length;
 							}
 						}
 					}	
@@ -359,7 +393,7 @@ namespace CaveGame.Core
 				if (keyboard.IsKeyDown(Keys.Up) && !previousKBState.IsKeyDown(Keys.Up))
 				{
 					inputCurrent = Math.Max(inputCurrent - 1, 0);
-					inputBox.inputBuffer = CommandHistory[inputCurrent];
+					inputBox.InputBuffer = CommandHistory[inputCurrent];
 				}
 
 
@@ -368,9 +402,9 @@ namespace CaveGame.Core
 					inputCurrent = Math.Min(inputCurrent + 1, CommandHistory.Count);
 
 					if (inputCurrent == CommandHistory.Count)
-						inputBox.inputBuffer = "";
+						inputBox.InputBuffer = "";
 					else
-						inputBox.inputBuffer = CommandHistory[inputCurrent];
+						inputBox.InputBuffer = CommandHistory[inputCurrent];
 
 				}
 			}

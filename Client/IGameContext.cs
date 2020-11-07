@@ -5,8 +5,8 @@ namespace CaveGame.Client
 {
 	public interface IGameContext
 	{
-		public Game Game { get; }
-		public bool Active { get; set; }
+		Microsoft.Xna.Framework.Game Game { get; }
+		bool Active { get; set; }
 
 
 		void Load();

@@ -1,42 +1,23 @@
 ﻿using CaveGame;
 using CaveGame.Client.UI;
-using CaveGame.Core.FileUtil;
+using CaveGame.Core;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.Diagnostics;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Text;
+using System.Collections.Generic;
 
 namespace CaveGame.Client.Menu
 {
 
 	public class HomePage : IGameContext
 	{
-		static string[] UpdateLogInfo =
-		{
-			">>Open Multiplayer Test",
-			"<Version 2.1.0 - October 31st, 2k20",
-			"",
-			"Thank you for playing! Expect lots of bugs, weird issues, and missing content.",
-			"",
-			"Stay tuned for frequent updates and devlogs!",
-			"",
-			"If you'd like to get in touch, click the discord button to the left.",
-			"",
-			"~ Conarium Software"
-		};
-
 
 		public CaveGameGL Game { get; private set; }
 
 		public bool Active { get; set; }
 
-		Game IGameContext.Game => Game;
+		Microsoft.Xna.Framework.Game IGameContext.Game => Game;
 
 		UIRoot CurrentPage;
 		UIRoot MainMenu;
@@ -122,7 +103,7 @@ namespace CaveGame.Client.Menu
 				Position = new UICoords(-10, 0, 1f, 1f),
 				Parent = MainMenu,
 				TextColor = Color.White,
-				Text = "Multiplayer Open Beta (v2.1.0)",
+				Text = String.Format("Multiplayer Open Beta (v{0})", Globals.CurrentVersionString),
 				BorderSize = 0,
 				Font = GameFonts.Arial10,
 				TextWrap = false,
@@ -302,28 +283,45 @@ namespace CaveGame.Client.Menu
 				Parent = homeContent,
 			};
 
-			foreach(string text in UpdateLogInfo)
+			List<string> compiledLogs = new List<string>();
+			foreach(UpdateDescription update in Globals.UpdateLog)
+			{
+				compiledLogs.Add(">>" + update.UpdateName);
+				compiledLogs.Add("<version " + update.VersionString);
+				compiledLogs.Add("<" + update.Date);
+
+				compiledLogs.Add(">Change log:");
+				update.ChangeLog.ForEach(t => compiledLogs.Add(t));
+				compiledLogs.Add(">Additional notes:");
+				update.Notes.ForEach(t => compiledLogs.Add(t));
+			}
+
+
+			foreach(string text in compiledLogs)
 			{
 				string displayedText = text;
-				SpriteFont font = GameFonts.Arial12;
-				int size = 20;
-				if (text.StartsWith(">>"))
+				SpriteFont font = GameFonts.Arial10;
+				int size = 18;
+				if (text.StartsWith(">>>"))
 				{
 					font = GameFonts.Arial16;
-					size = 30;
+					size = 24;
 					displayedText = text.Replace(">>", "");
 				}
 				else if (text.StartsWith(">"))
 				{
 					font = GameFonts.Arial14;
-					size = 24;
+					size = 16;
 					displayedText = text.Replace(">", "");
-				}else if (text.StartsWith("<"))
+				}
+				else if (text.StartsWith(">"))
 				{
-					font = GameFonts.Arial10;
-					size = 10;
-					displayedText = text.Replace("<", "");
-				} else if (text.StartsWith("-"))
+					font = GameFonts.Arial14;
+					size = 16;
+					displayedText = text.Replace(">", "");
+
+				}
+				else if (text.StartsWith("-"))
 				{
 					font = GameFonts.Arial10;
 					size = 12;

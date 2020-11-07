@@ -13,12 +13,8 @@ using System.Threading.Tasks;
 
 namespace CaveGame.Client
 {
-
-	//Graph
-
 	public class NetworkClient
 	{
-
 		public IPEndPoint EndPoint
 		{
 			get {

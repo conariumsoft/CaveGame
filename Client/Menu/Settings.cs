@@ -47,7 +47,7 @@ namespace CaveGame.Client.Menu
 		}
 
 		public CaveGameGL Game { get; set; }
-		Game IGameContext.Game => Game;
+		Microsoft.Xna.Framework.Game IGameContext.Game => Game;
 
 
 		public bool Active { get; set; }
@@ -111,7 +111,7 @@ namespace CaveGame.Client.Menu
 			{
 				Parent = container,
 				TextColor = Color.White,
-				Text = "Fullscreen: "+ReadableBoolean(CaveGameGL.GameSettings.Fullscreen),
+				Text = "Fullscreen: "+ReadableBoolean(GameSettings.CurrentSettings.Fullscreen),
 				Font = GameFonts.Arial14,
 				Size = new UICoords(0, 25, 1, 0),
 				TextXAlign = TextXAlignment.Center,
@@ -121,10 +121,10 @@ namespace CaveGame.Client.Menu
 			};
 			void updateFullscreenBnt(TextButton b, MouseState m)
 			{
-				CaveGameGL.GameSettings.Fullscreen = !CaveGameGL.GameSettings.Fullscreen;
-				fullscreenBtn.Text = "Fullscreen: " + ReadableBoolean(CaveGameGL.GameSettings.Fullscreen);
-				CaveGameGL.GameSettings.Save();
-				Game.OnSetFullscreen(CaveGameGL.GameSettings.Fullscreen);
+				GameSettings.CurrentSettings.Fullscreen = !GameSettings.CurrentSettings.Fullscreen;
+				fullscreenBtn.Text = "Fullscreen: " + ReadableBoolean(GameSettings.CurrentSettings.Fullscreen);
+				GameSettings.CurrentSettings.Save();
+				Game.OnSetFullscreen(GameSettings.CurrentSettings.Fullscreen);
 				
 			}
 			fullscreenBtn.OnLeftClick += updateFullscreenBnt;
@@ -133,7 +133,7 @@ namespace CaveGame.Client.Menu
 			{
 				Parent = container,
 				TextColor = Color.White,
-				Text = "Particles: " + ReadableBoolean(CaveGameGL.GameSettings.Particles),
+				Text = "Particles: " + ReadableBoolean(GameSettings.CurrentSettings.Particles),
 				Font = GameFonts.Arial14,
 				Size = new UICoords(0, 25, 1, 0),
 				TextXAlign = TextXAlignment.Center,
@@ -143,13 +143,11 @@ namespace CaveGame.Client.Menu
 			};
 			void updateParticles(TextButton b, MouseState m)
 			{
-				particlesBtn.Text = "Particles: " + ReadableBoolean(CaveGameGL.GameSettings.Particles);
-				CaveGameGL.GameSettings.Particles = !CaveGameGL.GameSettings.Particles;
-				CaveGameGL.GameSettings.Save();
+				particlesBtn.Text = "Particles: " + ReadableBoolean(GameSettings.CurrentSettings.Particles);
+				GameSettings.CurrentSettings.Particles = !GameSettings.CurrentSettings.Particles;
+				GameSettings.CurrentSettings.Save();
 			}
 			particlesBtn.OnLeftClick += updateParticles;
-
-
 
 
 			Label fpsCapText = new Label
@@ -158,12 +156,12 @@ namespace CaveGame.Client.Menu
 				Parent = container,
 				Size = new UICoords(0, 25, 1, 0),
 				Font = GameFonts.Arial14,
-				Text = "Framerate Cap: " + GameSettingsData.FPSSlider[CaveGameGL.GameSettings.FPSCapIndex].Display,
+				Text = "Framerate Cap: " + GameSettings.CurrentSettings.FPSLimit,
 			};
 
 			Slider<SliderIndex<int>> fpsCapSlider = new UI.Slider<SliderIndex<int>>
 			{
-				DataSet = GameSettingsData.FPSSlider,
+				DataSet = GameSettings.FramerateCapSliderOptions,
 				Parent = container,
 				Size = new UICoords(0, 25, 0.5f, 0),
 				AnchorPoint = new Vector2(0.0f, 0.0f),
@@ -174,13 +172,14 @@ namespace CaveGame.Client.Menu
 			};
 			void onFpsCapSliderChanged(Slider<SliderIndex<int>> sl, SliderIndex<int> val, int index)
 			{
-				CaveGameGL.GameSettings.FPSCapIndex = index;
+				GameSettings.CurrentSettings.FPSLimitIndex = index;
+				GameSettings.CurrentSettings.FPSLimit = val.Value;
 				fpsCapText.Text = "FPS Cap:" + val.Display;
 				Game.OnSetFPSLimit(val.Value);
 				GameSounds.MenuBlip?.Play(0.8f, 1, 0.0f);
 			}
 			fpsCapSlider.OnValueChanged += onFpsCapSliderChanged;
-			fpsCapSlider.SetIndex(CaveGameGL.GameSettings.FPSCapIndex);
+			fpsCapSlider.SetIndex(GameSettings.CurrentSettings.FPSLimitIndex);
 
 			Label chatSizeText = new Label
 			{
@@ -188,11 +187,11 @@ namespace CaveGame.Client.Menu
 				Parent = container,
 				Size = new UICoords(0, 25, 1, 0),
 				Font = GameFonts.Arial14,
-				Text = "Chat Size: " + GameSettingsData.ChatSizeSlider[(int)CaveGameGL.GameSettings.ChatSize].Display,
+				Text = "Chat Size: " + GameSettings.ChatSizeSliderOptions[(int)GameSettings.CurrentSettings.ChatSize].Display,
 			};
 			Slider<SliderIndex<GameChatSize>> chatSizeSlider = new UI.Slider<SliderIndex<GameChatSize>>
 			{
-				DataSet = GameSettingsData.ChatSizeSlider,
+				DataSet = GameSettings.ChatSizeSliderOptions,
 				Parent = container,
 				Size = new UICoords(0, 25, 0.5f, 0),
 				AnchorPoint = new Vector2(0.0f, 0.0f),
@@ -203,13 +202,13 @@ namespace CaveGame.Client.Menu
 			};
 			void onChatSliderChanged(Slider<SliderIndex<GameChatSize>> sl, SliderIndex<GameChatSize> val, int index)
 			{
-				CaveGameGL.GameSettings.ChatSize = val.Value;
+				GameSettings.CurrentSettings.ChatSize = val.Value;
 				chatSizeText.Text = "Chat Size:" + val.Display;
 				Game.OnSetChatSize(val.Value);
 				GameSounds.MenuBlip?.Play(0.8f, 1, 0.0f);
 			}
 			chatSizeSlider.OnValueChanged += onChatSliderChanged;
-			chatSizeSlider.SetIndex((int)CaveGameGL.GameSettings.ChatSize);
+			chatSizeSlider.SetIndex((int)GameSettings.CurrentSettings.ChatSize);
 
 			void bindButtonClick(TextButton b, MouseState m)
 			{
@@ -219,15 +218,15 @@ namespace CaveGame.Client.Menu
 
 			void jumpRebind(Keys key)
 			{
-				CaveGameGL.GameSettings.JumpKey = key;
-				jumpKeybindButton.Text = "Jump: " + CaveGameGL.GameSettings.JumpKey.ToString();
+				GameSettings.CurrentSettings.JumpKey = key;
+				jumpKeybindButton.Text = "Jump: " + GameSettings.CurrentSettings.JumpKey.ToString();
 			}
 
 
 			jumpKeybindButton = new BindButton
 			{
 				TextColor = Color.White,
-				Text = "Jump: " + CaveGameGL.GameSettings.JumpKey.ToString(),
+				Text = "Jump: " + GameSettings.CurrentSettings.JumpKey.ToString(),
 				Font = GameFonts.Arial14,
 				Size = new UICoords(0, 25, 1, 0),
 				TextXAlign = TextXAlignment.Center,
@@ -242,14 +241,14 @@ namespace CaveGame.Client.Menu
 
 			void upRebind(Keys key)
 			{
-				CaveGameGL.GameSettings.MoveUpKey = key;
-				upKeybindButton.Text = "Climb/Up: " + CaveGameGL.GameSettings.MoveUpKey.ToString();
+				GameSettings.CurrentSettings.MoveUpKey = key;
+				upKeybindButton.Text = "Climb/Up: " + GameSettings.CurrentSettings.MoveUpKey.ToString();
 			}
 
 			upKeybindButton = new BindButton
 			{
 				TextColor = Color.White,
-				Text = "Climb/Up: " + CaveGameGL.GameSettings.MoveUpKey.ToString(),
+				Text = "Climb/Up: " + GameSettings.CurrentSettings.MoveUpKey.ToString(),
 				Font = GameFonts.Arial14,
 				Size = new UICoords(0, 25, 1, 0),
 				TextXAlign = TextXAlignment.Center,
@@ -266,7 +265,7 @@ namespace CaveGame.Client.Menu
 			BindButton downKeybindButton = new BindButton
 			{
 				TextColor = Color.White,
-				Text = "Descend/Down: " + CaveGameGL.GameSettings.MoveDownKey.ToString(),
+				Text = "Descend/Down: " + GameSettings.CurrentSettings.MoveDownKey.ToString(),
 				Font = GameFonts.Arial14,
 				Size = new UICoords(0, 25, 1, 0),
 				TextXAlign = TextXAlignment.Center,
@@ -277,8 +276,8 @@ namespace CaveGame.Client.Menu
 			};
 			void downRebind(Keys key)
 			{
-				CaveGameGL.GameSettings.MoveDownKey = key;
-				downKeybindButton.Text = "Descend/Down: " + CaveGameGL.GameSettings.MoveDownKey.ToString();
+				GameSettings.CurrentSettings.MoveDownKey = key;
+				downKeybindButton.Text = "Descend/Down: " + GameSettings.CurrentSettings.MoveDownKey.ToString();
 			}
 			downKeybindButton.OnLeftClick += bindButtonClick;
 			downKeybindButton.OnRebind += downRebind;
@@ -287,7 +286,7 @@ namespace CaveGame.Client.Menu
 			BindButton leftKeybindButton = new BindButton
 			{
 				TextColor = Color.White,
-				Text = "Walk Left: " + CaveGameGL.GameSettings.MoveLeftKey.ToString(),
+				Text = "Walk Left: " + GameSettings.CurrentSettings.MoveLeftKey.ToString(),
 				Font = GameFonts.Arial14,
 				Size = new UICoords(0, 25, 1, 0),
 				TextXAlign = TextXAlignment.Center,
@@ -298,8 +297,8 @@ namespace CaveGame.Client.Menu
 			};
 			void leftRebind(Keys key)
 			{
-				CaveGameGL.GameSettings.MoveLeftKey = key;
-				leftKeybindButton.Text = "Walk Left: " + CaveGameGL.GameSettings.MoveLeftKey.ToString();
+				GameSettings.CurrentSettings.MoveLeftKey = key;
+				leftKeybindButton.Text = "Walk Left: " + GameSettings.CurrentSettings.MoveLeftKey.ToString();
 			}
 			leftKeybindButton.OnLeftClick += bindButtonClick;
 			leftKeybindButton.OnRebind += leftRebind;
@@ -307,7 +306,7 @@ namespace CaveGame.Client.Menu
 			BindButton rightKeybindButton = new BindButton
 			{
 				TextColor = Color.White,
-				Text = "Walk Right: " + CaveGameGL.GameSettings.MoveRightKey.ToString(),
+				Text = "Walk Right: " + GameSettings.CurrentSettings.MoveRightKey.ToString(),
 				Font = GameFonts.Arial14,
 				Size = new UICoords(0, 25, 1, 0),
 				TextXAlign = TextXAlignment.Center,
@@ -318,8 +317,8 @@ namespace CaveGame.Client.Menu
 			};
 			void rightRebind(Keys key)
 			{
-				CaveGameGL.GameSettings.MoveRightKey = key;
-				rightKeybindButton.Text = "Walk Right: " + CaveGameGL.GameSettings.MoveRightKey.ToString();
+				GameSettings.CurrentSettings.MoveRightKey = key;
+				rightKeybindButton.Text = "Walk Right: " + GameSettings.CurrentSettings.MoveRightKey.ToString();
 			}
 			rightKeybindButton.OnLeftClick += bindButtonClick;
 			rightKeybindButton.OnRebind += rightRebind;

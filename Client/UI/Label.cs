@@ -1,8 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CaveGame.Core;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace CaveGame.Client.UI
@@ -35,6 +37,36 @@ namespace CaveGame.Client.UI
 		{
 			ListenTextInput?.Invoke(sender, args);
 		}
+
+		public static string WrapText(this string text, SpriteFont spriteFont, float maxLineWidth)
+		{
+			string[] words = text.Split(' ');
+			StringBuilder sb = new StringBuilder();
+			float lineWidth = 0f;
+			float spaceWidth = spriteFont.MeasureString(" ").X;
+
+	
+
+
+
+			foreach (string word in words)
+			{
+				Vector2 size = spriteFont.MeasureString(word);
+
+				if (lineWidth + size.X < maxLineWidth)
+				{
+					sb.Append(word + " ");
+					lineWidth += size.X + spaceWidth;
+				}
+				else
+				{
+					sb.Append("\n" + word + " ");
+					lineWidth = size.X + spaceWidth;
+				}
+			}
+
+			return sb.ToString();
+		}
 	} 
 
 	public class TextInputLabel : Label
@@ -58,6 +90,8 @@ namespace CaveGame.Client.UI
 			BackgroundText = "";
 			BackgroundTextColor = Color.Gray;
 		}
+
+		
 
 
 		private bool IsMouseInside(MouseState mouse)
@@ -96,7 +130,6 @@ namespace CaveGame.Client.UI
 
 		public override void Draw(SpriteBatch sb)
 		{
-			base.Draw(sb);
 			Vector2 textDim = Font.MeasureString(BackgroundText);
 			Vector2 TextOutputPosition = AbsolutePosition;
 
@@ -119,8 +152,32 @@ namespace CaveGame.Client.UI
 				TextOutputPosition += new Vector2(0, AbsoluteSize.Y - textDim.Y);
 			}
 
+
 			TextOutputPosition.Floor();
-			if (Input.inputBuffer == "")
+			
+
+			if (Input.SpecialSelection)
+			{
+				
+				base.Draw(sb, true);
+				var beforeText = Input.GetScissorTextBefore();
+				var middleText = Input.GetScissorTextDuring();
+				var afterText = Input.GetScissorTextAfter();
+				var start = Font.MeasureString(beforeText);
+				var end = Font.MeasureString(middleText);
+
+				sb.Rect(Color.Blue, TextOutputPosition + new Vector2(start.X, 0), end);
+
+				// first section
+				sb.Print(Font, TextColor, TextOutputPosition,  beforeText);
+				sb.Print(Font, Color.Black, TextOutputPosition + new Vector2(start.X, 0), middleText);
+				sb.Print(Font, TextColor, TextOutputPosition + new Vector2(start.X + end.X, 0), afterText);
+			} else
+			{
+				base.Draw(sb);
+			}
+			
+			if (Input.InputBuffer == "")
 			{
 				sb.Print(Font, BackgroundTextColor, TextOutputPosition, BackgroundText);
 			}
@@ -204,23 +261,25 @@ namespace CaveGame.Client.UI
 			return Font.MeasureString(Text);
 		}
 
-		public override void Draw(SpriteBatch sb)
+		public void Draw(SpriteBatch sb, bool TextOverride = false)
 		{
-
-			
-
 			base.Draw(sb);
+			if (TextOverride)
+				return;
+
+
+
 			string DisplayedText = Text;
 			if (TextWrap)
 				DisplayedText = WrapText(Font, Text, AbsoluteSize.X);
 
-			Vector2 textDim =  Font.MeasureString(DisplayedText);
+			Vector2 textDim = Font.MeasureString(DisplayedText);
 			Vector2 TextOutputPosition = AbsolutePosition;
 
 			// Text Alignment
 			if (TextXAlign == TextXAlignment.Center)
 			{
-				TextOutputPosition += new Vector2((AbsoluteSize.X / 2) - (textDim.X/2), 0);
+				TextOutputPosition += new Vector2((AbsoluteSize.X / 2) - (textDim.X / 2), 0);
 			}
 			if (TextXAlign == TextXAlignment.Right)
 			{
@@ -229,7 +288,7 @@ namespace CaveGame.Client.UI
 
 			if (TextYAlign == TextYAlignment.Center)
 			{
-				TextOutputPosition += new Vector2(0, (AbsoluteSize.Y / 2) - (textDim.Y/2));
+				TextOutputPosition += new Vector2(0, (AbsoluteSize.Y / 2) - (textDim.Y / 2));
 			}
 			if (TextYAlign == TextYAlignment.Bottom)
 			{
@@ -237,6 +296,11 @@ namespace CaveGame.Client.UI
 			}
 			TextOutputPosition.Floor();
 			sb.Print(Font, TextColor, TextOutputPosition, DisplayedText);
+		}
+
+		public override void Draw(SpriteBatch sb)
+		{
+			Draw(sb, false);
 		}
 	}
 }

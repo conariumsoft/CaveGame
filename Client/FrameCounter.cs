@@ -16,7 +16,7 @@ namespace CaveGame.Core
 		int frames;
 		double averageFramerate;
 
-		public FrameCounter(Game game): base(game)
+		public FrameCounter(Microsoft.Xna.Framework.Game game): base(game)
 		{
 			frames = 0;
 			framerate = 0;

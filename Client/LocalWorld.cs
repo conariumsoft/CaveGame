@@ -1,5 +1,5 @@
 ﻿using CaveGame.Core;
-using CaveGame.Core.Entities;
+using CaveGame.Core.Game.Entities;
 using CaveGame.Core.Generic;
 using CaveGame.Core.Particles;
 using CaveGame.Core.Tiles;
@@ -14,32 +14,11 @@ using System.Threading.Tasks;
 
 namespace CaveGame.Client
 {
-	
-	public struct LightMatrix
-	{
-		public Light3[,] Lights;
-
-
-		public LightMatrix(int size)
-		{
-			Lights = new Light3[size, size];
-		}
-
-		public Light3 this[int x, int y]
-		{
-			get { return Lights[x, y]; }
-			set { Lights[x, y] = value; }
-		}
-
-	}
-
-	
-
 
 	public class LocalWorld : World, IClientWorld
 	{
 
-		public ParticleEmitter ParticleSystem;
+		public ParticleEmitter ParticleSystem { get; set; }
 
 
 		public List<ChunkCoordinates> RequestedChunks;
@@ -61,17 +40,15 @@ namespace CaveGame.Client
 			Lighting.On();
 		}
 
+
+		public void ClientDisconnect()
+		{
+			Lighting.Off();
+		}
+
 		public void UnloadChunk(ChunkCoordinates coords) {}
 
 		Random r = new Random();
-
-		private static void Repeat(Action a, int times)
-		{
-			for (int i = 0; i<times; i++)
-			{
-				a.Invoke();
-			}
-		}
 
 		public Light3 Ambience
 		{ 

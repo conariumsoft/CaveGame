@@ -24,7 +24,9 @@ namespace CaveGame.Client
 		public const int OpenMessageHistory = 15;
 		public const int ClosedMessageHistory = 5;
 		public bool Open { get; set; }
-		public GameChatSize ChatSize => CaveGameGL.GameSettings.ChatSize;
+		public GameChatSize ChatSize => GameSettings.CurrentSettings.ChatSize;
+
+		GameClient Client;
 		public GameChat(GameClient client) {
 
 			inputBox = new TextInput();
@@ -34,16 +36,21 @@ namespace CaveGame.Client
 			MessageHistory = new List<Message>();
 			Open = false;
 			TextInputManager.ListenTextInput += OnTextInput;
+			Client = client;
 		}
 
 		public void OnTextInput(object sender, TextInputEventArgs args)
 		{
+			if (Client.Game.Console.Open)
+				return;
 
 			if (args.Key == Keys.Escape || args.Key == Keys.Tab || args.Key == Keys.OemTilde)
 				return;
 
 			if (!Open)
 				return;
+
+			
 
 			inputBox.OnTextInput(sender, args);
 
@@ -65,7 +72,7 @@ namespace CaveGame.Client
 		public void Update(GameTime gt)
 		{
 			KeyboardState kb = Keyboard.GetState();
-			if (kb.IsKeyDown(Keys.T) && Open == false)
+			if (kb.IsKeyDown(Keys.T) && Open == false && Client.Game.Console.Open == false)
 			{
 				Open = true;
 				return;
@@ -105,11 +112,11 @@ namespace CaveGame.Client
 
 			#region Draw box
 			Color backgroundColor = new Color(0, 0, 0, 0.75f);
-			Vector2 chatsize = new Vector2(400, 15*14);
-			Vector2 chatpos = new Vector2(0, GameGlobals.Height - 20 - (15 * textHeight));
+			Vector2 chatsize = new Vector2(500, 15* textHeight);
+			Vector2 chatpos = new Vector2(0, GameGlobals.Height - 30 - (15 * textHeight));
 
 			Color inputBoxColor = new Color(0.15f, 0.15f, 0.25f);
-			Vector2 inputBoxPosition = new Vector2(0, GameGlobals.Height-20);
+			Vector2 inputBoxPosition = new Vector2(0, GameGlobals.Height-30);
 			Vector2 inputBoxSize = new Vector2(chatsize.X, 20);
 			spriteBatch.Begin();
 			if (Open)
@@ -141,7 +148,29 @@ namespace CaveGame.Client
 
 			if (Open)
 			{
-				spriteBatch.Print(font, new Color(1.0f, 1.0f, 1.0f), inputBoxPosition, inputBox.DisplayText);
+				//TODO:  duplicate code occurs in Label.cs, consider refactoring
+				if (inputBox.SpecialSelection)
+				{
+					var beforeText = inputBox.GetScissorTextBefore();
+					var middleText = inputBox.GetScissorTextDuring();
+					var afterText = inputBox.GetScissorTextAfter();
+					var start = font.MeasureString(beforeText);
+					var end = font.MeasureString(middleText);
+					//var final = font.MeasureString(afterText);
+
+					//Debug.WriteLine("{0}|{1}|{2}", beforeText, middleText, afterText);
+
+					spriteBatch.Rect(Color.Blue, inputBoxPosition + new Vector2(start.X, 0), end);
+
+					// first section
+					spriteBatch.Print(font, Color.White, inputBoxPosition, beforeText);
+					spriteBatch.Print(font, Color.Black, inputBoxPosition + new Vector2(start.X, 0), middleText);
+					spriteBatch.Print(font, Color.White, inputBoxPosition + new Vector2(start.X + end.X, 0), afterText);
+				} else
+				{
+					spriteBatch.Print(font, new Color(1.0f, 1.0f, 1.0f), inputBoxPosition, inputBox.DisplayText);
+				}
+				
 			}
 			
 

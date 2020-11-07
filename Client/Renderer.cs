@@ -1,5 +1,5 @@
 ﻿using CaveGame;
-using CaveGame.Core.Entities;
+using CaveGame.Core.Game.Entities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -76,11 +76,11 @@ namespace CaveGame.Client
 
 
 		static Texture2D _pixel;
-		static Game _game;
+		static Microsoft.Xna.Framework.Game _game;
 		static BasicEffect _effect3D;
 
 
-		public static void Initialize(Game game)
+		public static void Initialize(Microsoft.Xna.Framework.Game game)
 		{
 			_game = game;
 

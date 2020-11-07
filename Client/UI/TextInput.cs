@@ -1,13 +1,76 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CaveGame.Core;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
+using TextCopy;
 
 namespace CaveGame.Client.UI
 {
+	// clipboard support provided by: https://github.com/CopyText/TextCopy
+
+	public class KeyPressWrapper
+	{
+
+		KeyboardState previousKB = Keyboard.GetState();
+		KeyboardState currentKB = Keyboard.GetState();
+		Keys listenFor;
+
+		const float initialPressRepeatDelay = 0.4f;
+		const float repeatDelay = 0.05f;
+
+		float initialPressTimer;
+		float repeatTimer;
+
+		bool startRepeating;
+
+		public KeyPressWrapper(Keys key)
+		{
+			listenFor = key;
+		}
+		//private bool JustPressed(Keys key) => currentKB.IsKeyDown(key) && !previousKB.IsKeyDown(key);
+		public bool KeySignal { get; private set; }
+
+		public void Update(GameTime gt)
+		{
+			currentKB = Keyboard.GetState();
+
+			KeySignal = false;
+
+			if (currentKB.IsKeyDown(listenFor))
+			{
+				if (initialPressTimer == initialPressRepeatDelay)
+				{
+					KeySignal = true;
+				}
+
+				if (initialPressTimer > 0)
+				{
+					initialPressTimer -= gt.GetDelta();
+				} else
+				{
+					repeatTimer -= gt.GetDelta();
+
+					if (repeatTimer <= 0)
+					{
+						KeySignal = true;
+						repeatTimer = repeatDelay;
+					}
+				}
+			} else
+			{
+				initialPressTimer = initialPressRepeatDelay;
+				repeatTimer = repeatDelay;
+				KeySignal = false;
+			}
 
 
+
+			previousKB = currentKB;
+		}
+	}
 
 	public interface ITextProvider
 	{
@@ -23,11 +86,20 @@ namespace CaveGame.Client.UI
 		public delegate void TextInputHandler(object sender, string text);
 
 		public event TextInputHandler Handler;
-		public string inputBuffer;
-		public float cursorTimer;
-		public int cursorPosition;
-		public bool Focused;
-		public string InternalText { get { return inputBuffer; } }
+		public string InputBuffer { get; set; }
+		public float CursorBlinkTimer { get; set; }
+		public int CursorPosition { get; set; }
+		public bool Focused { get; set; }
+
+		public bool SpecialSelection { get; set; }
+		public int SpecialSelectionLower { get; set; }
+		public int SpecialSelectionUpper { get; set; }
+
+		public string GetScissorTextBefore() => InputBuffer.Substring(0, SpecialSelectionLower);
+		public string GetScissorTextDuring() => InputBuffer.Substring(SpecialSelectionLower, SpecialSelectionUpper - SpecialSelectionLower);
+		public string GetScissorTextAfter() => InputBuffer.Substring(SpecialSelectionUpper);
+
+		public string InternalText { get { return InputBuffer; } }
 		public List<char> BlacklistedCharacters;
 
 
@@ -37,23 +109,29 @@ namespace CaveGame.Client.UI
 		{
 			get
 			{
-				if (Math.Floor(cursorTimer * 4) % 2 == 0)
+				if (Math.Floor(CursorBlinkTimer * 4) % 2 == 0)
 				{
-					return inputBuffer.Insert(cursorPosition, "|");
+					return InputBuffer.Insert(CursorPosition, "|");
 				}
-				return inputBuffer;
+				return InputBuffer;
 			}
 		}
 
-		KeyboardState previousKB;
+		KeyboardState previousKB = Keyboard.GetState();
+		KeyboardState currentKB = Keyboard.GetState();
 
+		KeyPressWrapper xKeyHandler = new KeyPressWrapper(Keys.X);
+		KeyPressWrapper cKeyHandler = new KeyPressWrapper(Keys.C);
+		KeyPressWrapper vKeyHandler = new KeyPressWrapper(Keys.V);
+		KeyPressWrapper leftArrowHandler = new KeyPressWrapper(Keys.Left);
+		KeyPressWrapper rightArrowHandler = new KeyPressWrapper(Keys.Right);
 		public TextInput()
 		{
 			BlacklistedCharacters = new List<char>();
 			Focused = true;
-			cursorPosition = 0;
-			cursorTimer = 0;
-			inputBuffer = "";
+			CursorPosition = 0;
+			CursorBlinkTimer = 0;
+			InputBuffer = "";
 
 		}
 
@@ -61,52 +139,153 @@ namespace CaveGame.Client.UI
 		{
 			if (Focused)
 			{
+				
+
 				if (BlacklistedCharacters.Contains(args.Character))
 					return;
 
+
 				if (args.Key == Keys.Enter)
 				{
-					Handler?.Invoke(this, inputBuffer);
+					Handler?.Invoke(this, InputBuffer);
 					if (ClearOnReturn)
 					{
-						inputBuffer = "";
-						cursorPosition = 0;
+						SpecialSelection = false;
+						InputBuffer = "";
+						CursorPosition = 0;
 					}
 					return;
 				}
 				if (args.Key == Keys.Back)
 				{
-					if (cursorPosition > 0)
+					if (SpecialSelection)
 					{
-						inputBuffer = inputBuffer.Remove(cursorPosition - 1);
-						cursorPosition--;
+						InputBuffer = InputBuffer.Remove(SpecialSelectionLower, SpecialSelectionUpper - SpecialSelectionLower);
+						CursorPosition = SpecialSelectionLower;
+						SpecialSelection = false;
+						return;
+					} else
+					{
+						if (CursorPosition > 0)
+						{
+							InputBuffer = InputBuffer.Remove(CursorPosition - 1);
+							CursorPosition--;
+						}
+						return;
 					}
-					return;
+					
 				}
-				inputBuffer = inputBuffer.Insert(cursorPosition, args.Character.ToString());
-				cursorPosition += 1;
+				InputBuffer = InputBuffer.Insert(CursorPosition, args.Character.ToString());
+				CursorPosition += 1;
 			}
 			
 		}
 
+		private bool JustPressed(Keys key) => currentKB.IsKeyDown(key) && !previousKB.IsKeyDown(key);
+
+
 
 		public void Update(GameTime gameTime)
 		{
-			KeyboardState keyboard = Keyboard.GetState();
+			leftArrowHandler.Update(gameTime);
+			rightArrowHandler.Update(gameTime);
+
+
+			currentKB = Keyboard.GetState();
 
 			float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-			cursorTimer += delta;
+			CursorBlinkTimer += delta;
 
-			if (keyboard.IsKeyDown(Keys.Left) && !previousKB.IsKeyDown(Keys.Left))
-				cursorPosition--;
+			if (SpecialSelection)
+				Debug.WriteLine("lower {0}, upper {1}", SpecialSelectionLower, SpecialSelectionUpper);
 
-			if (keyboard.IsKeyDown(Keys.Right) && !previousKB.IsKeyDown(Keys.Right))
-				cursorPosition++;
 
-			cursorPosition = Math.Max(cursorPosition, 0);
-			cursorPosition = Math.Min(cursorPosition, inputBuffer.Length);
+			if (currentKB.IsKeyDown(Keys.LeftControl))
+			{
 
-			previousKB = keyboard;
+				if (JustPressed(Keys.C))
+				{
+					if (SpecialSelection)
+						ClipboardService.SetText(InputBuffer.Substring(SpecialSelectionLower, SpecialSelectionUpper - SpecialSelectionLower));
+					else
+						ClipboardService.SetText(InputBuffer);
+				}
+				if (JustPressed(Keys.V))
+				{
+					
+					if (ClipboardService.GetText() != null)
+					{
+						InputBuffer = InputBuffer.Insert(CursorPosition, ClipboardService.GetText());
+						CursorPosition += ClipboardService.GetText().Length;
+					}
+					SpecialSelection = false;
+				}
+				if (JustPressed(Keys.X))
+				{
+					if (SpecialSelection)
+					{
+						ClipboardService.SetText(InputBuffer.Substring(SpecialSelectionLower, SpecialSelectionUpper - SpecialSelectionLower));
+						InputBuffer = InputBuffer.Remove(SpecialSelectionLower, SpecialSelectionUpper - SpecialSelectionLower);
+					}else
+					{
+						ClipboardService.SetText(InputBuffer);
+						InputBuffer = "";
+						CursorPosition = 0;
+					}
+					SpecialSelection = false;
+				}
+
+			}
+
+
+
+			if (leftArrowHandler.KeySignal)
+			{
+				if (currentKB.IsKeyDown(Keys.LeftShift))
+				{
+
+					if (SpecialSelection == false)
+					{
+						SpecialSelectionUpper = CursorPosition;
+					}
+					SpecialSelection = true;
+					CursorPosition--;
+					CursorPosition = Math.Max(CursorPosition, 0);
+					SpecialSelectionLower = CursorPosition;
+				} else
+				{
+					SpecialSelection = false;
+					CursorPosition--;
+				}
+				
+			}
+
+
+			if (rightArrowHandler.KeySignal)
+			{
+				if (currentKB.IsKeyDown(Keys.LeftShift))
+				{
+					if (SpecialSelection == false)
+					{
+						SpecialSelectionLower = CursorPosition;
+					}
+					SpecialSelection = true;
+					CursorPosition++;
+					CursorPosition = Math.Min(CursorPosition, InputBuffer.Length);
+					SpecialSelectionUpper = CursorPosition;
+				}
+				else
+				{
+					SpecialSelection = false;
+					CursorPosition++;
+				}
+			}
+				
+
+			CursorPosition = Math.Max(CursorPosition, 0);
+			CursorPosition = Math.Min(CursorPosition, InputBuffer.Length);
+
+			previousKB = currentKB;
 
 		}
 	}

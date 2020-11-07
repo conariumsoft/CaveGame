@@ -10,7 +10,7 @@ namespace CaveGame.Client
 
 	public class InputManager: GameComponent
 	{
-		public InputManager(Game game) : base(game)
+		public InputManager(Microsoft.Xna.Framework.Game game) : base(game)
 		{
 
 		}

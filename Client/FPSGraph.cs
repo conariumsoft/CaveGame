@@ -23,7 +23,7 @@ namespace CaveGame.Client
 
 		public Vector2 Position;
 
-		public FPSGraph(Game game, int pollrate, int samplecount) : base(game)
+		public FPSGraph(Microsoft.Xna.Framework.Game game, int pollrate, int samplecount) : base(game)
 		{
 			Position = new Vector2(0, 0);
 			PollingRate = pollrate;

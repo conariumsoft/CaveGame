@@ -129,8 +129,6 @@ namespace CaveGame.Client.UI
 			prevMouse = mouse;
 
 
-			
-
 			base.Update(gt);
 		}
 

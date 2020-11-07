@@ -11,7 +11,7 @@ namespace CaveGame.Client.Menu
 	public class TimeoutMenu : IGameContext
 	{
 		public CaveGameGL Game { get; set; }
-		Game IGameContext.Game => Game;
+		Microsoft.Xna.Framework.Game IGameContext.Game => Game;
 
 		UIRoot TimeoutPage;
 
