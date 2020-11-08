@@ -38,9 +38,10 @@ namespace CaveGame.Client
 		public Item[] ItemSet =
 		{
 			new TileItem(new Core.Tiles.Stone()),
+			new TileItem(new Core.Tiles.Glass()),
 			new TileItem(new Grass()),
 			new TileItem(new Mycelium()),
-			new TileItem(new Core.Tiles. Dirt()),
+			new TileItem(new Core.Tiles.Dirt()),
 			new TileItem(new Leaves()),
 			new TileItem(new Core.Tiles.ClayBrick()),
 			new TileItem(new Core.Tiles.StoneBrick()),
@@ -48,8 +49,10 @@ namespace CaveGame.Client
 			new TileItem(new RedTorch()),
 			new TileItem(new BlueTorch()),
 			new TileItem(new GreenTorch()),
-			new TileItem(new YellowTorch()),
 			new TileItem(new Core.Tiles.OakPlank()),
+			new TileItem(new Core.Tiles.PinePlank()),
+			new TileItem(new Core.Tiles.RedwoodPlank()),
+			new TileItem(new Core.Tiles.EbonyPlank()),
 			new TileItem(new CopperOre()),
 			new TileItem(new UraniumOre()),
 			new TileItem(new CobaltOre()),

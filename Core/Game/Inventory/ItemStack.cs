@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace CaveGame.Core.Inventory
 {
@@ -25,12 +26,34 @@ namespace CaveGame.Core.Inventory
 	}
 
 
-	public class ItemContainer
+	public class Container
 	{
 		private ItemStack[,] slots;
-		public ItemContainer(int x, int y)
+
+		public int Width { get; private set; }
+		public int Height { get; private set; }
+
+		public Container(int width, int height)
 		{
-			slots = new ItemStack[x, y];
+			Width = width;
+			Height = height;
+			slots = new ItemStack[Width, Height];
+		}
+
+		public bool HasItem(Item search, int quantity = 1)
+		{
+			for (int x = 0; x < Width; x++)
+				for (int y = 0; y < Height; y++)
+					if (slots[x, y].Item.GetType().Equals(search.GetType()))
+						if (slots[x, y].Quantity >= quantity)
+							return true;
+			return false;
+		}
+
+
+		public bool AddItem()
+		{
+			return false;
 		}
 
 	}

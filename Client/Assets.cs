@@ -1,8 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using KeraLua;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
+using NLua;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -84,7 +86,7 @@ namespace CaveGame.Client
 
 	public static class AssetLoader
 	{
-		public static Texture2D FromStream(GraphicsDevice GraphicsProcessor, Stream DataStream)
+		private static Texture2D FromStream(GraphicsDevice GraphicsProcessor, Stream DataStream)
 		{
 
 			Texture2D Asset = Texture2D.FromStream(GraphicsProcessor, DataStream);
@@ -101,7 +103,6 @@ namespace CaveGame.Client
 		{
 			return FromStream(device, TitleContainer.OpenStream(filepath));
 		}
-
 
 	}
 
@@ -122,6 +123,9 @@ namespace CaveGame.Client
 
 		public static void LoadAssets(GraphicsDevice graphicsDevice)
 		{
+
+
+
 			foreach (var tex in Directory.GetFiles("Assets/Items/", "*.png"))
 			{
 				Texture2D loaded = AssetLoader.LoadTexture(graphicsDevice, tex);
@@ -135,6 +139,10 @@ namespace CaveGame.Client
 				Textures.Add(textureMeta.Name, loaded);
 			}
 		}
+ 
+
+		
+
 
 		public static Texture2D Bomb		=> Textures["bomb.png"];
 		public static Texture2D Bong		=> Textures["bong.png"];
@@ -155,7 +163,9 @@ namespace CaveGame.Client
 		public static Texture2D ForestPainting=>Textures["forestpainting.png"];
 		public static Texture2D Ingot		=> Textures["ingot.png"];
 		public static Texture2D Leggings	=> Textures["leggings.png"];
-		public static Texture2D Furnace => Textures["furnace.png"];
+		public static Texture2D Furnace		=> Textures["furnace.png"];
+		public static Texture2D Campfire	=> Textures["campfire.png"];
+		//public static Texture2D Campfire	=> Textures["campfire.png"];
 	}
 
 	public struct TextureMeta

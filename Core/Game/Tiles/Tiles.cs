@@ -35,7 +35,10 @@ namespace CaveGame.Core.Tiles
 		Snow, Ice, Mycelium, CryingLily, BlueMushroom, Poppy, BlueTallgrass, BlueVine,
 		ArsenicOre, GalliumOre, 
 		BlackEyedSusan, Chrysanthemum, ForgetMeNot, Honeysuckle, Hydrangea, Lily,
-		Magnolia,Orchid,Plumeria,Tulip, HexenRoses
+		Magnolia,Orchid,Plumeria,Tulip, HexenRoses,
+
+
+		Glass,
 		//GermanOccupiedTerritory,
 		//FurniturePointer = 254
 	}
@@ -941,9 +944,73 @@ namespace CaveGame.Core.Tiles
 	public class GreenPlastic : Plastic { }
 #endregion
 #region Stone&Bricks
-	public class Stone : Tile
+	public class Stone : Tile, ILocalTileUpdate
 	{
 		public Stone() : base(TileDefinitions.Stone) { }
+
+		private void DrawMask(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color, int rotation, Rectangle quad, Color tilecolor)
+		{
+			//if (GameGlobals.GraphicsDevice != null)
+			//{
+				var position = new Vector2(x * Globals.TileSize, y * Globals.TileSize);
+				var pixels4 = new Vector2(4, 4);
+
+				sb.Draw(tilesheet, position + pixels4, quad, color.MultiplyAgainst(tilecolor), MathHelper.ToRadians(rotation), new Vector2(4, 4), 1, SpriteEffects.None, 1);
+		//	}
+		}
+
+		private void DrawDirtMask(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color, int rotation)
+		{
+			DrawMask(tilesheet, sb, x, y, color, rotation, TileMap.DirtFading, TileDefinitions.Dirt.Color);
+		}
+
+
+		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		{
+			var position = new Vector2(x * Globals.TileSize, y * Globals.TileSize);
+
+			sb.Draw(tilesheet, position, Quad, color.MultiplyAgainst(Color));
+
+			//sb.End();
+
+			if (TileState.Get(0)) // Top Dirt
+				DrawDirtMask(tilesheet, sb, x, y, color, 0);
+			if (TileState.Get(1)) // Bottom Dirt
+				DrawDirtMask(tilesheet, sb, x, y, color, 180);
+			if (TileState.Get(2)) // Left Dirt
+				DrawDirtMask(tilesheet, sb, x, y, color, 270);
+			if (TileState.Get(3)) // Right Dirt
+				DrawDirtMask(tilesheet, sb, x, y, color, 90);
+
+			//sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+		}
+
+
+		public void LocalTileUpdate(IGameWorld world, int x, int y)
+		{
+			var top = world.GetTile(x, y - 1);
+			var bottom = world.GetTile(x, y + 1);
+			var left = world.GetTile(x - 1, y);
+			var right = world.GetTile(x + 1, y);
+
+			byte val = 0;
+
+			if (top is Dirt || top is Grass || top is Mycelium)
+				val.Set(0, true);
+			if (bottom is Dirt || bottom is Grass || bottom is Mycelium)
+				val.Set(1, true);
+			if (left is Dirt || left is Grass || left is Mycelium)
+				val.Set(2, true);
+			if (right is Dirt || right is Grass || right is Mycelium)
+				val.Set(3, true);
+
+			if (val != TileState)
+			{
+				TileState = val;
+				world.DoUpdatePropogation(x, y);
+			}
+			
+		}
 	}
 	public class Sandstone : Tile
 	{
@@ -954,8 +1021,52 @@ namespace CaveGame.Core.Tiles
 
 		public void LocalTileUpdate(IGameWorld world, int x, int y)
 		{
-			throw new NotImplementedException();
+			bool emptytop = IsEmpty(world, x, y - 1);
+			bool emptybottom = IsEmpty(world, x, y + 1);
+			bool emptyleft = IsEmpty(world, x - 1, y);
+			bool emptyright = IsEmpty(world, x + 1, y);
+
+			byte newNumber = TileState;
+			newNumber.Set(3, emptyright);
+			newNumber.Set(2, emptybottom);
+			newNumber.Set(1, emptyleft);
+			newNumber.Set(0, emptytop);
+
+			if (TileState != newNumber)
+			{
+				TileState = newNumber;
+				world.DoUpdatePropogation(x, y);
+			}
 		}
+
+		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		{
+			var gx = TileMap.Glass.X;
+			var gy = TileMap.Glass.Y;
+			var top = new Rectangle(gx, gy, 8, 1);
+			var left = new Rectangle(gx, gy, 1,8);
+			var bottom = new Rectangle(gx, gy+7, 8, 1);
+			var right = new Rectangle(gx+7, gy, 1, 8);
+
+			Vector2 position = new Vector2(x * Globals.TileSize, y * Globals.TileSize);
+
+
+			sb.Draw(tilesheet, position, TileMap.GlassBG, color.MultiplyAgainst(Color));
+
+			if (TileState.Get(3)) // Right
+				sb.Draw(tilesheet, position + new Vector2(7, 0), right, color.MultiplyAgainst(Color));
+
+			if (TileState.Get(2)) // Bottom
+				sb.Draw(tilesheet, position + new Vector2(0, 7), bottom, color.MultiplyAgainst(Color));
+
+			if (TileState.Get(1)) // Left
+				sb.Draw(tilesheet, position, left, color.MultiplyAgainst(Color));
+
+			if (TileState.Get(0)) // Top
+				sb.Draw(tilesheet, position, top, color.MultiplyAgainst(Color));
+		}
+		//sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), TileMap.Soil, color.MultiplyAgainst(Color.SaddleBrown));
+		
 	}
 	public class Limestone { }
 	public class Obsidian : Tile {
@@ -1452,12 +1563,32 @@ namespace CaveGame.Core.Tiles
 		public Light3 Light => new Light3(0, 0, 20);
 		public BlueTorch() : base(TileDefinitions.BlueTorch) { }
 	}
-	public class BlueMushroom : Tile, ILightEmitter, INonSolid, ITileUpdate, IWaterBreakable
+	public class BlueMushroom : Tile, ILightEmitter, INonSolid, ITileUpdate, IWaterBreakable, ILocalTileUpdate
 	{
 		public void TileUpdate(IGameWorld world, int x, int y)
 		{
 			if (!(world.GetTile(x, y + 1) is Mycelium))
 				world.SetTile(x, y, new Air());
+		}
+
+		public void LocalTileUpdate(IGameWorld world, int x, int y)
+		{
+			
+		}
+
+		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		{
+			Vector2 position = new Vector2(x * Globals.TileSize, y * Globals.TileSize);
+			if (TileState==0) // Upright
+				sb.Draw(tilesheet, position, Quad, color.MultiplyAgainst(Color), 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+			if (TileState == 1) // Right
+				sb.Draw(tilesheet, position, Quad, color.MultiplyAgainst(Color), MathHelper.ToRadians(90), Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+			if (TileState == 2) // Bottom
+				sb.Draw(tilesheet, position, Quad, color.MultiplyAgainst(Color), MathHelper.ToRadians(180), Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+			if (TileState == 3) // Left
+				sb.Draw(tilesheet, position, Quad, color.MultiplyAgainst(Color), MathHelper.ToRadians(270), Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+
+			//base.Draw(tilesheet, sb, x, y, color);
 		}
 
 		public Light3 Light => new Light3(2, 3, 3);

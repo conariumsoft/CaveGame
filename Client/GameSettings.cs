@@ -79,11 +79,24 @@ namespace CaveGame.Client
 			CurrentSettings = this;
 		}
 
-		public bool Fullscreen;
-		public bool Particles;
-		public int FPSLimit;
-		public int FPSLimitIndex;
-		public int MusicVolume;
+		public bool Fullscreen { get; set; }
+		public bool Particles { get; set; }
+		public int FPSLimit { get; set; }
+		public int FPSLimitIndex { get; set; }
+		public Keys MoveLeftKey { get; set; }
+		public Keys MoveRightKey { get; set; }
+		public Keys MoveDownKey { get; set; }
+		public Keys MoveUpKey { get; set; }
+		public Keys JumpKey { get; set; }
+		public GameChatSize ChatSize { get; set; }
+		public string TexturePackName { get; set; }
+
+		public int MasterVolume { get; set; }
+		public int MusicVolume { get; set; }
+		public int SFXVolume { get; set; }
+		public int MenuVolume { get; set; }
+		public bool CameraShake { get; set; }
+
 		public override void FillDefaults()
 		{
 			FPSLimit = 120;
@@ -96,14 +109,6 @@ namespace CaveGame.Client
 			MoveRightKey = Keys.D;
 			ChatSize = GameChatSize.Normal;
 		}
-
-		public Keys MoveLeftKey;
-		public Keys MoveRightKey;
-		public Keys MoveDownKey;
-		public Keys MoveUpKey;
-		public Keys JumpKey;
-
-		public GameChatSize ChatSize;
 
 	}
 }
