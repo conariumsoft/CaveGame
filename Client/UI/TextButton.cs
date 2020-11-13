@@ -5,6 +5,9 @@ using System;
 using System.Collections.Generic;
 using CaveGame.Client.Menu;
 using CaveGame;
+using CaveGame.Core.LuaInterop;
+using NLua;
+using System.Diagnostics;
 
 namespace CaveGame.Client.UI
 {
@@ -16,6 +19,10 @@ namespace CaveGame.Client.UI
 
 	public class TextButton: Label
 	{
+
+		public TextButton(NLua.Lua state, NLua.LuaTable table) : base(state, table) { }
+		public TextButton() : base(){}
+
 		public Color UnselectedBGColor { get; set; }
 		public Color SelectedBGColor { get; set; }
 		public bool Selected { get; set; }
@@ -27,6 +34,9 @@ namespace CaveGame.Client.UI
 		public event ClickHandler OnRightClick;
 		public event ClickHandler OnMouseEnter;
 		public event ClickHandler OnMouseExit;
+
+		public LuaEvent<LuaEventArgs> OnLMBClick = new LuaEvent<LuaEventArgs>();
+		public LuaEvent<LuaEventArgs> OnRMBClick = new LuaEvent<LuaEventArgs>();
 
 		protected MouseState prevMouse;
 
@@ -65,6 +75,7 @@ namespace CaveGame.Client.UI
 					{
 						GameSounds.MenuBlip?.Play(1.0f, 0.9f, 0.0f);
 						OnLeftClick?.Invoke(this, mouse);
+						OnLMBClick.Invoke(new LuaEventArgs());
 						CaveGameGL.ClickTimer = 0;
 					}
 						
@@ -73,6 +84,7 @@ namespace CaveGame.Client.UI
 					{
 						GameSounds.MenuBlip?.Play(1.0f, 0.9f, 0.0f);
 						OnRightClick?.Invoke(this, mouse);
+						OnRMBClick.Invoke(new LuaEventArgs());
 						CaveGameGL.ClickTimer = 0;
 					}
 						

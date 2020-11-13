@@ -159,6 +159,7 @@ namespace CaveGame.Client.Menu
 				Font = GameFonts.Arial12,
 				BackgroundText = "Server Address",
 				BackgroundTextColor = Color.Gray,
+				TextColor = Color.White,
 				TextYAlign = TextYAlignment.Center,
 				TextXAlign = TextXAlignment.Center,
 			};
@@ -179,13 +180,14 @@ namespace CaveGame.Client.Menu
 				BorderColor = Color.DarkBlue,
 				BackgroundText = "Nickname",
 				BackgroundTextColor = Color.Gray,
+				TextColor = Color.White,
 				//Provider = inputter2,
 				TextYAlign = TextYAlignment.Center,
 				TextXAlign = TextXAlignment.Center,
 			};
 			usernameInputBox.Input.InputBuffer = inputHistory.Username;
 			usernameInputBox.Input.BlacklistedCharacters.Add(' ');
-			usernameInputBox.Input.Focused = false;
+			usernameInputBox.Input.Focused = true;
 			//buttons.Children.Add(usernameInputBox);
 
 			var connect = new TextButton

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PluginDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Name>cavelua-core</Name>
+    <Author>JMS</Author>
+    <Description>Basic commands and utilities for the CaveGame Server</Description>
+    <Folder>x</Folder>
+    <Version>1.2.0</Version>
+    <Depend>WorldEditCore</Depend>
+
+
+</PluginDefinition>

@@ -167,13 +167,15 @@ namespace CaveGame.Client
 		bool pauseMenuOpen;
 		UIRoot pauseMenu;
 
+		Effect effect;
+
 		private void ConstructPauseMenu()
 		{
 			pauseMenu = new UIRoot(Game.GraphicsDevice);
 
 			UIRect bg = new UIRect
 			{
-				BGColor = Color.Black * 0.5f,
+				BGColor = Color.Transparent,
 				Size = new UICoords(0, 0, 1, 1),
 				Position = new UICoords(0, 0, 0, 0),
 				Parent = pauseMenu
@@ -768,7 +770,8 @@ namespace CaveGame.Client
 			DrawSkyColor(sb);
 			sb.End();
 			sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
-			
+			if (pauseMenuOpen)
+				effect.CurrentTechnique.Passes[0].Apply();
 			DrawChunkBGTextures(sb);
 			DrawChunkFGTextures(sb);
 			foreach(var furn in World.Furniture)
@@ -814,7 +817,8 @@ namespace CaveGame.Client
 			
 			if (pauseMenuOpen)
 			{
-				sb.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp);
+				sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
+				//effect.CurrentTechnique.Passes[0].Apply();
 				pauseMenu.Draw(sb);
 				sb.End();
 			}
@@ -822,13 +826,15 @@ namespace CaveGame.Client
 
 		public void Load()
 		{
+			effect = Game.Content.Load<Effect>("ShaderTest");
 			Hotbar = new Hotbar();
 
-			gameClient = new NetworkClient(ConnectAddress);
-
+			//	gameClient = new NetworkClient(ConnectAddress);
+			gameClient = new NetworkClient("127.0.0.1:40269");
 			//gameClient.Output = Game.Console;
 			gameClient.Start();
-			gameClient.SendPacket(new RequestJoinPacket(NetworkUsername));
+			//gameClient.SendPacket(new RequestJoinPacket(NetworkUsername));
+			gameClient.SendPacket(new RequestJoinPacket("jooj"));
 		}
 
 		public void Unload() {}

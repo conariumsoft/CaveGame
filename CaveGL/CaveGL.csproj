@@ -59,15 +59,15 @@
     <TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
-    <PackageReference Include="NLua" Version="1.5.4" />
-    <PackageReference Include="TextCopy" Version="4.2.0" />
-  </ItemGroup>
-  <ItemGroup>
+    <None Update="Assets\Scripts\menu.lua">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Textures\icon.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
+    </None>
+    <None Update="Steamworks\steam_api64.dll">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <Import Project="..\Client\Client.projitems" Label="Shared" />
@@ -78,6 +78,12 @@
   </Target>
   <ItemGroup>
     <_DeploymentManifestIconFile Remove="Icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
+    <PackageReference Include="NLua" Version="1.5.4" />
+    <PackageReference Include="TextCopy" Version="4.2.0" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Steamworks.NET">

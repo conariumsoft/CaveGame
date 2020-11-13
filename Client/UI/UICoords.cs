@@ -10,6 +10,17 @@ namespace CaveGame.Client.UI
 		public float ScaleX;
 		public float ScaleY;
 
+
+		public static UICoords operator  +(UICoords a, UICoords b)
+        {
+			return new UICoords(
+				a.PixelX + b.PixelX,
+				a.PixelY + b.PixelY,
+				a.ScaleX + b.ScaleX,
+				a.ScaleY + b.ScaleY
+			);
+        }
+
 		public Vector2 Scale
 		{
 			get

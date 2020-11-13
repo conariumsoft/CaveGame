@@ -1409,3 +1409,9 @@
 /processorParam:TextureFormat=Color
 /build:../Assets/Textures/TitleScreen.png;Textures/TitleScreen.png
 
+#begin Shaders/ShaderTest.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/ShaderTest.fx
+

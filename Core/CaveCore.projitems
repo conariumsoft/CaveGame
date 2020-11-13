@@ -11,7 +11,10 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Camera.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileUtil\FilePathSanitizer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileUtil\Metabinary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\CraftingRecipes\Recipe.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Inventory\Container.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\StatusEffects\StatusEffect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Bomb.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\PhysicsEntity.cs" />
@@ -24,6 +27,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Generic\ThreadSafeValue.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ISingleton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Logger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LuaInterop\LuaEvent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LuaInterop\LuaInterop.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\User.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rotation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Shell.cs" />
@@ -59,5 +64,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Chat\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Game\Items\" />
   </ItemGroup>
 </Project>

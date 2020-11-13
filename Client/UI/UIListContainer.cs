@@ -38,14 +38,14 @@ namespace CaveGame.Client.UI
 		public UICoords Position { get => Parent.Position; set { } }
 
 		public UICoords Size { get => Parent.Size; set { }}
-
 		public int Padding { get; set; }
 
 		public bool ExpandSelected { get; set; }
 		public float ExpandedHeight { get; set; }
 		public float CompressedHeight { get; set; }
+        public string Name { get; set; }
 
-		public UIListContainer()
+        public UIListContainer()
 		{
 
 			Visible = true;

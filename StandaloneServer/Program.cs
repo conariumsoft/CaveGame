@@ -58,45 +58,78 @@ namespace StandaloneServer
 			});
 			string inputBuf = "";
 
+			
+
+			Console.SetCursorPosition(Console.WindowLeft, Console.WindowHeight - 1);
+			Console.BackgroundColor = ConsoleColor.White;
+			Console.ForegroundColor = ConsoleColor.Black;
+			Console.Write("> ".PadRight(Console.WindowWidth-2));
+			Console.BackgroundColor = ConsoleColor.Black;
+			Console.ForegroundColor = ConsoleColor.White;
+			Console.SetCursorPosition(0, 0);
+
 			while (true)
 			{
+				Task.Delay(10);
+				Console.SetCursorPosition(0, 0);
+
+
+				// now lets handle our "output stream"
+				while (consoleWrapper.BufferMessages.Count > Console.WindowHeight - 1)
+				{
+					consoleWrapper.BufferMessages.RemoveAt(0);
+				}
+				int ic = 0;
+
+				int start = Math.Max(0, consoleWrapper.BufferMessages.Count - Console.WindowHeight - 1);
+				int end = Math.Min(consoleWrapper.BufferMessages.Count , Console.WindowHeight);
+
+				
+				Console.SetCursorPosition(0, 0);
+				for (int i = start; i < end; i++)
+				{
+					var bufferMessage = consoleWrapper.BufferMessages[i];
+
+					//Console.SetCursorPosition(Console.WindowLeft, i);
+					Console.ForegroundColor = bufferMessage.Color;
+					Console.Write(""); 
+					Console.Write(bufferMessage.Text);
+					ic += Math.Min(bufferMessage.Text.Length / Console.WindowWidth, 1);
+					if (ic > Console.WindowHeight)
+                    {
+						break;
+                    }
+				}
+				Console.ForegroundColor = ConsoleColor.White;
+
 				if (Console.KeyAvailable)
 				{
+					
 					char c = Console.ReadKey(true).KeyChar;
 					switch (c)
 					{
-						case '\r': server.OnCommand(inputBuf); inputBuf = ""; break;
+						case '\r': server.OnCommand(inputBuf); inputBuf = "";  break;
 						case '\b': if (inputBuf.Length > 0) { inputBuf = inputBuf.Remove(inputBuf.Length - 1); }break;
 						default: inputBuf += c; break;
 					}
+
 					Console.BackgroundColor = ConsoleColor.White;
 					Console.ForegroundColor = ConsoleColor.Black;
-					Console.SetCursorPosition(Console.WindowLeft, Console.WindowHeight-2);
-					for (int i = 0; i<Console.WindowWidth-1; i++)
-					{
-						Console.Write(" ");
-					}
-					
-					Console.SetCursorPosition(Console.WindowLeft, Console.WindowHeight - 2);
-					
+					Console.SetCursorPosition(Console.WindowLeft, Console.WindowHeight - 1);
+					Console.Write(" ".PadRight(Console.WindowWidth-2));
+
+					Console.SetCursorPosition(Console.WindowLeft, Console.WindowHeight - 1);
+
 					Console.Write("> " + inputBuf);
 
 					Console.BackgroundColor = ConsoleColor.Black;
 					Console.ForegroundColor = ConsoleColor.White;
-					
+					Console.SetCursorPosition(0, 0);
+					for (int i = 0; i < Console.WindowHeight - 1; i++)
+					{
+						Console.Write("".PadRight(Console.WindowWidth - 1));
+					}
 				}
-				Console.SetCursorPosition(Console.WindowLeft, Console.WindowHeight - 1);
-
-				Console.Write(server.Information.PadRight(Console.WindowWidth-1));
-				// now lets handle our "output stream"
-				for (int i = 0; i < Math.Min(Console.WindowHeight - 3, consoleWrapper.BufferMessages.Count); i++)
-				{
-
-					Console.SetCursorPosition(Console.WindowLeft, i);
-					Console.ForegroundColor = consoleWrapper.BufferMessages[i].Color;
-					Console.Write(consoleWrapper.BufferMessages[i].Text);
-				}
-				Console.ForegroundColor = ConsoleColor.White;
 			}
 		}
 	}

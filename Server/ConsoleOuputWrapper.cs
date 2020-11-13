@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -61,53 +62,69 @@ namespace CaveGame.Server
 			BufferMessages = new List<ConsoleMsg>();
 		}
 
-		public void Import(ConsoleMsg message)
+        public void Import(ConsoleMsg message)
+        {
+            string text = message.Text;
+
+
+
+
+            if (Regex.IsMatch(text, @"%\d|(%[a-f])"))
+            {
+
+                int cnum = 15;
+
+                while (Regex.IsMatch(text, @"%\d|(%[a-f])"))
+                {
+                   if (Regex.IsMatch(text, @"%\d|(%[a-f])"))
+                    {
+						int idx = text.IndexOf("%");
+                        char code = text[idx + 1];
+
+						if (idx > 0)
+                        {
+							BufferMessages.Add(new ConsoleMsg(text.Substring(0, idx), (ConsoleColor)cnum));
+						}
+						
+						bool worked = Int32.TryParse(code.ToString(), out cnum);
+						if (!worked)
+							cnum = Convert.ToInt32(code.ToString(), 16);
+						Debug.WriteLine((ConsoleColor)cnum);
+						text = text.Substring(idx + 2);
+                    }
+
+                }
+                BufferMessages.Add(new ConsoleMsg(text + "\n", (ConsoleColor)cnum));
+            }
+            else
+            {
+                BufferMessages.Add(new ConsoleMsg(text + "\n", Color.White));
+            }
+        }
+
+        public void Out(string message, Color color)
 		{
-			string text = message.Text;
-
-			if (Regex.IsMatch(text, @"%\d"))
-			{
-
-				int cnum = 15;
-
-				while (Regex.IsMatch(text, @"%\d"))
-				{
-					int idx = text.IndexOf("%");
-					char code = text[idx + 1];
-
-					
-
-					
-					BufferMessages.Add(new ConsoleMsg(text.Substring(0, idx), (ConsoleColor)cnum));
-					bool worked = Int32.TryParse(code.ToString(), out cnum);
-					text = text.Substring(idx + 2);
-				}
-				BufferMessages.Add(new ConsoleMsg(text, (ConsoleColor)cnum));
-			} else
-			{
-				BufferMessages.Add(new ConsoleMsg(text, Color.White));
-			}
+	
+				//Console.ForegroundColor = color.ToConsoleColor();
+				//Console.WriteLine(message);
+				//Console.ForegroundColor = ConsoleColor.White;
+				var msg = new ConsoleMsg(message, color);
+				Messages.Add(msg);
+				Import(msg);
 
 			
-		}
-
-		public void Out(string message, Color color)
-		{
-			//Console.ForegroundColor = color.ToConsoleColor();
-			//Console.WriteLine(message);
-			//Console.ForegroundColor = ConsoleColor.White;
-			var msg = new ConsoleMsg(message, color);
-			Messages.Add(msg);
-			Import(msg);
 
 		}
 
 		public void Out(string message)
 		{
-			//Console.WriteLine(message);
-			var msg = new ConsoleMsg(message, Color.White);
-			Messages.Add(msg);
-			Import(msg);
+
+				//Console.WriteLine(message);
+				var msg = new ConsoleMsg(message, Color.White);
+				Messages.Add(msg);
+				Import(msg);
+
+			
 		}
 	}
 }

@@ -3,9 +3,11 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NLua;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Text;
 
 
@@ -32,11 +34,51 @@ namespace CaveGame.Client.UI
 	{
 		
 		UINode Parent { get; }
+		string Name { get; }
 
+
+	}
+
+
+	public static class Poo
+    {
+		public static object Cast(this Type Type, object data)
+		{
+			var DataParam = Expression.Parameter(typeof(object), "data");
+			var Body = Expression.Block(Expression.Convert(Expression.Convert(DataParam, data.GetType()), Type));
+
+			var Run = Expression.Lambda(Body, DataParam).Compile();
+			var ret = Run.DynamicInvoke(data);
+			return ret;
+		}
 	}
 
 	public class UIRect : UINode
 	{
+	
+		public UIRect(Lua state, LuaTable table) : base()
+		{
+			Visible = true;
+			Active = true;
+			AnchorPoint = Vector2.Zero;
+			Children = new List<UINode>();
+			BorderSize = 1f;
+
+			foreach (KeyValuePair<object, object> kvp in state.GetTableDict(table))
+			{
+				if (kvp.Key is string keyString)
+				{
+					var prop = this.GetType().GetProperty(keyString);
+					if (prop != null)
+                    {
+						Debug.WriteLine("PropertySet {0} to {1} on {2}", keyString, kvp.Value.ToString(), this.ToString());
+						prop.SetValue(this, Poo.Cast(prop.PropertyType, kvp.Value));
+                    }
+	
+				}
+			}
+		}
+
 		public bool Visible { get; set; }
 		public bool Active { get; set; }
 
@@ -80,9 +122,9 @@ namespace CaveGame.Client.UI
 		public bool BorderEnabled { get; set; }
 		public float BorderSize { get; set; }
 		public Color BorderColor { get; set; }
+        public string Name { get; set; }
 
-
-		public UIRect()
+        public UIRect()
 		{
 			Visible = true;
 			Active = true;
@@ -165,7 +207,9 @@ namespace CaveGame.Client.UI
 			}
 		}
 
-		public UIRoot(GraphicsDevice device)
+        public string Name { get; }
+
+        public UIRoot(GraphicsDevice device)
 		{
 			this.device = device;
 

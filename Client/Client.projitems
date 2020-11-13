@@ -17,13 +17,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)InputManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\Multiplayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\TimeoutMenu.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)NetGraph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DebugTools\NetGraph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ISteamManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameChat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LightingEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CommandBar\CommandBar.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FPSGraph.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FrameCounter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DebugTools\FPSGraph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DebugTools\FrameCounter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LocalWorld.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\Credits.cs" />
@@ -35,6 +35,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Menu\Homepage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Label.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\NineSlice.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Slider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\TextButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\TextInput.cs" />
@@ -45,5 +46,8 @@
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)DebugTools\" />
   </ItemGroup>
 </Project>

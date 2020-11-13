@@ -6,6 +6,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using NLua;
+using System.IO;
+using System.Diagnostics;
 
 namespace CaveGame.Client.Menu
 {
@@ -36,16 +39,18 @@ namespace CaveGame.Client.Menu
 
 		public void Draw(SpriteBatch sb)
 		{
-			sb.Begin();
+			sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointWrap);
 
 			CurrentPage.Draw(sb);
 			//sb.Draw(GameTextures.TitleScreen, title.AbsolutePosition, null, Color.White, 0, Vector2.Zero, 2, SpriteEffects.None, 0);
 			sb.End();
 		}
 
-		Label title;
 		private void ConstructMainMenu()
 		{
+
+
+
 			MainMenu = new UIRoot(Game.GraphicsDevice);
 
 			TextButton singleplayerButton;
@@ -57,7 +62,23 @@ namespace CaveGame.Client.Menu
 			TextButton settingsButton;
 			TextButton quitButton;
 
-			title = new Label
+			
+
+			/*singleplayerButton = new TextButton
+			{
+				TextColor = Color.Gray,
+				Text = "SINGLEPLAYER",
+				Font = GameFonts.Arial14,
+				Size = new UICoords(0, -10, 1f, 0.125f),
+				TextWrap = true,
+				TextYAlign = TextYAlignment.Center,
+				TextXAlign = TextXAlignment.Center,
+				Parent = buttons,
+				UnselectedBGColor = new Color(0.05f, 0.05f, 0.05f),
+				SelectedBGColor = new Color(0.05f, 0.05f, 0.05f),
+			};*/
+
+			/*Label title = new Label
 			{
 				BGColor = Color.Transparent,
 				BorderColor = Color.Transparent,
@@ -72,11 +93,11 @@ namespace CaveGame.Client.Menu
 				TextWrap = false,
 				TextYAlign = TextYAlignment.Center,
 				TextXAlign = TextXAlignment.Center,
-			};
+			};*/
 
 			//MainMenu.Children.Add(title);
 
-			Label copyright = new Label
+			/*Label copyright = new Label
 			{
 				BGColor = Color.Transparent,
 				BorderColor = Color.Transparent,
@@ -91,7 +112,7 @@ namespace CaveGame.Client.Menu
 				TextWrap = false,
 				TextYAlign = TextYAlignment.Bottom,
 				TextXAlign = TextXAlignment.Left,
-			};
+			};*/
 			//MainMenu.Children.Add(copyright);
 
 			Label version = new Label
@@ -129,7 +150,7 @@ namespace CaveGame.Client.Menu
 			//buttonList.Children.Add(buttons);
 
 
-			singleplayerButton = new TextButton
+		/*	singleplayerButton = new TextButton
 			{
 				TextColor = Color.Gray,
 				Text = "SINGLEPLAYER",
@@ -141,16 +162,31 @@ namespace CaveGame.Client.Menu
 				Parent = buttons,
 				UnselectedBGColor = new Color(0.05f, 0.05f, 0.05f),
 				SelectedBGColor = new Color(0.05f, 0.05f, 0.05f),
-			};
+			};*/
 			//buttons.Children.Add(singleplayerButton);
 			//singleplayerButton.OnLeftClick += (b, m) => CurrentPage = SingleplayerMenu;
+
+
+			void pout(params object[] o) {
+				Debug.WriteLine(o);
+            }
+
+
+			Lua luastate = new Lua();
+			luastate.LoadCLRPackage();
+			luastate["game"] = Game;
+			luastate["menu"] = MainMenu;
+			luastate["buttonlist"] = buttons;
+			luastate["script"] = luastate;
+			
+			luastate.DoFile(Path.Combine("Assets", "Scripts", "menu.lua"));
 
 			multiplayerButton = new TextButton
 			{
 				TextColor = Color.White,
 				Text = "MULTIPLAYER",
 				Font = GameFonts.Arial14,
-				Size = new UICoords(0, -10, 1f, 0.125f),
+				Size = new UICoords(0, -10, 1f, 0.12f),
 				Position = new UICoords(0, 30, 0, 0),
 				TextWrap = true,
 				TextYAlign = TextYAlignment.Center,
@@ -168,7 +204,7 @@ namespace CaveGame.Client.Menu
 				TextColor = Color.Gray,
 				Text = "STATISTICS",
 				Font = GameFonts.Arial14,
-				Size = new UICoords(0, -10, 1f, 0.125f),
+				Size = new UICoords(0, -10, 1f, 0.12f),
 				Position = new UICoords(0, 30, 0, 0),
 				TextWrap = true,
 				TextYAlign = TextYAlignment.Center,

@@ -4,6 +4,7 @@ using CaveGame.Core;
 using CaveGame.Core.FileUtil;
 using CaveGame.Core.Furniture;
 using CaveGame.Core.Game.Entities;
+using CaveGame.Core.LuaInterop;
 using CaveGame.Core.Network;
 using CaveGame.Core.Tiles;
 using KeraLua;
@@ -13,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -57,8 +59,46 @@ namespace CaveGame.Server
 
 	}
 
+	public class CommandEventArgs : LuaEventArgs
+    {
+		public string Command { get; private set; }
+		public List<string> Arguments { get; private set; }
+
+		public CommandEventArgs(string cmd, List<string> args)
+        {
+			Command = cmd;
+			Arguments = args;
+        }
+    }
+
+	public class PlayerChatMessageEventArgs : LuaEventArgs
+    {
+		public Player Player { get; private set; }
+		public string Message { get; private set; }
+		public PlayerChatMessageEventArgs(Player player, string message)
+        {
+			Player = player;
+			Message = message;
+        }
+    }
+
+	public class PlayerEventArgs : LuaEventArgs
+	{
+		public Player Player {get; private set;}
+		public PlayerEventArgs(Player player)
+        {
+			Player = player;
+        }
+    }
+
 	public class GameServer : IPluginAPIServer, IGameServer
 	{
+
+		public LuaEvent<PlayerEventArgs> OnPlayerJoinedServer = new LuaEvent<PlayerEventArgs>();
+		public LuaEvent<PlayerEventArgs> OnPlayerLeftServer = new LuaEvent<PlayerEventArgs>();
+		public LuaEvent<PlayerChatMessageEventArgs> OnChatMessageFromClient = new LuaEvent<PlayerChatMessageEventArgs>();
+		public LuaEvent<CommandEventArgs> OnServerCommand = new LuaEvent<CommandEventArgs>();
+
 		public List<ServerCommand> Commands { get; set; }
 		public void BindCommand(ServerCommand command)
 		{
@@ -66,6 +106,7 @@ namespace CaveGame.Server
 		}
 		public void BindCommand(string cmd, string descr, LuaTable args)
 		{
+			Output.Out(String.Format("Bound! {0}",cmd));
 			var argsList = new List<string>();
 
 			foreach (var arg in args.Values)
@@ -128,7 +169,7 @@ namespace CaveGame.Server
 				if (keywords[0] == cmdDef.Keyword)
 				{
 					//cmdDef.InvokeCommand(keywords.Skip(1).ToArray());
-					PluginManager.CallOnCommand(cmdDef.Keyword, keywords.Skip(1).ToList());
+					OnServerCommand.Invoke(new CommandEventArgs(cmdDef.Keyword, keywords.Skip(1).ToList()));
 					return;
 				}
 			}
@@ -164,26 +205,8 @@ namespace CaveGame.Server
 			PluginManager = new PluginManager();
 		}
 
-		public void LoadPlugins()
-		{
+		public void LoadPlugins() => PluginManager.LoadPlugins(this);
 
-
-			if (!System.IO.Directory.Exists("Plugins"))
-				System.IO.Directory.CreateDirectory("Plugins");
-
-
-			foreach (string folder in System.IO.Directory.EnumerateDirectories("Plugins"))
-			{
-				var pluginDefinition = Configuration.Load<PluginDefinition>(folder + "/plugin.xml");
-
-				var plug = new Plugin(pluginDefinition, this, System.IO.File.ReadAllText(folder + "/main.lua"));
-				PluginManager.Plugins.Add(plug);
-			}
-
-			PluginManager.CallOnPluginLoaded();
-		}
-
-		
 		public void Start()
 		{
 			server.Start();
@@ -192,7 +215,7 @@ namespace CaveGame.Server
 
 		public void Shutdown()
 		{
-			PluginManager.CallOnServerShutdown();
+			PluginManager.UnloadPlugins();
 			Console.WriteLine("Shutting Down. Not Saving while testing worldgen");
 			//World.SaveData();
 			Thread.Sleep(100);
@@ -282,8 +305,8 @@ namespace CaveGame.Server
 			plr.User = newuser;
 			World.Entities.Add(plr);
 
-			PluginManager.CallOnPlayerJoined(plr);
-
+			//PluginManager.CallOnPlayerJoined(plr);
+			OnPlayerJoinedServer.Invoke(new PlayerEventArgs(plr));
 			newuser.PlayerEntity = plr;
 
 			SendTo(new AcceptJoinPacket(newuser.UserNetworkID, plr.EntityNetworkID), newuser);
@@ -294,8 +317,14 @@ namespace CaveGame.Server
 		{
 			QuitPacket packet = new QuitPacket(msg.Packet.GetBytes());
 
+			
+
 			if (World.FindEntityOfID(packet.EntityID, out Player player))
+            {
+				OnPlayerLeftServer.Invoke(new PlayerEventArgs(player));
 				World.Entities.Remove(player);
+			}
+				
 
 			SendToAll(new PlayerLeftPacket(packet.EntityID));
 			ConnectedUsers.Remove(user);
@@ -329,7 +358,7 @@ namespace CaveGame.Server
 		private void OnClientChat(NetworkMessage msg, User user)
 		{
 			ClientChatMessagePacket chatMessagePacket = new ClientChatMessagePacket(msg.Packet.GetBytes());
-			if (PluginManager.CallOnChatMessage(user.PlayerEntity, chatMessagePacket.Message))
+			if (OnChatMessageFromClient.Invoke(new PlayerChatMessageEventArgs(user.PlayerEntity, chatMessagePacket.Message)))
 			{
 				Chat(user.Username + ": " + chatMessagePacket.Message);
 			}

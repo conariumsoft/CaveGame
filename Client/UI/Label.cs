@@ -45,9 +45,6 @@ namespace CaveGame.Client.UI
 			float lineWidth = 0f;
 			float spaceWidth = spriteFont.MeasureString(" ").X;
 
-	
-
-
 
 			foreach (string word in words)
 			{
@@ -103,6 +100,9 @@ namespace CaveGame.Client.UI
 
 		public override void Update(GameTime gt)
 		{
+
+
+
 			Text = Input.DisplayText;
 			MouseState mouse = Mouse.GetState();
 
@@ -121,6 +121,7 @@ namespace CaveGame.Client.UI
 			Input.Focused = Selected;
 			if (Selected)
 			{
+				
 				Input.Update(gt);
 			}
 
@@ -154,19 +155,18 @@ namespace CaveGame.Client.UI
 
 
 			TextOutputPosition.Floor();
-			
 
+			
 			if (Input.SpecialSelection)
 			{
-				
-				base.Draw(sb, true);
+				base.Draw(sb, false);
 				var beforeText = Input.GetScissorTextBefore();
 				var middleText = Input.GetScissorTextDuring();
 				var afterText = Input.GetScissorTextAfter();
 				var start = Font.MeasureString(beforeText);
 				var end = Font.MeasureString(middleText);
 
-				sb.Rect(Color.Blue, TextOutputPosition + new Vector2(start.X, 0), end);
+				//sb.Rect(Color.Blue, TextOutputPosition + new Vector2(start.X, 0), end);
 
 				// first section
 				sb.Print(Font, TextColor, TextOutputPosition,  beforeText);
@@ -174,7 +174,8 @@ namespace CaveGame.Client.UI
 				sb.Print(Font, TextColor, TextOutputPosition + new Vector2(start.X + end.X, 0), afterText);
 			} else
 			{
-				base.Draw(sb);
+				base.Draw(sb, false);
+				//sb.Print(Font, TextColor, TextOutputPosition, Input.InputBuffer);
 			}
 			
 			if (Input.InputBuffer == "")
@@ -187,7 +188,6 @@ namespace CaveGame.Client.UI
 
 	public class Label : UIRect
 	{
-
 		public ITextProvider Provider { get; set; }
 		public string Text { get; set; }
 		public Color TextColor { get; set; }
@@ -200,12 +200,12 @@ namespace CaveGame.Client.UI
 		public bool TextWrapping { get; private set; }
 		public int TextWrappingCount { get; private set; }
 
-		public Label() : base()
-		{
-			Font = GameFonts.ComicSans10;
-			Text = "Bottom Text";
-			TextColor = Color.White;
+
+		public Label(NLua.Lua state, NLua.LuaTable table) : base(state, table) {
+
 		}
+
+		public Label() : base(){}
 
 		public override void Update(GameTime gt)
 		{
@@ -261,7 +261,7 @@ namespace CaveGame.Client.UI
 			return Font.MeasureString(Text);
 		}
 
-		public void Draw(SpriteBatch sb, bool TextOverride = false)
+		public void Draw(SpriteBatch sb, bool TextOverride)
 		{
 			base.Draw(sb);
 			if (TextOverride)

@@ -32,8 +32,11 @@
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
-    <PackageReference Include="NLua" Version="1.5.1" />
+    <PackageReference Include="NLua" Version="1.5.4" />
     <PackageReference Include="TextCopy" Version="4.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="CaveCorePlugin\" />
   </ItemGroup>
   <Import Project="..\Core\CaveCore.projitems" Label="Shared" />
   <Import Project="..\Server\CaveServer.projitems" Label="Shared" />
