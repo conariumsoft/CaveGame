@@ -26,7 +26,7 @@ namespace CaveGame.Client.Menu
 
 		private void ConstructUIElements()
 		{
-			TimeoutPage = new UIRoot(Game.GraphicsDevice);
+			TimeoutPage = new UIRoot();
 
 			Label message = new Label
 			{

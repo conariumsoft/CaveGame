@@ -1,7 +1,8 @@
 ﻿using CaveGame.Core.FileUtil;
-using CaveGame.Core.Tiles;
-using CaveGame.Core.Walls;
+using CaveGame.Core.Game.Tiles;
+using CaveGame.Core.Game.Walls;
 using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 
 namespace Editor.Actions
@@ -113,11 +114,64 @@ namespace Editor.Actions
             structureLayer.Walls[position.X, position.Y] = previousWall;
         }
 	}
-	/*public class StructureResizeAction : IAction { }
-    public class LayerAddAction: IAction { }
-    public class LayerRemoveAction: IAction { }
-    public class LayerRenameAction: IAction { }
-    public class TileSelectionTranslateAction: IAction { }
-    public class TileSelectionCutAction: IAction { }
-    public class TileSelectionPasteAction: IAction { }*/
+    public class StructureResizeAction : IAction
+    {
+        Point oldSize;
+        Point newSize;
+        StructureFile structure;
+        StructureMetadata oldMetadata;
+        StructureMetadata newMetadata;
+        Tile[,] oldTileGrid;
+        Wall[,] oldWallGrid;
+
+        public StructureResizeAction(StructureFile file, StructureMetadata _newMD, Point _newSize)
+        {
+            oldTileGrid = file.Layers[0].Tiles;
+            oldWallGrid = file.Layers[0].Walls;
+
+            oldSize = new Point(file.Metadata.Width, file.Metadata.Height);
+            oldMetadata = file.Metadata;
+            structure = file;
+
+            newSize = _newSize;
+            newMetadata = _newMD;
+            structure.Metadata = newMetadata;
+            structure.Layers[0].Tiles = new Tile[newSize.X, newSize.Y];
+            structure.Layers[0].Walls = new Wall[newSize.X, newSize.Y];
+            for (int x=0; x<newSize.X;x++)
+            {
+                for (int y = 0; y < newSize.Y; y++)
+                {
+                    structure.Layers[0].Tiles[x, y] = new CaveGame.Core.Game.Tiles.Air();
+                    structure.Layers[0].Walls[x, y] = new CaveGame.Core.Game.Walls.Air();
+                }
+            }
+            // initialzize new size
+
+            int smallerX = Math.Min(oldSize.X, newSize.X);
+            int smallerY = Math.Min(oldSize.Y, newSize.Y);
+
+            for (int x = 0; x < smallerX; x++)
+            {
+                for (int y = 0; y < smallerY; y++)
+                {
+                    structure.Layers[0].Tiles[x, y] = oldTileGrid[x, y];
+                    structure.Layers[0].Walls[x, y] = oldWallGrid[x, y];
+                }
+            }
+        }
+
+        public void Redo()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Undo()
+        {
+            structure.Metadata = oldMetadata;
+            structure.Layers[0].Tiles = oldTileGrid;
+            structure.Layers[0].Walls = oldWallGrid;
+            
+        }
+    }
 }

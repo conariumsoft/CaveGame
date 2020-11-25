@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataManagement;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,6 +10,9 @@ namespace CaveGame.Core.Noise
         /// <summary>
         /// The m_ perlin.
         /// </summary>
+        /// 
+
+        public static DoubleRange Interval = new DoubleRange(-0.5, 0.5);
         private readonly PerlinNoise[] m_Perlin;
 
         /// <summary>
@@ -61,6 +65,8 @@ namespace CaveGame.Core.Noise
 
             return value;
         }
+
+        public float Noise2D(int x, int y, double xScale, double yScale, double xOffset, double yOffset) => (float)Noise2D((x + xOffset) / xScale, (y + yOffset) / yScale);
 
         /// <summary>
         /// The noise 2 d.

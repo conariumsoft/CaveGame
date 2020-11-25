@@ -29,7 +29,7 @@ namespace CaveGame.Core.Inventory
 #if CLIENT
 		public override Texture2D ItemTexture => ItemTextures.Furnace;
 #endif
-		public override void OnClientLMBHeld(Player player, IGameClient client)
+		public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
 		{
 			MouseState mouse = Mouse.GetState();
 
@@ -41,6 +41,7 @@ namespace CaveGame.Core.Inventory
 
 			if (Furnace.CanPlace(client.World, pos.X, pos.Y))
 			{
+				stack.Quantity--;
 				client.Send(new PlaceFurniturePacket((byte)FurnitureID.Furnace, 0, pos.X, pos.Y));
 			}
 		}
@@ -54,7 +55,7 @@ namespace CaveGame.Core.Inventory
 #if CLIENT
 		public override Texture2D ItemTexture => ItemTextures.Door;
 #endif
-		public override void OnClientLMBHeld(Player player, IGameClient client)
+		public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
 		{
 			MouseState mouse = Mouse.GetState();
 
@@ -66,6 +67,7 @@ namespace CaveGame.Core.Inventory
 
 			if (WoodenDoor.CanPlace(client.World, pos.X, pos.Y))
 			{
+				stack.Quantity--;
 				client.Send(new PlaceFurniturePacket((byte)FurnitureID.WoodenDoor, 0, pos.X, pos.Y));
 			}
 		}
@@ -78,7 +80,7 @@ namespace CaveGame.Core.Inventory
 #if CLIENT
 		public override Texture2D ItemTexture => ItemTextures.Workbench;
 #endif
-		public override void OnClientLMBHeld(Player player, IGameClient client)
+		public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
 		{
 			MouseState mouse = Mouse.GetState();
 
@@ -90,6 +92,7 @@ namespace CaveGame.Core.Inventory
 
 			if (Furniture.Workbench.CanPlace(client.World, pos.X, pos.Y))
 			{
+				stack.Quantity--;
 				client.Send(new PlaceFurniturePacket((byte)FurnitureID.Workbench, 0, pos.X, pos.Y));
 			}
 		}

@@ -4,13 +4,18 @@ using CaveGame.Client;
 using CaveGame.Core.Game.Entities;
 using CaveGame.Core.Furniture;
 using CaveGame.Core.Network;
-using CaveGame.Core.Tiles;
+using CaveGame.Core.Game.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using CaveGame.Core.FileUtil;
+using System.Linq;
+using CaveGame.Core.Game.Walls;
+using DataManagement;
+using CaveGame.Core.Generic;
 
 namespace CaveGame.Core.Inventory
 {
@@ -19,6 +24,12 @@ namespace CaveGame.Core.Inventory
 		CopperIngot, LeadIngot, TinIngot, ChromiumIngot, AluminiumIngot,
 		IronIngot, NickelIngot, GoldIngot, TileItem, WallItem, 
 	}
+
+	public enum ItemTag
+    {
+		Armor, Potion
+
+    }
 
 	public interface IItem
 	{
@@ -30,10 +41,11 @@ namespace CaveGame.Core.Inventory
 #endif
 	}
 
-	
+
 
 	public class Item : IItem
 	{
+		public virtual List<ItemTag> Tags => new List<ItemTag>();
 		public short ID
 		{
 			get
@@ -43,16 +55,60 @@ namespace CaveGame.Core.Inventory
 			}
 		}
 
+		public virtual string Namespace => "cavegame";
+
 		public virtual int MaxStack => 99;
 		public virtual string Name => this.GetType().Name;
 		public virtual void Draw(SpriteBatch sb, Vector2 position, float scale) { }
-		public virtual void OnClientLMBDown(Player player, IGameClient client) { }
+		public virtual void OnClientLMBDown(Player player, IGameClient client, ItemStack stack) { }
 		public virtual void OnClientLMBUp(Player player, IGameClient client) {}
-		public virtual void OnClientLMBHeld(Player player, IGameClient client) { }
+		public virtual void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt) { }
 		public virtual void OnClientSelected(Player player, IGameClient client) { }
 		public virtual void OnServerUse(Player player, IGameWorld world) { }
 
+		public virtual Metabinary GetMetadataComplex()
+        {
+			var tag = new Metabinary { Name = "item" };
+			var itemmods = new ComplexTag { Name = "attachments" };
+			itemmods.AddInt("poison", 2);
+			itemmods.AddInt("dulled", 41);
+			tag.AddComplex(itemmods);
+			tag.AddString("namespace", Namespace);
+			tag.AddString("itemid", Name);
+
+			
+			return tag;
+        }
+
+		public static Item FromName(string name)
+		{
+			var basetype = typeof(Item);
+			var types = basetype.Assembly.GetTypes().Where(type => type.IsSubclassOf(basetype));
+
+
+			foreach (var type in types)
+			{
+				if (name == type.Name)
+					return (Item)type.GetConstructor(Type.EmptyTypes).Invoke(null);
+			}
+			throw new Exception("ID not valid! "+name);
+		}
+
+		public static Item FromMetadataComplex(ComplexTag tag)
+        {
+			Item item = FromName(tag.GetValue<string>("itemid"));
+
+			if (item is TileItem tileItem)
+				tileItem.Tile = Tile.FromID(tag.GetValue<short>("tileitem_id"));
+			if (item is WallItem wallItem)
+				wallItem.Wall = Wall.FromID(tag.GetValue<short>("wallitem_id"));
+
+
+			return item;
+        }
+
 	}
+
 
 	public interface IGameClient
 	{
@@ -63,23 +119,39 @@ namespace CaveGame.Core.Inventory
 
 	public class GenericPickaxe : Item
 	{
-		
-		public override void OnClientLMBHeld(Player player, IGameClient client)
+		public virtual float SwingTime => 0.15f;
+
+		public float swingingTimer;
+
+
+		public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
 		{
-			MouseState mouse = Mouse.GetState();
+			swingingTimer += gt.GetDelta();
 
-			var mp = client.Camera.ScreenToWorldCoordinates(mouse.Position.ToVector2());
+			if (swingingTimer >= SwingTime)
+            {
+				swingingTimer = 0;
+				MouseState mouse = Mouse.GetState();
 
-			Point pos = new Point(
-				(int)Math.Floor(mp.X / Globals.TileSize),
-				(int)Math.Floor(mp.Y / Globals.TileSize)
-			);
-			int x = pos.X;
-			int y = pos.Y;
-			if (client.World.GetTile(x, y).ID != 0)
-			{
-				client.Send(new PlaceTilePacket(0, 0, 0, x, y));
-				client.World.SetTile(x, y, new Air());
+				var mp = client.Camera.ScreenToWorldCoordinates(mouse.Position.ToVector2());
+
+				Point pos = new Point(
+					(int)Math.Floor(mp.X / Globals.TileSize),
+					(int)Math.Floor(mp.Y / Globals.TileSize)
+				);
+				int x = pos.X;
+				int y = pos.Y;
+
+				var tile = client.World.GetTile(x, y);
+				if (tile is INonMinable)
+					return;
+
+				if (client.World.GetTile(x, y).ID != 0)
+				{
+					client.Send(new DamageTilePacket(new Point(x, y), 2));
+					//client.Send(new PlaceTilePacket(0, 0, 0, x, y));
+					//client.World.SetTile(x, y, new Tiles.Air());
+				}
 			}
 		}
 		public override void Draw(SpriteBatch sb, Vector2 position, float scale)
@@ -93,7 +165,7 @@ namespace CaveGame.Core.Inventory
 
 	public class GenericWallScraper : Item
 	{
-		public override void OnClientLMBHeld(Player player, IGameClient client)
+		public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
 		{
 			MouseState mouse = Mouse.GetState();
 
@@ -108,7 +180,7 @@ namespace CaveGame.Core.Inventory
 			if (client.World.GetWall(x, y).ID != 0)
 			{
 				client.Send(new PlaceWallPacket(0, 0, 0, x, y));
-				client.World.SetWall(x, y, new Walls.Air());
+				client.World.SetWall(x, y, new Game.Walls.Air());
 			}
 		}
 		public override void Draw(SpriteBatch sb, Vector2 position, float scale)
@@ -124,15 +196,18 @@ namespace CaveGame.Core.Inventory
 	{
 		public override int MaxStack => 999;
 
-		public override string Name => Wall.WallName;
+		public string DisplayName => Wall.WallName;
 
-		public Walls.Wall Wall;
+		public Wall Wall;
 
-		public WallItem(Walls.Wall wall)
+
+		public WallItem() : base() { }
+
+		public WallItem(Wall wall)
 		{
 			Wall = wall;
 		}
-		public override void OnClientLMBHeld(Player player, IGameClient client)
+		public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
 		{
 			MouseState mouse = Mouse.GetState();
 
@@ -146,9 +221,18 @@ namespace CaveGame.Core.Inventory
 			int y = pos.Y;
 			if (client.World.GetTile(x, y).ID != Wall.ID)
 			{
+				// TODO: Play sound
+				stack.Quantity--;
 				client.Send(new PlaceWallPacket(Wall.ID, 0, 0, x, y));
-				client.World.SetWall(x, y, Walls.Wall.FromID(Wall.ID));
+				client.World.SetWall(x, y, Game.Walls.Wall.FromID(Wall.ID));
 			}
+		}
+
+		public override Metabinary GetMetadataComplex()
+		{
+			Metabinary fatass = base.GetMetadataComplex();
+			fatass.AddShort("wallitem_id", Wall.ID);
+			return fatass;
 		}
 
 		public override void Draw(SpriteBatch sb, Vector2 position, float scale)
@@ -165,15 +249,18 @@ namespace CaveGame.Core.Inventory
 	public class TileItem : Item
 	{
 		public override int MaxStack => 999;
-		public override string Name => Tile.TileName;
-
+		public string DisplayName => Tile.TileName;
+		
 		public Tile Tile;
+
+
+		public TileItem() : base() { }
 
 		public TileItem(Tile tile)
 		{
 			Tile = tile;
 		}
-		public override void OnClientLMBHeld(Player player, IGameClient client)
+		public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
 		{
 			MouseState mouse = Mouse.GetState();
 
@@ -187,20 +274,31 @@ namespace CaveGame.Core.Inventory
 			int y = pos.Y;
 			if (!client.World.IsCellOccupied(x, y))
 			{
-				client.Send(new PlaceTilePacket(Tile.ID, 0, 0, x, y));
-				client.World.SetTile(x, y, Tile.FromID(Tile.ID));
+				if (client.World.GetTile(x, y).ID != Tile.ID)
+                {
+					stack.Quantity--;
+
+					client.Send(new PlaceTilePacket(Tile.ID, 0, 0, x, y));
+					client.World.SetTile(x, y, Tile.FromID(Tile.ID));
+				}
+				
 			}
 		}
 
-		
+        public override Metabinary GetMetadataComplex()
+        {
+			Metabinary fatass = base.GetMetadataComplex();
+			fatass.AddShort("tileitem_id", Tile.ID);
+			return fatass;
+        }
 
-		public override void Draw(SpriteBatch sb, Vector2 position, float scale)
+        public override void Draw(SpriteBatch sb, Vector2 position, float scale)
 		{
 			Texture2D tex = null;
 #if CLIENT
 			tex = GameTextures.TileSheet;
 #endif
-			sb.Draw(tex, position, Tile.Quad, Tile.Color, 0, Vector2.Zero, scale*2, SpriteEffects.None, 0);
+			sb.Draw(tex, position+(new Vector2(1.5f, 1.5f)*scale*1.5f), Tile.Quad, Tile.Color, 0, Vector2.Zero, scale*1.5f, SpriteEffects.None, 0);
 		}
 	}
 
@@ -210,8 +308,10 @@ namespace CaveGame.Core.Inventory
 		public override int MaxStack => 99;
 
 
-		public override void OnClientLMBDown(Player player, IGameClient client)
+		public override void OnClientLMBDown(Player player, IGameClient client, ItemStack stack)
 		{
+			stack.Quantity--;
+
 			MouseState mouse = Mouse.GetState();
 
 			var mp = client.Camera.ScreenToWorldCoordinates(mouse.Position.ToVector2());

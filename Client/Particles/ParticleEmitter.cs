@@ -1,7 +1,7 @@
 ﻿using CaveGame.Client;
 using CaveGame.Core.Game.Entities;
 using CaveGame.Core.Generic;
-using CaveGame.Core.Tiles;
+using CaveGame.Core.Game.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -48,9 +48,9 @@ namespace CaveGame.Core.Particles
 	{
 		public static Rectangle Quad = new Rectangle(8, 0, 4, 4);
 		public static Vector2 Origin = new Vector2(2, 2);
-		public static Vector2 Friction = new Vector2(0.95f, 0.95f);
+		public static Vector2 Friction = new Vector2(0.8f, 0.8f);
 		public static float Mass = 0.1f;
-		public override float MaxParticleAge => 1.0f;
+		public override float MaxParticleAge => 2.0f;
 
 		private Rotation rotation;
 		private Vector2 position;
@@ -58,16 +58,18 @@ namespace CaveGame.Core.Particles
 		private float scale;
 		private Vector2 nextPosition;
 		private Vector2 velocity;
+		private Vector2 accelleration;
 
 
 
-		public SmokeParticle(Vector2 _position, Color _color, Rotation _rotation, float _scale, Vector2 _velocity)
+		public SmokeParticle(Vector2 _position, Color _color, Rotation _rotation, float _scale, Vector2 _accel)
 		{
 			position = _position;
 			color = _color;
 			rotation = _rotation;
 			scale = _scale;
-			velocity = _velocity;
+			accelleration = _accel;
+			//velocity = _velocity;
 			Dead = false;
 			nextPosition = _position;
 		}
@@ -80,7 +82,10 @@ namespace CaveGame.Core.Particles
 
 		public override void PhysicsStep(IGameWorld world, float step)
 		{
-			
+			velocity += (accelleration * step*3);
+			accelleration -= (accelleration * step*3);
+
+
 			velocity = new Vector2(velocity.X * Friction.X, velocity.Y * Friction.Y);
 
 			position = nextPosition;
@@ -123,6 +128,7 @@ namespace CaveGame.Core.Particles
 		const int MAX_PARTICLES = 4096;
 		private CircularArray<Particle> particles;
 		public IGameWorld World { get; set; }
+
 
 		public ParticleEmitter(IGameWorld world)
 		{

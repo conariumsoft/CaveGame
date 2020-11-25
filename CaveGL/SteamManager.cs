@@ -43,7 +43,7 @@ namespace CaveGame.Client
 
 	}
 
-	public class SteamManager: GameComponent, ISingleton<SteamManager>
+	public class SteamManager: GameComponent
 	{
 		public SteamManager Instance { get; set; }
 

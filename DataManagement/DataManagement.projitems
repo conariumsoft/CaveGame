@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>1a5d2272-8bf3-4436-8460-c4a466758971</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>DataManagement</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ByteExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ContainerExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LINQExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MathematicsExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Metabinary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NumberRange.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RandomExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeSerializer.cs" />
+  </ItemGroup>
+</Project>

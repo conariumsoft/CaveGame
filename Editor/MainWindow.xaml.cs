@@ -1,5 +1,5 @@
 ﻿using CaveGame.Core.FileUtil;
-using CaveGame.Core.Tiles;
+using CaveGame.Core.Game.Tiles;
 using Microsoft.Win32;
 using Microsoft.Xna.Framework;
 using System;
@@ -51,14 +51,14 @@ namespace Editor
 			{
 				for (int y = 0; y < md.Height; y++)
 				{
-					brug.Tiles[x, y] = new CaveGame.Core.Tiles.Air();
+					brug.Tiles[x, y] = new CaveGame.Core.Game.Tiles.Air();
 				}
 			}
 			for (int x = 0; x < md.Width; x++)
 			{
 				for (int y = 0; y < md.Height; y++)
 				{
-					brug.Walls[x, y] = new CaveGame.Core.Walls.Air();
+					brug.Walls[x, y] = new CaveGame.Core.Game.Walls.Air();
 				}
 			}
 			LoadedStructure.Layers.Add(brug);
@@ -113,7 +113,7 @@ namespace Editor
 		private void TOOL_Time(object sender, RoutedEventArgs e)
 		{
 			int n = r.Next(TOOLS.Length);
-			CaveGame.Core.SystemUtil.OpenUrl(TOOLS[n]);
+			CaveGame.Core.OperatingSystem.OpenUrl(TOOLS[n]);
 		}
 
 		private void Menu_About(object sender, RoutedEventArgs e) {
@@ -199,7 +199,7 @@ ScrollWheel - Change selected Tile/Wall
 						Height = Int32.Parse(dialog.heightTextBox.Text),
 					};
 
-					ViewModel.ResizeStructure(newMetadata);
+					ViewModel.ActionResizeStructure(newMetadata);
 				}
 			}
 			
@@ -211,40 +211,13 @@ ScrollWheel - Change selected Tile/Wall
 		}
 
 		#region MonoGameContentControls Input->ViewModel
-		private void MonoGameContentControl_MouseEnter(object sender, MouseEventArgs e)
-		{
-			ViewModel.MGCC_MouseEnter(sender, e);
-		}
-
-		private void MonoGameContentControl_MouseLeave(object sender, MouseEventArgs e)
-		{
-			ViewModel.MGCC_MouseLeave(sender, e);
-		}
-
-		private void MonoGameContentControl_MouseUp(object sender, MouseButtonEventArgs e)
-		{
-			ViewModel.MGCC_MouseUp(sender, e);
-		}
-
-		private void MonoGameContentControl_MouseMove(object sender, MouseEventArgs e)
-		{
-			ViewModel.MGCC_MouseMove(sender, e);
-		}
-
-		private void MonoGameContentControl_MouseDown(object sender, MouseButtonEventArgs e)
-		{
-			ViewModel.MGCC_MouseDown(sender, e);
-		}
-
-		private void MonoGameContentControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-		{
-			ViewModel.MGCC_MouseDoubleClick(sender, e);
-		}
-
-		private void MonoGameContentControl_MouseWheel(object sender, MouseWheelEventArgs e)
-		{
-			ViewModel.MGCC_MouseWheel(sender, e);
-		}
+		private void MonoGameContentControl_MouseEnter(object sender, MouseEventArgs e) => ViewModel.MGCC_MouseEnter(sender, e);
+		private void MonoGameContentControl_MouseLeave(object sender, MouseEventArgs e) => ViewModel.MGCC_MouseLeave(sender, e);
+		private void MonoGameContentControl_MouseUp(object sender, MouseButtonEventArgs e) => ViewModel.MGCC_MouseUp(sender, e);
+		private void MonoGameContentControl_MouseMove(object sender, MouseEventArgs e) => ViewModel.MGCC_MouseMove(sender, e);
+		private void MonoGameContentControl_MouseDown(object sender, MouseButtonEventArgs e) => ViewModel.MGCC_MouseDown(sender, e);
+		private void MonoGameContentControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)=> ViewModel.MGCC_MouseDoubleClick(sender, e);
+		private void MonoGameContentControl_MouseWheel(object sender, MouseWheelEventArgs e) => ViewModel.MGCC_MouseWheel(sender, e);
 
 		private void MonoGameContentControl_KeyDown(object sender, KeyEventArgs e)
 		{
@@ -254,10 +227,7 @@ ScrollWheel - Change selected Tile/Wall
 
 		}
 
-		private void MonoGameContentControl_KeyUp(object sender, KeyEventArgs e)
-		{
-			ViewModel.MGCC_KeyUp(sender, e);
-		}
+		private void MonoGameContentControl_KeyUp(object sender, KeyEventArgs e) => ViewModel.MGCC_KeyUp(sender, e);
 		#endregion
 
 

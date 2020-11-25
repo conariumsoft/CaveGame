@@ -1,7 +1,7 @@
 ﻿using CaveGame.Core.Game.Entities;
 using CaveGame.Core.Furniture;
-using CaveGame.Core.Tiles;
-using CaveGame.Core.Walls;
+using CaveGame.Core.Game.Tiles;
+using CaveGame.Core.Game.Walls;
 using Microsoft.Xna.Framework;
 using System;
 using System.Diagnostics;
@@ -9,9 +9,45 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using CaveGame.Core.Game.Inventory;
+using CaveGame.Core.FileUtil;
+using CaveGame.Core.Inventory;
+using CaveGame.Core.Generic;
+using DataManagement;
 
 namespace CaveGame.Core.Network
 {
+
+	public static class MonoGameByteArrayExtensions // serialize monogame types
+    {
+
+		public static Vector2 ReadVector2(this byte[] data, int index)=> new Vector2(data.ReadFloat(index), data.ReadFloat(index + 4));
+		/// <summary>
+		/// Data Length = 8 (2*int)
+		/// </summary>
+		/// <param name="data"></param>
+		/// <param name="index"></param>
+		/// <param name="value"></param>
+        public static void WriteVector2(this byte[] data, int index, Vector2 value)
+        {
+			data.WriteFloat(index, value.X);
+			data.WriteFloat(index + 4, value.Y);
+        }
+		public static Color ReadColorRGBA(this byte[] data, int index) => new Color(data[index], data[index + 1], data[index + 2], data[index+3]);
+		/// <summary>
+		/// Data Length = 4 (4*byte)
+		/// </summary>
+		/// <param name="data"></param>
+		/// <param name="index"></param>
+		/// <param name="value"></param>
+		public static void WriteColorRGBA(this byte[] data, int index, Color value)
+        {
+			data[index] = value.R;
+			data[index + 1] = value.G;
+			data[index + 2] = value.B;
+			data[index + 3] = value.A;
+        }
+    }
 
 	public enum PacketType : uint
 	{
@@ -44,22 +80,21 @@ namespace CaveGame.Core.Network
 		SExplosion,
 		PlayerThrowItemAction,
 		SpawnBombEntity,
+		SpawnItemStackEntity,
 		PlaceFurniture, RemoveFurniture,
-		OpenDoor, CloseDoor, TimeOfDay
+		OpenDoor, CloseDoor, TimeOfDay,
+		TransferContainer,
+		UpdateContainer,
+		DamageTile,
+		GivePlayerItem, // Temporary for testing?
+
 	}
 
-	public enum DataSender : byte
-	{
-		SERVER,
-		CLIENT,
-		UNCONN_CLIENT,
-	}
 
 	public class Packet
 	{
 		public PacketType Type;
 		public long Timestamp;
-		public DataSender Sender;
 		public byte[] Payload = new byte[0];
 		// Creates a packet with the set type and an empty Payload
 		public Packet(PacketType type)
@@ -109,7 +144,6 @@ namespace CaveGame.Core.Network
 		// Sends a Packet to a specific receiver 
 		public void Send(UdpClient client, IPEndPoint receiver)
 		{
-			// TODO maybe be async instead?
 			byte[] bytes = GetBytes();
 			client.Send(bytes, bytes.Length, receiver);
 		}
@@ -133,37 +167,60 @@ namespace CaveGame.Core.Network
 			return bob.ToString();
 		}
 	}
+	/// <summary>
+	/// 
+	/// </summary>
 	public class GetServerInformationPacket : Packet
 	{
 		public GetServerInformationPacket(int protocol) : base(PacketType.GetServerInfo)
 		{
+			Payload = new byte[4];
 			ClientProtocolVersion = protocol;
 		}
+
 		public GetServerInformationPacket(byte[] data) : base(data) { }
-		public int ClientProtocolVersion
+		/// <summary> 
+		/// index 0, size 4 
+		/// </summary>
+		public int ClientProtocolVersion 
 		{
-			get { return TypeSerializer.ToInt(Payload, 0); }
-			set { TypeSerializer.FromInt(ref Payload, 0, value); }
+			get => Payload.ReadInt(0);
+			set => Payload.WriteInt(0, value);
 		}
 	}
+	/// <summary>
+	/// 
+	/// </summary>
 	public class ServerInformationReplyPacket : Packet
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		public int ServerProtocolVersion
 		{
 			get { return TypeSerializer.ToInt(Payload, 0); }
 			set { TypeSerializer.FromInt(ref Payload, 0, value); }
 		}
+		/// <summary>
+		/// 
+		/// </summary>
 		public int MaxPlayers
 		{
 			get { return TypeSerializer.ToInt(Payload, 4); }
 			set { TypeSerializer.FromInt(ref Payload, 4, value); }
 
 		}
+		/// <summary>
+		/// 
+		/// </summary>
 		public string ServerName
 		{
 			get { return TypeSerializer.ToString(Encoding.ASCII, Payload, 8, 56); } //return Encoding.UTF8.GetString(Payload, 4, MessageLength); }
 			set { TypeSerializer.FromString(ref Payload, Encoding.ASCII, value, 8, 56); }
 		}
+		/// <summary>
+		/// 
+		/// </summary>
 		public string ServerMOTD 
 		{
 			get { return TypeSerializer.ToString(Encoding.ASCII, Payload, 64, 128); }
@@ -316,12 +373,122 @@ namespace CaveGame.Core.Network
 		}
 		public SpawnBombEntityPacket(byte[] data) : base(data) { }
 	}
+
+    public class SpawnItemStackPacket : Packet {
+
+		public int EntityNetworkID
+		{
+			get => Payload.ReadInt(0);
+			set => Payload.WriteInt(0, value);
+		}
+
+		public Vector2 Position
+        {
+			get => Payload.ReadVector2(4);
+			set => Payload.WriteVector2(4, value);
+		}
+		public ItemStack ItemStack
+        {
+			get
+            {
+				int quantity = Payload.ReadInt(12); 
+				var binary = Metabinary.Deserialize(Payload, 16);
+				Metabinary.DebugText(binary);
+				return new ItemStack { Quantity = quantity, Item = Item.FromMetadataComplex(binary) };
+            }
+			set
+            {
+				Metabinary data = value.Item.GetMetadataComplex();
+
+				byte[] bytedata = data.Serialize();
+				
+				Payload = new byte[16+bytedata.Length];
+				Payload.WriteInt(12, value.Quantity);
+				Array.Copy(bytedata, 0, Payload, 16, bytedata.Length);
+            }
+        }
+
+
+		public SpawnItemStackPacket(Vector2 position, ItemStack stack, int networkID) : base(PacketType.SpawnItemStackEntity)
+        {
+			ItemStack = stack; // Reminder: set ItemStack first to initalize payload size
+			// this is bad practice, but it works.
+			EntityNetworkID = networkID;
+			Position = position;
+        }
+		public SpawnItemStackPacket(byte[] data) : base(data) { }
+	}
+
+	public class GivePlayerItemPacket : Packet
+    {
+		public ItemStack Reward
+        {
+			get
+			{
+				int quantity = TypeSerializer.ToInt(Payload, 0);
+				var binary = Metabinary.Deserialize(Payload, 4);
+				Metabinary.DebugText(binary);
+				return new ItemStack { Quantity = quantity, Item = Item.FromMetadataComplex(binary) };
+			}
+			set
+			{
+				Metabinary data = value.Item.GetMetadataComplex();
+				byte[] bytedata = data.Serialize();
+				Payload = new byte[bytedata.Length + 4];
+
+				TypeSerializer.FromInt(ref Payload, 0, value.Quantity);
+				Array.Copy(bytedata, 0, Payload, 4, bytedata.Length);
+			}
+		}
+
+
+		public GivePlayerItemPacket(byte[] data) : base(data) { }
+		public GivePlayerItemPacket(ItemStack reward) : base(PacketType.GivePlayerItem)
+        {
+			
+			Reward = reward;
+        }
+    }
+	public class DamageTilePacket : Packet
+    {
+		public Point Position
+        {
+			get
+            {
+				int x = TypeSerializer.ToInt(Payload, 0);
+				int y = TypeSerializer.ToInt(Payload, 4);
+				return new Point(x, y);
+            }
+
+			set
+            {
+				TypeSerializer.FromInt(ref Payload, 0, value.X);
+				TypeSerializer.FromInt(ref Payload, 4, value.Y);
+			}
+        }
+
+		public int Damage
+        {
+			get => TypeSerializer.ToInt(Payload, 8);
+			set => TypeSerializer.FromInt(ref Payload, 8, value);
+        }
+
+		public DamageTilePacket(byte[] data) : base(data) { }
+
+		public DamageTilePacket(Point worldPosition, int damage) : base(PacketType.DamageTile) {
+			Payload = new byte[16];
+			Position = worldPosition;
+			Damage = damage;
+		}
+		
+    }
+
 	public class DropEntityPacket : Packet
 	{
 		public int EntityID
 		{
-			get { return TypeSerializer.ToInt(Payload, 0); }
-			set { TypeSerializer.FromInt(ref Payload, 0, value); }
+			get => TypeSerializer.ToInt(Payload, 0);
+			set => TypeSerializer.FromInt(ref Payload, 0, value);
 
 		}
 		public DropEntityPacket(int entityid) : base(PacketType.SDestroyEntity)
@@ -331,6 +498,22 @@ namespace CaveGame.Core.Network
 		}
 		public DropEntityPacket(byte[] data) : base(data) { }
 	}
+
+
+	public class TransferContainerPacket : Packet
+    {
+		
+		public TransferContainerPacket(Container container) : base(PacketType.TransferContainer)
+        {
+			Container = container;
+        }
+		public Container Container
+        {
+			get => Container.FromMetabinary(Metabinary.Deserialize(Payload));
+			set => Payload = value.ToMetabinary().Serialize();
+        }
+    }
+
 	public class AcceptJoinPacket : Packet
 	{
 		public int YourUserNetworkID { 
@@ -568,8 +751,8 @@ namespace CaveGame.Core.Network
 		public RemoveFurniturePacket(byte[] data) : base(data) { }
 		public int FurnitureNetworkID
 		{
-			get { return TypeSerializer.ToInt(Payload, 0); }
-			set { TypeSerializer.FromInt(ref Payload, 0, value); }
+			get => Payload.ReadInt(0);//{ return TypeSerializer.ToInt(Payload, 0); }
+			set => Payload.WriteInt(0, value);//{ TypeSerializer.FromInt(ref Payload, 0, value); }
 		}
 	}
 
@@ -577,10 +760,9 @@ namespace CaveGame.Core.Network
 	{
 		public int EntityID
 		{
-			get { return TypeSerializer.ToInt(Payload, 0); }
-			set { TypeSerializer.FromInt(ref Payload, 0, value); }
+			get => Payload.ReadInt(0);
+			set => Payload.WriteInt(0, value);
 		}
-
 		public HorizontalDirection Facing
 		{
 			get { return (HorizontalDirection)Payload[4]; }
@@ -600,7 +782,7 @@ namespace CaveGame.Core.Network
 
 		public PlayerStatePacket(HorizontalDirection f, bool grounded, bool walk) : base(PacketType.PlayerState)
 		{
-			Payload = new byte[12];
+			Payload = new byte[16];
 
 			OnGround = grounded;
 			Facing = f;
@@ -687,24 +869,18 @@ namespace CaveGame.Core.Network
 		public Chunk StoredChunk
 		{
 			get {
-				int chunkCoordsX = TypeSerializer.ToInt(Payload, 0);
-				int chunkCoordsY = TypeSerializer.ToInt(Payload, 4);
+				
+				int chunkCoordsX = Payload.ReadInt(0);
+				int chunkCoordsY = Payload.ReadInt(4);
 
 				Chunk chk = new Chunk(chunkCoordsX, chunkCoordsY);
-				int index = 2;
+				int index = 8;
 				for (int x = 0; x < Globals.ChunkSize; x++)
 				{
 					for (int y = 0; y < Globals.ChunkSize; y++)
 					{
-						
-
-						var t = Tile.FromID(Payload[index*4]);
-						t.Damage = Payload[1 + (index * 4)];
-						t.TileState = Payload[2 + (index * 4)];
-
-
-						chk.Tiles[x, y] = t;
-						index++;
+						chk.Tiles[x, y] = Tile.Deserialize(ref Payload, index);
+						index+=4;
 					}
 				}
 
@@ -712,22 +888,18 @@ namespace CaveGame.Core.Network
 				{
 					for (int y = 0; y < Globals.ChunkSize; y++)
 					{
-						var w = Wall.FromID(Payload[index * 4]);
-						w.Damage = Payload[1 + (index * 4)];
-
-						chk.Walls[x, y] = w;
-						index++;
+						chk.Walls[x, y] = Wall.Deserialize(ref Payload, index);
+						index+=4;
 					}
 				}
 				return chk;
 			}
 			set {
-				Payload = new byte[8200];
-				int index = 0;
-				TypeSerializer.FromInt(ref Payload, index , value.Coordinates.X);
-				index+=4;
-				TypeSerializer.FromInt(ref Payload, index, value.Coordinates.Y);
-				index+=4;
+				//Payload = new byte[10000];
+				
+				Payload.WriteInt(0, value.Coordinates.X);
+				Payload.WriteInt(4, value.Coordinates.Y);
+				int index = 8;
 				for (int x = 0; x < Globals.ChunkSize; x++)
 				{
 					for (int y = 0; y < Globals.ChunkSize; y++)
@@ -751,7 +923,7 @@ namespace CaveGame.Core.Network
 		public ChunkDownloadPacket(byte[] bytes) : base(bytes) { }
 		public ChunkDownloadPacket(Chunk chunk) : base(PacketType.SDownloadChunk)
 		{
-			Payload = new byte[4200];
+			Payload = new byte[10000];
 			StoredChunk = chunk;
 		}
 	}
@@ -788,7 +960,6 @@ namespace CaveGame.Core.Network
 	{
 		public PlayerActionPacket(PacketType type) : base(type)
 		{
-
 		}
 
 		
@@ -797,33 +968,33 @@ namespace CaveGame.Core.Network
 	public class PlaceWallPacket : Packet
 	{
 
-		public byte WallID
+		public short WallID
 		{
-			get { return Payload[0]; }
-			set { Payload[0] = value; }
+			get => Payload.ReadShort(0);
+			set => Payload.WriteShort(0, value);
 		}
 		public byte TileState
-		{
-			get { return Payload[1]; }
-			set { Payload[1] = value; }
-		}
-		public byte Damage
 		{
 			get { return Payload[2]; }
 			set { Payload[2] = value; }
 		}
+		public byte Damage
+		{
+			get { return Payload[3]; }
+			set { Payload[3] = value; }
+		}
 		public int WorldX
 		{
-			get { return TypeSerializer.ToInt(Payload, 4); }
-			set { TypeSerializer.FromInt(ref Payload, 4, value); }
+			get => Payload.ReadInt(4);
+			set => Payload.WriteInt(4, value);
 		}
 		public int WorldY
 		{
-			get { return TypeSerializer.ToInt(Payload, 8); }
-			set { TypeSerializer.FromInt(ref Payload, 8, value); }
+			get => Payload.ReadInt(8);
+			set => Payload.WriteInt(8, value);
 		}
 		public PlaceWallPacket(byte[] data) : base(data) { }
-		public PlaceWallPacket(byte wallID, byte tileState, byte damage, int worldX, int worldY) : base(PacketType.PlaceWall)
+		public PlaceWallPacket(short wallID, byte tileState, byte damage, int worldX, int worldY) : base(PacketType.PlaceWall)
 		{
 			Payload = new byte[16];
 			WallID = wallID;
@@ -835,34 +1006,34 @@ namespace CaveGame.Core.Network
 	}
 	public class PlaceTilePacket : Packet 
 	{
-		public byte TileID
+		public short TileID
 		{
-			get { return Payload[0];  }
-			set { Payload[0] = value; }
+			get => Payload.ReadShort(0);
+			set => Payload.WriteShort(0, value);
 		}
 		public byte TileState
 		{
-			get { return Payload[1];  }
-			set { Payload[1] = value; }
+			get => Payload[2];
+			set => Payload[2] = value;
 		}
 		public byte Damage
 		{
-			get { return Payload[2];  }
-			set { Payload[2] = value; }
+			get { return Payload[3];  }
+			set { Payload[3] = value; }
 		}
 		public int WorldX
 		{
-			get { return TypeSerializer.ToInt(Payload, 4); }
-			set { TypeSerializer.FromInt(ref Payload, 4, value); }
+			get => Payload.ReadInt(4); //{ return TypeSerializer.ToInt(Payload, 4); }
+			set => Payload.WriteInt(4, value); //{ TypeSerializer.FromInt(ref Payload, 4, value); }
 		}
 		public int WorldY
 		{
-			get { return TypeSerializer.ToInt(Payload, 8); }
-			set { TypeSerializer.FromInt(ref Payload, 8, value); }
+			get => Payload.ReadInt(8); // { return TypeSerializer.ToInt(Payload, 8); }
+			set => Payload.WriteInt(8, value);//{ TypeSerializer.FromInt(ref Payload, 8, value); }
 		}
 		public PlaceTilePacket(byte[] data) : base(data) { }
-		public PlaceTilePacket(byte tileID, byte tileState, byte damage, int worldX, int worldY) : base(PacketType.PlaceTile) {
-			Payload = new byte[16];
+		public PlaceTilePacket(short tileID, byte tileState, byte damage, int worldX, int worldY) : base(PacketType.PlaceTile) {
+			Payload = new byte[24];
 			TileID = tileID;
 			TileState = tileState;
 			Damage = damage;

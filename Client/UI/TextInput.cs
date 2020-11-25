@@ -1,4 +1,5 @@
-﻿using CaveGame.Core;
+﻿using CaveGame.Client.Input;
+using CaveGame.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -9,68 +10,7 @@ using TextCopy;
 
 namespace CaveGame.Client.UI
 {
-	// clipboard support provided by: https://github.com/CopyText/TextCopy
-
-	public class KeyPressWrapper
-	{
-
-		KeyboardState previousKB = Keyboard.GetState();
-		KeyboardState currentKB = Keyboard.GetState();
-		Keys listenFor;
-
-		const float initialPressRepeatDelay = 0.4f;
-		const float repeatDelay = 0.05f;
-
-		float initialPressTimer;
-		float repeatTimer;
-
-		bool startRepeating;
-
-		public KeyPressWrapper(Keys key)
-		{
-			listenFor = key;
-		}
-		//private bool JustPressed(Keys key) => currentKB.IsKeyDown(key) && !previousKB.IsKeyDown(key);
-		public bool KeySignal { get; private set; }
-
-		public void Update(GameTime gt)
-		{
-			currentKB = Keyboard.GetState();
-
-			KeySignal = false;
-
-			if (currentKB.IsKeyDown(listenFor))
-			{
-				if (initialPressTimer == initialPressRepeatDelay)
-				{
-					KeySignal = true;
-				}
-
-				if (initialPressTimer > 0)
-				{
-					initialPressTimer -= gt.GetDelta();
-				} else
-				{
-					repeatTimer -= gt.GetDelta();
-
-					if (repeatTimer <= 0)
-					{
-						KeySignal = true;
-						repeatTimer = repeatDelay;
-					}
-				}
-			} else
-			{
-				initialPressTimer = initialPressRepeatDelay;
-				repeatTimer = repeatDelay;
-				KeySignal = false;
-			}
-
-
-
-			previousKB = currentKB;
-		}
-	}
+	
 
 	public interface ITextProvider
 	{
@@ -120,11 +60,11 @@ namespace CaveGame.Client.UI
 		KeyboardState previousKB = Keyboard.GetState();
 		KeyboardState currentKB = Keyboard.GetState();
 
-		KeyPressWrapper xKeyHandler = new KeyPressWrapper(Keys.X);
-		KeyPressWrapper cKeyHandler = new KeyPressWrapper(Keys.C);
-		KeyPressWrapper vKeyHandler = new KeyPressWrapper(Keys.V);
-		KeyPressWrapper leftArrowHandler = new KeyPressWrapper(Keys.Left);
-		KeyPressWrapper rightArrowHandler = new KeyPressWrapper(Keys.Right);
+		KeyPressDetector xKeyHandler = new KeyPressDetector(Keys.X);
+		KeyPressDetector cKeyHandler = new KeyPressDetector(Keys.C);
+		KeyPressDetector vKeyHandler = new KeyPressDetector(Keys.V);
+		KeyPressDetector leftArrowHandler = new KeyPressDetector(Keys.Left);
+		KeyPressDetector rightArrowHandler = new KeyPressDetector(Keys.Right);
 		public TextInput()
 		{
 			BlacklistedCharacters = new List<char>();

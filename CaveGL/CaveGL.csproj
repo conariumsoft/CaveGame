@@ -59,8 +59,14 @@
     <TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="Assets\Scripts\MainMenu.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Scripts\menu.lua">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Scripts\SingleplayerMenu.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Textures\icon.png">
       <Pack>True</Pack>
@@ -73,6 +79,7 @@
   <Import Project="..\Client\Client.projitems" Label="Shared" />
   <Import Project="..\Core\CaveCore.projitems" Label="Shared" />
   <Import Project="..\Server\CaveServer.projitems" Label="Shared" />
+  <Import Project="..\DataManagement\DataManagement.projitems" Label="Shared" />
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
 	  <!--Exec Command="copy &quot;$(ProjectDir)Content\bin\&quot; &quot;$(TargetDir)Content\&quot;" /-->
   </Target>

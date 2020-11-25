@@ -1,4 +1,5 @@
 ﻿using CaveGame.Core;
+using DataManagement;
 using Microsoft.Xna.Framework;
 
 namespace CaveGame.Client.UI
@@ -71,10 +72,10 @@ namespace CaveGame.Client.UI
 		public static UICoords Lerp(UICoords a, UICoords b, float t)
 		{
 			return new UICoords(
-				Extensions.Lerp(a.Pixels.X, b.Pixels.X, t),
-				Extensions.Lerp(a.Pixels.Y, b.Pixels.Y, t),
-				Extensions.Lerp(a.Scale.X, b.Scale.X, t),
-				Extensions.Lerp(a.Scale.Y, b.Scale.Y, t)
+				MathematicsExtensions.Lerp(a.Pixels.X, b.Pixels.X, t),
+				MathematicsExtensions.Lerp(a.Pixels.Y, b.Pixels.Y, t),
+				MathematicsExtensions.Lerp(a.Scale.X, b.Scale.X, t),
+				MathematicsExtensions.Lerp(a.Scale.Y, b.Scale.Y, t)
 			);
 		}
 

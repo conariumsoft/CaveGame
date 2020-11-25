@@ -1,6 +1,7 @@
 ﻿using CaveGame.Core;
 using CaveGame.Core.Game.Entities;
-using CaveGame.Core.Tiles;
+using CaveGame.Core.Game.Inventory;
+using CaveGame.Core.Game.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -10,9 +11,16 @@ using System.Text;
 
 namespace CaveGame.Client.Game.Entities
 {
-	public class LocalPlayer : ClientPlayer
+
+
+
+	public class LocalPlayer : ClientPlayer, IClientPhysicsObserver
 	{
 		float jumpEnergy;
+
+		
+
+
 
 		public bool IgnoreInput { get; set; }
 
@@ -69,6 +77,8 @@ namespace CaveGame.Client.Game.Entities
 
 			base.OnCollide(world, t, separation, normal, tilePos);
 		}
+
+
 
 		public override void PhysicsStep(IGameWorld world, float step)
 		{
@@ -158,6 +168,8 @@ namespace CaveGame.Client.Game.Entities
 
 			base.PhysicsStep(world, step);
 		}
+
+		public virtual void ClientPhysicsTick(IClientWorld world, float step) => PhysicsStep(world, step);
 
 	}
 }

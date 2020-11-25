@@ -1,6 +1,7 @@
 ﻿using CaveGame.Core.FileUtil;
-using CaveGame.Core.Tiles;
-using CaveGame.Core.Walls;
+using CaveGame.Core.Game.Tiles;
+using CaveGame.Core.Game.Walls;
+using DataManagement;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,6 +14,8 @@ using System.Xml.Serialization;
 
 namespace CaveGame.Core.FileUtil
 {
+
+
 	[Serializable]
 	public class StructureMetadata
 	{
@@ -57,8 +60,8 @@ namespace CaveGame.Core.FileUtil
 		public Layer(StructureFile file) {
 			
 			Structure = file;
-			Tiles = new CaveGame.Core.Tiles.Tile[Structure.Metadata.Width, Structure.Metadata.Height];
-			Walls = new CaveGame.Core.Walls.Wall[Structure.Metadata.Width, Structure.Metadata.Height];
+			Tiles = new CaveGame.Core.Game.Tiles.Tile[Structure.Metadata.Width, Structure.Metadata.Height];
+			Walls = new CaveGame.Core.Game.Walls.Wall[Structure.Metadata.Width, Structure.Metadata.Height];
 			Furniture = new List<Furniture>();
 		}
 
@@ -74,10 +77,9 @@ namespace CaveGame.Core.FileUtil
 			{
 				for (int y = 0; y < Structure.Metadata.Height; y++)
 				{
-					Tile t = Tile.FromID(TileData[index]);
-					Trace.WriteLine(t);
+					Tile t = Tile.FromID(TileData.ReadShort(index));
 					Tiles[x,y] = t;
-					index++;
+					index+=2;
 				}
 			}
 
@@ -91,10 +93,9 @@ namespace CaveGame.Core.FileUtil
 			{
 				for (int y = 0; y < Structure.Metadata.Height; y++)
 				{
-					Wall w = Wall.FromID(WallData[index]);
-					Trace.WriteLine(w);
+					Wall w = Wall.FromID(WallData.ReadShort(index));
 					Walls[x,y] = w;
-					index++;
+					index+=2;
 				}
 			}
 		}
@@ -102,7 +103,7 @@ namespace CaveGame.Core.FileUtil
 		public byte[] SaveTiles()
 		{
 
-			byte[] TileData = new byte[Structure.Metadata.Width * Structure.Metadata.Height];
+			byte[] TileData = new byte[Structure.Metadata.Width * Structure.Metadata.Height*2];
 				
 
 			int index = 0;
@@ -110,8 +111,8 @@ namespace CaveGame.Core.FileUtil
 			{
 				for (int y = 0; y < Structure.Metadata.Height; y++)
 				{
-					TileData[index] = Tiles[x,y].ID;
-					index++;
+					TileData.WriteShort(index, Tiles[x,y].ID);
+					index+=2;
 				}
 			}
 
@@ -121,15 +122,15 @@ namespace CaveGame.Core.FileUtil
 		public byte[] SaveWalls()
 		{
 
-			byte[] WallData = new byte[Structure.Metadata.Width * Structure.Metadata.Height];
+			byte[] WallData = new byte[Structure.Metadata.Width * Structure.Metadata.Height*2];
 
 			int index = 0;
 			for (int x = 0; x < Structure.Metadata.Width; x++)
 			{
 				for (int y = 0; y < Structure.Metadata.Height; y++)
 				{
-					WallData[index] = Walls[x,y].ID;
-					index++;
+					WallData.WriteShort(index, Walls[x,y].ID);
+					index+=2;
 				}
 			}
 

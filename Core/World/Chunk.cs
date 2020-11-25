@@ -1,12 +1,13 @@
 ﻿using CaveGame.Core.Noise;
-using CaveGame.Core.Tiles;
-using CaveGame.Core.Walls;
+using CaveGame.Core.Game.Tiles;
+using DataManagement;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using CaveGame.Core.Game.Walls;
 
 namespace CaveGame.Core
 {
@@ -48,8 +49,8 @@ namespace CaveGame.Core
 			{
 				for (int y = 0; y < ChunkSize; y++)
 				{
-					SetTile(x, y, new Tiles.Air());
-					SetWall(x, y, new Walls.Air());
+					SetTile(x, y, new Game.Tiles.Air());
+					SetWall(x, y, new Game.Walls.Air());
 				}
 			}
 			
@@ -109,7 +110,7 @@ namespace CaveGame.Core
 			{
 				for (int y = 0; y < Globals.ChunkSize; y++)
 				{
-					Tiles[x, y].Serialize(ref data, dIndex);
+					Tiles[x, y].Encode(ref data, dIndex);
 					dIndex += 4;
 				}
 			}
@@ -118,7 +119,7 @@ namespace CaveGame.Core
 			{
 				for (int y = 0; y < Globals.ChunkSize; y++)
 				{
-					Walls[x, y].Serialize(ref data, dIndex);
+					Walls[x, y].Decode(ref data, dIndex);
 					dIndex += 4;
 				}
 			}

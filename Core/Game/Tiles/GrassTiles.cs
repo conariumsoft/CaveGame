@@ -1,14 +1,26 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CaveGame.Core.Inventory;
+#if !EDITOR
+using CaveGame.Server;
+#endif
+using DataManagement;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CaveGame.Core.Tiles
+namespace CaveGame.Core.Game.Tiles
 {
 	public class BaseGrass : Tile, ISoil
 	{
-		public BaseGrass(TDef def) : base(def) { }
+        public override Rectangle Quad => TileMap.Soil;
+        public override byte Hardness => 2;
+
+        public override void Drop(IGameServer server, IGameWorld world, Point tilePosition)
+		{
+			ItemStack stack = new ItemStack { Quantity = 1, Item = new TileItem(new Dirt()) };
+			Drop(server, world, tilePosition, stack);
+		}
 
 		public static Rectangle Patch = new Rectangle(8 * Globals.TileSize, 6 * Globals.TileSize, Globals.TileSize, Globals.TileSize);
 
@@ -65,9 +77,6 @@ namespace CaveGame.Core.Tiles
 			return false;
 		}
 
-
-		
-
 		public void LocalTileUpdate<T>(IGameWorld world, int x, int y)
 		{
 			bool planetop = IsEmpty(world, x, y - 1);
@@ -108,9 +117,10 @@ namespace CaveGame.Core.Tiles
 	{
 
 		public Light3 Light => new Light3(1,1,4);
-		public Mycelium() : base(TileDefinitions.Mycelium) { }
+        public override Color Color => new Color(0.1f, 0.1f, 2.5f);
+        public override byte Opacity => 2;
 
-		public void Spread(IGameWorld world, int x, int y)
+        public void Spread(IGameWorld world, int x, int y)
 		{
 			var above = world.GetTile(x, y - 1);
 			var below = world.GetTile(x, y + 1);
@@ -131,7 +141,7 @@ namespace CaveGame.Core.Tiles
 				double rand = RNG.NextDouble();
 				if (rand > 0.6)
 				{
-					world.SetTile(x, y - 1, new BlueMushroom());
+					world.SetTile(x, y - 1, new BlueOysterMushroom());
 				} else
 				{
 					world.SetTile(x, y - 1, new BlueTallgrass());
@@ -205,9 +215,9 @@ namespace CaveGame.Core.Tiles
 
 	public class Grass : BaseGrass, IRandomTick, ITileUpdate, ILocalTileUpdate
 	{
-		public Grass() : base(TileDefinitions.Grass) { }
+        public override Color Color => Color.Green;
 
-		public void Spread(IGameWorld world, int x, int y)
+        public void Spread(IGameWorld world, int x, int y)
 		{
 			var above = world.GetTile(x, y - 1);
 			var below = world.GetTile(x, y + 1);

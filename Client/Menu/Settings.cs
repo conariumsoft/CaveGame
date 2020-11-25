@@ -1,5 +1,5 @@
 ﻿using CaveGame.Client.UI;
-using CaveGame.Core.Tiles;
+using CaveGame.Core.Game.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -73,7 +73,7 @@ namespace CaveGame.Client.Menu
 					return "Off";
 			}
 
-			SettingsUI = new UIRoot(Game.GraphicsDevice);
+			SettingsUI = new UIRoot();
 
 			Label title = new Label
 			{

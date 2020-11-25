@@ -49,7 +49,7 @@ namespace CaveGame.Client.Menu
 
 		private void ConstructUIElements()
 		{
-			CreditsPage = new UIRoot(Game.GraphicsDevice);
+			CreditsPage = new UIRoot();
 
 			UIRect creditslist = new UIRect
 			{

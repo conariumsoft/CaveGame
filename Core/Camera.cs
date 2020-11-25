@@ -4,6 +4,7 @@ using System;
 
 namespace CaveGame.Core
 {
+
     public class Camera2D
     {
         public float Zoom { get; set; }
@@ -16,24 +17,24 @@ namespace CaveGame.Core
         public Vector2 _screenSize;
 
         public Vector2 TopLeft
-		{
+        {
             get { return Position; }
-		}
+        }
 
         public Vector2 ShakeVector { get; set; }
 
         public void Shake(float x, float y)
-		{
+        {
             ShakeVector += new Vector2(x, y);
-		}
+        }
 
         public Vector2 WorldToScreenCoordinates(Vector2 worldCoords)
-		{
+        {
             return Vector2.Transform(worldCoords, View);
-		}
+        }
 
         public Vector2 ScreenToWorldCoordinates(Vector2 screenCoords)
-		{
+        {
             return Vector2.Transform(screenCoords, Matrix.Invert(View));
         }
 
@@ -43,7 +44,8 @@ namespace CaveGame.Core
         }
         public Matrix View
         {
-            get {
+            get
+            {
                 return
                     Matrix.CreateTranslation(new Vector3(-OutputPosition.X, -OutputPosition.Y, 0)) *
                     Matrix.CreateRotationZ(Rotation) *
@@ -71,7 +73,7 @@ namespace CaveGame.Core
             }
         }
 
-        public Camera2D(Viewport viewport) 
+        public Camera2D(Viewport viewport)
         {
             Bounds = viewport.Bounds;
             _screenSize = new Vector2(Bounds.Width, Bounds.Height);
@@ -81,20 +83,21 @@ namespace CaveGame.Core
         }
         Random rng = new Random();
         public void Update(GameTime gt)
-		{
-            ShakeVector *= 1.0f - (gt.GetDelta()*2.0f);
+        {
+            ShakeVector *= 1.0f - (gt.GetDelta() * 2.0f);
 
             if (ShakeVector.Length() > 1f)
-			{
+            {
                 float cap = 100;
-                float x = (float)(rng.NextDouble() - 0.5)*Math.Min(ShakeVector.X, cap);
+                float x = (float)(rng.NextDouble() - 0.5) * Math.Min(ShakeVector.X, cap);
                 float y = (float)(rng.NextDouble() - 0.5) * Math.Min(ShakeVector.Y, cap);
 
                 OutputPosition = Position + new Vector2(x, y);
-			} else
-			{
+            }
+            else
+            {
                 OutputPosition = Position;
             }
-		}
+        }
     }
 }

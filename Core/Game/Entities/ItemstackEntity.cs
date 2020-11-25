@@ -1,27 +1,129 @@
-﻿using CaveGame.Core.Inventory;
+﻿#if CLIENT
+using CaveGame.Client;
+#endif
+using CaveGame.Core.Inventory;
+using CaveGame.Core.Network;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace CaveGame.Core.Game.Entities
 {
-	public class ItemstackEntity : PhysicsEntity
+	// client-relevant code
+	public partial class ItemstackEntity : PhysicsEntity, IClientPhysicsObserver
 	{
-		public override float Mass => 1;
-
+		public override float Mass => 0.3f;
 		public override Vector2 BoundingBox => new Vector2(4, 4);
-
-		public override Vector2 Friction => new Vector2(0.95f, 0.95f);
-
+		public override Vector2 Friction => new Vector2(5.0f, 0.5f);
 
 		public ItemStack ItemStack;
 
+		private float hover = 0;
 
-		public override void Draw(SpriteBatch sb)
+		public void ClientPhysicsTick(IClientWorld world, float step) => PhysicsStep(world, step);
+
+
+		public override void ClientUpdate(IClientWorld world, GameTime gt)
+        {
+			hover += gt.GetDelta();
+			base.ClientUpdate(world, gt);
+        }
+
+        public override void Draw(SpriteBatch sb)
 		{
-			base.Draw(sb);
+
+			var drawPos = TopLeft + new Vector2(0, (float)Math.Sin((double)hover * 1.5) * 1.0f);
+
+			if (ItemStack.Quantity > 0 && !Dead)
+            {
+
+				if (ItemStack.Quantity > 10)
+				{
+					ItemStack.Item.Draw(sb, drawPos + new Vector2(-2f, -2f), 0.5f);
+				}
+				if (ItemStack.Quantity > 1)
+				{
+					ItemStack.Item.Draw(sb, drawPos + new Vector2(-1f, -1f), 0.5f);
+				}
+				
+				ItemStack.Item.Draw(sb, drawPos, 0.5f);
+			
+				if (ItemStack.Quantity > 100)
+				{
+					ItemStack.Item.Draw(sb, drawPos + new Vector2(1f, 1f), 0.5f);
+				}
+			}
+
+
+#if CLIENT
+			sb.Print(Color.White, drawPos - new Vector2(0, 10), ItemStack.Quantity.ToString());
+#endif
+		}
+	}
+
+
+
+
+	// server-relevant code
+	public partial class ItemstackEntity : PhysicsEntity, IServerPhysicsObserver, IServerLogical
+	{
+		public void ServerPhysicsTick(IServerWorld world, float step)
+		{
+
+			foreach (var entity in world.Entities.ToArray())
+			{
+
+				if (entity is Player player && player.Position.Distance(Position) < 50)
+				{
+					float distance = player.Position.Distance(Position);
+					Vector2 unitVec = player.Position - Position;
+					unitVec.Normalize();
+					Velocity += (unitVec * Math.Max(0.75f - (distance / 6), 0.05f));
+
+
+					if (this.Dead == false && player.User != null && ItemStack.Quantity > 0 && player.Position.Distance(Position) < 10)
+					{
+						player.User.Send(new GivePlayerItemPacket(this.ItemStack));
+						// TODO: Add Item to player Inventory
+						this.Dead = true;
+						return;
+					}
+				}
+
+
+				if (entity is ItemstackEntity partner && entity != this)
+				{
+					if (partner.ItemStack.Quantity > 0 && ItemStack.Quantity > 0 && partner.ItemStack.AreCombinable(ItemStack) && partner.Position.Distance(Position) < 10)
+					{
+						int spaceLeft = Math.Min(ItemStack.Item.MaxStack - ItemStack.Quantity, partner.ItemStack.Quantity);
+
+						if (spaceLeft > 0)
+						{
+							partner.ItemStack.Quantity -= spaceLeft;
+							partner.Dead = true;
+							ItemStack.Quantity += spaceLeft;
+							return;
+						}
+					}
+				}
+			}
+
+			base.PhysicsStep(world, step);
+		}
+
+		public override void ServerUpdate(IServerWorld world, GameTime gt)
+		{
+
+			if (ItemStack.Quantity <= 0)
+			{
+				this.Dead = true;
+				return;
+			}
+
+			base.ServerUpdate(world, gt);
 		}
 	}
 }

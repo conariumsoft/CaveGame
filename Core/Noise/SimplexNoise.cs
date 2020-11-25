@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataManagement;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,8 +7,10 @@ namespace CaveGame.Core.Noise
 {
     public class SimplexNoise
     {
+
+        public static FloatRange Interval = new FloatRange(-1, 1);
         /// <summary>
-        /// 1D simplex noise
+        /// 1D simplex noise (returns value in [-1, 1] range)
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
@@ -33,7 +36,7 @@ namespace CaveGame.Core.Noise
         }
 
         /// <summary>
-        /// 2D simplex noise
+        /// 2D simplex noise (returns value in [-1, 1] range)
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -110,6 +113,7 @@ namespace CaveGame.Core.Noise
             // The result is scaled to return values in the interval [-1,1].
             return 40.0f * (n0 + n1 + n2); // TODO: The scale factor is preliminary!
         }
+        public float Noise(int x, int y, float xScale, float yScale, float xOffset, float yOffset) => Noise((x + xOffset) / xScale, (y + yOffset) / yScale);
 
         public float Noise(float x, float y, float z)
         {

@@ -40,4 +40,5 @@
   </ItemGroup>
   <Import Project="..\Core\CaveCore.projitems" Label="Shared" />
   <Import Project="..\Server\CaveServer.projitems" Label="Shared" />
+  <Import Project="..\DataManagement\DataManagement.projitems" Label="Shared" />
 </Project>

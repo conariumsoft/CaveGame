@@ -10,11 +10,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Assets.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DebugTools\ChunkGridLineRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\LocalPlayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\PeerPlayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\ClientPlayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InputManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Input\KeyPressDetector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\Multiplayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\TimeoutMenu.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DebugTools\NetGraph.cs" />
@@ -32,7 +34,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Particles\ParticleEmitter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NetworkClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IGameContext.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Menu\Homepage.cs" />
+    <Compile Include="..\Client\Menu\MenuManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PlayerContainerFrontend.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Label.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\NineSlice.cs" />
@@ -46,8 +49,5 @@
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)DebugTools\" />
   </ItemGroup>
 </Project>

@@ -3,7 +3,6 @@ using CaveGame.Core.Game.Entities;
 using CaveGame.Core.Furniture;
 using CaveGame.Core.Generic;
 using CaveGame.Core.Network;
-using CaveGame.Core.Tiles;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -12,6 +11,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Collections.Concurrent;
+using CaveGame.Core.Game.Tiles;
 
 namespace CaveGame.Server
 {
@@ -28,6 +29,8 @@ namespace CaveGame.Server
 
 	public class ServerWorld : Core.World, IServerWorld
 	{
+		private ConcurrentQueue<IEntity> entityQueue;
+		public void SpawnEntity(IEntity entity) => entityQueue.Enqueue(entity);
 		public int WorldSeed { get; }
 		public string WorldName { get; }
 		public GameServer Server { get; set; }
@@ -43,9 +46,10 @@ namespace CaveGame.Server
 
 		private ServerWorld() : base()
 		{
+			entityQueue = new ConcurrentQueue<IEntity>();
 			serverTileUpdateTask = new DelayedTask(ApplyTileUpdates, 1 / 10.0f);
 			serverRandomTileUpdateTask = new DelayedTask(ApplyRandomTileTicksToLoadedChunks, 1 / 5.0f);
-			Generator = new Generator();
+			Generator = new Generator(WorldSeed);
 		}
 
 
@@ -75,7 +79,7 @@ namespace CaveGame.Server
 		// Load from file 
 		public ServerWorld(string worldname) : this()
 		{
-
+			
 
 			XmlDocument worldmeta = new XmlDocument();
 			worldmeta.Load(@"Worlds\" + worldname + @"\WorldMetadata.xml");
@@ -171,8 +175,20 @@ namespace CaveGame.Server
 			return chunk;
 		}
 
+		protected override void PhysicsStep()
+		{
+			foreach (IEntity entity in Entities.ToArray())
+				if (entity is IServerPhysicsObserver physicsObserver)
+					physicsObserver.ServerPhysicsTick(this, PhysicsStepIncrement);
+		}
 
-		public override void RemoveFurniture(Core.Furniture.FurnitureTile furn)
+		public override void BreakTile(int x, int y)
+        {
+			GetTile(x, y).Drop(Server, this, new Point(x, y));
+			SetTile(x, y, new Air());
+            base.BreakTile(x, y);
+        }
+        public override void RemoveFurniture(Core.Furniture.FurnitureTile furn)
 		{
 			
 			Server.SendToAll(new RemoveFurniturePacket(furn.FurnitureNetworkID));
@@ -249,7 +265,7 @@ namespace CaveGame.Server
 					{
 
 						var dist = (entpos.Position - pos).Length();
-						var power = Math.Min((1 / dist) * strength * 8, 300);
+						var power = Math.Min((1 / dist) * strength * 8.5f, 350);
 						var unitVec = (entpos.Position - pos);
 						unitVec.Normalize();
 
@@ -273,11 +289,15 @@ namespace CaveGame.Server
 
 						var centroid = new Point((int)pos.X / Globals.TileSize, (int)pos.Y / Globals.TileSize) + new Point(x, y);
 						var tile = GetTile(centroid.X, centroid.Y);
+
+						if (tile is ILiquid)
+							continue;
+
 						tile.Damage += (byte)Math.Ceiling(damage);
 
 						if (tile.Damage > tile.Hardness)
 						{
-							SetTile(centroid.X, centroid.Y, new Air());
+							BreakTile(centroid.X, centroid.Y);
 						}
 					}
 				}
@@ -293,13 +313,21 @@ namespace CaveGame.Server
 
 		public override void Update(GameTime gt)
 		{
+			for (int i = 0; i < entityQueue.Count; i++)
+            {
+				bool success = entityQueue.TryDequeue(out var newEntity);
+				if (success)
+					Entities.Add(newEntity);
+            }
+
 			serverRandomTileUpdateTask.Update(gt);
 			serverTileUpdateTask.Update(gt);
 
 			
 
-			foreach (var ent in Entities)
+			foreach (var ent in Entities.ToArray())
 				ent.ServerUpdate(this, gt);
+				
 
 			base.Update(gt);
 		}

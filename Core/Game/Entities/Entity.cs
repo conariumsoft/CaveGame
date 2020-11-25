@@ -27,8 +27,8 @@ namespace CaveGame.Core.Game.Entities
 		HorizontalDirection Facing { get; set; }
 	}
 	public interface IPhysicsObject {
-		void PhysicsStep(IGameWorld world, float step);
-		void OnCollide(IGameWorld world, Tiles.Tile t, Vector2 separation, Vector2 normal, Point tilePos);
+		//void PhysicsStep(IGameWorld world, float step);
+		//void OnCollide(IGameWorld world, Tiles.Tile t, Vector2 separation, Vector2 normal, Point tilePos);
 		float Mass { get; }
 
 	}
@@ -36,8 +36,15 @@ namespace CaveGame.Core.Game.Entities
 	{
 		Vector2 Friction { get; }
 	}
-	public interface IEntity {
-		int EntityNetworkID { get; }
+	public interface IClientLogical {
+		void ClientUpdate(IClientWorld world, GameTime gt);
+	}
+	public interface IServerLogical {
+		void ServerUpdate(IServerWorld world, GameTime gt);
+	}
+	public interface IEntity
+	{
+		int EntityNetworkID { get; set; }
 		float DurationAlive { get; }
 		bool Dead { get; }
 		//void Update(IGameWorld world, GameTime gt);
@@ -48,9 +55,8 @@ namespace CaveGame.Core.Game.Entities
 		float ExpirationTicks { get; set; }
 	}
 
-	public class Entity: IEntity
+	public class Entity: IEntity, IServerLogical, IClientLogical
 	{
-
 		public float DurationAlive { get; set; }
 		public bool Dead { get; set; } // Gets collected on death
 		public bool RemoteControlled { get; set; }
@@ -69,34 +75,26 @@ namespace CaveGame.Core.Game.Entities
 
 		}
 
-		public virtual void Update(GameTime gt)
-		{
+		public Entity() {
+			ActiveEffects = new List<StatusEffect>();
+		}
+
+
+		public virtual void ClientUpdate(IClientWorld world, GameTime gt) {
+			DurationAlive += gt.GetDelta();
+		}
+
+		public virtual void ServerUpdate(IServerWorld world, GameTime gt) {
 			DurationAlive += gt.GetDelta();
 
 
-			foreach(StatusEffect effect in ActiveEffects.ToArray())
+			foreach (StatusEffect effect in ActiveEffects.ToArray())
 			{
 				effect.Duration -= gt.GetDelta();
 				effect.Tick(gt);
 			}
-			ActiveEffects.RemoveAll(e => e.Duration<0);
-
+			ActiveEffects.RemoveAll(e => e.Duration < 0);
 		}
-
-
-		public Entity()
-		{
-
-		}
-
-
-		public virtual void ClientUpdate(IClientWorld world, GameTime gt) { }
-		public virtual void ServerUpdate(IServerWorld world, GameTime gt) { }
 		public virtual void Draw(SpriteBatch sb) { }
-	}
-
-	public class Thinker : Entity
-	{
-
 	}
 }

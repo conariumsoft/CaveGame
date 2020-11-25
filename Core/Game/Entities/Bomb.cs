@@ -1,4 +1,4 @@
-﻿using CaveGame.Core.Tiles;
+﻿using CaveGame.Core.Game.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -11,8 +11,10 @@ using CaveGame.Client;
 
 namespace CaveGame.Core.Game.Entities
 {
-	public class Bomb : PhysicsEntity
+	public class Bomb : PhysicsEntity, IServerPhysicsObserver, IClientPhysicsObserver
 	{
+
+		public void ClientPhysicsTick(IClientWorld world, float step) => PhysicsStep(world, step);
 		public override float Mass => 0.8f;
 
 		public override Vector2 BoundingBox => new Vector2(6, 6);
@@ -24,12 +26,11 @@ namespace CaveGame.Core.Game.Entities
 		// collides with other bomb
 		public void OnCollide(IGameWorld world, Bomb family, Vector2 separation, Vector2 normal)
 		{
-			family.Velocity += normal*(Velocity/2);
+			family.Velocity += normal*(Velocity);
 		}
 
 		public override void OnCollide(IGameWorld world, Tile t, Vector2 separation, Vector2 normal, Point tilePos)
 		{
-
 			if (t is ILiquid liquid)
 			{
 				if (( normal.X != 0 || normal.Y != 0))
@@ -123,11 +124,16 @@ namespace CaveGame.Core.Game.Entities
 
 			base.ServerUpdate(world, gt);
 		}
+
+		public void ServerPhysicsTick(IServerWorld world, float step)
+		{
+			PhysicsStep(world, step);
+		}
 #if CLIENT
 		public override void Draw(SpriteBatch sb)
 		{
 			sb.Draw(ItemTextures.Bomb, TopLeft, null, Color.White, 0, new Vector2(0, 0), 0.75f, SpriteEffects.None, 0);
 		}
 #endif
-	}
+    }
 }

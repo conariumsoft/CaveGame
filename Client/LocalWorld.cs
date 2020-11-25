@@ -2,8 +2,9 @@
 using CaveGame.Core.Game.Entities;
 using CaveGame.Core.Generic;
 using CaveGame.Core.Particles;
-using CaveGame.Core.Tiles;
-using CaveGame.Core.Walls;
+using CaveGame.Core.Game.Tiles;
+using CaveGame.Core.Game.Walls;
+using DataManagement;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Concurrent;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using CaveGame.Core.Game.Walls;
 
 namespace CaveGame.Client
 {
@@ -121,7 +123,10 @@ namespace CaveGame.Client
 		protected override void PhysicsStep()
 		{
 			ParticleSystem.PhysicsStep(this, PhysicsStepIncrement);
-			base.PhysicsStep();
+			//base.PhysicsStep();
+			foreach (IEntity entity in Entities.ToArray())
+				if (entity is IClientPhysicsObserver physicsObserver)
+					physicsObserver.ClientPhysicsTick(this, PhysicsStepIncrement);
 		}
 
 		private void GetLatestDataFromLightingThread()
@@ -140,6 +145,7 @@ namespace CaveGame.Client
 
 			foreach (IEntity entity in Entities)
 				entity.ClientUpdate(this, gt);
+				
 
 			base.Update(gt);
 		}

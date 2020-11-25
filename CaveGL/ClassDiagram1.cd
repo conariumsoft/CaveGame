@@ -1,0 +1,3647 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" GroupingSetting="Access" MembersFormat="FullSignature">
+  <Class Name="CaveGame.Core.FileUtil.Configuration">
+    <Position X="6.5" Y="21.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgIAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\Configuration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.FileUtil.FilePathSanitizer">
+    <Position X="191" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\FilePathSanitizer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.FileUtil.MetabinaryTag">
+    <Position X="10.25" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAABAAAAAAAAAAAQAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\Metabinary.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.FileUtil.ComplexTag">
+    <Position X="1.25" Y="16.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAEAAAEAIABAAAAAIASQACQAACMAGAAAAAAAEAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\Metabinary.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.FileUtil.ByteTag">
+    <Position X="3.5" Y="16.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAABAAAAAAAAAAAQAACAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\Metabinary.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.FileUtil.ShortTag">
+    <Position X="5.75" Y="16.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAABAAAAAAAAAAAQAACAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\Metabinary.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.FileUtil.IntTag">
+    <Position X="8" Y="16.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAABAAAAAAAAAAAQAACAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\Metabinary.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.FileUtil.LongTag">
+    <Position X="10.25" Y="16.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAABAAAAAAAAAAAQAACAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\Metabinary.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.FileUtil.FloatTag">
+    <Position X="12.5" Y="16.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAABAAAAAAAAAAAQAACAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\Metabinary.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.FileUtil.DoubleTag">
+    <Position X="14.75" Y="16.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAABAAAAAAAAAAAQAACAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\Metabinary.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.FileUtil.ByteArrayTag">
+    <Position X="17" Y="16.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAABAAAAAAAAAAAQAACAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\Metabinary.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.FileUtil.StringTag">
+    <Position X="19.25" Y="16.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAABAAAAAAAAAAAQAACAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\Metabinary.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.FileUtil.Metabinary">
+    <Position X="1.25" Y="18.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIAIAAAAAAAAACBAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\Metabinary.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.FileUtil.StructureMetadata">
+    <Position X="189.25" Y="11.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAABAAAAAAAgAAAAEQAAAAEAgAAAAAAAAAAAEA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\StructureFile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.FileUtil.Furniture">
+    <Position X="177" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\StructureFile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.FileUtil.Layer">
+    <Position X="173.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAQAQAAAAFAAAAAAIIAAACAACBQAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\StructureFile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.FileUtil.StructureFile">
+    <Position X="12.25" Y="22.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAIAAAAAAAAAAAAAAAAAAAAAAAEAAQAAAAEAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\StructureFile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Game.CraftingRecipes.RecipeResult&lt;T&gt;">
+    <Position X="175.25" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\CraftingRecipes\Recipe.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Game.CraftingRecipes.Recipe">
+    <Position X="173.5" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\CraftingRecipes\Recipe.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Game.Entities.Bomb">
+    <Position X="19.75" Y="27.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAgAAAAAAAAgACCAAAAEAEAAAAgCAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Entities\Bomb.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Game.Entities.Entity">
+    <Position X="15.25" Y="24.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAQgCAGAAACACwACAAAAAAAAAAAAAAAAAAAACgAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Entities\Entity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Game.Entities.Thinker">
+    <Position X="10.75" Y="25.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Entities\Entity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Game.Entities.ItemstackEntity">
+    <Position X="13" Y="27.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAgAAAAAAAAAAACAAAAEAAAAAAACAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Entities\ItemstackEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Game.Entities.PhysicsEntity">
+    <Position X="16.5" Y="25.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAJAAAAAQIAAFAgIAAAAAAACCAAAAEAAAAIACCEAEA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Entities\PhysicsEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Game.Entities.Player">
+    <Position X="16.5" Y="27.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAABEAIQAAAQCAAAAAAAAEAAECAAAAEAAAAAggCAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Entities\Player.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Furniture.FurnitureTile">
+    <Position X="11.75" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAEAAIAAABAghAgAAAAAAAAADAAQAAAAAAAgAEAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Furniture\Furniture.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Furniture.Furnace">
+    <Position X="9.5" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAgAAAAAAAAAAAACAAAAAAAAQAgAEAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Furniture\Furniture.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Furniture.Chest">
+    <Position X="11.75" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAgAAAAAAAAAAAACAAAAAAAAQAgAEAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Furniture\Furniture.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Furniture.Bookshelf">
+    <Position X="14" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAgAAAAAAAAAAAACAAAAAAAAQAgAEAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Furniture\Furniture.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Furniture.PaintingFurniture">
+    <Position X="16.25" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAgAAAAAAAAAAAACAAAAAAAAAAgAEAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Furniture\Furniture.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Furniture.ForestPainting">
+    <Position X="16.25" Y="21.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Furniture\Furniture.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Furniture.Campfire">
+    <Position X="18.5" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAgAAAAAAAAAAAACAAAAAAAAAAgAEAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Furniture\Furniture.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Furniture.Workbench">
+    <Position X="5" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAABAgAAAAAAAAAAAACAAAAAAAAQAgAEAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Furniture\Furniture.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Furniture.WoodenDoor">
+    <Position X="7.25" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAIAAAAAghAAAAAAAAAAACAAAQEAAAQAhAEAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Furniture\Furniture.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Game.Inventory.Container">
+    <Position X="178.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAABAhAAAAQBAAAAEAAgQAAAgAAAAAQAAgAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Container.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.FurnitureItem">
+    <Position X="4.25" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgCAAAACAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\FurnitureItems.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.FurnaceItem">
+    <Position X="2" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\FurnitureItems.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.DoorItem">
+    <Position X="4.25" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\FurnitureItems.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.WorkbenchItem">
+    <Position X="6.5" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\FurnitureItems.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Item">
+    <Position X="19" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAAAggCAAAAAgAQAAAAAIEEAAAAQAgIBAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.GenericPickaxe">
+    <Position X="8.75" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.GenericWallScraper">
+    <Position X="11" Y="12.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.WallItem">
+    <Position X="13.25" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgCAAAAAAAQAAAAAAAQAAAAAAAABAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.TileItem">
+    <Position X="15.5" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgCAAAAAAAQAAAAAAAAAAAAAAAABAQA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.BombItem">
+    <Position X="17.75" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgCAAAAAAAAAAAAAAAAAAAAAAgAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Ingot">
+    <Position X="28" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgCAAAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.CopperIngot">
+    <Position X="29" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.LeadIngot">
+    <Position X="31.25" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.TinIngot">
+    <Position X="33.5" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.ChromiumIngot">
+    <Position X="35.75" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.AluminiumIngot">
+    <Position X="20" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.IronIngot">
+    <Position X="22.25" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.NickelIngot">
+    <Position X="24.5" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.GoldIngot">
+    <Position X="26.75" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.MilesHat">
+    <Position X="185.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.MilesBeard">
+    <Position X="184" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.MilesRobe">
+    <Position X="187.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.NatalieHat">
+    <Position X="192.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.NatalieRobe">
+    <Position X="170" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.NatalieLeggings">
+    <Position X="168.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.HeatRune">
+    <Position X="178.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.ElectricRune">
+    <Position X="175.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Necronomicon">
+    <Position X="171.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.ResurrectionTome">
+    <Position X="180.5" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Lean">
+    <Position X="175.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.ProgrammerSocks">
+    <Position X="192.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.OwlEyePotion">
+    <Position X="191" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.MetalDetector">
+    <Position X="178.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.EmptyBook">
+    <Position X="177" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Paper">
+    <Position X="192.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Sugar">
+    <Position X="191" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Sulphur">
+    <Position X="168.25" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.ThermiteMix">
+    <Position X="185.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.SoulManifold">
+    <Position X="175.25" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.EmptyBottle">
+    <Position X="178.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Fedora">
+    <Position X="189.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.TopHat">
+    <Position X="170" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.ArmyHelmet">
+    <Position X="180.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.NordicHelm">
+    <Position X="180.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.PhilosopherStone">
+    <Position X="171.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.PoisonVial">
+    <Position X="187.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.ShoeSpikes">
+    <Position X="168.25" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Jetpack">
+    <Position X="168.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.ExoskelHead">
+    <Position X="182.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.ExoskelTorso">
+    <Position X="185.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.ExoskelLegs">
+    <Position X="184" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.GrassSeeds">
+    <Position X="173.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Bucket">
+    <Position X="173.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.WaterBucket">
+    <Position X="168.25" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.MagmaBucket">
+    <Position X="171.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.SludgeBucket">
+    <Position X="173.5" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.LiquidOxygenTank">
+    <Position X="185.75" Y="6.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.LiquidNitrogenTank">
+    <Position X="182.25" Y="6.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.VRHeadset">
+    <Position X="189.25" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Transistor">
+    <Position X="171.75" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.M1911">
+    <Position X="170" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Uzi">
+    <Position X="185.75" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Revolver">
+    <Position X="182.25" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.PlasmaRifle">
+    <Position X="180.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Vulkan">
+    <Position X="191" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.ZeusCannon">
+    <Position X="180.5" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.SquirtGun">
+    <Position X="184" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.ProtonPump">
+    <Position X="168.25" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.FreezeRay">
+    <Position X="175.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Flamethrower">
+    <Position X="168.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Molotov">
+    <Position X="189.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Grenade">
+    <Position X="177" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Dynamite">
+    <Position X="170" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Bomb">
+    <Position X="170" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.StickyBomb">
+    <Position X="187.5" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Sparkler">
+    <Position X="178.75" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.GravityBoots">
+    <Position X="175.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Aqualung">
+    <Position X="178.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.ManletPotion">
+    <Position X="175.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.HellwalkerPotion">
+    <Position X="180.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.GlowingPotion">
+    <Position X="170" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.SpeedPotion">
+    <Position X="180.5" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.HP20Potion">
+    <Position X="187.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.HP50Potion">
+    <Position X="189.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Glue">
+    <Position X="171.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.PlasticPrinter">
+    <Position X="182.25" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Anvil">
+    <Position X="177" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Campfire">
+    <Position X="180.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.ArrowTurret">
+    <Position X="182.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.MGTurret">
+    <Position X="180.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.LaserTurret">
+    <Position X="171.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Teleporter">
+    <Position X="175.25" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Workbench">
+    <Position X="173.5" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.AlchemyLab">
+    <Position X="171.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Inventory.Hotbar">
+    <Position X="185.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\ItemStack.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Game.StatusEffects.StatusEffect">
+    <Position X="28.75" Y="25.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAAAAAAAAAAAAAAAAAhAAAAAAAAAQAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\StatusEffects\StatusEffect.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Game.StatusEffects.Burning">
+    <Position X="27.5" Y="26.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\StatusEffects\StatusEffect.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Game.StatusEffects.Poisoned">
+    <Position X="29.75" Y="26.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\StatusEffects\StatusEffect.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.BaseGrass">
+    <Position X="115.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAgAIAAAAAAAAAAAAQAAAAAAAAAAAQAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\BaseGrass.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Mycelium">
+    <Position X="114" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgIAABAAgAAAAAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\BaseGrass.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Grass">
+    <Position X="116.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgIAABAAAAAAAAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\BaseGrass.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.TileMap">
+    <Position X="195.25" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAEAwJAIEAgApARMMMAJoAJYAh2AAUW4HT8qJdMwQLQ=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\TileMap.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.TDef" BaseTypeListCollapsed="true">
+    <Position X="173.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAgAAAAAAAAgAAAAAAAgEAAAAAgAEAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.TileDefinitions">
+    <Position X="189.25" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ChsAAEBBSIUCgAA8UVQAgCBAYBEoAQUwmAAYYRIWwhQ=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Tile">
+    <Position X="87" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAEACAAgAAggAAgAAAAAAAErBAYggAAAAQgAEAABA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.FurniturePointer">
+    <Position X="105" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Void">
+    <Position X="118.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Air">
+    <Position X="127.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Vacuum">
+    <Position X="187.5" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Fog">
+    <Position X="170" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Miasma">
+    <Position X="182.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Dirt">
+    <Position X="132" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Mud">
+    <Position X="159" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Sand">
+    <Position X="161.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Snow">
+    <Position X="8.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Clay">
+    <Position X="15" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Liquid">
+    <Position X="24" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAEAAAAAgAAAAAAAAAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Lava">
+    <Position X="21.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAggIAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Water">
+    <Position X="24" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAggIAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Sludge">
+    <Position X="26.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAgAIAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Ectoplasm">
+    <Position X="173.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Oil">
+    <Position X="185.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.LiquidOxygen">
+    <Position X="184" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.LiquidNitrogen">
+    <Position X="180.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Cobweb">
+    <Position X="82.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Ladder">
+    <Position X="87" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Platform">
+    <Position X="93.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Rope">
+    <Position X="98.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Vine">
+    <Position X="107.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAggAAABAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Tallgrass">
+    <Position X="120.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAggAAABAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.BlueTallgrass">
+    <Position X="129.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAggAAABAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Plastic">
+    <Position X="4" Y="24.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.RedPlastic">
+    <Position X="0.75" Y="25.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.BluePlastic">
+    <Position X="3" Y="25.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.YellowPlastic">
+    <Position X="5.25" Y="25.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.GreenPlastic">
+    <Position X="7.5" Y="25.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Stone">
+    <Position X="163.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAgAIAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Sandstone">
+    <Position X="10.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Glass">
+    <Position X="17.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAIAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Limestone">
+    <Position X="178.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Obsidian">
+    <Position X="33" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Brimstone">
+    <Position X="171.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Ice">
+    <Position X="53.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.IceBrick">
+    <Position X="71.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.MossyStone">
+    <Position X="60" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.MossyStoneBrick">
+    <Position X="64.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.CarvedStoneBrick">
+    <Position X="69" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.CarvedSandBrick">
+    <Position X="84.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.CubedStone">
+    <Position X="89.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.CubedSandstone">
+    <Position X="96" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Granite">
+    <Position X="100.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Sovite">
+    <Position X="177" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Pyrite">
+    <Position X="171.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Cinnabar">
+    <Position X="192.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Magnetite">
+    <Position X="173.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Arsenic">
+    <Position X="184" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Gallium">
+    <Position X="178.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Ore">
+    <Position X="141" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAgAIAAAAAAAAgAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.CopperOre">
+    <Position X="145.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.LeadOre">
+    <Position X="147.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.TinOre">
+    <Position X="134.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.ChromiumOre">
+    <Position X="187.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.AluminiumOre">
+    <Position X="173.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.IronOre">
+    <Position X="136.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.NickelOre">
+    <Position X="178.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.CobaltOre">
+    <Position X="138.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.GoldOre">
+    <Position X="141" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.TitaniumOre">
+    <Position X="168.25" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.UraniumOre">
+    <Position X="143.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Brick">
+    <Position X="75.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAIAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.StoneBrick">
+    <Position X="73.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.ClayBrick">
+    <Position X="75.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.MudBrick">
+    <Position X="78" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.SandBrick">
+    <Position X="80.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Cobblestone">
+    <Position X="170" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.OakLog">
+    <Position X="123" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.RedwoodLog">
+    <Position X="177" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.BirchLog">
+    <Position X="192.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.PineLog">
+    <Position X="173.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.EbonyLog">
+    <Position X="171.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Plank">
+    <Position X="153.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAIAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.OakPlank">
+    <Position X="154.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.RedwoodPlank">
+    <Position X="156.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.PinePlank">
+    <Position X="150" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.EbonyPlank">
+    <Position X="152.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Leaves">
+    <Position X="28.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAABAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.PineNeedles">
+    <Position X="175.25" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.BaseTorch">
+    <Position X="43.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAggAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Torch">
+    <Position X="37.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.YellowTorch">
+    <Position X="39.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.WhiteTorch">
+    <Position X="42" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.GreenTorch">
+    <Position X="44.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.RedTorch">
+    <Position X="46.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.BlueTorch">
+    <Position X="48.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.BlueMushroom">
+    <Position X="91.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAggIAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Cactus">
+    <Position X="175.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.CactusFlower">
+    <Position X="177" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.CryingLily">
+    <Position X="109.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAggAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.HexenRoses">
+    <Position X="125.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Bamboo">
+    <Position X="187.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Sugarcane">
+    <Position X="192.75" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.WoodMushroom">
+    <Position X="171.75" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.PinkOysterMushroom">
+    <Position X="177" Y="9.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.CubensisMushroom">
+    <Position X="187.5" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.ChestnutMushroom">
+    <Position X="185.75" Y="1.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.BlackEyedSusan">
+    <Position X="165.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Chrysanthemum">
+    <Position X="12.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.ForgetMeNot">
+    <Position X="19.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Honeysuckle">
+    <Position X="30.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Hydrangea">
+    <Position X="35.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Lily">
+    <Position X="51" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Magnolia">
+    <Position X="55.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Orchid">
+    <Position X="57.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Plumeria">
+    <Position X="62.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Tulip">
+    <Position X="66.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Cornflower">
+    <Position X="184" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Begonia">
+    <Position X="189.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.BleedingHeart">
+    <Position X="168.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.EnglishBluebell">
+    <Position X="180.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Poppy">
+    <Position X="102.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.TNT">
+    <Position X="111.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Switch">
+    <Position X="170" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.ANDGate">
+    <Position X="175.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.ORGate">
+    <Position X="189.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.XORGate">
+    <Position X="178.75" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Diode">
+    <Position X="192.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.NORGate">
+    <Position X="182.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.XANDGate">
+    <Position X="177" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Delay">
+    <Position X="189.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Pump">
+    <Position X="170" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Pipe">
+    <Position X="178.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Tiles.Trapdoor">
+    <Position X="173.5" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.WDef" BaseTypeListCollapsed="true">
+    <Position X="170" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAgAAAAAAAAgAAAAAAIgAAAAAAgAEAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CaveGame.Core.Walls.WallDefinitions">
+    <Position X="192.75" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>GAAAAEBAQAQAAAAAAQQAAAAAAAAAAAAgkAAQQAACAgA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.Wall">
+    <Position X="19" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEACAAgAAggAAAAAAAIAAADBAYggAAAAQgAEAAEA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.Void">
+    <Position X="6.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.Air">
+    <Position X="8.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Walls.RockWall">
+    <Position X="12.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.Stone">
+    <Position X="11" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.Sandstone">
+    <Position X="13.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.Dirt">
+    <Position X="15.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.RockyDirt">
+    <Position X="17.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.OakPlank">
+    <Position X="20" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.Brick">
+    <Position X="24.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.StoneBrick">
+    <Position X="22.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.ClayBrick">
+    <Position X="24.5" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.SandstoneBrick">
+    <Position X="26.75" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.MossyStone">
+    <Position X="29" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.MossyStoneBrick">
+    <Position X="31.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.CarvedStoneBrick">
+    <Position X="33.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.CarvedSandstoneBrick">
+    <Position X="35.75" Y="8.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.CubedStone">
+    <Position X="2" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Walls.CubedSandstone">
+    <Position X="4.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Generic.CircularArray&lt;T&gt;" BaseTypeListCollapsed="true">
+    <Position X="168.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgQAAAAAAAAAhBBACAAAAAAAAAAAAAAEAABAAAJAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Generic\CircularArray.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CaveGame.Core.Generic.DelayedTask">
+    <Position X="191" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAACIAAACAAACgAAAAAAAIAAE=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Generic\DelayedTask.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Generic.ThreadSafeValue&lt;T&gt;">
+    <Position X="187.5" Y="12.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Generic\ThreadSafeValue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.LuaInterop.LuaBindingInstance&lt;TArgs&gt;">
+    <Position X="189.25" Y="6.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAABAAAAAAAAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\LuaInterop\LuaEvent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.LuaInterop.LuaEventArgs">
+    <Position X="3" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\LuaInterop\LuaEvent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.LuaInterop.LuaEvent&lt;TArgs&gt;">
+    <Position X="191" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAIAAAAAAAAAAAAAAAAAAAAAEAEAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\LuaInterop\LuaEvent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.LuaInterop.LuaSnippets">
+    <Position X="165.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\LuaInterop\LuaInterop.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.LuaInterop.LuaExtensions">
+    <Position X="192.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAAAAAAAAQACAAAAAAAAAAAAAAAAAQAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\LuaInterop\LuaInterop.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.NetworkMessage">
+    <Position X="175.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIACA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\NetworkMessage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.Packet">
+    <Position X="35" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAAAEAEASAAAAAAAAAAAAAQAAAAIIAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.GetServerInformationPacket">
+    <Position X="37.25" Y="5.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.ServerInformationReplyPacket">
+    <Position X="41.75" Y="5.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAgAAAAAACAAAAAAAAAAAAgAAAAAAAAAAAACAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.TimeOfDayPacket">
+    <Position X="44" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.ExplosionPacket">
+    <Position X="48.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAICAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAABAYAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.KickPacket">
+    <Position X="53" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAgAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.RequestJoinPacket">
+    <Position X="57.5" Y="5.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.SpawnBombEntityPacket">
+    <Position X="62" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.DropEntityPacket">
+    <Position X="66.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.TransferContainerPacket">
+    <Position X="3.5" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.AcceptJoinPacket">
+    <Position X="5.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAACAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.QuitPacket">
+    <Position X="8" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.RejectJoinPacket">
+    <Position X="10.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.PlayerJoinedPacket">
+    <Position X="12.5" Y="5.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgQAAAAAAAAAAAAAAIAgAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.PlayerLeftPacket">
+    <Position X="14.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.EntityPositionPacket">
+    <Position X="17" Y="5.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAYAAAAAAEkAAAwAAAAAAAAAAAAAIAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.PlaceFurniturePacket">
+    <Position X="19.25" Y="5.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.OpenDoorPacket">
+    <Position X="21.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAACAAAAAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.CloseDoorPacket">
+    <Position X="23.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.RemoveFurniturePacket">
+    <Position X="26" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.PlayerStatePacket">
+    <Position X="28.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAQAEAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.PlayerInputPacket">
+    <Position X="30.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.ClientChatMessagePacket">
+    <Position X="32.75" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.ServerChatMessagePacket">
+    <Position X="35" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIAABAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.ChunkDownloadPacket">
+    <Position X="39.5" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.PlayerThrowItemPacket">
+    <Position X="46.25" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAEAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.PlayerActionPacket">
+    <Position X="50.75" Y="5.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.PlaceWallPacket">
+    <Position X="55.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAABAAAAAAAAAAgAAAEAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.PlaceTilePacket">
+    <Position X="59.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAABAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.RequestChunkPacket">
+    <Position X="64.25" Y="5.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.TypeSerializer">
+    <Position X="175.25" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAoAAAAgQQAAAREEEAAQAAgCAAAAAJACDgSAAABBAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\TypeSerializer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Network.User">
+    <Position X="184" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAEAAAAACQAAAAQAAAABAAAAAABAAAAQAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\User.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Noise.OctaveNoise">
+    <Position X="184" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Noise\OctaveNoise.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Noise.PerlinNoise">
+    <Position X="170" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>KAAAAAAACAABAAAAAAAAAAAAAEAACAAAgAGAAAAAAAE=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Noise\PerlinNoise.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Noise.SimplexNoise">
+    <Position X="170" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAABAAIAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Noise\SimplexNoise.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Chunk">
+    <Position X="189.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>B1CAAAAACAAAwggABAAAIwAAIAAAEAIkAgAARACAAAg=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\World\Chunk.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.World">
+    <Position X="1.75" Y="27.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>RVQABEAAgAAIAAQiAgAAIEUUCAKAgAAAAAECAAIgAAg=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\World\GameWorld.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Core.Biome">
+    <Position X="191" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\World\Generator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Generator">
+    <Position X="192.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EABAAQAAAAAAAAAASEIAAAAAAAAAAAAAAAAEAAAgAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\World\Generator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Camera2D">
+    <Position X="178.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAYEAAAABAAAAJAgEQAAAAEYAAABAAAAAAAAABAAAgg=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Camera.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.CollisionSolver">
+    <Position X="171.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAEAAAACAAAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\CollisionSolver.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.MathematicalExtensions">
+    <Position X="157.75" Y="7.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Extensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Extensions">
+    <Position X="187.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAJACAAAAAQABABAAAIABAAAAAQAAAAAgAgIABIAAAQ=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Extensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.UpdateDescription">
+    <Position X="182.25" Y="13.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAgIAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAQ=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Globals.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Globals">
+    <Position X="162.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQACAAAAAEEAAAAAAAAAAAAAAAACAACAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Globals.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Logger">
+    <Position X="187.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Logger.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.OperatingSystem">
+    <Position X="187.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAACAACAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Shell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Shell">
+    <Position X="192.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Shell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.SystemUtil">
+    <Position X="171.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\SystemUtil.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Script">
+    <Position X="184" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\CommandBar\CommandBar.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Command">
+    <Position X="173.5" Y="2.5" Width="1.5" />
+    <NestedTypes>
+      <Delegate Name="CaveGame.Core.Command.CommandHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\CommandBar\CommandBar.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAAQAAAAAQAAAAAAAACEAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\CommandBar\CommandBar.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.CommandBar" BaseTypeListCollapsed="true">
+    <Position X="175.25" Y="2.5" Width="1.5" />
+    <NestedTypes>
+      <Delegate Name="CaveGame.Core.CommandBar.CommandHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\CommandBar\CommandBar.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>QCQAIgAAEAIIIggAUAAABYAABAAkAAAIlAAACAMAggQ=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\CommandBar\CommandBar.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CaveGame.Core.FrameCounter">
+    <Position X="158.5" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAIAAAAAAAAAAAAAAAIAAAAAIAIQABAAg=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\DebugTools\FrameCounter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Server.Conversions">
+    <Position X="182.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\ConsoleOuputWrapper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Server.ConsoleOuputWrapper" BaseTypeListCollapsed="true">
+    <Position X="177" Y="2.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>UAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\ConsoleOuputWrapper.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CaveGame.Server.ServerCommand">
+    <Position X="187.5" Y="10.5" Width="1.5" />
+    <NestedTypes>
+      <Delegate Name="CaveGame.Server.ServerCommand.SCommandHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\GameServer.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAAAAAAQAAAAAAAAAEAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\GameServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Server.CommandEventArgs">
+    <Position X="0.75" Y="1.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\GameServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Server.PlayerChatMessageEventArgs">
+    <Position X="3" Y="1.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIQAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\GameServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Server.PlayerEventArgs">
+    <Position X="5.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\GameServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Server.GameServer" BaseTypeListCollapsed="true">
+    <Position X="187.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>OAQAEgAwTTIEQSCDIAAIAQEYoAAiAAoIQCEIIhABGTI=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\GameServer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CaveGame.Server.NetworkServer">
+    <Position X="177" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAQgAAAACAAAAAACAAIAAAACAAAAIBAAAADAEKCAAI=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\NetworkServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Server.ChatMessageEvent">
+    <Position X="184" Y="1.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAIAAIAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\Plugin.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Server.PluginDefinition">
+    <Position X="1" Y="22.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAgAAAAgAAAAAQAAAAAAAAAAAAAAAAABAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\Plugin.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Server.PluginManager">
+    <Position X="185.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\Plugin.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Server.Plugin" BaseTypeListCollapsed="true">
+    <Position X="184" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAKAACABgAAAAAAQAAgAEAAAAAAggAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\Plugin.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CaveGame.Server.ServerConfig">
+    <Position X="10" Y="22.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAEAACAAAAAAAAAKAAgAEAAAAAAAAACCAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\ServerConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Server.WorldConfiguration">
+    <Position X="177" Y="19.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAEAAAEQAAAAAAAAAAAACAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\ServerWorld.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Server.ServerWorld">
+    <Position X="0.5" Y="28.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AARUAEAAAAAYIAQBAAQAQAAUAAQAAAAAAAACAgBQABA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\ServerWorld.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Client.DebugTools.ChunkGridLineRenderer">
+    <Position X="191" Y="1.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\DebugTools\ChunkGridLineRenderer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.FPSGraph">
+    <Position X="157" Y="13" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEQECAAAQAAAAoAgAAAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\DebugTools\FPSGraph.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.GameFonts">
+    <Position X="184" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAFAAAAAAAADAAAAAAAAAAAAgAAEAAAAAAAFU=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Assets.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.GameTextures">
+    <Position X="191" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>UAACAAAAEAAgAAhAAGAAAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Assets.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.TextureWrap">
+    <Position X="184" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Assets.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.AssetLoader">
+    <Position X="185.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Assets.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.ItemTextures">
+    <Position X="192.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAIAAAAAIxCACAAYIAABAEAKAAgAAggAAAYEAo=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Assets.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.GameSounds">
+    <Position X="189.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAgCBAAAAACAEAAgAAAAAgHsAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Assets.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.GameChat">
+    <Position X="180.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAUAAAAAAAIAIggAAAAAAACAAAAAAAEAAAAAgAEAAAQ=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\GameChat.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.TempItemDef">
+    <Position X="177" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAgAEAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\GameClient.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.Hotbar">
+    <Position X="184" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAgAAgAAAAAAAAAAAAAAAAAAAgEAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\GameClient.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.ContainerFrontend">
+    <Position X="180.5" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAgAgAAAAAAAAAAAAIAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\GameClient.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.GameClient" BaseTypeListCollapsed="true">
+    <Position X="182.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CCUmnAvACxCgC04GAVIAAEQAgQrCACogwQQhjAjAABQ=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\GameClient.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CaveGame.Client.SliderIndex&lt;T&gt;">
+    <Position X="171.75" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAAAAAAAAAAQAAAAAAAAAAAAAgAAAAABA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\GameSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.GameSettings">
+    <Position X="3.25" Y="22.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAACBAAAABACAQABIAAIACAAAAIQEIAIAAAAAkRAAI=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\GameSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.InputManager">
+    <Position X="191" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\InputManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.LightingEngine">
+    <Position X="163.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BVQAIIAKQBAACQCQBAQAAAAIIAgAACQAIAAEAAAACJI=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\LightingEngine.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.LocalWorld">
+    <Position X="2.75" Y="28.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AFQAIAACAAAAACACAgQAAAIACAAABAAAAEABAACIEBg=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\LocalWorld.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Client.NetworkClient">
+    <Position X="173.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAQQgQAEACAAQABACABIABAAAAgAgABAIAABAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\NetworkClient.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.ShapeCache">
+    <Position X="191" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAAAAAQAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Renderer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.Renderer">
+    <Position X="165.25" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgQAAAAAAAAAABCggAIAAAAQAAAAFAAQ=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Renderer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.GameGlobals">
+    <Position X="185.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAAAAEAAAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>CaveGameGL.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.CaveGameGL">
+    <Position X="182.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AATkABRAARAAAxAAgAwAABAgEABAKwEA0CAgAEAAgoQ=</HashCode>
+      <FileName>CaveGameGL.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.Achievements">
+    <Position X="170" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>SteamManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.Achievement">
+    <Position X="168.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAQAAAAIAAAgAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SteamManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.SteamManager" BaseTypeListCollapsed="true">
+    <Position X="185.75" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAQIAAQQAAAAAAAAgAAgAQgAACIQQCAKQAAAABAAIEA=</HashCode>
+      <FileName>SteamManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CaveGame.Client.Game.Entities.ClientPlayer">
+    <Position X="16.5" Y="28.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Game\Entities\ClientPlayer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.Game.Entities.LocalPlayer">
+    <Position X="17.5" Y="30.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAgAAAAAAQAAAAAAACAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Game\Entities\LocalPlayer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.Game.Entities.PeerPlayer">
+    <Position X="15.25" Y="30.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAACAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Game\Entities\PeerPlayer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.Input.KeyPressDetector">
+    <Position X="165.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAQgAAABAAAAEAAAAAAAAIAAAAgAAAAAIABAAAEAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Input\KeyPressDetector.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.Menu.Credits" BaseTypeListCollapsed="true">
+    <Position X="185.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAgACAAAAAAgACAAAAAAAAQAgAIAAgAAAAAIAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Menu\Credits.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CaveGame.Client.Menu.HomePage" BaseTypeListCollapsed="true">
+    <Position X="182.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAZAkIKAAAAAAgACAAAAAAAQAAhAAAEgAAAAAAAAAAI=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Menu\Homepage.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CaveGame.Client.Menu.MultiplayerInputHistory">
+    <Position X="5.5" Y="22.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAAAAEAAAAAAAAACAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Menu\Multiplayer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.Menu.ServerHistoryPersistence">
+    <Position X="7.75" Y="22.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAACAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Menu\Multiplayer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.Menu.Multiplayer" BaseTypeListCollapsed="true">
+    <Position X="191" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AARAgACIAAAgAgACAAAAAAAAQAgACAIgAAAAAAAQCAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Menu\Multiplayer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CaveGame.Client.Menu.BindButton">
+    <Position X="21.75" Y="22.75" Width="1.5" />
+    <NestedTypes>
+      <Delegate Name="CaveGame.Client.Menu.BindButton.KeysHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Menu\Settings.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Menu\Settings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.Menu.Settings" BaseTypeListCollapsed="true">
+    <Position X="197" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAYggACAgAAAAiQCAAAAQAAAQBgAAAAgAAAAAAEAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Menu\Settings.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CaveGame.Client.Menu.TimeoutMenu" BaseTypeListCollapsed="true">
+    <Position X="192.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAgACIAAAgAgACAAAAAAAAQAgAAAAgAAAAIAAACAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Menu\TimeoutMenu.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CaveGame.Client.Menu.UITheme">
+    <Position X="180.5" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAIAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Menu\UITheme.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Particles.Particle">
+    <Position X="23.75" Y="25.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAQAAAAAACAEAgAAAAAAAAAACAAAACAAAAAACAAAACA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Particles\ParticleEmitter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Particles.SmokeParticle">
+    <Position X="22.5" Y="26.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAQAAAAACAAAAgAAAACAIAACCAAAAAGAAAQAAAmAACA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Particles\ParticleEmitter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Particles.FireParticle">
+    <Position X="192.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Particles\ParticleEmitter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Particles.DustParticle">
+    <Position X="168.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Particles\ParticleEmitter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Particles.SplashParticle">
+    <Position X="182.25" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Particles\ParticleEmitter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Particles.RainParticle">
+    <Position X="24.75" Y="26.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Particles\ParticleEmitter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Core.Particles.ParticleEmitter">
+    <Position X="160" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAYAAAAAABAAAgAAAIgAAAAACAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Particles\ParticleEmitter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.UI.TextInputManager">
+    <Position X="180.5" Y="12.5" Width="1.75" />
+    <NestedTypes>
+      <Delegate Name="CaveGame.Client.UI.TextInputManager.TextInputEvent" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\Label.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAIAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\Label.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.UI.TextInputLabel">
+    <Position X="26.25" Y="21.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgQAgAAAAAAAAgAAAAAAAAAAEAAAAAAAECAAAAgAAAI=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\Label.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.UI.Label">
+    <Position X="24" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAFEAggIQAAAAAAAAAAAAAAAAAAACgQCgBA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\Label.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.UI.NineSlice">
+    <Position X="28.5" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAIAAAAAggEkAgAAAAQQAAgEAAAAIGIAgAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\NineSlice.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.UI.Scrubber">
+    <Position X="185.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\Slider.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.UI.Slider&lt;T&gt;">
+    <Position X="30.75" Y="19.75" Width="1.5" />
+    <NestedTypes>
+      <Delegate Name="CaveGame.Client.UI.Slider&lt;T&gt;.SliderChangedHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\Slider.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AhQAAAAQAAAAAgAJAAGApAAAAAAAAAEAAAAAAggAAAI=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\Slider.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.UI.TextButton">
+    <Position X="21.75" Y="21.25" Width="1.5" />
+    <NestedTypes>
+      <Delegate Name="CaveGame.Client.UI.TextButton.ClickHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\TextButton.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AgQAgAAQAAACAgAAQABABAAAEAAAAAAAAQAAAAgAAAI=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\TextButton.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.UI.TextInput" BaseTypeListCollapsed="true">
+    <Position X="178.75" Y="12.5" Width="1.5" />
+    <NestedTypes>
+      <Delegate Name="CaveGame.Client.UI.TextInput.TextInputHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\TextInput.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>BVwhAAQAAwAJgAAAAAAAoAIAAAAAAAAAAARAABUAJAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\TextInput.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CaveGame.Client.UI.TextInputWithHistory">
+    <Position X="182.25" Y="12.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\TextInput.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.UI.Tooltip">
+    <Position X="24" Y="21.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\Tooltip.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.UI.UIListContainer" BaseTypeListCollapsed="true">
+    <Position X="177" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAogAmAAAEQAQQAAAAAAAoAEIAAAAAAQA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\UIListContainer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CaveGame.Client.UI.Poo">
+    <Position X="195.25" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\UIRoot.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaveGame.Client.UI.UIRect">
+    <Position X="26.25" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAACAACogAkAAAEQAQSBAABAAAoAEAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\UIRoot.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CaveGame.Client.UI.UIRoot" BaseTypeListCollapsed="true">
+    <Position X="178.75" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAACAAAAogAkAAAEQAQQAAAAAAAoAEAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\UIRoot.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Cave.Program">
+    <Position X="191" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="CaveGame.Core.Inventory.ItemStack" BaseTypeListCollapsed="true">
+    <Position X="177" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAEAAAAAAAAAgBIAAACEQAAAAAAAAAEAgABAAgA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\ItemStack.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Struct>
+  <Struct Name="CaveGame.Core.Coordinates6D" BaseTypeListCollapsed="true">
+    <Position X="173.5" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAkAAABAIAAABgAAAAAAAAAAAAIAAAAAAAQAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\World\ChunkCoordinates.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Struct>
+  <Struct Name="CaveGame.Core.ChunkCoordinates" BaseTypeListCollapsed="true">
+    <Position X="170" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAEAIAAAAAAAAAAYAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\World\ChunkCoordinates.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Struct>
+  <Struct Name="CaveGame.Core.Light3" BaseTypeListCollapsed="true">
+    <Position X="187.5" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAASAAAACAAAAgAEgAQAAAAAAAAAAABAAAAAIBAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\World\Light3.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Struct>
+  <Struct Name="CaveGame.Core.Message">
+    <Position X="180.5" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Message.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="CaveGame.Core.Rotation" BaseTypeListCollapsed="true">
+    <Position X="182.25" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIBAIAAAAQAAAAAAkAAAgAAAAAFAAAACAAAAAACAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Rotation.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Struct>
+  <Struct Name="CaveGame.Server.ConsoleMsg">
+    <Position X="171.75" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAiAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\ConsoleOuputWrapper.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="CaveGame.Client.GraphEntry">
+    <Position X="166" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\DebugTools\FPSGraph.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="CaveGame.Client.TextureMeta">
+    <Position X="184" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\Assets.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="CaveGame.Client.Cell" BaseTypeListCollapsed="true">
+    <Position X="168.25" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAYAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\LightingEngine.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Struct>
+  <Struct Name="CaveGame.Client.TileChangedCell" BaseTypeListCollapsed="true">
+    <Position X="185.75" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYQA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\LightingEngine.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Struct>
+  <Struct Name="CaveGame.Client.WallChangedCell" BaseTypeListCollapsed="true">
+    <Position X="189.25" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAYAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\LightingEngine.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Struct>
+  <Struct Name="CaveGame.Client.UI.UICoords">
+    <Position X="187.5" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAgAAQAIBAAAAAAAAAAAAgAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\UICoords.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Interface Name="CaveGame.Core.Game.Entities.IReplicatedProperty">
+    <Position X="28" Y="22.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Entities\Entity.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Game.Entities.IPositional">
+    <Position X="31.5" Y="23.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Entities\Entity.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Game.Entities.IVelocity">
+    <Position X="24.75" Y="23.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Entities\Entity.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Game.Entities.INextPosition">
+    <Position X="27" Y="23.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Entities\Entity.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Game.Entities.IBoundingBox">
+    <Position X="168.25" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Entities\Entity.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Game.Entities.IHorizontalDirectionState">
+    <Position X="29.25" Y="23.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Entities\Entity.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Game.Entities.IPhysicsObject">
+    <Position X="177" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAACAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Entities\Entity.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Game.Entities.IFriction">
+    <Position X="175.25" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Entities\Entity.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Game.Entities.IEntity">
+    <Position X="171.75" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAgAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAACgAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Entities\Entity.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Game.Entities.IExpirationTime">
+    <Position X="173.5" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Entities\Entity.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Furniture.ILayerOccupant">
+    <Position X="187.5" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEACAAAAAAAAAAAAAAAAAAAAAIgAAAAAAAAEAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Furniture\Furniture.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Furniture.IFurniture">
+    <Position X="177" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Furniture\Furniture.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Inventory.IItem">
+    <Position X="185.75" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAggCAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Inventory.IGameClient">
+    <Position X="178.75" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAABAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Tiles.IWaterBreakable">
+    <Position X="170" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Tiles.INonSolid">
+    <Position X="171.75" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Tiles.INonStandardCollision">
+    <Position X="168.25" Y="19.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Tiles.ILightEmitter">
+    <Position X="189.25" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Tiles.ILocalTileUpdate">
+    <Position X="192.75" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Tiles.IRandomTick">
+    <Position X="182.25" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Tiles.ITileUpdate">
+    <Position X="192.75" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Tiles.ISoil">
+    <Position X="185.75" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Tiles.IGas">
+    <Position X="184" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Tiles.ILiquid">
+    <Position X="191" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Tiles.IVegetation">
+    <Position X="168.25" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Tiles.IOre">
+    <Position X="175.25" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Tiles.IMineral">
+    <Position X="170" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.Tiles.IPlatformTile">
+    <Position X="178.75" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.IGameWorld">
+    <Position X="6.75" Y="27.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BVQAAAAAgAAIAAAAAAAAIEAUAAKAAAAAAAECAAAAAAg=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\World\GameWorld.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.IServerWorld">
+    <Position X="5.5" Y="28.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\World\GameWorld.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.IClientWorld">
+    <Position X="7.75" Y="28.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\World\GameWorld.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.IMessageOutlet">
+    <Position X="168.25" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\IMessageOutlet.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Core.ISingleton&lt;TSingleton&gt;">
+    <Position X="184" Y="19.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\ISingleton.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Server.IPluginAPIServer">
+    <Position X="180.5" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAIAAAAAAAAAAgAAAAAAAAAAQA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\GameServer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Server.IGameServer">
+    <Position X="182.25" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Server\GameServer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Client.IGameContext">
+    <Position X="180.25" Y="21.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAgACAAAAAAgAAAAAAAAAAAAgAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\IGameContext.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Client.ISteamManager">
+    <Position X="187.5" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQIAAAAAAAAAAAAAAAAAQgAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\ISteamManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Client.UI.ITextInputListener">
+    <Position X="189.25" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\Label.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Client.UI.IClickable">
+    <Position X="170" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\TextButton.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Client.UI.ITextProvider">
+    <Position X="191" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\TextInput.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Client.UI.UIRootNode">
+    <Position X="0.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAogAkAAAEAAAAAAAAAAAoAEAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\UIRoot.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CaveGame.Client.UI.UINode">
+    <Position X="0.5" Y="4.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\UIRoot.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="CaveGame.Core.FileUtil.MetabinaryTagID">
+    <Position X="182.25" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAQAAAAAAAAAAAABAIAgAAJAAgABAAAIAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\FileUtil\Metabinary.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Core.Furniture.FurnitureID">
+    <Position X="171.75" Y="27" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAQAAAAAQAIAEADAAAAAAAAAAAAAAACQA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Furniture\Furniture.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Core.Furniture.DoorState">
+    <Position X="171.75" Y="35.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAABAAAAAAAAAAAAACAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Furniture\Furniture.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Core.Inventory.ItemID">
+    <Position X="175.25" Y="35" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAiAAAAAQAAAAgABAAEAAAAIAAACIAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Core.Inventory.ItemTag">
+    <Position X="171.75" Y="31" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Inventory\Items.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Core.Tiles.TileID">
+    <Position X="170" Y="27" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ChsAAEBBSIUCiAA8UVQAgCBAYBEoAQUwmAAYYRA2wwQ=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Tiles\Tiles.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Core.Walls.WallID">
+    <Position X="173.5" Y="27" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>GAAAAEBAQAQAAAAAAQQAAAAAAAAAAAAgkAAQQAACAgA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Game\Walls\Walls.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Core.Generic.TimeStepProcedure">
+    <Position X="177" Y="28.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AQAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Generic\DelayedTask.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Core.Network.PacketType">
+    <Position X="175.25" Y="27" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAhhPSAgAJAAAAAgwgRFBAEYAAIICgAACAAgAAAAQ=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Core.Network.DataSender">
+    <Position X="171.75" Y="29.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Core.Network.ThrownItem">
+    <Position X="173.5" Y="31" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Network\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Core.SurfaceBiome">
+    <Position X="171.75" Y="32.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAACAAAAAAAAAAAAAEAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\World\Generator.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Core.RegionBiome">
+    <Position X="173.5" Y="32" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\World\Generator.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Core.SubsurfaceBiome">
+    <Position X="173.5" Y="33" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\World\Generator.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Core.HorizontalDirection">
+    <Position X="177" Y="27" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Core\Enums.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Client.GameChatSize">
+    <Position X="173.5" Y="34" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABgAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\GameChat.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Client.FramerateLimiterOptions">
+    <Position X="179" Y="27" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAACCAEAAAkAAACAEAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\GameSettings.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Client.UI.TextXAlignment">
+    <Position X="171.75" Y="34" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACAAAAIAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\Label.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CaveGame.Client.UI.TextYAlignment">
+    <Position X="192.75" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAQAAAAAAAIAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\UI\Label.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Delegate Name="CaveGame.Core.ArgsCallback">
+    <Position X="170.25" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\j0sho\source\repos\conariumsoft\CaveGame\Client\CommandBar\CommandBar.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

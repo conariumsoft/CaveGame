@@ -14,6 +14,12 @@ namespace CaveGame.Client.Menu
 	[Serializable]
 	public class MultiplayerInputHistory : Configuration
 	{
+
+		public static MultiplayerInputHistory Load()
+        {
+			return Configuration.Load<MultiplayerInputHistory>("mphistory.xml");
+		}
+
 		public override void FillDefaults()
 		{
 			IPAddress = "";
@@ -111,7 +117,7 @@ namespace CaveGame.Client.Menu
 			// ability to enforce a ui style on
 			// multiple objects
 
-			MultiplayerPage = new UIRoot(Game.GraphicsDevice);
+			MultiplayerPage = new UIRoot();
 
 			Label title = new Label
 			{

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace CaveGame.Core.Tiles
+namespace CaveGame.Core.Game.Tiles
 {
 	public static class TileMap
 	{

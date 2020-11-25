@@ -1,5 +1,5 @@
 ﻿using CaveGame.Core.Furniture;
-using CaveGame.Core.Tiles;
+using CaveGame.Core.Game.Tiles;
 using Microsoft.Xna.Framework;
 using System;
 
@@ -8,7 +8,13 @@ using System;
 namespace CaveGame.Core.Game.Entities
 {
 	
+	public interface IServerPhysicsObserver {
+		void ServerPhysicsTick(IServerWorld world, float step);
+	}
 
+	public interface IClientPhysicsObserver {
+		void ClientPhysicsTick(IClientWorld world, float step);
+	}
 	public abstract class PhysicsEntity : Entity, IPhysicsObject, IPositional, IVelocity, INextPosition, IBoundingBox, IFriction
 	{
 
@@ -37,21 +43,24 @@ namespace CaveGame.Core.Game.Entities
 		public bool OnGround { get; set; }
 
 
+
+		protected void InterpolateServerPosition() => Position = Position.Lerp(NextPosition, 0.5f);
+
 		public virtual void ApplyGravity(IGameWorld world, float step)
 		{
 			if (InLiquid)
 			{
 
 
-				if (Mass >= 1)
+				if (Mass > 1)
 				{
 					if (Velocity.Y < 0.25)
 						Velocity = new Vector2(Velocity.X, Velocity.Y + (World.Gravity * (Buoyancy/2) * step));
 				}
-				if (Mass < 1)
+				if (Mass <= 1)
 				{
 					if (Velocity.Y > -0.25)
-						Velocity = new Vector2(Velocity.X, Velocity.Y - (World.Gravity * (Buoyancy/3) * step));
+						Velocity = new Vector2(Velocity.X, Velocity.Y - (World.Gravity * (Buoyancy/2) * step));
 				}
 				return;
 			}
@@ -116,7 +125,7 @@ namespace CaveGame.Core.Game.Entities
 
 			if (t is ILiquid liquid)
 			{
-				if (normal.X != 0 || normal.Y != 0)
+				if (normal.X != 0 || normal.Y != 0 && tilePos.Y*8 <= Position.Y)
 				{
 					InLiquid = true;
 					LiquidViscosity = liquid.Viscosity;

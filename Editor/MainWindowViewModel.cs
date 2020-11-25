@@ -3,8 +3,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Editor.MonoGameControls;
 using CaveGame.Core.FileUtil;
-using CaveGame.Core.Walls;
-using CaveGame.Core.Tiles;
+using CaveGame.Core.Game.Walls;
+using CaveGame.Core.Game.Tiles;
 using CaveGame.Core;
 using System.Diagnostics;
 using System.Windows.Media.Media3D;
@@ -17,11 +17,33 @@ using System.Collections.Generic;
 using System.Linq;
 using Editor.Actions;
 using CaveGame.Core.Generic;
+using DataManagement;
+using System.IO;
 
 namespace Editor
 {
 
+    public static class AssetLoader
+    {
+        private static Texture2D FromStream(GraphicsDevice GraphicsProcessor, Stream DataStream)
+        {
 
+            Texture2D Asset = Texture2D.FromStream(GraphicsProcessor, DataStream);
+            // Fix Alpha Premultiply
+            Color[] data = new Color[Asset.Width * Asset.Height];
+            Asset.GetData(data);
+            for (int i = 0; i != data.Length; ++i)
+                data[i] = Color.FromNonPremultiplied(data[i].ToVector4());
+            Asset.SetData(data);
+            return Asset;
+        }
+
+        public static Texture2D LoadTexture(GraphicsDevice device, string filepath)
+        {
+            return FromStream(device, TitleContainer.OpenStream(filepath));
+        }
+
+    }
     public static class EditorTypeExtensions
 	{
 
@@ -191,7 +213,7 @@ namespace Editor
             foreach (var type in types)
             {
 
-                Trace.WriteLine(type.Name);
+               
                 bool exists = Enum.TryParse(type.Name, out TileID id);
                 if (exists && type.Name != "Void")
                 {
@@ -218,8 +240,10 @@ namespace Editor
             var types = basetype.Assembly.GetTypes().Where(type => type.IsSubclassOf(basetype));
 
             WallCount = 0;
+            
             foreach (var type in types)
             {
+                Trace.WriteLine(type.Name);
                 bool exists = Enum.TryParse(type.Name, out WallID id);
                 if (exists && type.Name != "Void")
                 {
@@ -233,8 +257,8 @@ namespace Editor
                 bool exists = Enum.TryParse(type.Name, out WallID id);
                 if (exists && type.Name != "Void")
                 {
-                    Wall t = (Wall)type.GetConstructor(Type.EmptyTypes).Invoke(null);
-                    internalWallList[t.ID] = t;
+                    Wall w = (Wall)type.GetConstructor(Type.EmptyTypes).Invoke(null);
+                    internalWallList[w.ID] = w;
                 }
             }
         }
@@ -271,25 +295,9 @@ namespace Editor
         }
 
         private SpriteBatch _spriteBatch;
-        private Texture2D _texture;
-        private Vector2 _position;
-        private float _rotation;
-        private Vector2 _origin;
-        private Vector2 _scale;
 
-        public void ResizeStructure(StructureMetadata newMetadata)
-		{
-            foreach(Layer layer in LoadedStructure.Layers)
-			{
-                var oldTileArray = layer.Tiles.Clone();
-                layer.Tiles = new Tile[newMetadata.Width, newMetadata.Height];
+        
 
-                int greatX = Math.Min(LoadedStructure.Metadata.Width, newMetadata.Width);
-                int greatY = Math.Min(LoadedStructure.Metadata.Height, newMetadata.Height);
-
-            }
-            
-		}
 
         public override void Initialize()
 		{
@@ -304,8 +312,10 @@ namespace Editor
 		public override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _texture = Content.Load<Texture2D>("monogame-logo");
-            TileSheet = Content.Load<Texture2D>("Textures/tilesheet");
+
+            
+
+            TileSheet = AssetLoader.LoadTexture(GraphicsDevice, "tilesheet.png");
             Pixel = new Texture2D(GraphicsDevice, 1, 1);
             Pixel.SetData<Color>(new Color[] { Color.White });
         }
@@ -341,9 +351,9 @@ namespace Editor
 
         ActionStack Actions = new ActionStack();
 
-        public void ActionUndo() { Actions.Undo(); }
-        public void ActionRedo() { Actions.Redo(); }
-
+        public void ActionUndo() => Actions.Undo(); 
+        public void ActionRedo() => Actions.Redo();
+        public void ActionResizeStructure(StructureMetadata newMetadata) => Actions.AddAction(new StructureResizeAction(LoadedStructure, newMetadata, new Point(newMetadata.Width, newMetadata.Height)));
         private Point GetMouseGridPoint()
 		{
             var mp = Camera.ScreenToWorldCoordinates(MousePosition.ToVector2());
@@ -369,7 +379,7 @@ namespace Editor
         public override void Update(GameTime gameTime)
         {
             updateBarTask.Update(gameTime);
-
+            Camera.Update(gameTime);
             var mouse = GetMouseGridPoint();
             
 
@@ -382,14 +392,18 @@ namespace Editor
                         
 
                         if (CtrlDown)
-                            newTile = new CaveGame.Core.Tiles.Void();
-                        Actions.AddAction(new TileChangeAction(LoadedStructure.Layers[0], mouse, newTile));
+                            newTile = new CaveGame.Core.Game.Tiles.Void();
+
+                        if (LoadedStructure.Layers[0].Tiles[mouse.X, mouse.Y].GetType() != newTile.GetType())
+                            Actions.AddAction(new TileChangeAction(LoadedStructure.Layers[0], mouse, newTile));
                     
                 } else {
                     Wall newWall = Wall.FromID(internalWallList[GetSelectedWallID()].ID);
                     if (CtrlDown)
-                        newWall = new CaveGame.Core.Walls.Void();
-                    Actions.AddAction(new WallChangeAction(LoadedStructure.Layers[0], mouse, newWall));
+                        newWall = new CaveGame.Core.Game.Walls.Void();
+
+                    if (LoadedStructure.Layers[0].Walls[mouse.X, mouse.Y].GetType() != newWall.GetType())
+                        Actions.AddAction(new WallChangeAction(LoadedStructure.Layers[0], mouse, newWall));
 
                 }
                     
@@ -397,21 +411,38 @@ namespace Editor
 
             if (CtrlDown == true && ZDown == true && ShiftDown == false)
             {
-                Actions.Undo();
+                if (undoD == false)
+                {
+                    Actions.Undo();
+                    undoD = true;
+                }
+               
+            } else
+            {
+                undoD = false;
             }
 
+            
+           
             if (CtrlDown == true && ShiftDown == true && ZDown == true)
             {
-                Actions.Redo();
+                if (redoD == false)
+                {
+                    Actions.Redo();
+                    redoD = true;
+                }
+            } else
+            {
+                redoD = false;
             }
+         
 
             Camera.Zoom = Camera.Zoom.Lerp(_cameraZoom, 0.3f);
            
-            _position = GraphicsDevice.Viewport.Bounds.Center.ToVector2();
-            _rotation = (float)Math.Sin(gameTime.TotalGameTime.TotalSeconds) / 4f;
-            _origin = _texture.Bounds.Center.ToVector2();
-            _scale = Vector2.One;
         }
+
+        bool undoD;
+        bool redoD;
 
         private void DrawGridLines(SpriteBatch spriteBatch)
         {

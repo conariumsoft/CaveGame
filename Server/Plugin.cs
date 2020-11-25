@@ -7,7 +7,7 @@ using CaveGame.Core.FileUtil;
 using CaveGame.Core.Game.Entities;
 using CaveGame.Core.LuaInterop;
 using CaveGame.Core.Network;
-using CaveGame.Core.Tiles;
+using CaveGame.Core.Game.Tiles;
 using Microsoft.Xna.Framework;
 using NLua;
 using NLua.Exceptions;
@@ -130,7 +130,6 @@ function print(v)
 end
 "+LuaSnippets.UtilityFunctions + @"
 
-print(plugin.PluginName..' Loaded');
 
 ");
 
@@ -143,7 +142,9 @@ print(plugin.PluginName..' Loaded');
 				server.Output.Out(String.Format("Stack trace: {0} ", e.StackTrace), Color.Red);
 				this.FailedToLoad = true;
             }
-			
+
+
+			PluginLuaEnvironment.DoString(@"print(plugin.PluginName..' Loaded')");
 		}
 	}
 }

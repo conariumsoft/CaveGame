@@ -19,17 +19,23 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaveGL", "CaveGL\CaveGL.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetabinaryViewer", "MetabinaryViewer\MetabinaryViewer.csproj", "{744827BF-BAFF-4C1B-97C8-28F166F1806D}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DataManagement", "DataManagement\DataManagement.shproj", "{1A5D2272-8BF3-4436-8460-C4A466758971}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		DataManagement\DataManagement.projitems*{1a5d2272-8bf3-4436-8460-c4a466758971}*SharedItemsImports = 13
 		Core\CaveCore.projitems*{733dfad9-4d0f-46f6-913d-6f4bef29b30d}*SharedItemsImports = 5
+		DataManagement\DataManagement.projitems*{733dfad9-4d0f-46f6-913d-6f4bef29b30d}*SharedItemsImports = 5
 		Server\CaveServer.projitems*{733dfad9-4d0f-46f6-913d-6f4bef29b30d}*SharedItemsImports = 5
-		Core\CaveCore.projitems*{744827bf-baff-4c1b-97c8-28f166f1806d}*SharedItemsImports = 5
+		DataManagement\DataManagement.projitems*{744827bf-baff-4c1b-97c8-28f166f1806d}*SharedItemsImports = 5
 		Server\CaveServer.projitems*{97c00592-e703-4c2a-8df6-2e04c8f9b523}*SharedItemsImports = 13
 		Core\CaveCore.projitems*{a0cdbd0e-3a41-42b7-9425-a838bc2c7383}*SharedItemsImports = 13
 		Client\Client.projitems*{a49a2aa0-a8b2-4163-a5a2-16ea271424fa}*SharedItemsImports = 5
 		Core\CaveCore.projitems*{a49a2aa0-a8b2-4163-a5a2-16ea271424fa}*SharedItemsImports = 5
+		DataManagement\DataManagement.projitems*{a49a2aa0-a8b2-4163-a5a2-16ea271424fa}*SharedItemsImports = 5
 		Server\CaveServer.projitems*{a49a2aa0-a8b2-4163-a5a2-16ea271424fa}*SharedItemsImports = 5
 		Core\CaveCore.projitems*{cc2dd308-102c-410e-9f4f-96138e9f68c4}*SharedItemsImports = 5
+		DataManagement\DataManagement.projitems*{cc2dd308-102c-410e-9f4f-96138e9f68c4}*SharedItemsImports = 5
 		Client\Client.projitems*{d3acab99-f010-400f-86f1-c2772bc56b94}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

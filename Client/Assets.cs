@@ -55,7 +55,7 @@ namespace CaveGame.Client
 		public static Texture2D TileSheet => Textures["tilesheet.png"];
 		public static Texture2D BG => Textures["bg.png"];
 		public static Texture2D Border => Textures["border.png"];
-
+		public static Texture2D Slot => Textures["slot.png"];
 
 		public static void LoadAssets(GraphicsDevice graphicsDevice)
 		{

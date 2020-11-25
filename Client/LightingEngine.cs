@@ -1,7 +1,8 @@
 ﻿using CaveGame.Core;
 using CaveGame.Core.Generic;
-using CaveGame.Core.Tiles;
-using CaveGame.Core.Walls;
+using CaveGame.Core.Game.Tiles;
+using CaveGame.Core.Game.Walls;
+using DataManagement;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Concurrent;

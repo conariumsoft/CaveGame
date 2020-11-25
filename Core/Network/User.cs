@@ -1,5 +1,6 @@
 ﻿using CaveGame.Core.Game.Entities;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
@@ -15,13 +16,35 @@ namespace CaveGame.Core.Network
 		public Player PlayerEntity { get; set; }
 
 
+
+		private ConcurrentQueue<Packet> dispatchedPackets;
+
+
 		public bool Kicked { get; private set; }
 		public string DisconnectReason { get; private set; }
 		
 		public User()
 		{
 			UserNetworkID = this.GetHashCode();
+			dispatchedPackets = new ConcurrentQueue<Packet>();
 		}
+
+		public bool DispatcherHasMessage()
+        {
+			return dispatchedPackets.Count > 0;
+        }
+
+		public Packet PopDispatcherQueue()
+        {
+			if (!DispatcherHasMessage())
+				throw new Exception("Check the dispatcher you dipshit!");
+
+
+			bool success = dispatchedPackets.TryDequeue(out Packet payload);
+			return payload;
+        }
+
+		public void Send(Packet p) => dispatchedPackets.Enqueue(p);
 
 		public void Kick(string reason)
 		{

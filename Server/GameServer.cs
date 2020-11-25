@@ -6,11 +6,13 @@ using CaveGame.Core.Furniture;
 using CaveGame.Core.Game.Entities;
 using CaveGame.Core.LuaInterop;
 using CaveGame.Core.Network;
-using CaveGame.Core.Tiles;
+using CaveGame.Core.Game.Tiles;
+using DataManagement;
 using KeraLua;
 using Microsoft.Xna.Framework;
 using NLua;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Diagnostics;
@@ -37,10 +39,7 @@ namespace CaveGame.Server
 
 	}
 
-	public interface IGameServer
-	{
-
-	}
+	
 
 
 	public class ServerCommand
@@ -91,6 +90,17 @@ namespace CaveGame.Server
         }
     }
 
+	public static class EntityManager
+    {
+		static int entityNetworkID;
+		public static int GetNextEntityNetworkID()
+        {
+			var current = entityNetworkID;
+			entityNetworkID++;
+			return current;
+        }
+    }
+
 	public class GameServer : IPluginAPIServer, IGameServer
 	{
 
@@ -106,7 +116,6 @@ namespace CaveGame.Server
 		}
 		public void BindCommand(string cmd, string descr, LuaTable args)
 		{
-			Output.Out(String.Format("Bound! {0}",cmd));
 			var argsList = new List<string>();
 
 			foreach (var arg in args.Values)
@@ -118,27 +127,17 @@ namespace CaveGame.Server
 			Commands.Add(command);
 		}
 
+		public PluginManager PluginManager;
+		public string Information = "";
+		public bool Running { get; set; }
 
-
-		#region Lua API Members
 		public DateTime Time => DateTime.Now;
 		
-		public void Chat(string msg)
-		{
-			SendToAll(new ServerChatMessagePacket(msg));
-		}
-		public void Chat(string msg, Color color)
-		{
-			SendToAll(new ServerChatMessagePacket(msg, color));
-		}
-		public void Message(User user, string msg)
-		{
-			SendTo(new ServerChatMessagePacket(msg), user);
-		}
-		public void Message(User user, string msg, Color color)
-		{
-			SendTo(new ServerChatMessagePacket(msg, color), user);
-		}
+		public void Chat(string msg) => SendToAll(new ServerChatMessagePacket(msg));
+		public void Chat(string msg, Color color) => SendToAll(new ServerChatMessagePacket(msg, color));
+		public void Message(User user, string msg) => SendTo(new ServerChatMessagePacket(msg), user);
+		public void Message(User user, string msg, Color color) => SendTo(new ServerChatMessagePacket(msg, color), user);
+
 
 		public IMessageOutlet Output
 		{
@@ -146,15 +145,7 @@ namespace CaveGame.Server
 			set { server.Output = value; }
 		}
 
-
-		#endregion
-
-
 		private NetworkServer server;
-
-		public PluginManager PluginManager;
-		public string Information = "";
-		public bool Running { get; set; }
 
 		public void OnCommand(string msg)
 		{
@@ -178,15 +169,21 @@ namespace CaveGame.Server
 		
 
 		public int TickRate { get; private set; }
-
 		public List<User> ConnectedUsers { get; private set; }
 		public ServerWorld World { get; private set; }
-		float ticker;
-
-
 		public string ServerName { get; private set; }
 		public string ServerMOTD { get; private set; }
 		public int MaxPlayers { get; private set; }
+
+		float ticker;
+
+
+		public void SpawnEntity(IEntity entity)
+		{
+			entity.EntityNetworkID = EntityManager.GetNextEntityNetworkID();
+			World.SpawnEntity(entity);
+		}
+		public void LoadPlugins() => PluginManager.LoadPlugins(this);
 
 		public GameServer(ServerConfig config) {
 
@@ -205,7 +202,7 @@ namespace CaveGame.Server
 			PluginManager = new PluginManager();
 		}
 
-		public void LoadPlugins() => PluginManager.LoadPlugins(this);
+		
 
 		public void Start()
 		{
@@ -301,9 +298,8 @@ namespace CaveGame.Server
 			Player plr = new Player();
 			plr.Color = Color.White;
 			plr.DisplayName = packet.RequestedName;
-			plr.EntityNetworkID = 666-plr.GetHashCode();
 			plr.User = newuser;
-			World.Entities.Add(plr);
+			SpawnEntity(plr);
 
 			//PluginManager.CallOnPlayerJoined(plr);
 			OnPlayerJoinedServer.Invoke(new PlayerEventArgs(plr));
@@ -391,13 +387,14 @@ namespace CaveGame.Server
 		{
 			PlaceWallPacket packet = new PlaceWallPacket(msg.Packet.GetBytes());
 
-			Core.Walls.Wall w = Core.Walls.Wall.FromID(packet.WallID);
+			Core.Game.Walls.Wall w = Core.Game.Walls.Wall.FromID(packet.WallID);
 			w.Damage = packet.Damage;
 			World.SetWall(packet.WorldX, packet.WorldY, w);
 
 		}
 
 		int bombcount = 0;
+		float bombVelocity = 3.5f;
 		private void OnPlayerThrowItemAction(NetworkMessage msg, User user)
 		{
 			PlayerThrowItemPacket packet = new PlayerThrowItemPacket(msg.Packet.GetBytes());
@@ -406,12 +403,13 @@ namespace CaveGame.Server
 
 			if (packet.Item == ThrownItem.Bomb)
 			{
-				Bomb bomb = new Bomb();
-				bomb.Velocity = packet.ThrownDirection.ToUnitVector()*5;
-				bomb.Position = p.Position;
-				bomb.NextPosition = p.NextPosition;
-				bomb.EntityNetworkID = 1000000 + bombcount;
-				World.Entities.Add(bomb);
+				Bomb bomb = new Bomb {
+					Velocity = packet.ThrownDirection.ToUnitVector() * bombVelocity,
+					Position = p.Position,
+					NextPosition = p.NextPosition,
+				};
+				
+				SpawnEntity(bomb);
 				SendToAll(new SpawnBombEntityPacket(bomb.EntityNetworkID));
 				bombcount++;
 			}
@@ -423,7 +421,7 @@ namespace CaveGame.Server
 			PlaceFurniturePacket packet = new PlaceFurniturePacket(msg.Packet.GetBytes());
 
 			FurnitureTile f = FurnitureTile.FromID(packet.FurnitureID);
-			f.FurnitureNetworkID = 111111+furniturecount;
+			f.FurnitureNetworkID = EntityManager.GetNextEntityNetworkID(); // don't worry about it LOL
 			f.Position = new Point(packet.WorldX, packet.WorldY);
 			if (World.IsCellOccupied(packet.WorldX, packet.WorldY))
 				return;
@@ -468,6 +466,25 @@ namespace CaveGame.Server
 				SendToAllExcept(packet, user);
 			}
 		}
+
+        private void OnPlayerDamageTile(NetworkMessage msg, User user)
+        {
+            DamageTilePacket packet = new DamageTilePacket(msg.Packet.GetBytes());
+
+			var tile = World.GetTile(packet.Position.X, packet.Position.Y);
+
+			tile.Damage += (byte)packet.Damage;
+			Debug.WriteLine("tile damage:" + tile.Damage);
+			SendToAllExcept(packet, user);
+			if (tile.Damage >= tile.Hardness)
+            {
+				Debug.WriteLine("Tile Break");
+				tile.Drop(this, World, packet.Position);
+				World.SetTile(packet.Position.X, packet.Position.Y, new Air());
+				//SendToAll(new PlaceTilePacket(0, 0, 0, packet.Position.X, packet.Position.Y));
+            }
+			
+        }
 
 		#endregion
 
@@ -514,6 +531,8 @@ namespace CaveGame.Server
 					OnPlayerOpensDoor(msg, user);
 				if (msg.Packet.Type == PacketType.CloseDoor)
 					OnPlayerClosesDoor(msg, user);
+				if (msg.Packet.Type == PacketType.DamageTile)
+					OnPlayerDamageTile(msg, user);
 			}
 		}
 
@@ -530,6 +549,15 @@ namespace CaveGame.Server
 			ConnectedUsers.Remove(user);
 		}
 
+		protected void DispatchUserMessages(User user)
+        {
+			if (user.DispatcherHasMessage())
+            {
+				Packet p = user.PopDispatcherQueue();
+				SendTo(p, user);
+            }
+        }
+
 
 		public void Update(GameTime gt)
 		{
@@ -538,6 +566,7 @@ namespace CaveGame.Server
 
 
 			ConnectedUsers.Where(u => u.Kicked == true).ForEach(InternalUserKick);
+			ConnectedUsers.ForEach(u => DispatchUserMessages(u));
 
 			foreach(var user in ConnectedUsers.ToArray())
 			{
@@ -573,6 +602,15 @@ namespace CaveGame.Server
 							bomb.Position.X, bomb.Position.Y,
 							bomb.Velocity.X, bomb.Velocity.Y,
 							bomb.NextPosition.X, bomb.NextPosition.Y);
+						//Output?.Out("DT_OUT: " + pos.ToString());
+						SendToAll(pos);
+					}
+					if (entity is ItemstackEntity itementity && !entity.Dead)
+					{
+						var pos = new EntityPositionPacket(itementity.EntityNetworkID,
+							itementity.Position.X, itementity.Position.Y,
+							itementity.Velocity.X, itementity.Velocity.Y,
+							itementity.NextPosition.X, itementity.NextPosition.Y);
 						//Output?.Out("DT_OUT: " + pos.ToString());
 						SendToAll(pos);
 					}
@@ -633,5 +671,8 @@ namespace CaveGame.Server
 				Thread.Sleep(TickRate);
 			}
 		}
-	}
+
+
+		
+    }
 }

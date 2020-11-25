@@ -1,6 +1,7 @@
 ﻿#define UI_DEBUG
 
 
+using CaveGame.Core.LuaInterop;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NLua;
@@ -166,8 +167,8 @@ namespace CaveGame.Client.UI
 
 	public class UIRoot : UINode
 	{
-
-		GraphicsDevice device;
+		public LuaEvent<LuaEventArgs> OnUnload = new LuaEvent<LuaEventArgs>();
+		public LuaEvent<LuaEventArgs> OnLoad = new LuaEvent<LuaEventArgs>();
 
 		public bool Visible { get; }
 		public bool Active { get; }
@@ -177,7 +178,7 @@ namespace CaveGame.Client.UI
 
 		public Vector2 AbsoluteSize { 
 			get {
-				return new Vector2(device.Viewport.Width, device.Viewport.Height);
+				return new Vector2(GameGlobals.Width, GameGlobals.Height);
 			} 
 		}
 
@@ -209,10 +210,8 @@ namespace CaveGame.Client.UI
 
         public string Name { get; }
 
-        public UIRoot(GraphicsDevice device)
+        public UIRoot()
 		{
-			this.device = device;
-
 			Children = new List<UINode>();
 			Visible = true;
 			Active = true;

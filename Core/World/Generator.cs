@@ -1,285 +1,574 @@
 ﻿using CaveGame.Core.Noise;
-using CaveGame.Core.Tiles;
+using CaveGame.Core.Game;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
+using DataManagement;
+using CaveGame.Core.WorldGeneration;
+using CaveGame.Core.Game.Tiles;
+using System.Numerics;
 
 namespace CaveGame.Core
 {
-	public enum SurfaceBiome
+	public enum SurfaceBiome : int
 	{
+		Forest = 0,
 		Plains,
 		Mountains,
 		Desert,
-		Forest,
-	}
-
-	public enum RegionBiome
-	{
+		
 
 	}
 
-	public enum SubsurfaceBiome
-	{
+	public interface IBiomeImplementation
+    {
 
-	}
+    }
 
 	public abstract class Biome
 	{
-		public Biome(int seed)
-		{
+		public virtual SurfaceBiome BiomeID => SurfaceBiome.Forest;
 
+		public int Seed => Generator.Seed;
+		public OctaveNoise Octave4 => Generator.Octave4;
+		public OctaveNoise Octave2 => Generator.Octave2;
+		public OctaveNoise Octave3 => Generator.Octave3;
+		public OctaveNoise Octave8 => Generator.Octave8;
+		public SimplexNoise Simplex => Generator.Simplex;
+
+
+		private Generator Generator;
+
+
+
+		public Biome(Generator generator)
+		{
+			Generator = generator;
 		}
 
 		public abstract float GetHeight(int x);
+		public abstract void SurfacePass(Chunk chunk, int x, int y);
+		public abstract void StructurePass(IGameWorld world, int x, int y);
 	}
 
-	public class Generator
+
+   /* public class MountainsBiome : Biome
+    {
+        public override float GetHeight(int x)
+        {
+            
+        }
+
+        public override void SurfacePass(Chunk chunk, int x, int y)
+        {
+           
+        }
+    }
+
+	public class ForestBiome : Biome
+    {
+
+    }
+
+	public class PlainsBiome : Biome
+    {
+
+    }
+
+	public class DesertBiome : Biome
+    {
+
+    }*/
+
+
+
+    public class Generator
 	{
-		int[] biomemap;
+		public const float BIOME_SIZE = 5000.0f;//12006.5f;
+		public const float BIOME_TRANSITION = 0.2f;
+
 
 		public int Seed { get; set; }
 
-		Random terrainRNG;
+		public OctaveNoise Octave4;
+		public OctaveNoise Octave8;
+		public OctaveNoise Octave3;
+		public OctaveNoise Octave2;
+		public SimplexNoise Simplex;
+		public Random RNG;
 
-		public Generator()
+		private SurfaceBiome[] biomemap;
+		
+		private void GenerateBiomeNoiseMap()
 		{
-			terrainRNG = new Random(Seed);
+			int sampleCounts = 100;
+			float biomeRepeatChance = 0.35f;
+			int biomeCount = 4;
 
-			biomemap = new int[256];
-			int previous = 0;
-			for (int i = 0; i < 256; i++)
+			biomemap = new SurfaceBiome[sampleCounts];
+			SurfaceBiome previous = SurfaceBiome.Desert;
+			for (int i = 0; i < sampleCounts; i++)
 			{
-				
-				if (terrainRNG.NextDouble() > 0.5)
-				{
-					biomemap[i] = terrainRNG.Next(4);
-					previous = biomemap[i];
-				}else
-				{
+				if (RNG.NextFloat() > biomeRepeatChance)
 					biomemap[i] = previous;
-				}
-					
+				else
+					biomemap[i] = (SurfaceBiome)RNG.Next(biomeCount);
+
+
+				previous = biomemap[i];
 			}
-
 		}
 
-		private SurfaceBiome GetSurfaceBiome(int x)
+		public Generator(int WorldSeed)
 		{
-			int dj = (int)Math.Floor(x / 16.0f);
+			Seed = WorldSeed;
 
-			//Debug.Write(dj);
-			return (SurfaceBiome)biomemap[dj.Mod(256)];
+			Octave4 = new OctaveNoise(seed: Seed, octaves: 4);
+			Octave8 = new OctaveNoise(seed: Seed, octaves: 8);
+			Octave3 = new OctaveNoise(seed: Seed, octaves: 3);
+			Octave2 = new OctaveNoise(seed: Seed, octaves: 2);
+			Simplex = new SimplexNoise();
+			RNG = new Random(Seed: WorldSeed);
+			
+
+			GenerateBiomeNoiseMap();
+
 		}
+		
+		
+		private SurfaceBiome GetDominantSurfaceBiome(int x)
+		{
+			float alpha = (Simplex.Noise(x/BIOME_SIZE)+1)/2.0f; // transform from [-1, 1] to [0, 1]
+			int biome = (int)Math.Floor(alpha * 100.0f);
 
+			return biomemap[biome];
+		}
 		private float GetDesertHeight(int x)
 		{
-			return 0;
+			float n = (float)Simplex.Noise(x / 50.420f) * 10 + (float)Octave4.Noise2D(x / 30.0f, (-x * 0.10f) + (x / 20.0f)) * 20;
+			return n;
 		}
 		private float GetForestHeight(int x)
 		{
-			return 0;
+
+			float n = (float)Simplex.Noise(x/100.420f)*4 + (float)Octave4.Noise2D(x/50.0f, (-x*0.10f)+(x/20.0f))*40;
+			return 10 + n;
 		}
 
 		private float GetMountainHeight(int x)
 		{
+			
+			float simplex = (float)Simplex.Noise(x / 50.420f);
+			float octave = (float)Octave4.Noise2D(x / 100.0f, (-x * 0.05f) + (x / 40.0f));
+			float n =   (simplex * 30) * (octave * 10);
+			float a = Simplex.Noise(x / 10.0f) * 2;
+			float b = Simplex.Noise(x / 5.0f) * 2;
+			return (a+b + 100) + n;
+		}
+		private float GetPlainsHeight(int x)
+        {
+			return Simplex.Noise(x / 100.420f)*4;
+        }
+
+		private float GetHeightmap(int x, SurfaceBiome biome)
+        {
+
+			if (biome == SurfaceBiome.Desert)
+				return GetDesertHeight(x);
+			if (biome == SurfaceBiome.Forest)
+				return GetForestHeight(x);
+			if (biome == SurfaceBiome.Mountains)
+				return GetMountainHeight(x);
+			if (biome == SurfaceBiome.Plains)
+				return GetPlainsHeight(x);
+
+
+			return 0;
+        }
+
+		private float GetBiomeSurface(int x)
+        {
+
+			SurfaceBiome primaryBiome = GetDominantSurfaceBiome(x);
+			SurfaceBiome secondaryBiome = GetSecondarySurfaceBiome(x);
+
+			var primaryScale= GetPrimarySurfaceBiomeScale(x);
+			var secondScale = GetSecondarySurfaceBiomeScale(x);
+
+
+			return (GetHeightmap(x, primaryBiome)*primaryScale) + (GetHeightmap(x, secondaryBiome)*secondScale);
+		}
+
+
+		public const float SURFACE_BASE_HEIGHT = -40;
+
+		private float GetBaseSurface(int x, int y)
+        {
+			float surfacePass1 = Octave4.Noise2D(x: x, y: y, xScale: 10.0, yScale: 10.0, xOffset: -2405, yOffset: 222);
+			float surfacePass2 = Octave4.Noise2D(x: x, y: y, xScale: 325.0, yScale: 299.0, xOffset: 2, yOffset: -9924);
+			float surface = (surfacePass1*3) + (surfacePass2*10);
+			return ( surface - SURFACE_BASE_HEIGHT);
+		}
+
+
+
+		private SurfaceBiome GetSecondarySurfaceBiome(int x)
+        {
+			float alpha = (Simplex.Noise(x / BIOME_SIZE) + 1) / 2.0f; // transform from [-1, 1] to [0, 1]
+			int biome = (int)Math.Floor(alpha * 100.0f);
+			float biomedelta = GetPrimarySurfaceBiomeStrength(x);
+			if (biomedelta > (1- BIOME_TRANSITION)) // begin blending with biome on the right side
+				return biomemap[(biome + 1).Mod(100)];
+			if (biomedelta < BIOME_TRANSITION) // begin blending with biome on the left side
+				return biomemap[(biome - 1).Mod(100)];
+			return biomemap[biome];
+
+		}
+
+		private float GetPrimarySurfaceBiomeScale(int x)
+        {
+			float biomedelta = GetPrimarySurfaceBiomeStrength(x);
+			if (biomedelta > (1 - BIOME_TRANSITION)) // begin blending with biome on the right side
+			{
+				float inverse = (1 - BIOME_TRANSITION);
+				float lerp = (biomedelta - inverse) / BIOME_TRANSITION;
+				return 1-(lerp/2);
+			}
+
+			if (biomedelta < BIOME_TRANSITION) // begin blending with biome on the left side
+			{
+				float lerp = biomedelta  / BIOME_TRANSITION;
+				return (lerp/2) + 0.5f;
+			}
+			return 1;
+		}
+
+		private float GetSecondarySurfaceBiomeScale(int x)
+        {
+			float biomedelta = GetPrimarySurfaceBiomeStrength(x);
+			if (biomedelta > (1- BIOME_TRANSITION)) // begin blending with biome on the right side
+			{
+				float lerp = (biomedelta - ( 1- BIOME_TRANSITION)) / BIOME_TRANSITION;
+				return lerp / 2;
+			}
+
+			if (biomedelta < BIOME_TRANSITION) // begin blending with biome on the left side
+			{
+				float lerp = (biomedelta / BIOME_TRANSITION);
+				return (1-lerp)/2;
+			}
 			return 0;
 		}
+
+		private float GetPrimarySurfaceBiomeStrength(int x)
+        {
+			float alpha = (Simplex.Noise(x / BIOME_SIZE) + 1) / 2.0f; // transform from [-1, 1] to [0, 1]
+			int biome = (int)Math.Floor(alpha * 100.0f);
+			float biomedelta = (alpha * 100) - biome;
+			return biomedelta;
+		}
+
+		private void MountainsPass(Chunk chunk, int chunkX, int chunkY)
+        {
+			int worldX = ((chunk.Coordinates.X * Globals.ChunkSize) + chunkX);
+			int worldY = ((chunk.Coordinates.Y * Globals.ChunkSize) + chunkY);
+			float depth = worldY + GetBiomeSurface(worldX) - GetBaseSurface(worldX, worldY);
+			if (depth < 0)
+			{
+				chunk.SetTile(chunkX, chunkY, new Game.Tiles.Air());
+			}
+			else
+			{
+				chunk.SetTile(chunkX, chunkY, new Game.Tiles.Stone());
+			}
+
+			if (depth < 0)
+			{
+				chunk.SetTile(chunkX, chunkY, new Game.Tiles.Air());
+			}
+			else if (depth <= 1.5f)
+			{
+				chunk.SetTile(chunkX, chunkY, new Game.Tiles.Grass());
+			}
+			else if (depth <= 3)
+			{
+				chunk.SetTile(chunkX, chunkY, new Game.Tiles.Dirt());
+				chunk.SetWall(chunkX, chunkY, new Game.Walls.Dirt());
+			}
+			else
+			{
+				chunk.SetTile(chunkX, chunkY, new Game.Tiles.Stone());
+				chunk.SetWall(chunkX, chunkY, new Game.Walls.Stone());
+			}
+
+
+			if (depth > 0)
+			{
+				///
+				var noise = Simplex.Noise(worldX / 4.0f, worldY / 4.0f) * 10;
+				if (worldY - noise + depth > 10.5)
+					chunk.SetTile(chunkX, chunkY, new Game.Tiles.Stone());
+			}
+		}
+
+		private void ForestPass(Chunk chunk, int chunkX, int chunkY)
+        {
+			int worldX = ((chunk.Coordinates.X * Globals.ChunkSize) + chunkX);
+			int worldY = ((chunk.Coordinates.Y * Globals.ChunkSize) + chunkY);
+			float depth = worldY + GetBiomeSurface(worldX) - GetBaseSurface(worldX, worldY);
+			if (depth < 0)
+			{
+				chunk.SetTile(chunkX, chunkY, new Game.Tiles.Air());
+			}
+			else if (depth <= 1.5f)
+			{
+				chunk.SetTile(chunkX, chunkY, new Game.Tiles.Grass());
+			}
+			else if (depth <= 30)
+			{
+				chunk.SetTile(chunkX, chunkY, new Game.Tiles.Dirt());
+				chunk.SetWall(chunkX, chunkY, new Game.Walls.Dirt());
+			}
+			else
+			{
+				chunk.SetWall(chunkX, chunkY, new Game.Walls.Stone());
+				var noise = Simplex.Noise(worldX / 4.0f, worldY / 4.0f) * 40;
+				if (noise + depth > 40.5)
+					chunk.SetTile(chunkX, chunkY, new Game.Tiles.Stone());
+				else
+					chunk.SetTile(chunkX, chunkY, new Game.Tiles.Dirt());
+			}
+		}
+
+		private void DesertPass(Chunk chunk, int chunkX, int chunkY)
+        {
+			int worldX = ((chunk.Coordinates.X * Globals.ChunkSize) + chunkX);
+			int worldY = ((chunk.Coordinates.Y * Globals.ChunkSize) + chunkY);
+			float depth = worldY + GetBiomeSurface(worldX) - GetBaseSurface(worldX, worldY);
+			if (depth < 0)
+			{
+				chunk.SetTile(chunkX, chunkY, new Air());
+			}
+			else if (depth <= 1.5f)
+			{
+				chunk.SetTile(chunkX, chunkY, new Sand());
+			}
+			else if (depth <= 5)
+			{
+				chunk.SetTile(chunkX, chunkY, new Sand());
+				chunk.SetWall(chunkX, chunkY, new Game.Walls.Sandstone());
+			}
+			else
+			{
+				chunk.SetWall(chunkX, chunkY, new Game.Walls.Sandstone());
+				var noise = Simplex.Noise(chunkX / 4.0f, chunkY / 4.0f) * 30;
+				if (noise + depth > 30.5)
+					chunk.SetTile(chunkX, chunkY, new Sandstone());
+				else
+					chunk.SetTile(chunkX, chunkY, new Sand());
+			}
+		}
+
+		private void PlainsPass(Chunk chunk, int chunkX, int chunkY)
+        {
+			int worldX = ((chunk.Coordinates.X * Globals.ChunkSize) + chunkX);
+			int worldY = ((chunk.Coordinates.Y * Globals.ChunkSize) + chunkY);
+			float depth = worldY + GetBiomeSurface(worldX) - GetBaseSurface(worldX, worldY);
+			if (depth < 0)
+			{
+				chunk.SetTile(chunkX, chunkY, new Game.Tiles.Air());
+			}
+			else if (depth <= 1.5f)
+			{
+				chunk.SetTile(chunkX, chunkY, new Game.Tiles.Grass());
+			}
+			else if (depth <= 30)
+			{
+				chunk.SetTile(chunkX, chunkY, new Game.Tiles.Dirt());
+				chunk.SetWall(chunkX, chunkY, new Game.Walls.Dirt());
+			}
+			else
+			{
+				chunk.SetWall(chunkX, chunkY, new Game.Walls.Stone());
+				var noise = Simplex.Noise(worldX / 4.0f, worldY / 4.0f) * 30;
+				if (noise + depth > 30.5)
+					chunk.SetTile(chunkX, chunkY, new Game.Tiles.Stone());
+				else
+					chunk.SetTile(chunkX, chunkY, new Game.Tiles.Dirt());
+			}
+		}
+
+		//public float Get
 
 		public void HeightPass(ref Chunk chunk)
 		{
 
-			var simplex = new SimplexNoise();
-			var octave = new OctaveNoise(5, 4);
-
-			for (int x = 0; x < Chunk.ChunkSize; x++)
+			for (int chunkX = 0; chunkX < Chunk.ChunkSize; chunkX++)
 			{
-				for (int y = 0; y < Chunk.ChunkSize; y++)
+				for (int chunkY = 0; chunkY < Chunk.ChunkSize; chunkY++)
 				{
 
-					int curX = ((chunk.Coordinates.X * Globals.ChunkSize) + x);
-					int curY = ((chunk.Coordinates.Y * Globals.ChunkSize) + y);
+					int worldX = ((chunk.Coordinates.X * Globals.ChunkSize) + chunkX);
+					int worldY = ((chunk.Coordinates.Y * Globals.ChunkSize) + chunkY);
 
+					float depth = worldY + GetBiomeSurface(worldX) - GetBaseSurface(worldX, worldY);
+					
 
-					var surface = octave.Noise2D(curX / 20.0, curY / 20.0) * 10 + (octave.Noise2D(curX / 201.0, curY / 199.0) * 40);
+					SurfaceBiome biome = GetDominantSurfaceBiome(worldX);
 
-					var depth = (curY - surface - 15);
-					SurfaceBiome biome = GetSurfaceBiome(x);
+					// Surface Biome Generation
+					if (biome == SurfaceBiome.Mountains)
+						MountainsPass(chunk, chunkX, chunkY);
 
-				/*	if (biome == SurfaceBiome.Mountains)
-					{
-						if (depth < 0)
-						{
-							chunk.SetTile(x, y, new Tiles.Air());
-						}
-						else
-						{
-							chunk.SetTile(x, y, new Tiles.Stone());
-						}
-					}
 					if (biome == SurfaceBiome.Forest)
-					{
-						if (depth < 0)
-						{
-							chunk.SetTile(x, y, new Tiles.Air());
-						}
-						else
-						{
-							chunk.SetTile(x, y, new Tiles.Mud());
-						}
-					}
+						ForestPass(chunk, chunkX, chunkY);
 
 					if (biome == SurfaceBiome.Desert)
-					{
-						if (depth < 0)
-						{
-							chunk.SetTile(x, y, new Tiles.Air());
-						}
-						else if (depth <= 1.5f)
-						{
-							chunk.SetTile(x, y, new Tiles.Sand());
-						}
-						else if (depth <= 5)
-						{
-							chunk.SetTile(x, y, new Tiles.Sand());
-							chunk.SetWall(x, y, new Walls.Sandstone());
-						}
-						else
-						{
-							chunk.SetWall(x, y, new Walls.Sandstone());
-							var noise = simplex.Noise(curX / 4.0f, curY / 4.0f) * 30;
-							if (noise + depth > 30.5)
-								chunk.SetTile(x, y, new Tiles.Sandstone());
-							else
-								chunk.SetTile(x, y, new Tiles.Sand());
-						}
-					}*/
+						DesertPass(chunk, chunkX, chunkY);
+
+					if (biome == SurfaceBiome.Plains)
+						PlainsPass(chunk, chunkX, chunkY);
 					
-					//if (biome == SurfaceBiome.Plains)
-					//{
-						if (depth < 0)
-						{
-							chunk.SetTile(x, y, new Tiles.Air());
-						}
-						else if (depth <= 1.5f)
-						{
-							chunk.SetTile(x, y, new Tiles.Grass());
-						}
-						else if (depth <= 5)
-						{
-							chunk.SetTile(x, y, new Tiles.Dirt());
-							chunk.SetWall(x, y, new Walls.Dirt());
-						}
-						else
-						{
-							chunk.SetWall(x, y, new Walls.Stone());
-							var noise = simplex.Noise(curX / 4.0f, curY / 4.0f) * 30;
-							if (noise + depth > 30.5)
-								chunk.SetTile(x, y, new Tiles.Stone());
-							else
-								chunk.SetTile(x, y, new Tiles.Dirt());
-						}
-					//}
-					
-					if (depth > 100)
+
+					// Cave and other structures
+
+					// Mushroom Cave
+					if (depth > 1000)
 					{
-						float noise = simplex.Noise((curX - 999) / 400.0f, (curY + 420) / 400.0f);
-						float n2 = (float)octave.Noise2D((curX - 999) / 4.0f, (curY + 420) / 4.0f);
+						float noise = Simplex.Noise((worldX - 999) / 400.0f, (worldY + 420) / 400.0f);
+						float n2 = (float)Octave4.Noise2D((worldX - 999) / 4.0f, (worldY + 420) / 4.0f);
 						if (noise > 0.75f)
 						{
 							if (n2 < 0.10f)
-								chunk.SetTile(x, y, new Mycelium());
+								chunk.SetTile(chunkX, chunkY, new Mycelium());
 							else
-								chunk.SetTile(x, y, new Air());
+								chunk.SetTile(chunkX, chunkY, new Air());
 						}
 					}
 
 					if (depth > 0)
 					{
-						if (simplex.Noise(curX / 50.0f, (curY / 60.0f) + 4848) > 0.65f)
-							chunk.SetTile(x, y, new Clay());
+						if (Simplex.Noise(worldX / 50.0f, (worldY / 60.0f) + 4848) > 0.85f)
+							chunk.SetTile(chunkX, chunkY, new Clay());
 
-						if (simplex.Noise((curX + 444) / 45.0f, (curY / 22.0f) + 458) > 0.75f)
-							chunk.SetTile(x, y, new Granite());
+						if (Simplex.Noise((worldX + 444) / 45.0f, (worldY / 22.0f) + 458) > 0.92f)
+							chunk.SetTile(chunkX, chunkY, new Granite());
 					}
 
 					// caves
 					if (depth >= 0)
 					{
-
-
-
 						// jagged caves
-						var cavetiny = octave.Noise2D(curX / 5.0f, curY / 5.0f) * 0.5f;
-						var cave1 = (octave.Noise2D(curX / 30.0f, curY / 30.0f));
-						var cave2 = (octave.Noise2D((curX + 11) / 200.0f, (curY + 50) / 200.0f) * 0.6f) + (cave1 * 1.5f) - 0.3f + (cavetiny);
-						if (cave1 > 0.75f)
-						{
-							chunk.SetTile(x, y, new Tiles.Air());
-						}
-						if (cavetiny > 0.8f)
-						{
-							chunk.SetTile(x, y, new Tiles.Air());
-						}
-						if (cave2 > -0.08f && cave2 < 0.08f)
-						{
-							chunk.SetTile(x, y, new Tiles.Air());
-						}
 
-						if (depth > 50 && chunk.GetTile(x, y) is Tiles.Air && simplex.Noise(curX / 5.0f, curY / 8.0f) > 0.98f)
-						{
+						float cavemap = Simplex.Noise(worldX, worldY, xScale: 200, yScale: 200, xOffset: 60, yOffset: -200);
 
-							chunk.SetTile(x, y, new Cobweb());
-						}
+						//cavemap = FloatRange.I_Unit.NormalizeFrom(FloatRange.I_Negative1_Positive1, cavemap); // normalize from [-1, 1] to [0, 1]
+
+						float caveDetail1 = Octave2.Noise2D(worldX, worldY, xScale: 8, yScale: 8, xOffset: 10, yOffset: 444);
+						float caveDetail2 = Simplex.Noise(worldX, worldY, 20, 20, 55, 242);
+						//caveDetail1 = FloatRange.I_Unit.NormalizeFrom(FloatRange.I_Negative1_Positive1, caveDetail1); // normalize from [-0.5, 0.5] to [0, 1]
 
 
-						if (cavetiny > 0.2f)
-						{
+						float caveCarve = (cavemap) - (caveDetail1*0.3f) + (caveDetail2*0.08f);
 
-							chunk.SetTile(x, y, new Water { TileState = 8 });
-							//TileUpdate[x, y] = true;
+						float cavewidth = 0.13f;
+						if (caveCarve > -cavewidth && caveCarve < cavewidth)
+                        {
+							if (depth < 50)
+							{
+								if (caveCarve < (-cavewidth) + 0.05f || caveCarve > (cavewidth - 0.05f))
+								{
+									if (chunk.GetTile(chunkX, chunkY).GetType() == typeof(Dirt))
+                                    {
+										chunk.SetTile(chunkX, chunkY, new Grass());
+									}
+								} else
+                                {
+									chunk.SetTile(chunkX, chunkY, new Game.Tiles.Air());
+								}
+							} else
+                            {
+								chunk.SetTile(chunkX, chunkY, new Game.Tiles.Air());
+							}
+							
+							
 						}
+
+						
+
+						
+						/*if (cavetiny > 0.45f)
+							chunk.SetTile(chunkX, chunkY, new Game.Tiles.Air());
+						if (cave2 > -0.1f && cave2 < 0.1f)
+							chunk.SetTile(chunkX, chunkY, new Game.Tiles.Air());
+
+						if (depth > 5)
+                        {
+							if (cave1 * cavetiny > 0.5f)
+								chunk.SetTile(chunkX, chunkY, new Game.Tiles.Air());
+							if (cave1 > 0.8f)
+								chunk.SetTile(chunkX, chunkY, new Game.Tiles.Air());
+						}
+
+
+						if (depth > 500)
+                        {
+							if (cave1 > 0.75f)
+                            {
+								chunk.SetTile(chunkX, chunkY, new Game.Tiles.Air());
+
+								// bruh caves
+								if (cave1 < 0.15f && cave2 < 0.15)
+								{
+									chunk.SetTile(chunkX, chunkY, new Game.Tiles.Mud());
+								}
+							}
+							
+						}*/
+
+						if (depth > 50 && chunk.GetTile(chunkX, chunkY) is Game.Tiles.Air && Simplex.Noise(worldX / 5.0f, worldY / 8.0f) > 0.98f)
+						{
+							chunk.SetTile(chunkX, chunkY, new Cobweb());
+						}
+
+						
 
 						if (depth > 150)
 						{
-							// lava tubes
-							if (simplex.Noise( (curX + 444) / 100.0f, curY / 100.0f) > 0.8f)
+							if (Simplex.Noise( (worldX + 444) / 100.0f, worldY / 100.0f) > 0.8f)
 							{
-								chunk.SetTile(x, y, new Lava { TileState = 8 });
+								chunk.SetTile(chunkX, chunkY, new Lava { TileState = 8 });
 							}
-							if (simplex.Noise(curX / 400.0f, curY / 400.0f) > 0.7f)
+							if (Simplex.Noise(worldX / 400.0f, worldY / 400.0f) > 0.9f)
 							{
-								if (chunk.GetTile(x, y) is Air)
-									chunk.SetTile(x, y, new Lava { TileState = 8 });
-								//TileUpdate[x, y] = true;
+								if (chunk.GetTile(chunkX, chunkY) is Air)
+									chunk.SetTile(chunkX, chunkY, new Lava { TileState = 8 });
 							}
 						}
+					}
+
+
+					float liquidNoise = Simplex.Noise(worldX / 50.0f, worldY / 50.0f);
+					if (liquidNoise > 0.8f && depth < 6)
+					{
+						float carve = (liquidNoise - 0.5f) * 6.0f;
+						if (depth > 0 && depth + carve > 0)
+						{
+							chunk.SetWall(chunkX, chunkY, new Game.Walls.Air());
+							chunk.SetTile(chunkX, chunkY, new Water());
+						} 
 					}
 				}
 			}
 		}
-		
 		public void StructurePass(IGameWorld world, int x, int y)
 		{
-			if (terrainRNG.Next(64) == 2 && world.GetTile(x, y) is Tiles.Grass && world.GetTile(x, y - 1) is Tiles.Air)
-			{
-
-
-				for (int dx = -3; dx <= 3; dx++)
+			float depth = y + GetBiomeSurface(x) - GetBaseSurface(x, y);
+			if (GetDominantSurfaceBiome(x) == SurfaceBiome.Forest && depth < 3)
+            {
+				
+				if (RNG.Next(7) == 2 && world.GetTile(x, y) is Game.Tiles.Grass && world.GetTile(x, y - 1) is Game.Tiles.Air)
 				{
-					for (int dy = -3; dy <= 3; dy++)
-					{
-						world.SetTile(dx + x, dy + y - 7, new Tiles.Leaves());
-					}
+					TreeGenerator.GenerateTree(world, RNG, x, y - 1);
 				}
-				world.SetTile(x, y - 1, new Tiles.OakLog());
-				world.SetTile(x, y - 2, new Tiles.OakLog());
-				world.SetTile(x, y - 3, new Tiles.OakLog());
-				world.SetTile(x, y - 4, new Tiles.OakLog());
-				world.SetTile(x, y - 5, new Tiles.OakLog());
-
-				//world.SetTile(x, y - 1, new Stone());
 			}
 		}
 	}

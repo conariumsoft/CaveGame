@@ -1,4 +1,5 @@
 ﻿using CaveGame.Core.FileUtil;
+using CaveGame.Core.Game.Tiles;
 using CaveGame.Server;
 using Microsoft.Xna.Framework;
 using System;
@@ -36,6 +37,8 @@ namespace StandaloneServer
 		[STAThread]
 		static void Main()
 		{
+			Tile.AssertTileEnumeration();
+
 			Console.Title = "CaveGameServer";
 			Console.CursorVisible = false;
 			ConsoleOuputWrapper consoleWrapper = new ConsoleOuputWrapper();

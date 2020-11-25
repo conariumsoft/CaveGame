@@ -1,9 +1,11 @@
-﻿using System;
+﻿using DataManagement;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace CaveGame.Core.Noise
 {
+
 	class PerlinNoise
 	{
 		public const double OFFSET = 0.5;
@@ -50,6 +52,18 @@ namespace CaveGame.Core.Noise
             _random = new Random((int)seed);
             InitGradients();
         }
+
+        public static DoubleRange Interval = new DoubleRange(-0.5, 0.5);
+
+        /// <summary>
+        /// Returns a noise value in [-0.5, 0.5] range.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <returns></returns>
+        /// 
+
 
         public double Noise(double x, double y, double z)
         {

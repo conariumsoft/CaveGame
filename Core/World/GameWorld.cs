@@ -1,13 +1,13 @@
 ﻿using CaveGame.Core.Game.Entities;
 using CaveGame.Core.Furniture;
 using CaveGame.Core.Generic;
-using CaveGame.Core.Tiles;
-using CaveGame.Core.Walls;
+using CaveGame.Core.Game.Tiles;
+using CaveGame.Core.Game.Walls;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
+using DataManagement;
 
 namespace CaveGame.Core
 {
@@ -26,6 +26,7 @@ namespace CaveGame.Core
 		void SetWall(int x, int y, Wall w);
 		void SetTileNetworkUpdated(int x, int y);
 		void DoUpdatePropogation(int x, int y);
+		void BreakTile(int x, int y);
 		void SetTileUpdated(int x, int y);
 		bool IsCellOccupied(int x, int y);
 		bool IsTile<Type>(int x, int y);
@@ -121,6 +122,15 @@ namespace CaveGame.Core
 			throw new NotImplementedException();
 		}
 
+
+		public virtual void BreakTile(int x, int y)
+        {
+
+        }
+
+		public void SetTile(Point p, Tile t)=>SetTile(p.X, p.Y, t);
+		public Tile GetTile (Point p) => GetTile(p.X, p.Y);
+
 		public virtual void SetTile(int x, int y, Tile t)
 		{
 			
@@ -171,14 +181,14 @@ namespace CaveGame.Core
 
 			if (Chunks.ContainsKey(cc))
 				return Chunks[cc].GetTile(coordinates.TileX, coordinates.TileY);
-			return new Tiles.Void();
+			return new Game.Tiles.Void();
 		}
 		public void GetTile(int x, int y, out Tile t)
 		{
 			Coordinates6D coordinates = Coordinates6D.FromWorld(x, y);
 
 			var cc = new ChunkCoordinates(coordinates.ChunkX, coordinates.ChunkY);
-			t = new Tiles.Void();
+			t = new Game.Tiles.Void();
 			if (Chunks.ContainsKey(cc))
 				t = Chunks[cc].GetTile(coordinates.TileX, coordinates.TileY);
 			
@@ -191,14 +201,14 @@ namespace CaveGame.Core
 
 			if (Chunks.ContainsKey(cc))
 				return Chunks[cc].GetWall(coordinates.TileX, coordinates.TileY);
-			return new Walls.Void();
+			return new Game.Walls.Void();
 		}
 		public void GetWall(int x, int y, out Wall w)
 		{
 			Coordinates6D coordinates = Coordinates6D.FromWorld(x, y);
 
 			var cc = new ChunkCoordinates(coordinates.ChunkX, coordinates.ChunkY);
-			w = new Walls.Void();
+			w = new Game.Walls.Void();
 			if (Chunks.ContainsKey(cc))
 				w = Chunks[cc].GetWall(coordinates.TileX, coordinates.TileY);
 			
@@ -273,14 +283,9 @@ namespace CaveGame.Core
 			physicsTask.Update(gt);
 		}
 
-		protected virtual void PhysicsStep()
-		{
-			foreach (IEntity entity in Entities)
-				if (entity is IPhysicsObject physEntity)
-					physEntity.PhysicsStep(this, PhysicsStepIncrement);
-		}
+		protected virtual void PhysicsStep() { }
 
-		public virtual void Explosion(Vector2 pos, float strength, float radius, bool damageTiles, bool damageEntities) {}
+		public virtual void Explosion(Vector2 pos, float strength, float radius, bool damageTiles, bool damageEntities) { }
 
 		public bool ContainsFurniture(int x, int y) {
 			foreach (var furn in Furniture)
@@ -295,7 +300,7 @@ namespace CaveGame.Core
 		{
 			if (ContainsFurniture(x, y))
 				return true;
-			if (IsTile<Tiles.Air>(x, y))
+			if (IsTile<Game.Tiles.Air>(x, y))
 				return false;
 			if (IsTile<INonSolid>(x, y))
 				return false;

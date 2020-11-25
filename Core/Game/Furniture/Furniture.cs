@@ -1,6 +1,7 @@
 ﻿using CaveGame.Core.Game.Entities;
+using CaveGame.Core.Game.Tiles;
 using CaveGame.Core.Inventory;
-using CaveGame.Core.Tiles;
+using CaveGame.Core.Game.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -201,7 +202,7 @@ namespace CaveGame.Core.Furniture
 
 		public override FurnitureID ID => FurnitureID.Workbench;
 		public override Vector2 BoundingBox => new Vector2(8, 0);
-		public override Color Color => TileDefinitions.OakPlank.Color;
+		public override Color Color => new Color(0.8f, 0.55f, 0.25f);
 		public override Rectangle Quad => new Rectangle(56, 104, 16, 8);
 
 		public override Point OccupationBox => new Point(2, 1);
@@ -272,7 +273,7 @@ namespace CaveGame.Core.Furniture
 
 		public override Vector2 BoundingBox => new Vector2(3, 12);
 
-		public override Color Color => TileDefinitions.OakPlank.Color;
+		public override Color Color => new Color(0.8f, 0.55f, 0.25f);
 
 		public override Rectangle Quad => OpenDoorQuad;
 

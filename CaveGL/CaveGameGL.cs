@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System;
 using CaveGame.Client.Menu;
 using CaveGame.Client.UI;
-using Steamworks;
 using CaveGame.Core.FileUtil;
 using System.IO;
 using Microsoft.Xna.Framework.Input;
+using System.Globalization;
 
 namespace CaveGame.Client
 {
@@ -28,7 +28,7 @@ namespace CaveGame.Client
 
 		#region Game States
 		public GameClient InWorldContext;
-		public Menu.HomePage HomePageContext;
+		public Menu.MenuManager HomePageContext;
 		public Menu.Multiplayer MultiplayerPageContext;
 		public Menu.Settings SettingsContext;
 		public Menu.TimeoutMenu TimeoutContext;
@@ -188,6 +188,14 @@ namespace CaveGame.Client
 			
 		}
 
+		private void OnTimeCommand(CommandBar sender, Command command, params string[] args)
+        {
+			if (args.Length > 0)
+				InWorldContext.World.TimeOfDay = float.Parse(args[0], CultureInfo.InvariantCulture.NumberFormat);
+			else
+				sender.Out("Time of day (hours): " + InWorldContext.World.TimeOfDay.ToString());
+		}
+
 		protected override void Initialize()
 		{
 			Window.TextInput += TextInputManager.OnTextInput;
@@ -203,10 +211,10 @@ namespace CaveGame.Client
 			Console.BindCommandInformation(new Command("connect", "", new List<string> { }, OnDisconnectCommand));
 			Console.BindCommandInformation(new Command("graph", "", new List<string> { }, OnGraphCommand));
 			Console.BindCommandInformation(new Command("screen", "", new List<string> { }, OnScreenshot));
+			Console.BindCommandInformation(new Command("time", "Set/Get time of day", new List<string> { "time" }, OnTimeCommand));
 			//Console.Handler += CommandBarEvent;
 			Components.Add(Console);
 			
-
 			FPSCounter = new FrameCounter(this);
 			Components.Add(FPSCounter);
 
@@ -224,7 +232,7 @@ namespace CaveGame.Client
 
 		private void CreateGameStates()
 		{
-			HomePageContext = new HomePage(this);
+			HomePageContext = new MenuManager(this);
 			InWorldContext = new GameClient(this);
 			CreditsContext = new Credits(this);
 			MultiplayerPageContext = new Multiplayer(this);

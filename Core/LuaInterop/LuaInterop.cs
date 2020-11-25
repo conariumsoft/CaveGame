@@ -20,7 +20,7 @@ function list(clrlist)
         end
     end
 end
-
+_G.list = list
 ";
     }
 	public static class LuaExtensions
