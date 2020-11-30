@@ -17,7 +17,7 @@ using System.Text;
 
 namespace CaveGame.Core.Game.Entities
 {
-	public class Player : PhysicsEntity, IClientLogical, IPhysicsObject, IPositional, IVelocity, INextPosition, IHorizontalDirectionState
+	public class Player : PhysicsEntity, IPhysicsObject, IPositional, IVelocity, INextPosition, IHorizontalDirectionState
 	{
 
 		public override Vector2 BoundingBox => new Vector2(6, 12);
@@ -54,12 +54,10 @@ namespace CaveGame.Core.Game.Entities
 			Color = Color.White;
 		}
 
-		public override void ClientUpdate(IClientWorld world, GameTime gt)
+		public override void ClientUpdate(IGameClient client, GameTime gt)
 		{
 			walkingAnimationTimer += (float)gt.ElapsedGameTime.TotalSeconds * 5;
-			base.ClientUpdate(world, gt);
+			base.ClientUpdate(client, gt);
 		}
-
-		
 	}
 }

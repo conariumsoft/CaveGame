@@ -26,13 +26,13 @@ namespace CaveGame.Core.Game.Entities
 		public void ClientPhysicsTick(IClientWorld world, float step) => PhysicsStep(world, step);
 
 
-		public override void ClientUpdate(IClientWorld world, GameTime gt)
+		public override void ClientUpdate(IGameClient client, GameTime gt)
         {
 			hover += gt.GetDelta();
-			base.ClientUpdate(world, gt);
+			base.ClientUpdate(client, gt);
         }
 
-        public override void Draw(SpriteBatch sb)
+        public override void Draw(GraphicsEngine GFX)
 		{
 
 			var drawPos = TopLeft + new Vector2(0, (float)Math.Sin((double)hover * 1.5) * 1.0f);
@@ -42,25 +42,22 @@ namespace CaveGame.Core.Game.Entities
 
 				if (ItemStack.Quantity > 10)
 				{
-					ItemStack.Item.Draw(sb, drawPos + new Vector2(-2f, -2f), 0.5f);
+					ItemStack.Item.Draw(GFX, drawPos + new Vector2(-2f, -2f), 0.5f);
 				}
 				if (ItemStack.Quantity > 1)
 				{
-					ItemStack.Item.Draw(sb, drawPos + new Vector2(-1f, -1f), 0.5f);
+					ItemStack.Item.Draw(GFX, drawPos + new Vector2(-1f, -1f), 0.5f);
 				}
 				
-				ItemStack.Item.Draw(sb, drawPos, 0.5f);
+				ItemStack.Item.Draw(GFX, drawPos, 0.5f);
 			
 				if (ItemStack.Quantity > 100)
 				{
-					ItemStack.Item.Draw(sb, drawPos + new Vector2(1f, 1f), 0.5f);
+					ItemStack.Item.Draw(GFX, drawPos + new Vector2(1f, 1f), 0.5f);
 				}
 			}
 
-
-#if CLIENT
-			sb.Print(Color.White, drawPos - new Vector2(0, 10), ItemStack.Quantity.ToString());
-#endif
+			GFX.Text(ItemStack.Quantity.ToString(), drawPos - new Vector2(0, 10));
 		}
 	}
 
@@ -68,7 +65,7 @@ namespace CaveGame.Core.Game.Entities
 
 
 	// server-relevant code
-	public partial class ItemstackEntity : PhysicsEntity, IServerPhysicsObserver, IServerLogical
+	public partial class ItemstackEntity : PhysicsEntity, IServerPhysicsObserver
 	{
 		public void ServerPhysicsTick(IServerWorld world, float step)
 		{
@@ -114,7 +111,7 @@ namespace CaveGame.Core.Game.Entities
 			base.PhysicsStep(world, step);
 		}
 
-		public override void ServerUpdate(IServerWorld world, GameTime gt)
+		public override void ServerUpdate(IGameServer server, GameTime gt)
 		{
 
 			if (ItemStack.Quantity <= 0)
@@ -123,7 +120,7 @@ namespace CaveGame.Core.Game.Entities
 				return;
 			}
 
-			base.ServerUpdate(world, gt);
+			base.ServerUpdate(server, gt);
 		}
 	}
 }

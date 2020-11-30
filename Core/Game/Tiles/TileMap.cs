@@ -68,7 +68,7 @@ namespace CaveGame.Core.Game.Tiles
 		public static Rectangle Reeds = Quad(9, 4);
 		public static Rectangle ReedsTop = Quad(8, 4);
 
-		public static Rectangle BMPY_WoodGrain = Quad(0, 4);
+		public static Rectangle Sand = Quad(0, 4);
 		public static Rectangle BMPY_Stone = Quad(3, 3);
 		public static Rectangle BMPY_DarkStone = Quad(1, 4);
 		public static Rectangle RedBrick = Quad(0, 3);

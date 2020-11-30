@@ -117,6 +117,13 @@ namespace Editor
     public class MainWindowViewModel : MonoGameViewModel, I_MGCCInput, INotifyPropertyChanged
     {
 
+        public GraphicsEngine GFX { get; set; }
+        public bool CreatingSelectionBox { get; set; }
+        public Rectangle? Selection { get; set; }
+
+        public Point? InitialShiftClickPosition { get; set; }
+
+
         private Tile[] internalTileList;
         private Wall[] internalWallList;
 
@@ -156,6 +163,7 @@ namespace Editor
         public bool CtrlDown { get; set; }
 
         public bool ZDown { get; set; }
+        public bool YDown { get; set; }
         public bool MousePanning { get; set; }
         public bool EditorFocused { get; set; }
 
@@ -273,6 +281,7 @@ namespace Editor
             FPSDisplayInfo = "Awaiting FPS";
             StructureDisplayInfo = "Awaiting Structure";
 
+            GFX = new GraphicsEngine();
 
             LoadTileInformation();
             LoadWallInformation();
@@ -313,11 +322,18 @@ namespace Editor
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            
+
+            GFX.ContentManager = Content;
+            GFX.GraphicsDevice = GraphicsDevice;
+            //GFX.GraphicsDeviceManager = GraphicsDev;
 
             TileSheet = AssetLoader.LoadTexture(GraphicsDevice, "tilesheet.png");
             Pixel = new Texture2D(GraphicsDevice, 1, 1);
             Pixel.SetData<Color>(new Color[] { Color.White });
+
+            GFX.LoadFonts = false;
+            GFX.Initialize();
+            GFX.LoadAssets(GraphicsDevice);
         }
 
         private int GetSelectedTileID(int index)
@@ -352,6 +368,9 @@ namespace Editor
         ActionStack Actions = new ActionStack();
 
         public void ActionUndo() => Actions.Undo(); 
+        public void ActionCopySelection() { }
+        public void ActionCutSelection() { }
+        public void ActionPasteSelection() { }
         public void ActionRedo() => Actions.Redo();
         public void ActionResizeStructure(StructureMetadata newMetadata) => Actions.AddAction(new StructureResizeAction(LoadedStructure, newMetadata, new Point(newMetadata.Width, newMetadata.Height)));
         private Point GetMouseGridPoint()
@@ -378,35 +397,57 @@ namespace Editor
 
         public override void Update(GameTime gameTime)
         {
+            GFX.Update(gameTime);
+
+            if (!GFX.ContentLoaded)
+                return;
+
             updateBarTask.Update(gameTime);
             Camera.Update(gameTime);
             var mouse = GetMouseGridPoint();
-            
+
 
             if (LeftMouseDown && LoadedStructure!=null && IsMouseOnGrid())
             {
-                if (LayerActivity == EditorActivity.EditTile)
+                if (ShiftDown)
                 {
-                    
-                        Tile newTile = Tile.FromID(internalTileList[GetSelectedTileID()].ID);
-                        
+                    if (InitialShiftClickPosition == null)
+                        InitialShiftClickPosition = mouse;
 
-                        if (CtrlDown)
-                            newTile = new CaveGame.Core.Game.Tiles.Void();
 
-                        if (LoadedStructure.Layers[0].Tiles[mouse.X, mouse.Y].GetType() != newTile.GetType())
-                            Actions.AddAction(new TileChangeAction(LoadedStructure.Layers[0], mouse, newTile));
-                    
-                } else {
-                    Wall newWall = Wall.FromID(internalWallList[GetSelectedWallID()].ID);
-                    if (CtrlDown)
-                        newWall = new CaveGame.Core.Game.Walls.Void();
+                    Selection = new Rectangle((Point)InitialShiftClickPosition, mouse- ( (Point)InitialShiftClickPosition - new Point(1, 1)) );
+                } else
+                {
+                    if (Selection == null)
+                    {
+                        if (LayerActivity == EditorActivity.EditTile)
+                        {
 
-                    if (LoadedStructure.Layers[0].Walls[mouse.X, mouse.Y].GetType() != newWall.GetType())
-                        Actions.AddAction(new WallChangeAction(LoadedStructure.Layers[0], mouse, newWall));
+                            Tile newTile = Tile.FromID(internalTileList[GetSelectedTileID()].ID);
 
-                }
-                    
+
+                            if (CtrlDown)
+                                newTile = new CaveGame.Core.Game.Tiles.Void();
+
+                            if (LoadedStructure.Layers[0].Tiles[mouse.X, mouse.Y].GetType() != newTile.GetType())
+                                Actions.AddAction(new TileChangeAction(LoadedStructure.Layers[0], mouse, newTile));
+
+                        }
+                        else
+                        {
+                            Wall newWall = Wall.FromID(internalWallList[GetSelectedWallID()].ID);
+                            if (CtrlDown)
+                                newWall = new CaveGame.Core.Game.Walls.Void();
+
+                            if (LoadedStructure.Layers[0].Walls[mouse.X, mouse.Y].GetType() != newWall.GetType())
+                                Actions.AddAction(new WallChangeAction(LoadedStructure.Layers[0], mouse, newWall));
+
+                        }
+                    }
+
+                    InitialShiftClickPosition = null;
+                    Selection = null;
+                }    
             }
 
             if (CtrlDown == true && ZDown == true && ShiftDown == false)
@@ -424,7 +465,7 @@ namespace Editor
 
             
            
-            if (CtrlDown == true && ShiftDown == true && ZDown == true)
+            if (CtrlDown == true && YDown == true)
             {
                 if (redoD == false)
                 {
@@ -444,13 +485,13 @@ namespace Editor
         bool undoD;
         bool redoD;
 
-        private void DrawGridLines(SpriteBatch spriteBatch)
+        private void DrawGridLines(GraphicsEngine GFX)
         {
 
 
             for (int x = 0; x < LoadedStructure.Metadata.Width; x++)
             {
-                spriteBatch.Line(GridLineColor, new Vector2(
+                GFX.Line(GridLineColor, new Vector2(
                     x * (Globals.TileSize),
                     0
                 ), new Vector2(
@@ -461,7 +502,7 @@ namespace Editor
 
             for (int y = 0; y < LoadedStructure.Metadata.Height; y++)
             {
-                spriteBatch.Line(GridLineColor, new Vector2(
+                GFX.Line(GridLineColor, new Vector2(
                     0,
                     y *  Globals.TileSize
                 ), new Vector2(
@@ -472,7 +513,7 @@ namespace Editor
 
         }
 
-        public void DrawStructure(StructureFile structure, SpriteBatch sb)
+        public void DrawStructure(StructureFile structure, GraphicsEngine GFX)
         {
             foreach (Layer layer in structure.Layers)
             {
@@ -486,9 +527,9 @@ namespace Editor
                             Tile tile = layer.Tiles[x, y];
 
                             if (WallsVisible && (wall.ID!=0||AirVisible))
-                                wall.Draw(MainWindowViewModel.TileSheet, sb, x, y, new Light3(16, 16, 16));
+                                wall.Draw(GFX, x, y, new Light3(16, 16, 16));
                             if (TilesVisible && (tile.ID != 0 || AirVisible))
-                                tile.Draw(MainWindowViewModel.TileSheet, sb, x, y, new Light3(16, 16, 16));
+                                tile.Draw(GFX, x, y, new Light3(16, 16, 16));
                         }
                     }
                 }
@@ -496,9 +537,9 @@ namespace Editor
         }
 
 
-        private void DrawTileSelectionSet(SpriteBatch sb)
+        private void DrawTileSelectionSet(GraphicsEngine GFX)
 		{
-            sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
+            GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
             for (int i = -20; i<20; i++)
 			{
 
@@ -507,18 +548,18 @@ namespace Editor
                 Vector2 pos = new Vector2((20*24)+10+(i*25), 10);
                 if (i == 0)
                 {
-                    sb.Rect(Color.White * 0.5f, (int)pos.X - 4, (int)pos.Y - 4, 24, 24);
+                    GFX.Rect(Color.White * 0.5f, new Vector2(pos.X - 4, pos.Y - 4), new Vector2(24, 24));
                    
                 }
-                sb.Draw(TileSheet, pos, t.Quad, t.Color, 0, Vector2.Zero, 2, SpriteEffects.None, 0);
+                GFX.Sprite(GFX.TileSheet, pos, t.Quad, t.Color, Rotation.Zero, Vector2.Zero, 2, SpriteEffects.None, 0);
                
 			}
-            sb.End();
+            GFX.End();
         }
 
-        private void DrawWallSelectionSet(SpriteBatch sb)
+        private void DrawWallSelectionSet(GraphicsEngine GFX)
 		{
-            sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
+            GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
             for (int i = -20; i < 20; i++)
             {
 
@@ -527,38 +568,49 @@ namespace Editor
                 Vector2 pos = new Vector2((20 * 24) + 10 + (i * 25), 10);
                 if (i == 0)
                 {
-                    sb.Rect(Color.White * 0.5f, (int)pos.X - 4, (int)pos.Y - 4, 24, 24);
+                    GFX.Rect(Color.White * 0.5f, new Vector2(pos.X - 4, pos.Y - 4), new Vector2(24, 24));
                 }
-                sb.Draw(TileSheet, pos, w.Quad, w.Color, 0, Vector2.Zero, 2, SpriteEffects.None, 0);
+                GFX.Sprite(TileSheet, pos, w.Quad, w.Color, Rotation.Zero, Vector2.Zero, 2, SpriteEffects.None, 0);
 
             }
-            sb.End();
+            GFX.End();
         }
 
         public override void Draw(GameTime gameTime)
         {
-            if (EditorFocused)
-                GraphicsDevice.Clear(BackgroundColor);
-            else
-                GraphicsDevice.Clear(UnfocusedBackground);
 
-            _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
+            if (!GFX.ContentLoaded)
+                return;
+
+            if (EditorFocused)
+                GFX.GraphicsDevice.Clear(BackgroundColor);
+            else
+                GFX.GraphicsDevice.Clear(UnfocusedBackground);
+
+            GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
             if (LoadedStructure != null)
 			{
                 if (GridVisible)
-                    DrawGridLines(_spriteBatch);
-                DrawStructure(LoadedStructure, _spriteBatch);
+                    DrawGridLines(GFX);
+                DrawStructure(LoadedStructure, GFX);
                 if (GridVisible)
-                    DrawGridLines(_spriteBatch);
+                    DrawGridLines(GFX);
+
+
+                if (Selection!=null)
+                {
+                    var selection = (Rectangle)Selection;
+                    GFX.Rect(Color.Blue * 0.5f, new Vector2(selection.X * 8, selection.Y * 8), new Vector2(selection.Width * 8, selection.Height * 8));
+                }
             }
 
-            
-            _spriteBatch.End();
+
+            GFX.End();
 
             if (LayerActivity == EditorActivity.EditTile)
-                DrawTileSelectionSet(_spriteBatch);
+                DrawTileSelectionSet(GFX);
             else if (LayerActivity == EditorActivity.EditWall)
-                DrawWallSelectionSet(_spriteBatch);
+                DrawWallSelectionSet(GFX);
         }
 
 		public void MGCC_KeyDown(object sender, KeyEventArgs e)
@@ -578,9 +630,16 @@ namespace Editor
 
 
             if (e.Key == Key.Z)
-            {
                 ZDown = true;
+            if (e.Key == Key.Y)
+                YDown = true;
+
+            if (e.Key == Key.Escape)
+            {
+                InitialShiftClickPosition = null;
+                Selection = null;
             }
+            
 
 
             //  if (e.Key == Key.LeftShift) { ShiftDown = true; }
@@ -603,6 +662,8 @@ namespace Editor
             {
                 ZDown = false;
             }
+            if (e.Key == Key.Y)
+                YDown = false;
 
         }
 

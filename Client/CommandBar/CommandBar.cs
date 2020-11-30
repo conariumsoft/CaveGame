@@ -142,9 +142,9 @@ namespace CaveGame.Core
 
 
 		List<Message> MessageHistory;
-		List<string> CommandHistory;
+		List<string> CommandHistory { get; set; }
 
-		int inputCurrent;
+		int inputCurrent { get; set; }
 
 		Lua consoleLua;
 
@@ -206,6 +206,10 @@ namespace CaveGame.Core
 		{
 			MessageHistory.Add(new Message(">" + command, new Color(0.75f, 0.75f, 0.75f)));
 
+			
+			CommandHistory.Add(command);
+			inputCurrent = CommandHistory.Count-1;
+
 			string cleaned = command.Trim();
 
 			string[] keywords = cleaned.Split(' ');
@@ -218,6 +222,7 @@ namespace CaveGame.Core
 				}
 			}
 			MessageHistory.Add(new Message("No command " + keywords[0] + " found!", new Color(1.0f, 0, 0)));
+
 		}
 		
 		public void OnTextInput(object sender, TextInputEventArgs args)
@@ -252,7 +257,7 @@ namespace CaveGame.Core
 			return additional;
 		}
 
-		public void Draw(SpriteBatch spriteBatch)
+		public void Draw(GraphicsEngine GFX)
 		{
 			if (!Open)
 				return;
@@ -266,10 +271,10 @@ namespace CaveGame.Core
 			Vector2 inputBoxPosition = consolePosition + new Vector2(0, consoleSize.Y - 20);
 			Vector2 inputBoxSize = new Vector2(consoleSize.X, 20);
 
-			spriteBatch.Begin();
-			spriteBatch.Rect(backgroundColor, consolePosition, consoleSize);
-			spriteBatch.Rect(inputBoxColor, inputBoxPosition, inputBoxSize);
-			spriteBatch.OutlineRect(new Color(0.0f, 0.0f, 0.0f), consolePosition, consoleSize);
+			GFX.Begin();
+			GFX.Rect(backgroundColor, consolePosition, consoleSize);
+			GFX.Rect(inputBoxColor, inputBoxPosition, inputBoxSize);
+			GFX.OutlineRect(new Color(0.0f, 0.0f, 0.0f), consolePosition, consoleSize);
 			#endregion
 
 			//Draw message history
@@ -284,10 +289,10 @@ namespace CaveGame.Core
 				for (int i = MessageHistory.Count-1; i >= 0; i--)
 				{
 					var message = history[i];
-					string text = message.Text.WrapText(GameFonts.Arial10, consoleSize.X);
+					string text = message.Text.WrapText(GFX.Fonts.Arial10, consoleSize.X);
 					visIter++;
 					visIter += text.Count(c => c == '\n');
-					spriteBatch.Print(message.TextColor, consolePosition + new Vector2(0, (consoleSize.Y - 20) - (visIter * 14)), text);
+					GFX.Text(text, consolePosition + new Vector2(0, (consoleSize.Y - 20) - (visIter * 14)), message.TextColor);
 					
 				}
 			}
@@ -304,7 +309,7 @@ namespace CaveGame.Core
 						if (cmd.Keyword.StartsWith(cleaned))
 						{
 
-							spriteBatch.Print(new Color(0.5f, 0.5f, 0.0f), inputBoxPosition, InputBufferProcess(cmd.Keyword) + " " + GetArgsInfo(cmd));
+							GFX.Text(InputBufferProcess(cmd.Keyword) + " " + GetArgsInfo(cmd), inputBoxPosition , new Color(0.5f, 0.5f, 0.0f));
 							break;
 						}
 					}
@@ -316,14 +321,14 @@ namespace CaveGame.Core
 							autocompleteOptionIndex++;
 
 					if (autocompleteOptionIndex > 0)
-						spriteBatch.Rect(new Color(0.0f, 0.0f, 0.0f, 0.2f), inputBoxPosition - new Vector2(-5, (autocompleteOptionIndex + 1) * 14), new Vector2(300, autocompleteOptionIndex * 14));
+						GFX.Rect(new Color(0.0f, 0.0f, 0.0f, 0.2f), inputBoxPosition - new Vector2(-5, (autocompleteOptionIndex + 1) * 14), new Vector2(300, autocompleteOptionIndex * 14));
 
 					var iterator2 = 0;
 					foreach (Command cmd in Commands)
 					{
 						if (cmd.Keyword.StartsWith(cleaned))
 						{
-							spriteBatch.Print(new Color(1.0f, 1.0f, 0), inputBoxPosition - new Vector2(-5, (iterator2 + 2) * 14), cmd.Keyword + " " + GetArgsInfo(cmd));
+							GFX.Text(cmd.Keyword + " " + GetArgsInfo(cmd), inputBoxPosition - new Vector2(-5, (iterator2 + 2) * 14), new Color(1.0f, 1.0f, 0));
 							iterator2++;
 						}
 				}
@@ -332,27 +337,27 @@ namespace CaveGame.Core
 
 			if (inputBox.SpecialSelection)
 			{
-				var font = GameFonts.Arial10;
+				var font = GFX.Fonts.Arial10;
 				var beforeText = inputBox.GetScissorTextBefore();
 				var middleText = inputBox.GetScissorTextDuring();
 				var afterText = inputBox.GetScissorTextAfter();
 				var start = font.MeasureString(beforeText);
 				var end = font.MeasureString(middleText);
 
-				spriteBatch.Rect(Color.Blue, inputBoxPosition + new Vector2(start.X, 0), end);
+				GFX.Rect(Color.Blue, inputBoxPosition + new Vector2(start.X, 0), end);
 
 				// first section
-				spriteBatch.Print(Color.White, inputBoxPosition, beforeText);
-				spriteBatch.Print(Color.Black, inputBoxPosition + new Vector2(start.X, 0), middleText);
-				spriteBatch.Print(Color.White, inputBoxPosition + new Vector2(start.X + end.X, 0), afterText);
+				GFX.Text(beforeText,  inputBoxPosition, Color.White);
+				GFX.Text(middleText, inputBoxPosition + new Vector2(start.X, 0), Color.Black);
+				GFX.Text(afterText, inputBoxPosition + new Vector2(start.X + end.X, 0), Color.White);
 			} else
 			{
 				// Input buffer
-				spriteBatch.Print(new Color(1.0f, 1.0f, 1.0f), inputBoxPosition, inputBox.DisplayText);
+				GFX.Text(inputBox.DisplayText, inputBoxPosition, new Color(1.0f, 1.0f, 1.0f));
 			}
-			
 
-			spriteBatch.End();
+
+			GFX.End();
 		}
 
 		public override void Update(GameTime gameTime)
@@ -392,8 +397,9 @@ namespace CaveGame.Core
 
 				if (keyboard.IsKeyDown(Keys.Up) && !previousKBState.IsKeyDown(Keys.Up))
 				{
-					inputCurrent = Math.Max(inputCurrent - 1, 0);
+					
 					inputBox.InputBuffer = CommandHistory[inputCurrent];
+					inputCurrent = Math.Max(inputCurrent - 1, 0);
 				}
 
 

@@ -123,6 +123,8 @@ namespace Editor.Actions
         StructureMetadata newMetadata;
         Tile[,] oldTileGrid;
         Wall[,] oldWallGrid;
+        Tile[,] newTileGrid;
+        Wall[,] newWallGrid;
 
         public StructureResizeAction(StructureFile file, StructureMetadata _newMD, Point _newSize)
         {
@@ -159,11 +161,16 @@ namespace Editor.Actions
                     structure.Layers[0].Walls[x, y] = oldWallGrid[x, y];
                 }
             }
+            newTileGrid = structure.Layers[0].Tiles;
+            newWallGrid = structure.Layers[0].Walls;
+
         }
 
         public void Redo()
         {
-            throw new System.NotImplementedException();
+            structure.Metadata = newMetadata;
+            structure.Layers[0].Tiles = newTileGrid;
+            structure.Layers[0].Walls = newWallGrid;
         }
 
         public void Undo()

@@ -12,19 +12,19 @@ namespace CaveGame.Core.Game.Tiles
 {
 	public class FurniturePointer : Tile
 	{
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 light) { } // leave empty
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 light) { } // leave empty
 	}
 
 	public class Void : Tile
 	{
 		public override void Drop(IGameServer server, IGameWorld world, Point tilePosition) { }
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 light) { } // leave empty
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 light) { } // leave empty
 	}
 
 	public class Air : Tile, INonSolid, IWaterBreakable
 	{
 		public override void Drop(IGameServer server, IGameWorld world, Point tilePosition) { }
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 light) { } // leave empty
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 light) { } // leave empty
 	}
 	public class Vacuum { }
 	public class Fog { }

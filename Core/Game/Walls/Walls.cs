@@ -48,13 +48,6 @@ namespace CaveGame.Core.Game.Walls
 		public static Color BGDarken = new Color(92, 92, 92);
 
 
-
-#if CLIENT
-		public static Texture2D Tilesheet = GameTextures.TileSheet;
-#else
-		public static Texture2D Tilesheet;
-#endif
-
 		public static Random RNG = new Random();
 
 		public byte Damage { get; set; }
@@ -108,30 +101,44 @@ namespace CaveGame.Core.Game.Walls
 			throw new Exception(String.Format("WallID not valid! {0}", t));
 		}
 
-		public virtual void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public virtual void Draw(GraphicsEngine GFX, int x, int y, Light3 color)
 		{
-			sb.Draw(
-				tilesheet, 
+			GFX.Sprite(
+				GFX.TileSheet, 
 				new Vector2(x * Globals.TileSize, y * Globals.TileSize), 
 				Quad, color.MultiplyAgainst(Color)
 			);
 		}
-	}
+
+        internal static Wall FromName(string name)
+        {
+			var basetype = typeof(Wall);
+			var types = basetype.Assembly.GetTypes().Where(type => type.IsSubclassOf(basetype));
+
+
+			foreach (var type in types)
+			{
+				if (name == type.Name)
+					return (Wall)type.GetConstructor(Type.EmptyTypes).Invoke(null);
+			}
+			throw new Exception("ID not valid!");
+		}
+    }
 
 
 	public class Void : Wall
 	{
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color) { }
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 color) { }
 	}
 	public class Air : Wall, INonSolid {
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color) { }
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 color) { }
 	}
 
 	public abstract class RockWall : Wall
 	{
         public override byte Hardness => 5;
         public override Rectangle Quad => TileMap.Stone;
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 color)
 		{
 			Rectangle quad = TileMap.BGBrickTL;
 
@@ -145,8 +152,8 @@ namespace CaveGame.Core.Game.Walls
 				quad = TileMap.BGStoneBR;
 			//base.Dquad = TileMap.BGStoneBL;raw(tilesheet, sb, x, y, color);
 
-			sb.Draw(
-				tilesheet,
+			GFX.Sprite(
+				GFX.TileSheet,
 				new Vector2(x * Globals.TileSize, y * Globals.TileSize),
 				quad, color.MultiplyAgainst(Color)
 			);
@@ -193,7 +200,7 @@ namespace CaveGame.Core.Game.Walls
 
 
 
-        public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+        public override void Draw(GraphicsEngine GFX, int x, int y, Light3 color)
 		{
 			Rectangle quad = TileMap.BGBrickTL;
 
@@ -212,8 +219,8 @@ namespace CaveGame.Core.Game.Walls
 
 			//base.Draw(tilesheet, sb, x, y, color);
 
-			sb.Draw(
-				tilesheet,
+			GFX.Sprite(
+				GFX.TileSheet,
 				new Vector2(x * Globals.TileSize, y * Globals.TileSize),
 				quad, color.MultiplyAgainst(Color)
 			);

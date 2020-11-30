@@ -1,5 +1,7 @@
 ﻿using CaveGame.Core.Game.Tiles;
+using CaveGame.Core.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -22,8 +24,8 @@ namespace CaveGame.Core.Game.Tiles
 	}
 	public class Sand : Tile, ITileUpdate
 	{
-		public override Rectangle Quad => TileMap.Soil;
-        public override Color Color => new Color(0.9f, 0.8f, 0.4f);
+		public override Rectangle Quad => TileMap.Sand;
+        public override Color Color => new Color(0.9f, 0.9f, 0.5f);
 
         public void TileUpdate(IGameWorld world, int x, int y)
         {
@@ -40,6 +42,37 @@ namespace CaveGame.Core.Game.Tiles
 				world.SetTile(x, y + 1, new Sand());
             }
         }
+
+       public override void Draw(GraphicsEngine gfx, int x, int y, Light3 color)
+        {
+			var rngval = RNGIntMap[x, y];
+			if (rngval % 2 == 0)
+            {
+				gfx.Sprite(
+					gfx.TileSheet,
+					new Vector2(x * Globals.TileSize, y * Globals.TileSize),
+					Quad, color.MultiplyAgainst(Color), Rotation.Zero,
+					Vector2.Zero, 1, SpriteEffects.None, 0
+				);
+			} else if (rngval % 2 == 1)
+            {
+				gfx.Sprite(
+					gfx.TileSheet,
+					new Vector2(x * Globals.TileSize, y * Globals.TileSize),
+					Quad, color.MultiplyAgainst(Color), Rotation.Zero,
+					Vector2.Zero, 1, SpriteEffects.FlipVertically, 0
+				);
+			} else
+            {
+				gfx.Sprite(
+					gfx.TileSheet,
+					new Vector2(x * Globals.TileSize, y * Globals.TileSize),
+					Quad, color.MultiplyAgainst(Color), Rotation.Zero,
+					Vector2.Zero, 1, SpriteEffects.FlipHorizontally, 0
+				);
+			}
+        }
+
     }
 	public class Snow : Tile
 	{

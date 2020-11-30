@@ -8,6 +8,8 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <Authors>Joshua O'Leary</Authors>
+    <Company>Conarium Software</Company>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>TRACE;WINDOZE</DefineConstants>
@@ -36,7 +38,15 @@
     <PackageReference Include="TextCopy" Version="4.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="CaveCorePlugin\" />
+    <None Update="Plugins\CaveCorePlugin\apidoc.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Plugins\CaveCorePlugin\plugin.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	  <None Update="Plugins\CaveCorePlugin\main.lua">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
   </ItemGroup>
   <Import Project="..\Core\CaveCore.projitems" Label="Shared" />
   <Import Project="..\Server\CaveServer.projitems" Label="Shared" />

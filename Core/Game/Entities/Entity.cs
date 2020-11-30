@@ -36,26 +36,30 @@ namespace CaveGame.Core.Game.Entities
 	{
 		Vector2 Friction { get; }
 	}
-	public interface IClientLogical {
-		void ClientUpdate(IClientWorld world, GameTime gt);
-	}
-	public interface IServerLogical {
-		void ServerUpdate(IServerWorld world, GameTime gt);
-	}
+
 	public interface IEntity
 	{
 		int EntityNetworkID { get; set; }
-		float DurationAlive { get; }
-		bool Dead { get; }
+		float DurationAlive { get; set; }
+		bool Dead { get; set; }
+		int Health { get; set; }
+		int MaxHealth { get; }
 		//void Update(IGameWorld world, GameTime gt);
-		void ClientUpdate(IClientWorld world, GameTime gt);
-		void ServerUpdate(IServerWorld world, GameTime gt);
+		void ClientUpdate(IGameClient client, GameTime gt);
+		void ServerUpdate(IGameServer server, GameTime gt);
+		void Draw(GraphicsEngine engine);
 	}
-	public interface IExpirationTime{
-		float ExpirationTicks { get; set; }
-	}
+	public interface IThinker
+    {
+		float Anger { get; }
+		float Fear { get; }
+		float ResponseTime { get; } // time between Think() ticks
+		int IQ { get; } // affects properties within Think() such as accuracy of pathfinding
+		void Think(IGameServer server, GameTime gt);
 
-	public class Entity: IEntity, IServerLogical, IClientLogical
+    }
+
+	public class Entity: IEntity
 	{
 		public float DurationAlive { get; set; }
 		public bool Dead { get; set; } // Gets collected on death
@@ -63,13 +67,10 @@ namespace CaveGame.Core.Game.Entities
 		public int EntityNetworkID { get; set; }
 		public int Health { get; set; }
 		public virtual int MaxHealth { get; }
-
 		public List<StatusEffect> ActiveEffects { get; private set; }
 
-		public void ClearActiveEffects()
-		{
-			ActiveEffects.Clear();
-		}
+		public void ClearActiveEffects() => ActiveEffects.Clear();
+
 		public void AddEffect(StatusEffect effect)
 		{
 
@@ -80,11 +81,11 @@ namespace CaveGame.Core.Game.Entities
 		}
 
 
-		public virtual void ClientUpdate(IClientWorld world, GameTime gt) {
+		public virtual void ClientUpdate(IGameClient client, GameTime gt) {
 			DurationAlive += gt.GetDelta();
 		}
 
-		public virtual void ServerUpdate(IServerWorld world, GameTime gt) {
+		public virtual void ServerUpdate(IGameServer server, GameTime gt) {
 			DurationAlive += gt.GetDelta();
 
 
@@ -95,6 +96,6 @@ namespace CaveGame.Core.Game.Entities
 			}
 			ActiveEffects.RemoveAll(e => e.Duration < 0);
 		}
-		public virtual void Draw(SpriteBatch sb) { }
-	}
+		public virtual void Draw(GraphicsEngine gfx) { }
+    }
 }

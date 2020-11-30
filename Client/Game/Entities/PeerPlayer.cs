@@ -12,12 +12,12 @@ namespace CaveGame.Client.Game.Entities
 	public class PeerPlayer : ClientPlayer, IClientPhysicsObserver
 	{
 		//public void ClientPhysicsTick(IClientWorld world, float step) => PhysicsStep(world, step);
-		public override void Draw(SpriteBatch sb)
+		public override void Draw(GraphicsEngine GFX)
 		{
 
-			Vector2 namebounds = GameFonts.Arial8.MeasureString(DisplayName);
-			sb.Print(GameFonts.Arial8, Color.White, Position - new Vector2(namebounds.X/2, namebounds.Y), DisplayName);
-			base.Draw(sb);
+			Vector2 namebounds = GFX.Fonts.Arial8.MeasureString(DisplayName);
+			GFX.Text(GFX.Fonts.Arial8, DisplayName, Position - new Vector2(namebounds.X/2, namebounds.Y), Color.White);
+			base.Draw(GFX);
 		}
 
 		public void ClientPhysicsTick(IClientWorld world, float step) => Position = Position.Lerp(NextPosition, 0.5f);

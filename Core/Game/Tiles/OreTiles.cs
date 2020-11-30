@@ -1,5 +1,6 @@
 ﻿#if CLIENT
 using CaveGame.Client;
+using CaveGame.Core.Generic;
 #endif
 using DataManagement;
 using Microsoft.Xna.Framework;
@@ -15,60 +16,48 @@ namespace CaveGame.Core.Game.Tiles
 	{
 		public override byte Hardness => 12;
 		public override Rectangle Quad => TileMap.Ore;
-#if CLIENT
-		private void DrawMask(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color, int rotation, Rectangle quad, Color tilecolor)
+		private void DrawMask(GraphicsEngine gfx, int x, int y, Light3 color, int rotation, Rectangle quad, Color tilecolor)
 		{
-			if (GameGlobals.GraphicsDevice != null)
-			{
-				var position = new Vector2(x * Globals.TileSize, y * Globals.TileSize);
-				var pixels4 = new Vector2(4, 4);
-
-				sb.Draw(tilesheet, position + pixels4, quad, color.MultiplyAgainst(tilecolor), MathHelper.ToRadians(rotation), new Vector2(4, 4), 1, SpriteEffects.None, 1);
-			}
+			var position = new Vector2(x * Globals.TileSize, y * Globals.TileSize);
+			var pixels4 = new Vector2(4, 4);
+			gfx.Sprite(gfx.TileSheet, position + pixels4, quad, color.MultiplyAgainst(tilecolor), Rotation.FromDeg(rotation), new Vector2(4, 4), 1, SpriteEffects.None, 1);
 		}
 
-		private void DrawDirtMask(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color, int rotation)
-		{
-			DrawMask(tilesheet, sb, x, y, color, rotation, TileMap.DirtFading, Color.SaddleBrown);
-		}
+		private void DrawDirtMask(GraphicsEngine gfx, int x, int y, Light3 color, int rotation) => DrawMask(gfx, x, y, color, rotation, TileMap.DirtFading, Color.SaddleBrown);
+		private void DrawStoneMask(GraphicsEngine gfx, int x, int y, Light3 color, int rot) => DrawMask(gfx, x, y, color, rot, TileMap.StoneFading, new Color(0.7f, 0.7f, 0.7f));
 
-		private void DrawStoneMask(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color, int rotation)
-		{
-			DrawMask(tilesheet, sb, x, y, color, rotation, TileMap.StoneFading, new Color(0.7f, 0.7f, 0.7f));
-		}
-
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public override void Draw(GraphicsEngine gfx, int x, int y, Light3 color)
 		{
 			var position = new Vector2(x * Globals.TileSize, y * Globals.TileSize);
 
-			sb.Draw(tilesheet, position, Quad, color.MultiplyAgainst(Color));
+			gfx.Sprite(gfx.TileSheet, position, Quad, color.MultiplyAgainst(Color));
 
 			//sb.End();
 
 			if (TileState.Get(0)) // Top Dirt
-				DrawDirtMask(tilesheet, sb, x, y, color, 0);
+				DrawDirtMask(gfx, x, y, color, 0);
 			if (TileState.Get(1)) // Top Stone
-				DrawStoneMask(tilesheet, sb, x, y, color, 0);
+				DrawStoneMask(gfx, x, y, color, 0);
 			if (TileState.Get(2)) // Bottom Dirt
-				DrawDirtMask(tilesheet, sb, x, y, color, 180);
+				DrawDirtMask(gfx, x, y, color, 180);
 			if (TileState.Get(3)) // Bottom Stone
-				DrawStoneMask(tilesheet, sb, x, y, color, 180);
+				DrawStoneMask(gfx, x, y, color, 180);
 
 			if (TileState.Get(4)) // Left Dirt
-				DrawDirtMask(tilesheet, sb, x, y, color, 270);
+				DrawDirtMask(gfx, x, y, color, 270);
 
 			if (TileState.Get(5)) // Left Stone
-				DrawStoneMask(tilesheet, sb, x, y, color, 270);
+				DrawStoneMask(gfx, x, y, color, 270);
 
 			if (TileState.Get(6)) // Right Dirt
-				DrawDirtMask(tilesheet, sb, x, y, color, 90);
+				DrawDirtMask(gfx, x, y, color, 90);
 
 			if (TileState.Get(7)) // Right Stone
-				DrawStoneMask(tilesheet, sb, x, y, color, 90);
+				DrawStoneMask(gfx, x, y, color, 90);
 
 			//sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 		}
-#endif
+
 		public void LocalTileUpdate(IGameWorld world, int x, int y)
 		{
 			var top = world.GetTile(x, y - 1);

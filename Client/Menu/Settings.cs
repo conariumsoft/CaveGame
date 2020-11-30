@@ -1,4 +1,5 @@
 ﻿using CaveGame.Client.UI;
+using CaveGame.Core;
 using CaveGame.Core.Game.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,19 +11,7 @@ using System.Text;
 
 namespace CaveGame.Client.Menu
 {
-	// settings:
-	// Video
-	// fullscreen (boolean toggle)
-	// screen resolution (a selection list)
-	// max particles (particles off)
-	// Max FPS (Unlimited, 240, 144, 120, 90, 60, 30)
-	// Audio
-	// Music Volume
-	// Menu Volume
-	// Game Master Volume
-	// Player Volume
-	// World Volume
-	// Entity Volume
+
 	public class BindButton : TextButton
 	{
 		public event KeysHandler OnRebind;
@@ -41,6 +30,8 @@ namespace CaveGame.Client.Menu
 
 		UIRoot SettingsUI;
 
+		GraphicsEngine GFX => Game.GraphicsEngine;
+
 		public Settings(CaveGameGL _game)
 		{
 			Game = _game;
@@ -52,11 +43,11 @@ namespace CaveGame.Client.Menu
 
 		public bool Active { get; set; }
 
-		public void Draw(SpriteBatch sb)
+		public void Draw(GraphicsEngine GFX)
 		{
-			sb.Begin();
-			SettingsUI.Draw(sb);
-			sb.End();
+			GFX.Begin();
+			SettingsUI.Draw(GFX);
+			GFX.End();
 		}
 
 
@@ -85,7 +76,7 @@ namespace CaveGame.Client.Menu
 				Parent = SettingsUI,
 				TextColor = Color.White,
 				Text = "Settings",
-				Font = GameFonts.Arial20,
+				Font = GFX.Fonts.Arial20,
 				BorderSize = 0,
 				TextWrap = false,
 				TextXAlign = TextXAlignment.Center,
@@ -112,7 +103,7 @@ namespace CaveGame.Client.Menu
 				Parent = container,
 				TextColor = Color.White,
 				Text = "Fullscreen: "+ReadableBoolean(GameSettings.CurrentSettings.Fullscreen),
-				Font = GameFonts.Arial14,
+				Font = GFX.Fonts.Arial14,
 				Size = new UICoords(0, 25, 1, 0),
 				TextXAlign = TextXAlignment.Center,
 				TextYAlign = TextYAlignment.Center,
@@ -134,7 +125,7 @@ namespace CaveGame.Client.Menu
 				Parent = container,
 				TextColor = Color.White,
 				Text = "Particles: " + ReadableBoolean(GameSettings.CurrentSettings.Particles),
-				Font = GameFonts.Arial14,
+				Font = GFX.Fonts.Arial14,
 				Size = new UICoords(0, 25, 1, 0),
 				TextXAlign = TextXAlignment.Center,
 				TextYAlign = TextYAlignment.Center,
@@ -155,7 +146,7 @@ namespace CaveGame.Client.Menu
 				TextColor = Color.White,
 				Parent = container,
 				Size = new UICoords(0, 25, 1, 0),
-				Font = GameFonts.Arial14,
+				Font = GFX.Fonts.Arial14,
 				Text = "Framerate Cap: " + GameSettings.CurrentSettings.FPSLimit,
 			};
 
@@ -186,7 +177,7 @@ namespace CaveGame.Client.Menu
 				TextColor = Color.White,
 				Parent = container,
 				Size = new UICoords(0, 25, 1, 0),
-				Font = GameFonts.Arial14,
+				Font = GFX.Fonts.Arial14,
 				Text = "Chat Size: " + GameSettings.ChatSizeSliderOptions[(int)GameSettings.CurrentSettings.ChatSize].Display,
 			};
 			Slider<SliderIndex<GameChatSize>> chatSizeSlider = new UI.Slider<SliderIndex<GameChatSize>>
@@ -227,7 +218,7 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "Jump: " + GameSettings.CurrentSettings.JumpKey.ToString(),
-				Font = GameFonts.Arial14,
+				Font = GFX.Fonts.Arial14,
 				Size = new UICoords(0, 25, 1, 0),
 				TextXAlign = TextXAlignment.Center,
 				TextYAlign = TextYAlignment.Center,
@@ -249,7 +240,7 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "Climb/Up: " + GameSettings.CurrentSettings.MoveUpKey.ToString(),
-				Font = GameFonts.Arial14,
+				Font = GFX.Fonts.Arial14,
 				Size = new UICoords(0, 25, 1, 0),
 				TextXAlign = TextXAlignment.Center,
 				TextYAlign = TextYAlignment.Center,
@@ -266,7 +257,7 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "Descend/Down: " + GameSettings.CurrentSettings.MoveDownKey.ToString(),
-				Font = GameFonts.Arial14,
+				Font = GFX.Fonts.Arial14,
 				Size = new UICoords(0, 25, 1, 0),
 				TextXAlign = TextXAlignment.Center,
 				TextYAlign = TextYAlignment.Center,
@@ -287,7 +278,7 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "Walk Left: " + GameSettings.CurrentSettings.MoveLeftKey.ToString(),
-				Font = GameFonts.Arial14,
+				Font = GFX.Fonts.Arial14,
 				Size = new UICoords(0, 25, 1, 0),
 				TextXAlign = TextXAlignment.Center,
 				TextYAlign = TextYAlignment.Center,
@@ -307,7 +298,7 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "Walk Right: " + GameSettings.CurrentSettings.MoveRightKey.ToString(),
-				Font = GameFonts.Arial14,
+				Font = GFX.Fonts.Arial14,
 				Size = new UICoords(0, 25, 1, 0),
 				TextXAlign = TextXAlignment.Center,
 				TextYAlign = TextYAlignment.Center,
@@ -327,7 +318,7 @@ namespace CaveGame.Client.Menu
 			{
 				TextColor = Color.White,
 				Text = "BACK",
-				Font = GameFonts.Arial16,
+				Font = GFX.Fonts.Arial16,
 				Size = new UICoords(100, 30, 0, 0),
 				Position = new UICoords(10, -30, 0, 1.0f),
 				AnchorPoint = new Vector2(0, 1),
@@ -339,7 +330,7 @@ namespace CaveGame.Client.Menu
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
 			};
 
-			backButton.OnLeftClick += (btn, mouse) => Game.CurrentGameContext = Game.HomePageContext;
+			backButton.OnLeftClick += (btn, mouse) => Game.CurrentGameContext = Game.MenuContext;
 		}
 		BindButton rebinding;
 

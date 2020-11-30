@@ -9,6 +9,7 @@
     <Import_RootNamespace>CaveGame.Core</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AssetLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Camera.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileUtil\FilePathSanitizer.cs" />
@@ -43,12 +44,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)Game\Furniture\Furniture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generic\CircularArray.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generic\ThreadSafeValue.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IGameServer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GraphicsEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IGameMainControllers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Logger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LuaInterop\LuaEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LuaInterop\LuaInterop.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\User.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Generic\Rotation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataTypes\Rotation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Physics\RaycastSolver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Shell.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\Chunk.cs" />
@@ -83,5 +85,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Game\Items\" />
+    <Folder Include="$(MSBuildThisFileDirectory)DataTypes\" />
   </ItemGroup>
 </Project>

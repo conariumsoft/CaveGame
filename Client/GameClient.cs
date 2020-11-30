@@ -24,13 +24,6 @@ using CaveGame.Client.DebugTools;
 
 namespace CaveGame.Client
 {
-	public class TempItemDef
-	{
-		public Rectangle Quad;
-		public byte TileID;
-		public Color Color;
-	}
-
 	// The testbench for building the server/client archite ture
 	public class Hotbar
 	{
@@ -96,37 +89,50 @@ namespace CaveGame.Client
 		}
 
 
-		public void Draw(SpriteBatch sb)
+		public void Draw(GraphicsEngine GFX)
 		{
-			sb.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
+			GFX.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
 			int travel = 0;
 
-			Vector2 pos = new Vector2(GameGlobals.Width - ( (24 * (ItemSet.Length-1))+48), 2);
+			Vector2 pos = new Vector2(GFX.WindowSize.X - ( (24 * (ItemSet.Length-1))+48), 2);
 
 			for (int i = 0; i < ItemSet.Length; i++)
 			{
 				if (Index == i)
 				{
-					sb.Rect(new Color(0.8f, 0.8f, 0.8f), pos+new Vector2(travel, 0), new Vector2(48, 48));
-					ItemSet[i].Draw(sb, pos + new Vector2(travel, 0), 3f);
+					GFX.Rect(
+						color: new Color(0.8f, 0.8f, 0.8f), 
+						position: pos+new Vector2(travel, 0), 
+						size: new Vector2(48, 48)
+					);
+					ItemSet[i].Draw(GFX, pos + new Vector2(travel, 0), 3f);
 
-					Vector2 dim = GameFonts.Arial14.MeasureString(ItemSet[Index].Name);
-					float x = Math.Min(GameGlobals.Width - dim.X, pos.X+travel + 24 - (dim.X / 2));
+					Vector2 dim = GFX.Fonts.Arial14.MeasureString(ItemSet[Index].Name);
+					float x = Math.Min(GFX.WindowSize.X - dim.X, pos.X+travel + 24 - (dim.X / 2));
 					x = Math.Max(pos.X, x);
-					sb.Print(GameFonts.Arial14, Color.White, new Vector2(x, pos.Y+48), ItemSet[Index].Name);
+
+					GFX.Text(
+						font: GFX.Fonts.Arial14, 
+						text: ItemSet[Index].Name, 
+						position: new Vector2(x, pos.Y + 48)
+					);
 
 					travel += 48;
 				}
 				else
 				{
-					sb.Rect(new Color(0.3f, 0.3f, 0.3f), pos + new Vector2(travel, 0), new Vector2(24, 24));
-					ItemSet[i].Draw(sb, pos + new Vector2(travel, 0), 1.5f);
+					GFX.Rect(
+						color: new Color(0.3f, 0.3f, 0.3f), 
+						position: pos + new Vector2(travel, 0), 
+						size: new Vector2(24, 24)
+					);
+					ItemSet[i].Draw(GFX, pos + new Vector2(travel, 0), 1.5f);
 					travel += 24;
 				}
 			}
-			
 
-			sb.End();
+
+			GFX.End();
 		}
 	}
 
@@ -142,7 +148,7 @@ namespace CaveGame.Client
 		public string ConnectAddress { get; set; }
 		public bool Active { get; set; }
 		Microsoft.Xna.Framework.Game IGameContext.Game => Game;
-		IGameWorld IGameClient.World => World;
+		IClientWorld IGameClient.World => World;
 		//public Hotbar Hotbar { get; set; }
 		public PlayerContainerFrontend Inventory { get; set; }
 		public LocalWorld World { get; private set; }
@@ -161,75 +167,36 @@ namespace CaveGame.Client
 
 		private int IntitalScrollValue;
 
-		bool pauseMenuOpen;
-		UIRoot pauseMenu;
+		//bool pauseMenuOpen;
+		//UIRoot pauseMenu;
 
-		Effect effect { get; set; }
+		
 
 
-
-		private void ConstructPauseMenu()
-		{
-			pauseMenu = new UIRoot();
-
-			UIRect bg = new UIRect
-			{
-				BGColor = Color.Transparent,
-				Size = new UICoords(0, 0, 1, 1),
-				Position = new UICoords(0, 0, 0, 0),
-				Parent = pauseMenu
-			};
-
-			TextButton resumeButton = new TextButton
-			{
-				Parent = bg,
-				TextColor = Color.White,
-				Text = "Resume",
-				Font = GameFonts.Arial14,
-				Size = new UICoords(150, 25, 0, 0),
-				TextXAlign = TextXAlignment.Center,
-				TextYAlign = TextYAlignment.Center,
-				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
-				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
-				Position = new UICoords(10, -100, 0, 1)
-			};
-			resumeButton.OnLeftClick += (x, y) => pauseMenuOpen = false;
-
-			TextButton exitButton = new TextButton
-			{
-				Parent = bg,
-				TextColor = Color.White,
-				Text = "Disconnect",
-				Font = GameFonts.Arial14,
-				Size = new UICoords(150, 25, 0, 0),
-				TextXAlign = TextXAlignment.Center,
-				TextYAlign = TextYAlignment.Center,
-				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
-				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
-				Position = new UICoords(10, -50, 0, 1)
-			};
-			exitButton.OnLeftClick += onClientExit;	
-		}
+		PauseMenu PauseMenu { get; set; }
+		
 
 		private void onClientExit(TextButton sender, MouseState state)=>OverrideDisconnect();
 	
 		public void OverrideDisconnect()
 		{
-			pauseMenuOpen = false;
+			PauseMenu.Open = false;
 			Disconnect();
-			Game.CurrentGameContext = Game.HomePageContext;
+			Game.CurrentGameContext = Game.MenuContext;
 		}
 
 		public GameClient(CaveGameGL _game)
 		{
 			Game = _game;
 
-			ConstructPauseMenu();
 			MouseState mouse = Mouse.GetState();
 
-			World = new LocalWorld();
-			Camera = new Camera2D(Game.GraphicsDevice.Viewport) { Zoom = CameraZoom };
-			Chat = new GameChat(this);
+			World     = new LocalWorld(this);
+			Camera    = new Camera2D(Game.GraphicsDevice.Viewport) { Zoom = CameraZoom };
+			Chat      = new GameChat(this);
+			PauseMenu = new PauseMenu(this);
+			Inventory = new PlayerContainerFrontend();
+
 			IntitalScrollValue = mouse.ScrollWheelValue;
 
 			playerStateReplicationTask = new DelayedTask(ReplicatePlayerState, 1 / 10.0f);
@@ -238,7 +205,7 @@ namespace CaveGame.Client
 
 
 			ChunkingRadius = 1;
-			Inventory = new PlayerContainerFrontend();
+			
 
 		}
 
@@ -421,8 +388,8 @@ namespace CaveGame.Client
 			RejectJoinPacket packet = new RejectJoinPacket(message.Packet.GetBytes());
 			// TODO: send player to the rejection screen
 
-			Game.CurrentGameContext = Game.TimeoutContext;
-			Game.TimeoutContext.Message = packet.RejectReason;
+			Game.CurrentGameContext = Game.MenuContext;
+			Game.MenuContext.TimeoutMessage = packet.RejectReason;
 		}
 		private void OnServerAcceptJoining(NetworkMessage message)
 		{
@@ -438,16 +405,24 @@ namespace CaveGame.Client
 			MyPlayer = myplayer;
 			World.Entities.Add(myplayer);
 			Inventory.Player = myplayer;
-			Inventory.Container.ForceSetSlot(0, 0, new ItemStack {Item = new GenericPickaxe(), Quantity = 4 });
-			Inventory.Container.ForceSetSlot(1, 0, new ItemStack { Item = new TileItem(new Core.Game.Tiles.OakPlank()), Quantity = 25 });
-			Inventory.Container.ForceSetSlot(2, 0, new ItemStack { Item = new TileItem(new Core.Game.Tiles.OakPlank()), Quantity = 25 });
-			Inventory.Container.ForceSetSlot(3, 0, new ItemStack { Item = new TileItem(new Core.Game.Tiles.EbonyPlank()), Quantity = 50 });
+			Inventory.Container.ForceSetSlot(0, 0, new ItemStack {Item = new CopperPickaxe(), Quantity = 1 });
+			Inventory.Container.ForceSetSlot(0, 1, new ItemStack { Item = new IronPickaxe(), Quantity = 1 });
+			Inventory.Container.ForceSetSlot(0, 2, new ItemStack { Item = new LeadPickaxe(), Quantity = 1 });
+			Inventory.Container.ForceSetSlot(1, 0, new ItemStack { Item = new TileItem(new Core.Game.Tiles.OakPlank()), Quantity = 999 });
+			Inventory.Container.ForceSetSlot(1, 1, new ItemStack { Item = new GenericWallScraper(), Quantity = 1 });
+			Inventory.Container.ForceSetSlot(2, 0, new ItemStack { Item = new TileItem(new Core.Game.Tiles.StoneBrick()), Quantity = 999 });
+			Inventory.Container.ForceSetSlot(3, 0, new ItemStack { Item = new TileItem(new Core.Game.Tiles.ClayBrick()), Quantity = 999 });
 			Inventory.Container.ForceSetSlot(4, 0, new ItemStack { Item = new BombItem(), Quantity = 999 });
 			Inventory.Container.ForceSetSlot(5, 0, new ItemStack { Item = new TileItem(new RedTorch()), Quantity = 999 });
 			Inventory.Container.ForceSetSlot(6, 0, new ItemStack { Item = new TileItem(new GreenTorch()), Quantity = 999 });
 			Inventory.Container.ForceSetSlot(7, 0, new ItemStack { Item = new TileItem(new BlueTorch()), Quantity = 999 });
 			Inventory.Container.ForceSetSlot(8, 0, new ItemStack { Item = new TileItem(new Torch()), Quantity = 999 });
 			Inventory.Container.ForceSetSlot(9, 0, new ItemStack { Item = new TileItem(new Water()), Quantity = 999 });
+
+			Inventory.Container.ForceSetSlot(2, 1, new ItemStack { Item = new WallItem(new Core.Game.Walls.ClayBrick()), Quantity = 999 });
+			Inventory.Container.ForceSetSlot(3, 1, new ItemStack { Item = new WallItem(new Core.Game.Walls.Dirt()), Quantity = 999 });
+			Inventory.Container.ForceSetSlot(4, 1, new ItemStack { Item = new WallItem(new Core.Game.Walls.OakPlank()), Quantity = 999 });
+			Inventory.Container.ForceSetSlot(5, 1, new ItemStack { Item = new WallItem(new Core.Game.Walls.StoneBrick()), Quantity = 999 });
 		}
 
 		Random r = new Random();
@@ -461,13 +436,13 @@ namespace CaveGame.Client
 			float dist =  (1.0f/Math.Clamp(pos.Distance(Camera.Position), 0.2f, 200f)) * 200f;
 			Camera.Shake(dist, dist);
 
-			for (int i = 0; i<360; i+=10)
+			for (int i = 0; i<360; i+=5)
 			{
-				float randy = r.Next(0, 20)-10;
+				float randy = r.Next(0, 10)-5;
 				Rotation rotation = Rotation.FromDeg(i+randy);
 				Vector2 direction = new Vector2((float)Math.Sin(rotation.Radians), (float)Math.Cos(rotation.Radians));
-				float size = ((float)r.NextDouble() *0.25f) + (packet.Strength*0.35f);
-				World.ParticleSystem.Add(new SmokeParticle(pos, Color.White, Rotation.FromDeg(0), size, direction* (packet.Radius*1.0f+((float)r.NextDouble()*4))));
+				float size = ((float)r.NextDouble() *0.4f) + (packet.Strength*0.2f);
+				World.ParticleSystem.EmitSmokeParticle(pos, Color.White, Rotation.FromDeg(0), size, direction* (packet.Radius*1.0f+((float)r.NextDouble()*5)));
 			}
 		}
 
@@ -566,7 +541,28 @@ namespace CaveGame.Client
 			MyPlayer.Inventory.AddItem(packet.Reward);
 
         }
-				
+
+
+		private void OnSpawnedWurmhole(NetworkMessage msg)
+        {
+			SpawnWurmholeEntityPacket packet = new SpawnWurmholeEntityPacket(msg.Packet.GetBytes());
+
+			Wurmhole wurm = new Wurmhole();
+			wurm.EntityNetworkID = packet.EntityNetworkID;
+			World.Entities.Add(wurm);
+        }
+
+		private void OnWurmholeTriggered(NetworkMessage msg)
+		{
+			TriggerWurmholeEntityPacket packet = new TriggerWurmholeEntityPacket(msg.Packet.GetBytes());
+
+			var entity = World.FindEntityOfID(packet.EntityNetworkID);
+
+			if (entity is Wurmhole wurmhole)
+            {
+				wurmhole.Triggered = true;
+            }
+		}
 
 		#endregion
 		// gameclient
@@ -618,11 +614,17 @@ namespace CaveGame.Client
                     OnDamageTile(msg);
 				if (msg.Packet.Type == PacketType.GivePlayerItem)
 					GiveItToMeDaddy(msg);
+				if (msg.Packet.Type == PacketType.SpawnWurmholeEntity)
+					OnSpawnedWurmhole(msg);
+				if (msg.Packet.Type == PacketType.TriggerWurmholeEntity)
+					OnWurmholeTriggered(msg);
 
+
+				// DickSack
 			}
 		}
 
-		private void DrawChunks(SpriteBatch sb)
+		private void DrawChunks(GraphicsEngine GFX)
 		{
 			if (drawTimer > (1/5.0f))
 			{
@@ -630,23 +632,21 @@ namespace CaveGame.Client
 				Chunk.RefreshedThisFrame = false;
 				foreach (var chunkpair in World.Chunks)
 				{
-					chunkpair.Value.Draw(GameTextures.TileSheet, Game.GraphicsDevice, sb);	
+					chunkpair.Value.Draw(GFX);	
 				}
 			}
 		}
 
-		private void EntityRendering(SpriteBatch sb)
+		private void EntityRendering(GraphicsEngine gfx)
 		{
 			foreach (Entity entity in World.Entities)
             {
-				if (entity.DurationAlive > 0)
-				entity.Draw(sb);
+				entity.Draw(gfx);
 			}
-				
 
 		}
 
-		private void DrawChunkFGTextures(SpriteBatch sb)
+		private void DrawChunkFGTextures(GraphicsEngine gfx)
 		{
 			foreach (var chunkpair in World.Chunks)
 			{
@@ -654,11 +654,11 @@ namespace CaveGame.Client
 				Chunk chunk = chunkpair.Value;
 				Vector2 pos = new Vector2(chunk.Coordinates.X * Globals.ChunkSize * Globals.TileSize, chunk.Coordinates.Y * Globals.ChunkSize * Globals.TileSize);
 				if (chunk.ForegroundRenderBuffer != null)
-					sb.Draw(chunk.ForegroundRenderBuffer, pos, Color.White);
+					gfx.Sprite(chunk.ForegroundRenderBuffer, pos, Color.White);
 
 			}
 		}
-		private void DrawChunkBGTextures(SpriteBatch sb)
+		private void DrawChunkBGTextures(GraphicsEngine gfx)
 		{
 			foreach (var chunkpair in World.Chunks)
 			{
@@ -667,12 +667,12 @@ namespace CaveGame.Client
 				Vector2 pos = new Vector2(chunk.Coordinates.X * Globals.ChunkSize * Globals.TileSize, chunk.Coordinates.Y * Globals.ChunkSize * Globals.TileSize);
 
 				if (chunk.BackgroundRenderBuffer != null)
-					sb.Draw(chunk.BackgroundRenderBuffer, pos, Color.White);
+					gfx.Sprite(chunk.BackgroundRenderBuffer, pos, Color.White);
 			}
 		}
-		private void DrawDebugInfo(SpriteBatch sb)
+		private void DrawDebugInfo(GraphicsEngine gfx)
 		{
-			sb.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
+			gfx.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
 			MouseState mouse = Mouse.GetState();
 
 			var mp = Camera.ScreenToWorldCoordinates(mouse.Position.ToVector2());
@@ -689,38 +689,41 @@ namespace CaveGame.Client
 
 			if (MyPlayer != null)
 			{
-				sb.Print(Color.White, new Vector2(2, 12),
-					String.Format("pos {0} {1} vel {2} {3}",
+				string positionData = String.Format("pos {0} {1} vel {2} {3}",
 						Math.Floor(MyPlayer.Position.X / Globals.TileSize),
 						Math.Floor(MyPlayer.Position.Y / Globals.TileSize),
 						Math.Round(MyPlayer.Velocity.X, 2),
 						Math.Round(MyPlayer.Velocity.Y, 2)
-					)
 				);
-				sb.Print(Color.White, new Vector2(2, 24),
-					String.Format("pin {0}, pout {1} myid {2}",
+				
+				string networkData = String.Format("pin {0}, pout {1} myid {2}",
 						gameClient.ReceivedCount,
 						gameClient.SentCount,
 						MyPlayer?.EntityNetworkID
-					)
 				);
-				sb.Print(Color.White, new Vector2(2, 36),
-					String.Format("tid {0}, state {1} tdmg {2} wid {3} wdmg {4} light {5}",
+				
+				string worldData = String.Format("tid {0}, state {1} tdmg {2} wid {3} wdmg {4} light {5}",
 						tileat.ID,
 						tileat.TileState,
 						tileat.Damage,
 						wallat.ID,
 						wallat.Damage,
 						World.GetLight((int)tileCoords.X, (int)tileCoords.Y).ToString()
-					)
 				);
-				sb.Print(Color.White, new Vector2(2, 48), String.Format("entities {0} furn {1}", World.Entities.Count, World.Furniture.Count) );
+				
+
+				string mObjectData = String.Format("entities {0} furn {1}", World.Entities.Count, World.Furniture.Count);
+
+				gfx.Text(positionData, new Vector2(2, 12));
+				gfx.Text(networkData, new Vector2(2, 24));
+				gfx.Text(worldData, new Vector2(2, 36));
+				gfx.Text(mObjectData, new Vector2(2, 48));
 
 			}
-			sb.End();
+			gfx.End();
 		}
 
-		private void DrawSkyColor(SpriteBatch sb)
+		private void DrawSkyColor(GraphicsEngine GFX)
 		{
 			for (int y = 0; y<10; y++)
 			{
@@ -740,49 +743,37 @@ namespace CaveGame.Client
 
 				var finalColor = Color.Lerp(prevSection, thisSection, (World.TimeOfDay % 2.0f) / 2.0f);
 				float sliceHeight = Camera._screenSize.Y / 10.0f;
-				sb.Rect(finalColor, new Vector2(0,(sliceHeight*y)), new Vector2(Camera._screenSize.X, sliceHeight + 1));
+				GFX.Rect(finalColor, new Vector2(0,(sliceHeight*y)), new Vector2(Camera._screenSize.X, sliceHeight + 1));
 			}
 			
 		}
 
-		private SpriteBatch sbReference;
-		public void Draw(SpriteBatch sb)
+		public void Draw(GraphicsEngine GFX)
 		{
-			if (sbReference == null)
-				sbReference = sb;
 
-
-
-			DrawChunks(sb);
+			DrawChunks(GFX);
 
 			Game.GraphicsDevice.Clear(World.SkyColor);
-			sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
+			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
 			
-			DrawSkyColor(sb);
-			sb.End();
-			sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
-			if (pauseMenuOpen)
-            {
-				effect.Parameters["xSize"].SetValue((float)256);
-				effect.Parameters["ySize"].SetValue((float)256);
-				effect.Parameters["xDraw"].SetValue((float)16);
-				effect.Parameters["yDraw"].SetValue((float)16);
-				//effect.Parameters["filterColor"].SetValue(Color.White.ToVector4());
-				effect.CurrentTechnique.Passes[0].Apply();
+			DrawSkyColor(GFX);
+			GFX.End();
+			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
+			if (PauseMenu.Open)
+				PauseMenu.DrawWaterPixelsFilter(GFX);
+				
 
-			}
 			
-			DrawChunkBGTextures(sb);
-			DrawChunkFGTextures(sb);
-			//effect.CurrentTechnique.Passes[0].();
+			DrawChunkBGTextures(GFX);
+			DrawChunkFGTextures(GFX);
 
 			foreach (var furn in World.Furniture)
 			{
-				furn.Draw(GameTextures.TileSheet, sb);
+				furn.Draw(GFX);
 			}
-			EntityRendering(sb);
+			EntityRendering(GFX);
 			
-			World.ParticleSystem.Draw(sb);
+			World.ParticleSystem.Draw(GFX);
 
 			MouseState mouse = Mouse.GetState();
 
@@ -796,41 +787,33 @@ namespace CaveGame.Client
 
 			if (mouse.LeftButton == ButtonState.Pressed)
 			{
-				sb.Rect(Color.Green, mp, new Vector2(8, 8));
+				GFX.Rect(Color.Green, mp, new Vector2(8, 8));
 			} else
 			{
-				sb.Rect(new Color(1,1,1,0.5f), mp, new Vector2(8, 8));
+				GFX.Rect(new Color(1,1,1,0.5f), mp, new Vector2(8, 8));
 			}
 
-			sb.End();
+			GFX.End();
 			if (ShowChunkBoundaries)
 			{
-				sb.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, Camera.View);
-				chunkGridTool?.Draw(sb, Camera);
-				sb.End();
+				GFX.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, Camera.View);
+				chunkGridTool?.Draw(GFX, Camera);
+				GFX.End();
 			}
 
 			//	TODO: Consolidate draw calls
-			sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
-			Inventory.Draw(sb);
-			sb.End();
-			DrawDebugInfo(sb);
-			Chat.Draw(sb);
+			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
+			Inventory.Draw(GFX);
+			GFX.End();
+			DrawDebugInfo(GFX);
+			Chat.Draw(GFX);
 
-			
-			if (pauseMenuOpen)
-			{
-				sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
-				//effect.CurrentTechnique.Passes[0].Apply();
-				pauseMenu.Draw(sb);
-				sb.End();
-			}
+			PauseMenu.Draw(GFX);
 		}
 
 		public void Load()
 		{
-			effect = Game.Content.Load<Effect>("ShaderTest");
-			//Hotbar = new Hotbar();
+			PauseMenu.LoadShader(Game.Content);
 
 			gameClient = new NetworkClient(ConnectAddress);
 			//gameClient = new NetworkClient("127.0.0.1:40269");
@@ -957,7 +940,7 @@ namespace CaveGame.Client
 
 
 			if (PressedThisFrame(Keys.Escape))
-				pauseMenuOpen = !pauseMenuOpen;
+				PauseMenu.Open = !PauseMenu.Open;
 
 			if (PressedThisFrame(Keys.Tab))
 				Inventory.InventoryOpen = !Inventory.InventoryOpen;
@@ -988,7 +971,7 @@ namespace CaveGame.Client
 
 			if (MyPlayer != null)
 			{
-				if (pauseMenuOpen == true || Chat.Open == true || Game.Console.Open == true)
+				if (PauseMenu.Open == true || Chat.Open == true || Game.Console.Open == true)
 					MyPlayer.IgnoreInput = true;
 				else
 					MyPlayer.IgnoreInput = false;
@@ -996,12 +979,8 @@ namespace CaveGame.Client
 
 
 			Inventory.Update(gt);
-
-			if (pauseMenuOpen)
-				pauseMenu.Update(gt);
-
+			PauseMenu.Update(gt);
 			Chat.Update(gt);
-			//Hotbar.Update(gt);
 			World.Update(gt);
 			HotbarUpdate(gt);
 			UpdateCamera(gt);

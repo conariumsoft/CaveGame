@@ -31,6 +31,7 @@ namespace CaveGame.Client
 
 		public static SliderIndex<int>[] GetIntArray(int minimum, int maximum, int increment = 1)
 		{
+
 			SliderIndex<int>[] arr = new SliderIndex<int>[maximum-minimum];
 			for (int i = 0; i<(maximum - minimum); i++)
 			{

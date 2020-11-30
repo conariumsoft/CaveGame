@@ -13,41 +13,37 @@ namespace CaveGame.Core.Game.Tiles
 		public override Rectangle Quad => TileMap.Stone;
 		public override byte Hardness => 4;
 
-		private void DrawMask(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color, int rotation, Rectangle quad, Color tilecolor)
+		private void DrawMask(GraphicsEngine GFX, int x, int y, Light3 color, int rotation, Rectangle quad, Color tilecolor)
 		{
 			//if (GameGlobals.GraphicsDevice != null)
 			//{
 			var position = new Vector2(x * Globals.TileSize, y * Globals.TileSize);
 			var pixels4 = new Vector2(4, 4);
 
-			sb.Draw(tilesheet, position + pixels4, quad, color.MultiplyAgainst(tilecolor), MathHelper.ToRadians(rotation), new Vector2(4, 4), 1, SpriteEffects.None, 1);
+			GFX.Sprite(GFX.TileSheet, position + pixels4, quad, color.MultiplyAgainst(tilecolor), Rotation.FromDeg(rotation), new Vector2(4, 4), 1, SpriteEffects.None, 1);
 			//	}
 		}
 
-		private void DrawDirtMask(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color, int rotation)
+		private void DrawDirtMask(GraphicsEngine GFX, int x, int y, Light3 color, int rotation)
 		{
-			DrawMask(tilesheet, sb, x, y, color, rotation, TileMap.DirtFading, Color.SaddleBrown);
+			DrawMask(GFX, x, y, color, rotation, TileMap.DirtFading, Color.SaddleBrown);
 		}
 
 
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 color)
 		{
 			var position = new Vector2(x * Globals.TileSize, y * Globals.TileSize);
 
-			sb.Draw(tilesheet, position, Quad, color.MultiplyAgainst(Color));
-
-			//sb.End();
+			GFX.Sprite(GFX.TileSheet, position, Quad, color.MultiplyAgainst(Color));
 
 			if (TileState.Get(0)) // Top Dirt
-				DrawDirtMask(tilesheet, sb, x, y, color, 0);
+				DrawDirtMask(GFX, x, y, color, 0);
 			if (TileState.Get(1)) // Bottom Dirt
-				DrawDirtMask(tilesheet, sb, x, y, color, 180);
+				DrawDirtMask(GFX, x, y, color, 180);
 			if (TileState.Get(2)) // Left Dirt
-				DrawDirtMask(tilesheet, sb, x, y, color, 270);
+				DrawDirtMask(GFX, x, y, color, 270);
 			if (TileState.Get(3)) // Right Dirt
-				DrawDirtMask(tilesheet, sb, x, y, color, 90);
-
-			//sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+				DrawDirtMask(GFX, x, y, color, 90);
 		}
 
 
@@ -111,7 +107,7 @@ namespace CaveGame.Core.Game.Tiles
 			}
 		}
 
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 color)
 		{
 			var gx = TileMap.Glass.X;
 			var gy = TileMap.Glass.Y;
@@ -123,19 +119,19 @@ namespace CaveGame.Core.Game.Tiles
 			Vector2 position = new Vector2(x * Globals.TileSize, y * Globals.TileSize);
 
 
-			sb.Draw(tilesheet, position, TileMap.GlassBG, color.MultiplyAgainst(Color));
+			GFX.Sprite(GFX.TileSheet, position, TileMap.GlassBG, color.MultiplyAgainst(Color));
 
 			if (TileState.Get(3)) // Right
-				sb.Draw(tilesheet, position + new Vector2(7, 0), right, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position + new Vector2(7, 0), right, color.MultiplyAgainst(Color));
 
 			if (TileState.Get(2)) // Bottom
-				sb.Draw(tilesheet, position + new Vector2(0, 7), bottom, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position + new Vector2(0, 7), bottom, color.MultiplyAgainst(Color));
 
 			if (TileState.Get(1)) // Left
-				sb.Draw(tilesheet, position, left, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position, left, color.MultiplyAgainst(Color));
 
 			if (TileState.Get(0)) // Top
-				sb.Draw(tilesheet, position, top, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position, top, color.MultiplyAgainst(Color));
 		}
 		//sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), TileMap.Soil, color.MultiplyAgainst(Color.SaddleBrown));
 
@@ -145,7 +141,7 @@ namespace CaveGame.Core.Game.Tiles
 	{
 		public override Rectangle Quad => TileMap.Brick;
 		public override byte Hardness => 12;
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 color)
 		{
 			//sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), TileMap.Soil, color.MultiplyAgainst(Color.SaddleBrown));
 			var TL = new Rectangle(0, Globals.TileSize, 4, 4);
@@ -162,24 +158,24 @@ namespace CaveGame.Core.Game.Tiles
 
 
 			if (TileState.Get(3)) // BottomRight
-				sb.Draw(tilesheet, position + new Vector2(4, 4), RBR, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position + new Vector2(4, 4), RBR, color.MultiplyAgainst(Color));
 			else
-				sb.Draw(tilesheet, position + new Vector2(4, 4), BR, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position + new Vector2(4, 4), BR, color.MultiplyAgainst(Color));
 
 			if (TileState.Get(2)) // BottomLeft
-				sb.Draw(tilesheet, position + new Vector2(0, 4), RBL, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position + new Vector2(0, 4), RBL, color.MultiplyAgainst(Color));
 			else
-				sb.Draw(tilesheet, position + new Vector2(0, 4), BL, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position + new Vector2(0, 4), BL, color.MultiplyAgainst(Color));
 
 			if (TileState.Get(1)) // TopLeft
-				sb.Draw(tilesheet, position, RTL, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position, RTL, color.MultiplyAgainst(Color));
 			else
-				sb.Draw(tilesheet, position, TL, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position, TL, color.MultiplyAgainst(Color));
 
 			if (TileState.Get(0)) // TopRight
-				sb.Draw(tilesheet, position + new Vector2(4, 0), RTR, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position + new Vector2(4, 0), RTR, color.MultiplyAgainst(Color));
 			else
-				sb.Draw(tilesheet, position + new Vector2(4, 0), TR, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position + new Vector2(4, 0), TR, color.MultiplyAgainst(Color));
 
 
 		}
@@ -213,7 +209,7 @@ namespace CaveGame.Core.Game.Tiles
 	{
 		public override Rectangle Quad => TileMap.RedBrick;
 
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 color)
 		{
 			//sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), TileMap.Soil, color.MultiplyAgainst(Color.SaddleBrown));
 			var TL = new Rectangle(0, (Globals.TileSize * 3), 4, 4);
@@ -230,24 +226,24 @@ namespace CaveGame.Core.Game.Tiles
 
 
 			if (TileState.Get(3)) // BottomRight
-				sb.Draw(tilesheet, position + new Vector2(4, 4), RBR, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position + new Vector2(4, 4), RBR, color.MultiplyAgainst(Color));
 			else
-				sb.Draw(tilesheet, position + new Vector2(4, 4), BR, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position + new Vector2(4, 4), BR, color.MultiplyAgainst(Color));
 
 			if (TileState.Get(2)) // BottomLeft
-				sb.Draw(tilesheet, position + new Vector2(0, 4), RBL, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position + new Vector2(0, 4), RBL, color.MultiplyAgainst(Color));
 			else
-				sb.Draw(tilesheet, position + new Vector2(0, 4), BL, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position + new Vector2(0, 4), BL, color.MultiplyAgainst(Color));
 
 			if (TileState.Get(1)) // TopLeft
-				sb.Draw(tilesheet, position, RTL, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position, RTL, color.MultiplyAgainst(Color));
 			else
-				sb.Draw(tilesheet, position, TL, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position, TL, color.MultiplyAgainst(Color));
 
 			if (TileState.Get(0)) // TopRight
-				sb.Draw(tilesheet, position + new Vector2(4, 0), RTR, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position + new Vector2(4, 0), RTR, color.MultiplyAgainst(Color));
 			else
-				sb.Draw(tilesheet, position + new Vector2(4, 0), TR, color.MultiplyAgainst(Color));
+				GFX.Sprite(GFX.TileSheet, position + new Vector2(4, 0), TR, color.MultiplyAgainst(Color));
 
 
 		}

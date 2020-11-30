@@ -9,16 +9,11 @@ using CaveGame.Core.FileUtil;
 using System.IO;
 using Microsoft.Xna.Framework.Input;
 using System.Globalization;
+using CaveGame.Core.Network;
+using CaveGame.Core.Generic;
 
 namespace CaveGame.Client
 {
-	public static class GameGlobals
-	{
-		public static int Width;
-		public static int Height;
-		public static GraphicsDevice GraphicsDevice;
-	}
-
 	public class CaveGameGL : Microsoft.Xna.Framework.Game
 	{
 		public GameSettings GameSettings { get; set; }
@@ -27,23 +22,23 @@ namespace CaveGame.Client
 		private IGameContext PreviousGameContext { get; set; }
 
 		#region Game States
-		public GameClient InWorldContext;
-		public Menu.MenuManager HomePageContext;
-		public Menu.Multiplayer MultiplayerPageContext;
+		public GameClient GameClientContext;
+		public Menu.MenuManager MenuContext;
 		public Menu.Settings SettingsContext;
-		public Menu.TimeoutMenu TimeoutContext;
-		public Menu.Credits CreditsContext;
 		#endregion
 
+		public GraphicsEngine GraphicsEngine { get; private set; }
 		public GraphicsDeviceManager GraphicsDeviceManager { get; private set; }
 		public SpriteBatch SpriteBatch { get; private set; }
 		#region GameComponents
 		public CommandBar Console { get; private set; }
-		public FPSGraph FPSGraph { get; private set; }
 		public FrameCounter FPSCounter { get; private set; }
+		public Splash Splash { get; private set; }
 		#endregion
 
 		public static float ClickTimer;
+
+		
 
 		public SteamManager SteamManager { get; private set; }
 
@@ -93,30 +88,35 @@ namespace CaveGame.Client
 				IsFullScreen = false,
 				PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8
 			};
-			
+
 
 			IsMouseVisible = true;
 			Content.RootDirectory = "Content";
 			Window.AllowUserResizing = true;
 			Window.AllowAltF4 = true;
 
+			GraphicsEngine = new GraphicsEngine();
+
+			
+			Splash = new Splash();
+
+#if DEBUG
+			GraphicsEngine.LoadingDelay = 0.05f;
+			Splash.SplashTimer = 5f;
+#endif
 			OnSetFPSLimit(GameSettings.FPSLimit);
 		}
 
-
-
 		void Window_ClientSizeChanged(object sender, EventArgs e)
 		{
-			GameGlobals.Width = Window.ClientBounds.Width;
-			GameGlobals.Height = Window.ClientBounds.Height;
-			if (InWorldContext != null)
+			GraphicsEngine.WindowSize = Window.ClientBounds.Size.ToVector2();
+			if (GameClientContext != null)
 			{
-				InWorldContext.Camera.Bounds = Window.ClientBounds;
-				InWorldContext.Camera._screenSize = new Vector2(Window.ClientBounds.Width, Window.ClientBounds.Height);
+				GameClientContext.Camera.Bounds = Window.ClientBounds;
+				GameClientContext.Camera._screenSize = new Vector2(Window.ClientBounds.Width, Window.ClientBounds.Height);
 			}
 			
 		}
-		private void OnTestCommand(CommandBar sender, Command command, params string[] args) {}
 
 		private void OnTeleportCommand(CommandBar sender, Command command, params string[] args)
 		{
@@ -145,20 +145,20 @@ namespace CaveGame.Client
 				return;
 			}
 
-			if (InWorldContext.MyPlayer != null)
+			if (GameClientContext.MyPlayer != null)
 			{
-				InWorldContext.MyPlayer.NextPosition = new Vector2(x, y);
+				GameClientContext.MyPlayer.NextPosition = new Vector2(x, y);
 			}
 		}
 		private void OnGodCommand(CommandBar sender, Command command, params string[] args)
 		{
-			InWorldContext.MyPlayer.God = !InWorldContext.MyPlayer.God;
+			GameClientContext.MyPlayer.God = !GameClientContext.MyPlayer.God;
 		}
 		private void OnDisconnectCommand(CommandBar sender, Command command, params string[] args)
 		{
-			if (CurrentGameContext == InWorldContext)
+			if (CurrentGameContext == GameClientContext)
 			{
-				InWorldContext.OverrideDisconnect();
+				GameClientContext.OverrideDisconnect();
 
 			} else
 			{
@@ -166,14 +166,6 @@ namespace CaveGame.Client
 				return;
 			}
 		}
-		private void OnGraphCommand(CommandBar sender, Command command, params string[] args)
-		{
-			if (args.Length > 0)
-			{
-
-			}
-		}
-
 		private void OnScreenshot(CommandBar sender, Command command, params string[] args)
 		{
 			if (args.Length>0)
@@ -187,13 +179,37 @@ namespace CaveGame.Client
 			}
 			
 		}
-
-		private void OnTimeCommand(CommandBar sender, Command command, params string[] args)
+		private void SendAdminCommand(string command, params string[] args) => GameClientContext.Send(new AdminCommandPacket(command, args, GameClientContext.MyPlayer.EntityNetworkID));
+		private void CmdTimeCommand(CommandBar sender, Command command, params string[] args)
         {
 			if (args.Length > 0)
-				InWorldContext.World.TimeOfDay = float.Parse(args[0], CultureInfo.InvariantCulture.NumberFormat);
+				GameClientContext.World.TimeOfDay = float.Parse(args[0], CultureInfo.InvariantCulture.NumberFormat);
 			else
-				sender.Out("Time of day (hours): " + InWorldContext.World.TimeOfDay.ToString());
+				sender.Out("Time of day (hours): " + GameClientContext.World.TimeOfDay.ToString());
+		}
+		private void CmdRequestSummonEntity(CommandBar sender, Command command, params string[] args)
+        {
+			if (args.Length == 0) // give list of entities
+            {
+				sender.Out("Syntax: sv_summon <entity_id> <xpos> <ypos> <metadata>");
+				sender.Out("Entity ID list:");
+				sender.Out("itemstack, wurmhole");
+			}
+			else
+            {
+				
+				SendAdminCommand(command.Keyword, args);
+			}
+				
+        }
+		private void CmdRequestItemstack(CommandBar sender, Command command, params string[] args)
+        {
+			if (args.Length == 0)
+            {
+
+            } 
+			else
+				SendAdminCommand(command.Keyword, args);
 		}
 
 		protected override void Initialize()
@@ -204,57 +220,60 @@ namespace CaveGame.Client
 
 
 			Console = new CommandBar(this);
-			Console.BindCommandInformation(new Command("test", "it does a thing", new List<string>{"argA", "argB", "argC"}, OnGodCommand));
-			Console.BindCommandInformation(new Command("teleport", "", new List<string> { "x", "y" }, OnTeleportCommand));
-			Console.BindCommandInformation(new Command("god", "AAOKSOKADFOS", new List<string> {}, OnGodCommand));
-			Console.BindCommandInformation(new Command("disconnect", "", new List<string> { }, OnDisconnectCommand));
-			Console.BindCommandInformation(new Command("connect", "", new List<string> { }, OnDisconnectCommand));
-			Console.BindCommandInformation(new Command("graph", "", new List<string> { }, OnGraphCommand));
-			Console.BindCommandInformation(new Command("screen", "", new List<string> { }, OnScreenshot));
-			Console.BindCommandInformation(new Command("time", "Set/Get time of day", new List<string> { "time" }, OnTimeCommand));
-			//Console.Handler += CommandBarEvent;
+
+			// epic new .NET 5 feature
+			Command[] commands =
+			{
+				new ("teleport", "", new List<string> { "x", "y" }, OnTeleportCommand),
+				new ("god", "", new List<string> {}, OnGodCommand),
+				new ("disconnect", "", new List<string> { }, OnDisconnectCommand),
+				new ("connect", "", new List<string> { }, OnDisconnectCommand),
+				new ("screenshot", "", new List<string> { }, OnScreenshot),
+				new ("time", "Set/Get time of day", new List<string> { "time" }, CmdTimeCommand),
+				new ("sv_summon", "Summon an entity", new List<string>{"entityid, xpos, ypos, metadatastring" }, CmdRequestSummonEntity)
+				
+			};
+			foreach (var command in commands)
+				Console.BindCommandInformation(command);
+
 			Components.Add(Console);
 			
 			FPSCounter = new FrameCounter(this);
 			Components.Add(FPSCounter);
 
-			FPSGraph = new FPSGraph(this, 25, 500);
-			Components.Add(FPSGraph);
 
 			SteamManager.Initialize();
 			Components.Add(SteamManager);
 
-			GameGlobals.Width = Window.ClientBounds.Width;
-			GameGlobals.Height = Window.ClientBounds.Height;
-			GameGlobals.GraphicsDevice = GraphicsDeviceManager.GraphicsDevice;
 			base.Initialize();
 		}
 
+
 		private void CreateGameStates()
 		{
-			HomePageContext = new MenuManager(this);
-			InWorldContext = new GameClient(this);
-			CreditsContext = new Credits(this);
-			MultiplayerPageContext = new Multiplayer(this);
-			TimeoutContext = new TimeoutMenu(this);
+			MenuContext = new MenuManager(this);
+			GameClientContext = new GameClient(this);
 			SettingsContext = new Settings(this);
 			Window.TextInput += SettingsContext.OnTextInput;
-			CurrentGameContext = HomePageContext;
+			CurrentGameContext = MenuContext;
 		}
 
 		protected override void LoadContent()
 		{
-			SpriteBatch = new SpriteBatch(GraphicsDevice);
-			Renderer.Initialize(this);
-
-			GameFonts.LoadAssets(Content);
 			GameSounds.LoadAssets(Content);
-			GameTextures.LoadAssets(GraphicsDevice);
-			ItemTextures.LoadAssets(GraphicsDevice);
+
+			GraphicsEngine.ContentManager = Content;
+			GraphicsEngine.GraphicsDevice = GraphicsDevice;
+			GraphicsEngine.GraphicsDeviceManager = GraphicsDeviceManager;
+
+			GraphicsEngine.Initialize();
+			GraphicsEngine.LoadAssets(GraphicsDevice);
+
+			//GameTextures.LoadAssets(GraphicsDevice);
+			//ItemTextures.LoadAssets(GraphicsDevice);
 			CreateGameStates();
 		}
 
-		float splashTimer = 3;
 
 		public void TakeScreenshot(string filename = "")
 		{
@@ -285,13 +304,23 @@ namespace CaveGame.Client
 		KeyboardState previousKB = Keyboard.GetState();
 		protected override void Update(GameTime gameTime)
 		{
+			// update graphics information
+			GraphicsEngine.WindowSize = Window.ClientBounds.Size.ToVector2();
+			GraphicsEngine.Update(gameTime);
+
+			if (!GraphicsEngine.ContentLoaded)
+				return;
+
+			if (Splash.SplashActive)
+            {
+				Splash.Update(gameTime);
+				//return;
+            }
 
 			KeyboardState currentKB = Keyboard.GetState();
 			if (currentKB.IsKeyDown(Keys.F5) && !previousKB.IsKeyDown(Keys.F5)) {
 				TakeScreenshot();
 			}
-
-			splashTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
 
 			if (CurrentGameContext != PreviousGameContext && PreviousGameContext != null)
 			{
@@ -315,70 +344,85 @@ namespace CaveGame.Client
 
 		private void DrawDebugOverlay()
 		{
-			SpriteBatch.Begin();
-			SpriteBatch.Print(Color.White, new Vector2(2, 0), String.Format("fps: {0} ", Math.Floor(FPSCounter.GetAverageFramerate())));
-			SpriteBatch.End();
+			GraphicsEngine.Begin();
+			GraphicsEngine.Text(String.Format("fps: {0} ", Math.Floor(FPSCounter.GetAverageFramerate())), new Vector2(2, 0));
+			GraphicsEngine.End();
 		}
 
 
 		protected override void OnExiting(object sender, EventArgs args)
 		{
 			GameSettings.Save();
-			InWorldContext.Disconnect();
+			GameClientContext.Disconnect();
 			
 			SteamManager.Shutdown();
 			base.OnExiting(sender, args);
 		}
 
-		private void DrawSplash()
-		{
+		private void DrawLoadingBar(GraphicsEngine GFX)
+        {
+			if (!GFX.FontsLoaded)
+				return;
+
+			float frac = (float)GFX.LoadedTextures / (float)GFX.TotalTextures;
+			string text = String.Format("Loading: {0} of {1} ({2}%)", GFX.LoadedTextures, GFX.TotalTextures, (int)(frac*100));
+			GFX.GraphicsDevice.Clear(Color.Black);
+			GFX.Begin();
+			GFX.Text(GFX.Fonts.Arial20, text, GFX.WindowSize / 2.0f, Color.White, TextXAlignment.Center, TextYAlignment.Center);
+
+			float barY = (GFX.WindowSize.Y / 2.0f) + 20.0f;
+			float barX = GFX.WindowSize.X / 2.0f;
+			float barLength = GFX.WindowSize.X / 3.0f;
+			float barHeight = 10.0f;
+
+			Vector2 center = new Vector2(barX, barY);
 			
-			GraphicsDevice.Clear(Color.Black);
-
-			SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
-			Vector2 center = new Vector2(GameGlobals.Width / 2.0f, GameGlobals.Height / 2.0f);
-			Vector2 origin = new Vector2(GameTextures.EyeOfHorus.Width / 2.0f, GameTextures.EyeOfHorus.Height / 2.0f);
-			float scale = 8;
-
-			Vector2 bounds = GameFonts.Arial30.MeasureString("CONARIUM SOFTWARE");
-
-			SpriteBatch.Draw(GameTextures.EyeOfHorus, center-new Vector2(0, (float)Math.Sin(splashTimer*2)*10), null, Color.White, 0, origin, scale, SpriteEffects.None, 0);
-			SpriteBatch.Print(GameFonts.Arial30, Color.White, center - new Vector2(bounds.X/2, -bounds.Y*2), "CONARIUM SOFTWARE");
-			SpriteBatch.End();
-
-		}
+			GFX.Rect(
+				Color.Gray, 
+				center - new Vector2(barLength/2.0f, 0), 
+				new Vector2(barLength, barHeight)
+			);
+			GFX.Rect(
+				Color.White,
+				center - new Vector2(barLength / 2.0f, 0),
+				new Vector2(barLength*frac, barHeight)
+			);
+			
+		
+			GFX.End();
+        }
 
 		protected override void Draw(GameTime gameTime)
 		{
-			if (!GameTextures.ContentLoaded)
-				return;
-
-			if (splashTimer > 0)
-			{
-				DrawSplash();
+			if (!GraphicsEngine.ContentLoaded)
+            {
+				DrawLoadingBar(GraphicsEngine);
 				return;
 			}
+			if (Splash.SplashActive)
+            {
+				Splash.Draw(GraphicsEngine);
+				return;
+            }
 
-			GraphicsDevice.Clear(Color.Black);
+			GraphicsEngine.Clear(Color.Black);
+			GraphicsEngine.Begin();
 
-			SpriteBatch.Begin();
-
-			Vector2 center = new Vector2(GameGlobals.Width / 2.0f, GameGlobals.Height / 2.0f);
-			Vector2 origin = new Vector2(GameTextures.BG.Width / 2.0f, GameTextures.BG.Height / 2.0f);
-			float horizscale = GameGlobals.Width / (float)GameTextures.BG.Width;
-			float vertscale = GameGlobals.Height / (float)GameTextures.BG.Height;
+			Vector2 center = GraphicsEngine.WindowSize / 2.0f;
+			Vector2 origin = new Vector2(GraphicsEngine.BG.Width, GraphicsEngine.BG.Height) / 2.0f;
+			float horizscale = GraphicsEngine.WindowSize.X / (float)GraphicsEngine.BG.Width;
+			float vertscale = GraphicsEngine.WindowSize.Y / (float)GraphicsEngine.BG.Height;
 			float scale = Math.Max(horizscale, vertscale);
-			SpriteBatch.Draw(GameTextures.BG, center, null, Color.White, 0, origin, scale, SpriteEffects.None, 0);
-			SpriteBatch.End();
+
+
+			GraphicsEngine.Sprite(GraphicsEngine.BG, center, null, Color.White, Rotation.Zero, origin, scale, SpriteEffects.None, 0);
+			GraphicsEngine.End();
 
 			if (CurrentGameContext.Active == true)
-			{
-				CurrentGameContext.Draw(SpriteBatch);
-			}
-			FPSGraph.Draw(SpriteBatch);
+				CurrentGameContext.Draw(GraphicsEngine);
 			DrawDebugOverlay();
 
-			Console.Draw(SpriteBatch);
+			Console.Draw(GraphicsEngine);
 			base.Draw(gameTime);
 		}
 	}

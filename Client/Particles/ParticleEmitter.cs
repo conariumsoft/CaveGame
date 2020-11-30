@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Collections.Concurrent;
 
 namespace CaveGame.Core.Particles
 {
@@ -15,7 +16,7 @@ namespace CaveGame.Core.Particles
 
 	public abstract class Particle
 	{
-		public virtual void Draw(SpriteBatch sb) { }
+		public virtual void Draw(GraphicsEngine gfx) { }
 		public virtual void Update(GameTime gt) { }
 		public virtual void PhysicsStep(IGameWorld world, float step) { }
 		public virtual void OnCollide(IGameWorld world, Tile t, Vector2 separation, Vector2 Normal) { }
@@ -24,23 +25,22 @@ namespace CaveGame.Core.Particles
 		public virtual float MaxParticleAge { get;  }
 
 
-		private bool _disposed = false;
+	}
 
-		protected virtual void Dispose(bool disposing)
+	public class ObjectPool<T>
+	{
+		private readonly ConcurrentBag<T> _objects;
+		private readonly Func<T> _objectGenerator;
+
+		public ObjectPool(Func<T> objectGenerator)
 		{
-			if (_disposed)
-				return;
-
-
-			if (disposing)
-				_disposed = true;
+			_objectGenerator = objectGenerator ?? throw new ArgumentNullException(nameof(objectGenerator));
+			_objects = new ConcurrentBag<T>();
 		}
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+		public T Get() => _objects.TryTake(out T item) ? item : _objectGenerator();
+
+		public void Return(T item) => _objects.Add(item);
 	}
 
 
@@ -52,26 +52,30 @@ namespace CaveGame.Core.Particles
 		public static float Mass = 0.1f;
 		public override float MaxParticleAge => 2.0f;
 
-		private Rotation rotation;
-		private Vector2 position;
-		private Color color;
-		private float scale;
-		private Vector2 nextPosition;
-		private Vector2 velocity;
-		private Vector2 accelleration;
+		public Rotation Rotation { get; set; }
+        public Vector2 Position { get; set; }
+
+		public Color Color { get; set; }
+		public float Scale { get; set; }
+		public Vector2 NextPosition;
+		public Vector2 Velocity;
+		public Vector2 Accelleration;
+
+		public SmokeParticle() { }
 
 
-
-		public SmokeParticle(Vector2 _position, Color _color, Rotation _rotation, float _scale, Vector2 _accel)
-		{
-			position = _position;
-			color = _color;
-			rotation = _rotation;
-			scale = _scale;
-			accelleration = _accel;
+		public void Initialize(Vector2 _position, Color _color, Rotation _rotation, float _scale, Vector2 _accel)
+        {
+			ParticleAge = 0;
+			Position = _position;
+			Color = _color;
+			Rotation = _rotation;
+			Scale = _scale;
+			Accelleration = _accel;
 			//velocity = _velocity;
+			NextPosition = _position;
 			Dead = false;
-			nextPosition = _position;
+
 		}
 
 		public override void Update(GameTime gt)
@@ -82,23 +86,23 @@ namespace CaveGame.Core.Particles
 
 		public override void PhysicsStep(IGameWorld world, float step)
 		{
-			velocity += (accelleration * step*3);
-			accelleration -= (accelleration * step*3);
+			Velocity += (Accelleration * step*3);
+			Accelleration -= (Accelleration * step*3);
 
 
-			velocity = new Vector2(velocity.X * Friction.X, velocity.Y * Friction.Y);
+			Velocity = new Vector2(Velocity.X * Friction.X, Velocity.Y * Friction.Y);
 
-			position = nextPosition;
-			nextPosition += velocity;
+			Position = NextPosition;
+			NextPosition += Velocity;
 
 			//base.PhysicsStep(world, step);
 		}
-		public override void Draw(SpriteBatch sb)
+		public override void Draw(GraphicsEngine gfx)
 		{
 			float alpha = Math.Min(1, (1- (ParticleAge / MaxParticleAge))*2);
 
 
-			sb.Draw(GameTextures.ParticleSet, position, Quad, color*alpha, rotation.Radians, Origin, scale, SpriteEffects.None, 0);
+			gfx.Sprite(gfx.ParticleSet, Position, Quad, Color*alpha, Rotation, Origin, Scale, SpriteEffects.None, 0);
 		}
 
 		public override void OnCollide(IGameWorld world, Tile t, Vector2 separation, Vector2 Normal)
@@ -126,68 +130,69 @@ namespace CaveGame.Core.Particles
 	public class ParticleEmitter
 	{
 		const int MAX_PARTICLES = 4096;
-		private CircularArray<Particle> particles;
+
+
+		ObjectPool<SmokeParticle> SmokeParticlePool = new ObjectPool<SmokeParticle>(() => new SmokeParticle());
+
+
+		private List<Particle> Particles;
 		public IGameWorld World { get; set; }
 
 
 		public ParticleEmitter(IGameWorld world)
 		{
 			World = world;
-			particles = new CircularArray<Particle>(MAX_PARTICLES);
+			Particles = new List<Particle>();
 		}
 
-		public void Add(Particle p)
+		public void Add(Particle p) => Particles.Add(p);
+
+
+		public void EmitSmokeParticle(Vector2 position, Color color, Rotation rotation, float scale, Vector2 accel)
 		{
-			particles.Next(p);
+			var myParticle = SmokeParticlePool.Get();
+			myParticle.Initialize(position, color, rotation, scale, accel);
+			Add(myParticle);
 		}
 
 		public void Update(GameTime gt)
 		{
-			Particle particle;
-			for (int i = 0; i <particles.Size; i++)
+			foreach (var particle in Particles.ToArray())
 			{
-				particles.Get(i, out particle);
 				if (particle == null)
 					continue;
 
 				if (particle.ParticleAge > particle.MaxParticleAge)
 					particle.Dead = true;
 
-				if (particle.Dead)
+				if (particle.Dead && particle is SmokeParticle smokey)
 				{
-					particle.Dispose();
+					SmokeParticlePool.Return(smokey);
+					Particles.Remove(particle);
 					continue;
 				}
 					
-					
-
-				
-
 				particle.Update(gt);
 			}
 		}
 
-		public void Draw(SpriteBatch sb)
+		public void Draw(GraphicsEngine gfx)
 		{
-			Particle particle;
-			for (int i = 0; i < particles.Size; i++)
+			foreach (Particle particle in Particles)
 			{
-				particles.Get(i, out particle);
 				if (particle == null)
 					continue;
 				if (particle.Dead)
 					continue;
 
-				particle.Draw(sb);
+				particle.Draw(gfx);
 			}
 		}
 
 		public void PhysicsStep(IGameWorld world, float step)
 		{
-			Particle particle;
-			for (int i = 0; i < particles.Size; i++)
+			foreach (Particle particle in Particles)
 			{
-				particles.Get(i, out particle);
 				if (particle == null)
 					continue;
 

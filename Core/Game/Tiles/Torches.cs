@@ -26,16 +26,16 @@ namespace CaveGame.Core.Game.Tiles
 			new Rectangle(Globals.TileSize*14, Globals.TileSize*5, Globals.TileSize, Globals.TileSize),
 		};
 
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 color)
 		{
 			Vector2 position = new Vector2(Globals.TileSize * x, Globals.TileSize * y);
 
 
-			sb.Draw(tilesheet, position, TileMap.Torch, color.MultiplyAgainst(Color.White));
+			GFX.Sprite(GFX.TileSheet, position, TileMap.Torch, color.MultiplyAgainst(Color.White));
 
 #if CLIENT
-			sb.Rect(FlameColor * 0.5f, position + new Vector2(2, -1), new Vector2(4, 4));
-			sb.Rect(FlameColor * 1.2f, position + new Vector2(3, 0), new Vector2(2, 2));
+			GFX.Rect(FlameColor * 0.5f, position + new Vector2(2, -1), new Vector2(4, 4));
+			GFX.Rect(FlameColor * 1.2f, position + new Vector2(3, 0), new Vector2(2, 2));
 #endif
 		}
 

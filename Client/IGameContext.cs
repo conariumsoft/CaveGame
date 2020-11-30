@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CaveGame.Core;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace CaveGame.Client
@@ -12,17 +13,6 @@ namespace CaveGame.Client
 		void Load();
 		void Unload();
 		void Update(GameTime gt);
-		void Draw(SpriteBatch sb);
+		void Draw(GraphicsEngine gfx);
 	}
-	/*	public interface IGameState
-	{
-		public Game Game { get; }
-		public bool Active { get; set; }
-
-		void Initialize();
-		void LoadContent();
-		void UnloadContent();
-		void Update(GameTime gt);
-		void Draw(SpriteBatch sb);
-	}*/
 }

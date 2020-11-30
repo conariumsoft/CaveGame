@@ -1,6 +1,7 @@
 ﻿using CaveGame.Client.Game.Entities;
 using CaveGame.Core;
 using CaveGame.Core.Game.Inventory;
+using CaveGame.Core.Generic;
 using CaveGame.Core.Inventory;
 using DataManagement;
 using Microsoft.Xna.Framework;
@@ -58,48 +59,48 @@ namespace CaveGame.Client
 		private string GetDisplayStringForItemQuantity(int quantity) => quantity.ToString() + "x";
 
 
-		private void DrawTextForStack(SpriteBatch sb, Vector2 slotPos, float uiScale, int quantity, Color color)
+		private void DrawTextForStack(GraphicsEngine gfx, Vector2 slotPos, float uiScale, int quantity, Color color)
         {
 			string displayStr = GetDisplayStringForItemQuantity(quantity);
-			Vector2 dimensions = GameFonts.Arial16.MeasureString(displayStr);
+			Vector2 dimensions = gfx.Fonts.Arial16.MeasureString(displayStr);
 
 			Vector2 offset = new Vector2(ItemTextureSize * uiScale, ItemTextureSize * uiScale) - dimensions;
 
 			//sb.Print(GameFonts.Arial16, Color.Black, slotPos + offset + new Vector2(4, 4), displayStr);
-			sb.Print(GameFonts.Arial16, color, slotPos + offset, displayStr);
+			gfx.Text(gfx.Fonts.Arial16, displayStr, slotPos + offset, color);
 			
 		}
 
-		private void DrawItemSlot(SpriteBatch sb, Vector2 containerOffset, Point position, float uiScale, ItemStack stack, bool bgOverride = false)
+		private void DrawItemSlot(GraphicsEngine gfx, Vector2 containerOffset, Point position, float uiScale, ItemStack stack, bool bgOverride = false)
 		{
 			Vector2 slotPos = GetSlotIndexPosition(containerOffset, position, uiScale);
 
 			if (!bgOverride)
-				sb.Draw(GameTextures.Slot, slotPos - new Vector2(1, 1), null, Color.Gray, 0, Vector2.Zero, uiScale, SpriteEffects.None, 0);
+				gfx.Sprite(gfx.Slot, slotPos - new Vector2(1, 1), null, Color.Gray, Rotation.Zero, Vector2.Zero, uiScale, SpriteEffects.None, 0);
 
 			if (!stack.Equals(ItemStack.Empty))
 			{
-				stack.Item?.Draw(sb, slotPos, uiScale);
+				stack.Item?.Draw(gfx, slotPos, uiScale);
 				if (stack.Quantity > 1)
-					DrawTextForStack(sb, slotPos, uiScale, stack.Quantity, Color.White);
+					DrawTextForStack(gfx, slotPos, uiScale, stack.Quantity, Color.White);
 			}
 		}
 
-		private void DrawHighlightedItemSlot(SpriteBatch sb, Vector2 containerOffset, Point position, float uiScale, ItemStack stack)
+		private void DrawHighlightedItemSlot(GraphicsEngine gfx, Vector2 containerOffset, Point position, float uiScale, ItemStack stack)
 		{
 			Vector2 slotPos = GetSlotIndexPosition(containerOffset, position, uiScale);
 
-			sb.Draw(GameTextures.Slot, slotPos-new Vector2(1, 1), null, Color.White, 0, Vector2.Zero, uiScale, SpriteEffects.None, 0);
+			gfx.Sprite(gfx.Slot, slotPos-new Vector2(1, 1), null, Color.White, Rotation.Zero, Vector2.Zero, uiScale, SpriteEffects.None, 0);
 			if (!stack.Equals(ItemStack.Empty))
 			{
-				stack.Item?.Draw(sb, slotPos, UIScale);
+				stack.Item?.Draw(gfx, slotPos, UIScale);
 				if (stack.Quantity > 1)
-					DrawTextForStack(sb, slotPos, uiScale, stack.Quantity, Color.Black);
+					DrawTextForStack(gfx, slotPos, uiScale, stack.Quantity, Color.Black);
 			}
 
 		}
 
-		private void DrawOpenInventory(SpriteBatch sb)
+		private void DrawOpenInventory(GraphicsEngine gfx)
 		{
 			// the player's primary inventory
 
@@ -110,14 +111,25 @@ namespace CaveGame.Client
 					ItemStack stack = Container.GetItemStack(x, y);
 
 					if (IsHighlighted && HighlightedSlot.X == x && HighlightedSlot.Y == y)
-						DrawHighlightedItemSlot(sb, InventoryDrawPosition, new Point(x, y), UIScale, stack);
+                    {
+						DrawHighlightedItemSlot(gfx, InventoryDrawPosition, new Point(x, y), UIScale, stack);
+						if (!stack.Equals(ItemStack.Empty))
+                        {
+							string text = stack.Item.DisplayName;
+							Vector2 offset = gfx.Fonts.Arial16.MeasureString(text);
+							gfx.Text(gfx.Fonts.Arial16, text, InventoryDrawPosition + new Vector2(-(offset.X+10) , 20));
+                        }
+					}
+					
 					else
-						DrawItemSlot(sb, InventoryDrawPosition, new Point(x, y), UIScale, stack);
+						DrawItemSlot(gfx, InventoryDrawPosition, new Point(x, y), UIScale, stack);
 				}
 			}
+
+
 		}
 
-		private void DrawHotbar(SpriteBatch sb)
+		private void DrawHotbar(GraphicsEngine gfx)
 		{
 			// draw top of hotbar
 			for (int x = 0; x < Container.Width; x++)
@@ -125,34 +137,34 @@ namespace CaveGame.Client
 				ItemStack stack = Container.GetItemStack(x, 0);
 
 				if (IsHighlighted && HighlightedSlot.X == x)
-					DrawHighlightedItemSlot(sb, HotbarDrawPosition, new Point(x, 0), UIScale, stack);
+					DrawHighlightedItemSlot(gfx, HotbarDrawPosition, new Point(x, 0), UIScale, stack);
 				else
-					DrawItemSlot(sb, HotbarDrawPosition, new Point(x, 0), UIScale, stack);
+					DrawItemSlot(gfx, HotbarDrawPosition, new Point(x, 0), UIScale, stack);
 
 			}
 		}
 
-		private void DrawMouseHeldItem(SpriteBatch sb)
+		private void DrawMouseHeldItem(GraphicsEngine gfx)
         {
 			MouseState ms = Mouse.GetState();
 
-			DrawItemSlot(sb, ms.Position.ToVector2(), new Point(0, 0), UIScale, MouseHeldItem, true);
+			DrawItemSlot(gfx, ms.Position.ToVector2(), new Point(0, 0), UIScale, MouseHeldItem, true);
         }
 
-		public void Draw(SpriteBatch sb)
+		public void Draw(GraphicsEngine gfx)
 		{
 			if (Player == null)
 				return;
 
 			if (InventoryOpen)
-				DrawOpenInventory(sb);
+				DrawOpenInventory(gfx);
 			else
-				DrawHotbar(sb);
+				DrawHotbar(gfx);
 
 
 			if (MouseHeldItem!=null)
             {
-				DrawMouseHeldItem(sb);
+				DrawMouseHeldItem(gfx);
             }
 
 		}

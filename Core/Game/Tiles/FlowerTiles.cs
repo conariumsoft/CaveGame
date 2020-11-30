@@ -33,7 +33,7 @@ namespace CaveGame.Core.Game.Tiles
 
 		}
 
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 color)
 		{
 			SpriteEffects effects = SpriteEffects.None;
 			Vector2 position = new Vector2((Globals.TileSize * x) + (x % 3) - (y % 6), (Globals.TileSize * y));
@@ -42,7 +42,7 @@ namespace CaveGame.Core.Game.Tiles
 			{
 				effects = SpriteEffects.FlipHorizontally;
 			}
-			sb.Draw(tilesheet, position, TileMap.CryingLily, color.MultiplyAgainst(Color), 0, Vector2.Zero, Vector2.One, effects, 0);
+			GFX.Sprite(GFX.TileSheet, position, TileMap.CryingLily, color.MultiplyAgainst(Color), Rotation.Zero, Vector2.Zero, Vector2.One, effects, 0);
 			//base.Draw(tilesheet, sb, x, y, color);
 		}
 	}

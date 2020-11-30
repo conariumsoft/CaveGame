@@ -1,6 +1,7 @@
 ﻿#define UI_DEBUG
 
 
+using CaveGame.Core;
 using CaveGame.Core.LuaInterop;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -19,7 +20,7 @@ namespace CaveGame.Client.UI
 	public interface UIRootNode
 	{
 		void Update(GameTime gt);
-		void Draw(SpriteBatch sb);
+		void Draw(GraphicsEngine gfx);
 		List<UINode> Children { get; }
 		bool Visible { get; }
 		bool Active { get; }
@@ -144,21 +145,21 @@ namespace CaveGame.Client.UI
 		}
 
 		//[Conditional("UI_DEBUG")]
-		private void DrawAnchorPoint(SpriteBatch sb)
+		private void DrawAnchorPoint(GraphicsEngine gfx)
 		{
 
-			sb.Circle(new Color(0, 1, 0.0f), AbsolutePosition + (AnchorPoint*AbsoluteSize), 2);
+			gfx.Circle(new Color(0, 1, 0.0f), AbsolutePosition + (AnchorPoint*AbsoluteSize), 2);
 		}
 
-		public virtual void Draw(SpriteBatch sb)
+		public virtual void Draw(GraphicsEngine gfx)
 		{
 
-			sb.Rect(BGColor, AbsolutePosition, AbsoluteSize);
-			sb.OutlineRect(BorderColor, AbsolutePosition, AbsoluteSize, BorderSize);
-			DrawAnchorPoint(sb);
+			gfx.Rect(BGColor, AbsolutePosition, AbsoluteSize);
+			gfx.OutlineRect(BorderColor, AbsolutePosition, AbsoluteSize, BorderSize);
+			DrawAnchorPoint(gfx);
 			foreach (UINode child in Children)
 			{
-				child.Draw(sb);
+				child.Draw(gfx);
 			}
 		}
 
@@ -176,19 +177,9 @@ namespace CaveGame.Client.UI
 		public List<UINode> Children { get; }
 		public Vector2 AnchorPoint { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-		public Vector2 AbsoluteSize { 
-			get {
-				return new Vector2(GameGlobals.Width, GameGlobals.Height);
-			} 
-		}
+		public Vector2 AbsoluteSize { get; private set; }
 
-		public Vector2 AbsolutePosition
-		{
-			get
-			{
-				return Vector2.Zero;
-			}
-		}
+		public Vector2 AbsolutePosition=> Vector2.Zero;
 
 		public UICoords Position { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
@@ -229,11 +220,12 @@ namespace CaveGame.Client.UI
 			}
 		}
 
-		public virtual void Draw(SpriteBatch sb)
+		public virtual void Draw(GraphicsEngine gfx)
 		{
+			AbsoluteSize = gfx.WindowSize;
 			foreach (UINode child in Children)
 			{
-				child.Draw(sb);
+				child.Draw(gfx);
 			}
 		}
 

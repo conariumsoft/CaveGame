@@ -27,20 +27,29 @@ namespace CaveGame.Core
 			new UpdateDescription
 			{
 				VersionString = "2.2.0",
-				Date = "2020 November 13",
+				Date = "2020 November 27",
 				UpdateName = "Multiplayer Update 2",
-				Notes = new string[]{
-					"f",
-
-				},
+				
 				ChangeLog = new string[]{
+					"+ Added Biomes",
+					"+ Added Inventory",
+					"+ Added Itemstacks",
+					"+ Upgraded rendering code",
+					"+ Added loading screen",
+					"+ Added more settings",
+					"+ Menus are now lua scripts.",
+					"+ Many under-the-hood changes and upgrades",
+					"+ Added summon command",
 					"+ Added Entity Health Stat",
+					"+ Added a crash report system",
 					"+ Added Entity Status Effects",
 					"+ Liquids slow entities down, some even float.",
-					"+ Lava damages entities and inflicts Burning debuff",
-					"+ Fixed some UI bugs",
-
-				}
+					"+ Fixed numerous bugs"
+				},
+				Notes = new string[]{
+					"This version will be distributed to playtesters only.",
+					"2.2.1 will be released on Steam in one week."
+				},
 			},
 			new UpdateDescription
 			{

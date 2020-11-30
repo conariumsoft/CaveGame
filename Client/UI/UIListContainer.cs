@@ -1,4 +1,5 @@
 ﻿using CaveGame.Client.UI;
+using CaveGame.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -56,11 +57,11 @@ namespace CaveGame.Client.UI
 			ExpandSelected = false;
 		}
 
-		public void Draw(SpriteBatch sb)
+		public void Draw(GraphicsEngine GFX)
 		{
 			foreach (UINode child in Children)
 			{
-				child.Draw(sb);
+				child.Draw(GFX);
 			}
 		}
 

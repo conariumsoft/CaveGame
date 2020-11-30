@@ -23,24 +23,16 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using CaveGame.Core.Inventory;
 
 namespace CaveGame.Server
 {
-	public interface IPluginAPIServer
+	public interface IPluginAPIServer: IGameServer
 	{
+		DateTime Time { get; }
 		IMessageOutlet Output { get; }
 
-		DateTime Time { get; }
-
-
-		void Chat(string text);
-		void Chat(string text, Color color);
-		ServerWorld World { get; }
-
 	}
-
-	
-
 
 	public class ServerCommand
 	{
@@ -60,6 +52,8 @@ namespace CaveGame.Server
 
 	public class CommandEventArgs : LuaEventArgs
     {
+
+		public Player Sender { get; set; }
 		public string Command { get; private set; }
 		public List<string> Arguments { get; private set; }
 
@@ -68,7 +62,13 @@ namespace CaveGame.Server
 			Command = cmd;
 			Arguments = args;
         }
-    }
+		public CommandEventArgs(string cmd, List<string> args, Player player)
+		{
+			Command = cmd;
+			Arguments = args;
+			Sender = player;
+		}
+	}
 
 	public class PlayerChatMessageEventArgs : LuaEventArgs
     {
@@ -90,10 +90,15 @@ namespace CaveGame.Server
         }
     }
 
-	public static class EntityManager
+
+
+
+	public class EntityManager : IEntityManager
     {
+		public EntityManager() { }
+
 		static int entityNetworkID;
-		public static int GetNextEntityNetworkID()
+		public int GetNextEntityNetworkID()
         {
 			var current = entityNetworkID;
 			entityNetworkID++;
@@ -103,6 +108,8 @@ namespace CaveGame.Server
 
 	public class GameServer : IPluginAPIServer, IGameServer
 	{
+
+		
 
 		public LuaEvent<PlayerEventArgs> OnPlayerJoinedServer = new LuaEvent<PlayerEventArgs>();
 		public LuaEvent<PlayerEventArgs> OnPlayerLeftServer = new LuaEvent<PlayerEventArgs>();
@@ -168,15 +175,22 @@ namespace CaveGame.Server
 		}
 		
 
+		public EntityManager EntityManager { get; private set; }
 		public int TickRate { get; private set; }
 		public List<User> ConnectedUsers { get; private set; }
+
+		
+
 		public ServerWorld World { get; private set; }
 		public string ServerName { get; private set; }
 		public string ServerMOTD { get; private set; }
 		public int MaxPlayers { get; private set; }
+		
 
-		float ticker;
+        float ticker;
 
+		IEntityManager IGameServer.EntityManager => EntityManager;
+		IServerWorld IGameServer.World => World;
 
 		public void SpawnEntity(IEntity entity)
 		{
@@ -199,7 +213,9 @@ namespace CaveGame.Server
 			World = new ServerWorld(new WorldConfiguration { Name = config.World, Seed = 420 });
 			World.Server = this;
 
+			EntityManager = new EntityManager();
 			PluginManager = new PluginManager();
+			
 		}
 
 		
@@ -246,6 +262,8 @@ namespace CaveGame.Server
 			Chat(text);
 			Output?.Out(String.Format("[{0} {1}] {2}", "server", DateTime.Now.ToString("HH:mm:ss.ff"), text));
 		}
+
+
 
 		#region NetworkListenerMethods
 		private void OnServerInfoRequested(NetworkMessage msg)
@@ -403,7 +421,8 @@ namespace CaveGame.Server
 
 			if (packet.Item == ThrownItem.Bomb)
 			{
-				Bomb bomb = new Bomb {
+                Core.Game.Entities.Bomb bomb = new Core.Game.Entities.Bomb
+                {
 					Velocity = packet.ThrownDirection.ToUnitVector() * bombVelocity,
 					Position = p.Position,
 					NextPosition = p.NextPosition,
@@ -486,6 +505,64 @@ namespace CaveGame.Server
 			
         }
 
+		private void OnAdminCommandInput(NetworkMessage msg, User user)
+        {
+			AdminCommandPacket packet = new AdminCommandPacket(msg.Packet.GetBytes());
+
+			//Debug.WriteLine("GOT ADMIN COMMAND {0} {1}", packet.Command, packet.PlayerNetworkID);
+
+			var player = (Player)World.FindEntityOfID(packet.PlayerNetworkID);
+
+			if (packet.Command == "sv_summon")
+            {
+				Vector2 spawnPos = player.NextPosition;
+				if (packet.Arguments.Length > 0)
+                {
+					if (packet.Arguments[0] == "wurmhole")
+                    {
+						var wurm = new Wurmhole();
+						wurm.EntityNetworkID = EntityManager.GetNextEntityNetworkID();
+						
+
+
+						if (packet.Arguments.Length == 3)
+                        {
+							bool xSuccess = Single.TryParse(packet.Arguments[1], out float x);
+							bool ySuccess = Single.TryParse(packet.Arguments[2], out float y);
+							if (xSuccess && ySuccess)
+								spawnPos = new Vector2(x, y);
+                        }
+						wurm.NextPosition = spawnPos;
+						World.Entities.Add(wurm);
+						SendToAll(new SpawnWurmholeEntityPacket(wurm.EntityNetworkID));
+
+						return;
+                    }
+					if (packet.Arguments[0] == "bomb")
+					{
+						var bomb = new Core.Game.Entities.Bomb();
+						bomb.EntityNetworkID = EntityManager.GetNextEntityNetworkID();
+
+
+
+						if (packet.Arguments.Length == 3)
+						{
+							bool xSuccess = Single.TryParse(packet.Arguments[1], out float x);
+							bool ySuccess = Single.TryParse(packet.Arguments[2], out float y);
+							if (xSuccess && ySuccess)
+								spawnPos = new Vector2(x, y);
+						}
+						bomb.NextPosition = spawnPos;
+						World.Entities.Add(bomb);
+						SendToAll(new SpawnBombEntityPacket(bomb.EntityNetworkID));
+
+						return;
+					}
+				}
+            }
+
+        }
+
 		#endregion
 
 		private void ReadIncomingPackets()
@@ -533,6 +610,8 @@ namespace CaveGame.Server
 					OnPlayerClosesDoor(msg, user);
 				if (msg.Packet.Type == PacketType.DamageTile)
 					OnPlayerDamageTile(msg, user);
+				if (msg.Packet.Type == PacketType.AdminCommand)
+					OnAdminCommandInput(msg, user);
 			}
 		}
 
@@ -586,6 +665,25 @@ namespace CaveGame.Server
 				ticker = 0;
 				foreach(var entity in World.Entities)
 				{
+					if (entity is Wurmhole wurmhole && !entity.Dead)
+                    {
+						var pos = new EntityPositionPacket(wurmhole.EntityNetworkID,
+							wurmhole.Position.X, wurmhole.Position.Y,
+							wurmhole.Velocity.X, wurmhole.Velocity.Y,
+							wurmhole.NextPosition.X, wurmhole.NextPosition.Y);
+						SendToAll(pos);
+
+
+						// TODO: remove dipshit hack;
+						if (wurmhole.Triggered)
+                        {
+							if (wurmhole.TriggerNetworkHandled == false)
+                            {
+								wurmhole.TriggerNetworkHandled = true;
+								SendToAll(new TriggerWurmholeEntityPacket(wurmhole.EntityNetworkID));
+                            }
+                        }
+					}
 
 					if (entity is Player player)
 					{
@@ -596,7 +694,7 @@ namespace CaveGame.Server
 						//Output?.Out("DT_OUT: " + pos.ToString());
 						SendToAll(pos);
 					}
-					if (entity is Bomb bomb && !entity.Dead)
+					if (entity is Core.Game.Entities.Bomb bomb && !entity.Dead)
 					{
 						var pos = new EntityPositionPacket(bomb.EntityNetworkID,
 							bomb.Position.X, bomb.Position.Y,

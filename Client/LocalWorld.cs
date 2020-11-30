@@ -31,8 +31,16 @@ namespace CaveGame.Client
 		protected DelayedTask localTileUpdateTask;
 		protected DelayedTask localLightingUpdateTask;
 
-		public LocalWorld() : base()
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+		public GameClient Client { get; set; }
+
+        public LocalWorld(GameClient client) : base()
 		{
+			Client = client;
 			localTileUpdateTask = new DelayedTask(ApplyVisualTileUpdates, 1 / 10.0f);
 			localLightingUpdateTask = new DelayedTask(GetLatestDataFromLightingThread, 1 / 20.0f);
 			ParticleSystem = new ParticleEmitter(this);
@@ -40,6 +48,7 @@ namespace CaveGame.Client
 			RequestedChunks = new List<ChunkCoordinates>();
 			LoadedChunks = new List<ChunkCoordinates>();
 			Lighting.On();
+			Tile.InitializeManager(420);
 		}
 
 
@@ -144,7 +153,7 @@ namespace CaveGame.Client
 
 
 			foreach (IEntity entity in Entities)
-				entity.ClientUpdate(this, gt);
+				entity.ClientUpdate(Client, gt);
 				
 
 			base.Update(gt);

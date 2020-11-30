@@ -9,7 +9,7 @@
     <Import_RootNamespace>CaveGame.Client</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Assets.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSounds.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DebugTools\ChunkGridLineRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\LocalPlayer.cs" />
@@ -18,25 +18,23 @@
     <Compile Include="$(MSBuildThisFileDirectory)InputManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Input\KeyPressDetector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\Multiplayer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Menu\TimeoutMenu.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DebugTools\NetGraph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ISteamManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameChat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LightingEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CommandBar\CommandBar.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DebugTools\FPSGraph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DebugTools\FrameCounter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LocalWorld.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Menu\Credits.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\UITheme.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Particles\ParticleEmitter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NetworkClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IGameContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PauseMenu.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Splash.cs" />
     <Compile Include="..\Client\Menu\MenuManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PlayerContainerFrontend.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Renderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Label.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\NineSlice.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Slider.cs" />

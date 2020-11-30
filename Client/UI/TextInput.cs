@@ -75,15 +75,25 @@ namespace CaveGame.Client.UI
 
 		}
 
+		public void BlacklistCharacter(char block)
+        {
+			BlacklistedCharacters.Add(block);
+        }
+		public void BlacklistCharacter(string block)
+		{
+			BlacklistedCharacters.Add(block[0]);
+		}
+
 		public void OnTextInput(object sender, TextInputEventArgs args)
 		{
 			if (Focused)
 			{
-				
 
 				if (BlacklistedCharacters.Contains(args.Character))
 					return;
 
+				if (args.Key == Keys.Tab)
+					return;
 
 				if (args.Key == Keys.Enter)
 				{

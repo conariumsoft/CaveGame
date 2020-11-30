@@ -50,6 +50,7 @@ namespace CaveGame.Server
 			serverTileUpdateTask = new DelayedTask(ApplyTileUpdates, 1 / 10.0f);
 			serverRandomTileUpdateTask = new DelayedTask(ApplyRandomTileTicksToLoadedChunks, 1 / 5.0f);
 			Generator = new Generator(WorldSeed);
+			Tile.InitializeManager(WorldSeed);
 		}
 
 
@@ -58,12 +59,12 @@ namespace CaveGame.Server
 			WorldName = config.Name;
 			WorldSeed = config.Seed;
 
-			CreateDirectoryIfNull(@"Worlds");
-			CreateDirectoryIfNull(@"Worlds\" + WorldName);
-			CreateDirectoryIfNull(@"Worlds\" + WorldName + @"\Chunks");
+			CreateDirectoryIfNull("Worlds");
+			CreateDirectoryIfNull(Path.Combine("Worlds",  WorldName));
+			CreateDirectoryIfNull(Path.Combine("Worlds", WorldName, "Chunks"));
 
 			// Serialize world info into file.
-			XmlWriter worldXml = XmlWriter.Create(@"Worlds\" + WorldName + @"\WorldMetadata.xml");
+			XmlWriter worldXml = XmlWriter.Create(Path.Combine("Worlds", WorldName, @"\WorldMetadata.xml"));
 			worldXml.WriteStartDocument();
 			worldXml.WriteStartElement("Metadata");
 
@@ -82,7 +83,7 @@ namespace CaveGame.Server
 			
 
 			XmlDocument worldmeta = new XmlDocument();
-			worldmeta.Load(@"Worlds\" + worldname + @"\WorldMetadata.xml");
+			worldmeta.Load(Path.Combine("Worlds",  worldname, @"WorldMetadata.xml"));
 
 			WorldName = worldname;
 			WorldSeed = Int32.Parse(worldmeta["Metadata"]["Seed"].InnerText);
@@ -99,7 +100,7 @@ namespace CaveGame.Server
 			foreach(var kvp in Chunks)
 			{
 				Chunk chunk = kvp.Value;
-				File.WriteAllBytes(@"Worlds\" + WorldName + @"\Chunks\" + kvp.Key.GetHashCode(), chunk.ToData());
+				File.WriteAllBytes(Path.Combine("Worlds", WorldName, "Chunks", kvp.Key.GetHashCode().ToString()), chunk.ToData());
 			}
 
 
@@ -113,7 +114,7 @@ namespace CaveGame.Server
 
 		private bool HasChunkOnFile(ChunkCoordinates coords)
 		{
-			return File.Exists(@"Worlds\" + WorldName + @"\Chunks\" + coords.GetHashCode());
+			return File.Exists(Path.Combine"Worlds\" + WorldName + @"\Chunks\" + coords.GetHashCode());
 		}
 
 		private Chunk RetrieveChunkFromFile(ChunkCoordinates coords)
@@ -326,7 +327,7 @@ namespace CaveGame.Server
 			
 
 			foreach (var ent in Entities.ToArray())
-				ent.ServerUpdate(this, gt);
+				ent.ServerUpdate(Server, gt);
 				
 
 			base.Update(gt);

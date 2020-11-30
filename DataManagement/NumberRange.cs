@@ -25,7 +25,8 @@ namespace DataManagement
 
     public struct IntegerRange : IRange<int>
     {
-        public static IntegerRange PercentInterval = new IntegerRange(0, 100);
+        public static IntegerRange I_PercentInterval = new IntegerRange(0, 100);
+
 
         public bool Inclusive { get; private set; }
         public int LowerLimit { get; private set; }

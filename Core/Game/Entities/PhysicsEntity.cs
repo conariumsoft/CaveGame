@@ -18,7 +18,7 @@ namespace CaveGame.Core.Game.Entities
 	public abstract class PhysicsEntity : Entity, IPhysicsObject, IPositional, IVelocity, INextPosition, IBoundingBox, IFriction
 	{
 
-		public Vector2 TopLeft
+		public virtual Vector2 TopLeft
 		{
 			get { return Position - BoundingBox; }
 		}

@@ -37,11 +37,9 @@ namespace CaveGame.Core.Inventory
 		int MaxStack { get; }
 		string Name { get; }
 #if CLIENT
-		void Draw(SpriteBatch sb, Vector2 position, float scale);
+		void Draw(GraphicsEngine GFX, Vector2 position, float scale);
 #endif
 	}
-
-
 
 	public class Item : IItem
 	{
@@ -59,7 +57,12 @@ namespace CaveGame.Core.Inventory
 
 		public virtual int MaxStack => 99;
 		public virtual string Name => this.GetType().Name;
-		public virtual void Draw(SpriteBatch sb, Vector2 position, float scale) { }
+		public virtual string DisplayName => Name;
+		public void Draw(GraphicsEngine GFX, Texture2D texture, Vector2 position, float scale)
+		{
+			GFX.Sprite(texture, position, null, Color.Gray, Rotation.Zero, Vector2.Zero, scale, SpriteEffects.None, 0);
+		} // pseudo- default draw
+		public virtual void Draw(GraphicsEngine GFX, Vector2 position, float scale) {}
 		public virtual void OnClientLMBDown(Player player, IGameClient client, ItemStack stack) { }
 		public virtual void OnClientLMBUp(Player player, IGameClient client) {}
 		public virtual void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt) { }
@@ -82,6 +85,17 @@ namespace CaveGame.Core.Inventory
 
 		public static Item FromName(string name)
 		{
+			if (name.StartsWith("TileItem"))
+            {
+				var tilename = name.Substring(9);
+				return new TileItem(Tile.FromName(tilename));
+            }
+			if (name.StartsWith("WallItem"))
+            {
+				var wallname = name.Substring(9);
+				return new WallItem(Wall.FromName(wallname));
+            }
+
 			var basetype = typeof(Item);
 			var types = basetype.Assembly.GetTypes().Where(type => type.IsSubclassOf(basetype));
 
@@ -109,17 +123,13 @@ namespace CaveGame.Core.Inventory
 
 	}
 
-
-	public interface IGameClient
-	{
-		Camera2D Camera { get; }
-		void Send(Packet p);
-		IGameWorld World { get; }
-	}
-
 	public class GenericPickaxe : Item
 	{
 		public virtual float SwingTime => 0.15f;
+		public virtual byte Strength => 2;
+		public virtual Color Tint => Color.Gray;
+
+		public virtual float Size => 1.0f;
 
 		public float swingingTimer;
 
@@ -154,15 +164,41 @@ namespace CaveGame.Core.Inventory
 				}
 			}
 		}
-		public override void Draw(SpriteBatch sb, Vector2 position, float scale)
+		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale)
 		{
-#if CLIENT
-
-			sb.Draw(ItemTextures.PickaxeNew, position, null, Color.Gray, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
-#endif
+			GFX.Sprite(GFX.PickaxeNew, position+new Vector2(8*scale, 8*scale), null, Tint, Rotation.Zero, new Vector2(8, 8), scale* Size, SpriteEffects.None, 0);
 		}
+
 	}
 
+	public class CopperPickaxe : GenericPickaxe
+    {
+        public override string DisplayName => "Copper Pickaxe";
+        public override Color Tint => new Color(1.0f, 0.7f, 0.2f);
+        public override float SwingTime => 0.2f;
+        public override byte Strength => 2;
+        public override float Size => 0.8f;
+    }
+
+	public class LeadPickaxe : GenericPickaxe
+	{
+		public override string DisplayName => "Lead Pickaxe";
+		public override Color Tint => new Color(0.3f, 0.3f, 0.4f);
+		public override float SwingTime => 0.4f;
+		public override byte Strength => 12;
+		public override float Size => 1.25f;
+	}
+
+	public class IronPickaxe : GenericPickaxe
+	{
+		public override string DisplayName => "Iron Pickaxe";
+		public override Color Tint => new Color(0.75f, 0.5f, 0.4f);
+		public override float SwingTime => 0.3f;
+		public override byte Strength => 6;
+	}
+
+
+	// TODO: Make walls break
 	public class GenericWallScraper : Item
 	{
 		public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
@@ -183,21 +219,15 @@ namespace CaveGame.Core.Inventory
 				client.World.SetWall(x, y, new Game.Walls.Air());
 			}
 		}
-		public override void Draw(SpriteBatch sb, Vector2 position, float scale)
-		{
-#if CLIENT
-
-			sb.Draw(ItemTextures.WallScraper, position, null, Color.Red, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
-#endif
-		}
+		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale) => Draw(GFX, GFX.WallScraper, position, scale);
 	}
 
 	public class WallItem : Item
 	{
 		public override int MaxStack => 999;
 
-		public string DisplayName => Wall.WallName;
-
+		public override string DisplayName => Wall.WallName + " Wall";
+		public override string Name => "WallItem:" + Wall.WallName;
 		public Wall Wall;
 
 
@@ -235,13 +265,9 @@ namespace CaveGame.Core.Inventory
 			return fatass;
 		}
 
-		public override void Draw(SpriteBatch sb, Vector2 position, float scale)
+		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale)
 		{
-			Texture2D tex = null;
-#if CLIENT
-			tex = GameTextures.TileSheet;
-#endif
-			sb.Draw(tex, position, Wall.Quad, Wall.Color, 0, Vector2.Zero, scale * 2, SpriteEffects.None, 0);
+			GFX.Sprite(GFX.TileSheet, position + (new Vector2(1.5f, 1.5f) * scale * 1.5f), Wall.Quad, Wall.Color, Rotation.Zero, Vector2.Zero, scale * 1.5f, SpriteEffects.None, 0);
 		}
 
 	}
@@ -249,8 +275,10 @@ namespace CaveGame.Core.Inventory
 	public class TileItem : Item
 	{
 		public override int MaxStack => 999;
-		public string DisplayName => Tile.TileName;
-		
+		public override string DisplayName => Tile.TileName + " Block";
+
+		public override string Name => "TileItem:" + Tile.TileName;
+
 		public Tile Tile;
 
 
@@ -292,13 +320,9 @@ namespace CaveGame.Core.Inventory
 			return fatass;
         }
 
-        public override void Draw(SpriteBatch sb, Vector2 position, float scale)
+        public override void Draw(GraphicsEngine GFX, Vector2 position, float scale)
 		{
-			Texture2D tex = null;
-#if CLIENT
-			tex = GameTextures.TileSheet;
-#endif
-			sb.Draw(tex, position+(new Vector2(1.5f, 1.5f)*scale*1.5f), Tile.Quad, Tile.Color, 0, Vector2.Zero, scale*1.5f, SpriteEffects.None, 0);
+			GFX.Sprite(GFX.TileSheet, position+(new Vector2(1.5f, 1.5f)*scale*1.5f), Tile.Quad, Tile.Color, Rotation.Zero, Vector2.Zero, scale*1.5f, SpriteEffects.None, 0);
 		}
 	}
 
@@ -324,12 +348,7 @@ namespace CaveGame.Core.Inventory
 
 
 
-#if CLIENT
-		public override void Draw(SpriteBatch sb, Vector2 position, float scale)
-		{
-			sb.Draw(ItemTextures.Bomb, position, null, Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
-		}
-#endif
+		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale) => Draw(GFX, GFX.BombSprite, position, scale);
 	}
 
 
@@ -341,12 +360,10 @@ namespace CaveGame.Core.Inventory
 
 		public virtual Color Color { get; }
 
-#if CLIENT
-		public override void Draw(SpriteBatch sb, Vector2 position, float scale)
+		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale)
 		{
-			sb.Draw(ItemTextures.Ingot, position, null, Color, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+			GFX.Sprite(GFX.Ingot, position, null, Color, Rotation.Zero, Vector2.Zero, scale, SpriteEffects.None, 0);
 		}
-#endif
 	}
 
 	public class CopperIngot: Ingot {
@@ -406,17 +423,13 @@ namespace CaveGame.Core.Inventory
 	public class TopHat { }
 	public class ArmyHelmet { }
 	public class NordicHelm { }
-
-
 	public class PhilosopherStone { }
 	public class PoisonVial { }
-
 	public class ShoeSpikes { }
 	public class Jetpack { }
 	public class ExoskelHead { }
 	public class ExoskelTorso { }
 	public class ExoskelLegs { }
-
 	public class GrassSeeds { }
 	public class Bucket { }
 	public class WaterBucket { }

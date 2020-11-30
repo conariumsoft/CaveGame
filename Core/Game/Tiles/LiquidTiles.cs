@@ -162,10 +162,10 @@ namespace CaveGame.Core.Game.Tiles
 		public override Color Color => Color.Red;
 		public override void Drop(IGameServer server, IGameWorld world, Point tilePosition) { }
 
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 light)
+		public override void Draw(GraphicsEngine gfx, int x, int y, Light3 light)
 		{
 			var rect = new Rectangle(0, 15 * Globals.TileSize, Globals.TileSize, TileState);
-			sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, (y * Globals.TileSize) + (8 - TileState)), rect, light.MultiplyAgainst(Color.Red));
+			gfx.Sprite(gfx.TileSheet, new Vector2(x * Globals.TileSize, (y * Globals.TileSize) + (8 - TileState)), rect, light.MultiplyAgainst(Color));
 		}
 
 		public override float Viscosity => 1.06f;
@@ -220,13 +220,13 @@ namespace CaveGame.Core.Game.Tiles
 		public override float Viscosity => 1.04f;
 		public Water() { TileState = 8; }
 
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 light)
+		public override void Draw(GraphicsEngine gfx, int x, int y, Light3 light)
 		{
 
 			float brug = Math.Max(0.5f, (1 - (light.Blue / 16.0f)) * 2.0f);
 
 			var rect = new Rectangle(0, 15 * Globals.TileSize, Globals.TileSize, TileState);
-			sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, (y * Globals.TileSize) + (8 - TileState)), rect, light.MultiplyAgainst(Color.Blue) * brug);
+			gfx.Sprite(gfx.TileSheet, new Vector2(x * Globals.TileSize, (y * Globals.TileSize) + (8 - TileState)), rect, light.MultiplyAgainst(Color.Blue) * brug);
 		}
 
 		public void TileUpdate(IGameWorld world, int x, int y)
@@ -246,11 +246,11 @@ namespace CaveGame.Core.Game.Tiles
 		public Sludge() { TileState = 8; }
 		public Light3 Light => new Light3(14, 32, 8);
 
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 light)
+		public override void Draw(GraphicsEngine gfx, int x, int y, Light3 light)
 		{
 
 			var rect = new Rectangle(0, 15 * Globals.TileSize, Globals.TileSize, TileState);
-			sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, (y * Globals.TileSize) + (8 - TileState)), rect, light.MultiplyAgainst(new Color(0.6f, 0.9f, 0.3f)));
+			gfx.Sprite(gfx.TileSheet, new Vector2(x * Globals.TileSize, (y * Globals.TileSize) + (8 - TileState)), rect, light.MultiplyAgainst(new Color(0.6f, 0.9f, 0.3f)));
 		}
 
 		public void LocalTileUpdate(IGameWorld world, int x, int y)

@@ -74,14 +74,14 @@ namespace CaveGame.Core
 
 		public Color[] SkyColors =
 		{
-			new Color(0, 5, 12), new Color(0, 10, 64), //0 or 24
-			new Color(5, 10, 12), new Color(10, 20, 92), //2
-			new Color(32, 32, 32), new Color(48, 48, 130), //4
-			new Color(35, 30, 51), new Color(76, 50, 150),  //6
+			new Color(0, 2, 6), new Color(5, 5, 30), //0 or 24
+			new Color(2, 2, 10), new Color(16, 16, 40), //2
+			new Color(2, 2, 10), new Color(20, 20, 45), //4
+			new Color(8, 9, 50), new Color(85, 85, 40),  //6
 			new Color(40, 60, 90), new Color(90, 90, 190), //8
 			new Color(70, 90, 130), new Color(110, 110, 230), //10
-			new Color(70, 80, 170), new Color(150, 150, 255), //12
-			new Color(80, 100, 140), new Color(110, 110, 220), //14
+			new Color(70, 80, 170), new Color(170, 170, 255), //12
+			new Color(80, 100, 140), new Color(140, 140, 250), //14
 			new Color(35, 41, 60), new Color(60, 80, 140), //14
 			new Color(50, 32, 50), new Color(170, 100, 70), // 18
 			new Color(25, 25, 55), new Color(92, 52, 23), //20

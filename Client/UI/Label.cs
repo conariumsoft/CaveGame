@@ -9,19 +9,7 @@ using System.Text;
 
 namespace CaveGame.Client.UI
 {
-	public enum TextXAlignment
-	{
-		Left,
-		Center,
-		Right
-	}
-	public enum TextYAlignment
-	{
-		Top,
-		Center,
-		Bottom,
-		
-	}
+	
 
 
 	public interface ITextInputListener
@@ -88,8 +76,14 @@ namespace CaveGame.Client.UI
 			BackgroundTextColor = Color.Gray;
 		}
 
-		
 
+		public TextInputLabel(NLua.Lua state, NLua.LuaTable table) : base(state, table)
+		{
+			Input = new TextInput();
+			TextInputManager.ListenTextInput += Input.OnTextInput;
+
+			Selected = false;
+		}
 
 		private bool IsMouseInside(MouseState mouse)
 		{
@@ -129,7 +123,7 @@ namespace CaveGame.Client.UI
 			base.Update(gt);
 		}
 
-		public override void Draw(SpriteBatch sb)
+		public override void Draw(GraphicsEngine GFX)
 		{
 			Vector2 textDim = Font.MeasureString(BackgroundText);
 			Vector2 TextOutputPosition = AbsolutePosition;
@@ -159,7 +153,7 @@ namespace CaveGame.Client.UI
 			
 			if (Input.SpecialSelection)
 			{
-				base.Draw(sb, false);
+				base.Draw(GFX, true);
 				var beforeText = Input.GetScissorTextBefore();
 				var middleText = Input.GetScissorTextDuring();
 				var afterText = Input.GetScissorTextAfter();
@@ -169,18 +163,18 @@ namespace CaveGame.Client.UI
 				//sb.Rect(Color.Blue, TextOutputPosition + new Vector2(start.X, 0), end);
 
 				// first section
-				sb.Print(Font, TextColor, TextOutputPosition,  beforeText);
-				sb.Print(Font, Color.Black, TextOutputPosition + new Vector2(start.X, 0), middleText);
-				sb.Print(Font, TextColor, TextOutputPosition + new Vector2(start.X + end.X, 0), afterText);
+				GFX.Text(Font, beforeText, TextOutputPosition, TextColor);
+				GFX.Text(Font, middleText, TextOutputPosition + new Vector2(start.X, 0),  Color.Black);
+				GFX.Text(Font, afterText , TextOutputPosition + new Vector2(start.X + end.X, 0), TextColor);
 			} else
 			{
-				base.Draw(sb, false);
+				base.Draw(GFX, false);
 				//sb.Print(Font, TextColor, TextOutputPosition, Input.InputBuffer);
 			}
 			
 			if (Input.InputBuffer == "")
 			{
-				sb.Print(Font, BackgroundTextColor, TextOutputPosition, BackgroundText);
+				GFX.Text(Font, BackgroundText , TextOutputPosition, BackgroundTextColor);
 			}
 		}
 	}
@@ -261,15 +255,17 @@ namespace CaveGame.Client.UI
 			return Font.MeasureString(Text);
 		}
 
-		public void Draw(SpriteBatch sb, bool TextOverride)
+		public void Draw(GraphicsEngine GFX, bool TextOverride)
 		{
-			base.Draw(sb);
+			base.Draw(GFX);
 			if (TextOverride)
 				return;
 
 
 
-			string DisplayedText = Text;
+			string DisplayedText = "";
+			if (Text!=null)
+				DisplayedText = Text;
 			if (TextWrap)
 				DisplayedText = WrapText(Font, Text, AbsoluteSize.X);
 
@@ -295,12 +291,12 @@ namespace CaveGame.Client.UI
 				TextOutputPosition += new Vector2(0, AbsoluteSize.Y - textDim.Y);
 			}
 			TextOutputPosition.Floor();
-			sb.Print(Font, TextColor, TextOutputPosition, DisplayedText);
+			GFX.Text(Font, DisplayedText, TextOutputPosition, TextColor);
 		}
 
-		public override void Draw(SpriteBatch sb)
+		public override void Draw(GraphicsEngine GFX)
 		{
-			Draw(sb, false);
+			Draw(GFX, false);
 		}
 	}
 }

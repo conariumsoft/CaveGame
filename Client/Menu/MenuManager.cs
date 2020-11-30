@@ -14,7 +14,13 @@ using CaveGame.Core.LuaInterop;
 
 namespace CaveGame.Client.Menu
 {
-
+	public static class EnumExtensions
+    {
+		public static int ToInt(this GameChatSize e)
+        {
+			return (int)e;
+        }
+    }
 	public class MenuManager : IGameContext
 	{
 
@@ -37,6 +43,8 @@ namespace CaveGame.Client.Menu
             }
 		}
 
+		public string TimeoutMessage { get; set; }
+
 
 		public MenuManager(CaveGameGL _game)
 		{
@@ -44,11 +52,11 @@ namespace CaveGame.Client.Menu
 			Game = _game;
 		}
 
-		public void Draw(SpriteBatch sb)
+		public void Draw(GraphicsEngine GFX)
 		{
-			sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointWrap);
-			CurrentPage?.Draw(sb);
-			sb.End();
+			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointWrap);
+			CurrentPage?.Draw(GFX);
+			GFX.End();
 		}
 
 
@@ -64,6 +72,35 @@ namespace CaveGame.Client.Menu
 			luastate.DoFile(Path.Combine("Assets", "Scripts", "menu.lua"));
 		}
 
+
+		// Temporary solution until I figure out generics within lua
+		public Slider<SliderIndex<int>> GetFPSCapSlider()
+        {
+			return new UI.Slider<SliderIndex<int>>
+			{
+				DataSet = GameSettings.FramerateCapSliderOptions,
+				Size = new UICoords(0, 25, 0.5f, 0),
+				AnchorPoint = new Vector2(0.0f, 0.0f),
+				UnselectedBGColor = new Color(0.6f, 0.6f, 0.6f),
+				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
+				Scrubber = new Scrubber{ Width = 20 },
+				BGColor = new Color(0.25f, 0.25f, 0.25f),
+			};
+		}
+
+		public Slider<SliderIndex<GameChatSize>> GetChatSizeSlider()
+        {
+			return new UI.Slider<SliderIndex<GameChatSize>>
+			{
+				DataSet = GameSettings.ChatSizeSliderOptions,
+				Size = new UICoords(0, 25, 0.5f, 0),
+				AnchorPoint = new Vector2(0.0f, 0.0f),
+				UnselectedBGColor = new Color(0.6f, 0.6f, 0.6f),
+				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
+				Scrubber = new Scrubber { Width = 20 },
+				BGColor = new Color(0.25f, 0.25f, 0.25f),
+			};
+		}
 /*
 		private void ConstructSingleplayerMenu()
 		{

@@ -171,10 +171,10 @@ ScrollWheel - Change selected Tile/Wall
 		private void Menu_Exit(object sender, RoutedEventArgs e) { this.Close(); }
 		private void Menu_Undo(object sender, RoutedEventArgs e) { ViewModel.ActionUndo(); }
 		private void Menu_Redo(object sender, RoutedEventArgs e) { ViewModel.ActionRedo(); }
-		private void Menu_Copy(object sender, RoutedEventArgs e) { }
-		private void Menu_Cut(object sender, RoutedEventArgs e) { }
+		private void Menu_Copy(object sender, RoutedEventArgs e) { ViewModel.ActionCopySelection(); }
+		private void Menu_Cut(object sender, RoutedEventArgs e) { ViewModel.ActionCutSelection(); }
 		private void Menu_Delete(object sender, RoutedEventArgs e) { }
-		private void Menu_Paste(object sender, RoutedEventArgs e) { }
+		private void Menu_Paste(object sender, RoutedEventArgs e) { ViewModel.ActionPasteSelection(); }
 		private void Menu_SelectAll(object sender, RoutedEventArgs e) { }
 		private void Menu_Resize(object sender, RoutedEventArgs e)
 		{
@@ -221,8 +221,6 @@ ScrollWheel - Change selected Tile/Wall
 
 		private void MonoGameContentControl_KeyDown(object sender, KeyEventArgs e)
 		{
-			if (e.Key == Key.Escape)
-				MessageBox.Show("There is no escape.");
 			ViewModel.MGCC_KeyDown(sender, e);
 
 		}

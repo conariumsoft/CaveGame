@@ -8,6 +8,7 @@ using CaveGame;
 using CaveGame.Core.LuaInterop;
 using NLua;
 using System.Diagnostics;
+using CaveGame.Core;
 
 namespace CaveGame.Client.UI
 {
@@ -104,9 +105,9 @@ namespace CaveGame.Client.UI
 			base.Update(gt);
 		}
 
-		public override void Draw(SpriteBatch sb)
+		public override void Draw(GraphicsEngine GFX)
 		{
-			base.Draw(sb);
+			base.Draw(GFX);
 		}
 	}
 }

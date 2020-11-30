@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using CaveGame.Core.Generic;
 
 #if CLIENT
 using CaveGame.Client;
@@ -114,26 +115,29 @@ namespace CaveGame.Core.Game.Entities
 			base.PhysicsStep(world, step);
 		}
 
-		public override void ServerUpdate(IServerWorld world, GameTime gt)
+		public override void ServerUpdate(IGameServer server, GameTime gt)
 		{
 			detonationCountdown -= (float)gt.ElapsedGameTime.TotalSeconds;
 
 
 			if (detonationCountdown <= 0)
-				Explode(world);
+				Explode(server.World);
 
-			base.ServerUpdate(world, gt);
+			base.ServerUpdate(server, gt);
 		}
 
-		public void ServerPhysicsTick(IServerWorld world, float step)
-		{
-			PhysicsStep(world, step);
-		}
-#if CLIENT
-		public override void Draw(SpriteBatch sb)
-		{
-			sb.Draw(ItemTextures.Bomb, TopLeft, null, Color.White, 0, new Vector2(0, 0), 0.75f, SpriteEffects.None, 0);
-		}
-#endif
+		public void ServerPhysicsTick(IServerWorld world, float step) => PhysicsStep(world, step);
+
+		public override void Draw(GraphicsEngine gfx) => gfx.Sprite(
+			texture: gfx.BombSprite,
+			position: TopLeft,
+			quad: null,
+			color: Color.White,
+			rotation: Rotation.Zero,
+			origin: Vector2.Zero,
+			scale: 0.75f,
+			efx: SpriteEffects.None,
+			layer: 0
+		);
     }
 }

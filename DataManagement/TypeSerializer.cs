@@ -45,6 +45,26 @@ namespace DataManagement
         public static void WriteFloat(this byte[] data, int index, float value) => FromFloat(ref data, index, value);
         public static double ReadDouble(this byte[] data, int index) => ToDouble(data, index);
         public static void WriteDouble(this byte[] data, int index, double value) => FromDouble(ref data, index, value);
+        public static string ReadString(this byte[] data, int index, int length, Encoding encoder) => ToString(encoder, data, index, length);
+
+
+
+        public static void WriteString(this byte[] data, int index, string msg, Encoding encoder, int length) => FromString(ref data, encoder, msg, index, length);
+
+        public static int ReadStringAuto(this byte[] data, int index, Encoding encoder, out string result)
+        {
+            int length = data.ReadInt(index);
+
+            result = data.ReadString(index + 4, length, encoder);
+            return length+4;
+        }
+        public static int WriteStringAuto(this byte[] data, int index, string msg, Encoding encoder)
+        {
+            byte[] stringbytes = encoder.GetBytes(msg);
+            data.WriteInt(index, stringbytes.Length);
+            data.WriteString(index+4, msg, encoder, stringbytes.Length);
+            return stringbytes.Length+4;
+        }
 
         public static byte[] FromChar(char input) => BitConverter.GetBytes(input);
 

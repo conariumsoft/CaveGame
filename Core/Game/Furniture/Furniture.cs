@@ -66,9 +66,9 @@ namespace CaveGame.Core.Furniture
 
 		public virtual void OnCollide(){}
 		public virtual void OnPlayerInteracts(Player player, IGameWorld world, IGameClient client) { }
-		public virtual void Draw(Texture2D tilesheet, SpriteBatch sb)
+		public virtual void Draw(GraphicsEngine gfx)
 		{
-			sb.Draw(tilesheet, Position.ToVector2()*Globals.TileSize, Quad, Color);
+			gfx.Sprite(gfx.TileSheet, Position.ToVector2()*Globals.TileSize, Quad, Color);
 		}
 		public virtual void OnTileUpdate(IGameWorld world, int x, int y) { }
 	}
@@ -287,16 +287,16 @@ namespace CaveGame.Core.Furniture
 			State = DoorState.Closed;
 		}
 
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb)
+		public override void Draw(GraphicsEngine GFX)
 		{
 			var pos = Position.ToVector2() * Globals.TileSize;
 
 			if (State == DoorState.Closed)
-				sb.Draw(tilesheet, pos, ClosedDoorQuad, Color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+				GFX.Sprite(GFX.TileSheet, pos, ClosedDoorQuad, Color, Rotation.Zero, Vector2.Zero, 1, SpriteEffects.None, 0);
 			if (State == DoorState.OpenLeft)
-				sb.Draw(tilesheet, pos-new Vector2(8, 0), OpenDoorQuad, Color, 0, Vector2.Zero, 1, SpriteEffects.FlipHorizontally, 0);
+				GFX.Sprite(GFX.TileSheet, pos-new Vector2(8, 0), OpenDoorQuad, Color, Rotation.Zero, Vector2.Zero, 1, SpriteEffects.FlipHorizontally, 0);
 			if (State == DoorState.OpenRight)
-				sb.Draw(tilesheet, pos, OpenDoorQuad, Color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+				GFX.Sprite(GFX.TileSheet, pos, OpenDoorQuad, Color, Rotation.Zero, Vector2.Zero, 1, SpriteEffects.None, 0);
 		}
 
 		public static bool CanPlace(IGameWorld world, int x, int y)

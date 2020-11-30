@@ -1,4 +1,5 @@
-﻿using CaveGame.Core.Inventory;
+﻿using CaveGame.Core.Generic;
+using CaveGame.Core.Inventory;
 using CaveGame.Core.WorldGeneration;
 using DataManagement;
 using Microsoft.Xna.Framework;
@@ -51,8 +52,10 @@ namespace CaveGame.Core.Game.Tiles
 		public override Rectangle Quad => TileMap.Plank;
 
 
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public override void Draw(GraphicsEngine gfx, int x, int y, Light3 color)
 		{
+
+
 			var Plank = new Rectangle(2 * Globals.TileSize, 0, 4, Globals.TileSize);
 			var PlankRight = new Rectangle((2 * Globals.TileSize) + 4, 0 * Globals.TileSize, 4, Globals.TileSize);
 			var RPlank = new Rectangle(8 * Globals.TileSize, 0, 4, Globals.TileSize);
@@ -61,18 +64,21 @@ namespace CaveGame.Core.Game.Tiles
 
 			Vector2 position = new Vector2(x * Globals.TileSize, y * Globals.TileSize);
 
+			var texture = gfx.TileSheet;
+			var outputColor = color.MultiplyAgainst(Color);
+
 			if (TileState.Get(1)) // cornerd
-				sb.Draw(tilesheet, position, RPlank, color.MultiplyAgainst(Color), MathHelper.ToRadians(0), Vector2.Zero, 1, SpriteEffects.None, 1);
+				gfx.Sprite(texture, position, RPlank, outputColor, Rotation.Zero, Vector2.Zero, 1, SpriteEffects.None, 1);
 			else
-				sb.Draw(tilesheet, position, Plank, color.MultiplyAgainst(Color), MathHelper.ToRadians(0), Vector2.Zero, 1, SpriteEffects.None, 1);
+				gfx.Sprite(texture, position, Plank, outputColor, Rotation.Zero, Vector2.Zero, 1, SpriteEffects.None, 1);
 
 			if (TileState.Get(0)) // cornerc
-				sb.Draw(tilesheet, position + new Vector2(4, 0), RPlankRight, color.MultiplyAgainst(Color), MathHelper.ToRadians(0), Vector2.Zero, 1, SpriteEffects.None, 1);
+				gfx.Sprite(texture, position + new Vector2(4, 0), RPlankRight, outputColor, Rotation.Zero, Vector2.Zero, 1, SpriteEffects.None, 1);
 			else
-				sb.Draw(tilesheet, position + new Vector2(4, 0), PlankRight, color.MultiplyAgainst(Color), MathHelper.ToRadians(0), Vector2.Zero, 1, SpriteEffects.None, 1);
+				gfx.Sprite(texture, position + new Vector2(4, 0), PlankRight, outputColor, Rotation.Zero, Vector2.Zero, 1, SpriteEffects.None, 1);
 
 #if EDITOR
-			base.Draw(tilesheet, sb, x, y, color);
+			base.Draw(gfx, x, y, color);
 #endif
 		}
 
@@ -179,11 +185,6 @@ namespace CaveGame.Core.Game.Tiles
 				world.BreakTile(x, y);
 			}
 
-		}
-
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
-		{
-			base.Draw(tilesheet, sb, x, y, color);
 		}
 	}
 	public class PineNeedles { }

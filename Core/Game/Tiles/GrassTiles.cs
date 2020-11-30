@@ -24,33 +24,33 @@ namespace CaveGame.Core.Game.Tiles
 
 		public static Rectangle Patch = new Rectangle(8 * Globals.TileSize, 6 * Globals.TileSize, Globals.TileSize, Globals.TileSize);
 
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 color)
 		{
 #if EDITOR
-			sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), Quad, Color);
+			GFX.Sprite(GFX.TileSheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), Quad, Color);
 			return;
 #endif
 
-			sb.Draw(tilesheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), TileMap.Soil, color.MultiplyAgainst(Color.SaddleBrown));
+			GFX.Sprite(GFX.TileSheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), TileMap.Soil, color.MultiplyAgainst(Color.SaddleBrown));
 			var corner = new Rectangle(9 * Globals.TileSize, 6 * Globals.TileSize, Globals.TileSize, Globals.TileSize);
 			Vector2 position = new Vector2(x * Globals.TileSize, y * Globals.TileSize) + new Vector2(4, 4);
 
 			if (TileState.Get(0)) // cornerd
-				sb.Draw(tilesheet, position, corner, color.MultiplyAgainst(Color), MathHelper.ToRadians(270), new Vector2(4, 4), 1, SpriteEffects.None, 1);
+				GFX.Sprite(GFX.TileSheet, position, corner, color.MultiplyAgainst(Color), Rotation.FromDeg(270), new Vector2(4, 4), 1, SpriteEffects.None, 1);
 			if (TileState.Get(1)) // cornerc
-				sb.Draw(tilesheet, position, corner, color.MultiplyAgainst(Color), MathHelper.ToRadians(180), new Vector2(4, 4), 1, SpriteEffects.None, 1);
+				GFX.Sprite(GFX.TileSheet, position, corner, color.MultiplyAgainst(Color), Rotation.FromDeg(180), new Vector2(4, 4), 1, SpriteEffects.None, 1);
 			if (TileState.Get(2)) // cornerb
-				sb.Draw(tilesheet, position, corner, color.MultiplyAgainst(Color), MathHelper.ToRadians(90), new Vector2(4, 4), 1, SpriteEffects.None, 1);
+				GFX.Sprite(GFX.TileSheet, position, corner, color.MultiplyAgainst(Color), Rotation.FromDeg(90), new Vector2(4, 4), 1, SpriteEffects.None, 1);
 			if (TileState.Get(3)) // cornera
-				sb.Draw(tilesheet, position, corner, color.MultiplyAgainst(Color), 0, new Vector2(4, 4), 1, SpriteEffects.None, 1);
+				GFX.Sprite(GFX.TileSheet, position, corner, color.MultiplyAgainst(Color), Rotation.Zero, new Vector2(4, 4), 1, SpriteEffects.None, 1);
 			if (TileState.Get(4)) // planeright
-				sb.Draw(tilesheet, position, Patch, color.MultiplyAgainst(Color), MathHelper.ToRadians(90), new Vector2(4, 4), 1, SpriteEffects.None, 1);
+				GFX.Sprite(GFX.TileSheet, position, Patch, color.MultiplyAgainst(Color), Rotation.FromDeg(90), new Vector2(4, 4), 1, SpriteEffects.None, 1);
 			if (TileState.Get(5)) // planebottom
-				sb.Draw(tilesheet, position, Patch, color.MultiplyAgainst(Color), MathHelper.ToRadians(0), new Vector2(4, 4), 1, SpriteEffects.FlipVertically, 1);
+				GFX.Sprite(GFX.TileSheet, position, Patch, color.MultiplyAgainst(Color), Rotation.FromDeg(0), new Vector2(4, 4), 1, SpriteEffects.FlipVertically, 1);
 			if (TileState.Get(6)) // planeleft
-				sb.Draw(tilesheet, position, Patch, color.MultiplyAgainst(Color), MathHelper.ToRadians(270), new Vector2(4, 4), 1, SpriteEffects.None, 1);
+				GFX.Sprite(GFX.TileSheet, position, Patch, color.MultiplyAgainst(Color), Rotation.FromDeg(270), new Vector2(4, 4), 1, SpriteEffects.None, 1);
 			if (TileState.Get(7)) // planetop
-				sb.Draw(tilesheet, position, Patch, color.MultiplyAgainst(Color), MathHelper.ToRadians(0), new Vector2(4, 4), 1, SpriteEffects.None, 1);
+				GFX.Sprite(GFX.TileSheet, position, Patch, color.MultiplyAgainst(Color), Rotation.FromDeg(0), new Vector2(4, 4), 1, SpriteEffects.None, 1);
 
 		}
 

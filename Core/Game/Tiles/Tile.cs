@@ -1,9 +1,8 @@
-﻿#if CLIENT
-using CaveGame.Client;
-#endif
-using CaveGame.Core.Game.Entities;
+﻿using CaveGame.Core.Game.Entities;
+using CaveGame.Core.Generic;
 using CaveGame.Core.Inventory;
 using CaveGame.Core.Network;
+using CaveGame.Core.Noise;
 using DataManagement;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -29,7 +28,42 @@ namespace CaveGame.Core.Game.Tiles
 	public abstract class Tile : IEquatable<Tile>
 	{
 
-		[Conditional("DEBUG")]
+		const int grid_width = 64;
+		const int grid_height = 64;
+		const float n_scale = 0.5f;
+		const float n_mult = 40;
+		private static float[,] PrecomputeFloatMap()
+		{
+			var map = new float[grid_width, grid_height];
+			SimplexNoise noise = new SimplexNoise();
+			for (int x = 0; x < grid_width; x++)
+				for (int y = 0; y < grid_height; y++)
+					map[x, y] = noise.Noise(x/n_scale, y/n_scale)* n_mult;
+
+			return map;
+		}
+		private static int[,] PrecomputeIntMap()
+        {
+			var map = new int[grid_width, grid_height];
+
+			SimplexNoise noise = new SimplexNoise();
+			for (int x = 0; x < grid_width; x++)
+				for (int y = 0; y < grid_height; y++)
+					map[x, y] = (int) ( noise.Noise(x / n_scale, y / n_scale)* n_mult);
+
+			return map;
+		}
+
+
+		public static float[,] RNGFloatMap = PrecomputeFloatMap();
+		public static int[,] RNGIntMap = PrecomputeIntMap();
+
+
+		public static void InitializeManager(int rngseed)
+        {
+
+        }
+
 		public static void AssertTileEnumeration() {	}
 
 		// Tile Properties
@@ -56,13 +90,17 @@ namespace CaveGame.Core.Game.Tiles
 		// Default Methods
 
 
-		public virtual void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public virtual void Draw(GraphicsEngine GFX, int x, int y, Light3 color)
 		{
-			sb.Draw(
-				tilesheet,
-				new Vector2(x * Globals.TileSize, y * Globals.TileSize),
-				Quad, color.MultiplyAgainst(Color), 0,
-				Vector2.Zero, 1, SpriteEffects.None, 0
+			GFX.Sprite(
+				texture: GFX.TileSheet,
+				position: new Vector2(x * Globals.TileSize, y * Globals.TileSize),
+				quad: Quad, color.MultiplyAgainst(Color), 
+				rotation: Rotation.Zero,
+				origin: Vector2.Zero, 
+				scale: 1, 
+				efx: SpriteEffects.None, 
+				layer: 0
 			);
 		}
 
@@ -141,11 +179,7 @@ namespace CaveGame.Core.Game.Tiles
 
 
 		// static shit
-#if CLIENT
-		public static Texture2D Tilesheet = GameTextures.TileSheet;
-#else
-		public static Texture2D Tilesheet;
-#endif
+
 		public static Random RNG = new Random();
 
 		public static short IDOf<T>()

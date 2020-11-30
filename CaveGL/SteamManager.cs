@@ -9,13 +9,15 @@ using System.Text;
 
 namespace CaveGame.Client
 {
+	
+
 	public static class Achievements
 	{
 		public static Achievement[] List =
 		{
-			new Achievement("FIRST_TREE"),
-			new Achievement("BRUG"),
-			new Achievement("DUMP"),
+			new ("FIRST_TREE"),
+			new ("BRUG"),
+			new ("DUMP"),
 		};
 	}
 	public class Achievement
@@ -43,8 +45,22 @@ namespace CaveGame.Client
 
 	}
 
-	public class SteamManager: GameComponent
+	public class SteamManager: GameComponent, ISteamManager
 	{
+		// api members
+		public bool HasAchievement(GameSteamAchievement achievement)
+        {
+
+			return false;
+        }
+
+		public void AwardAchievement(GameSteamAchievement achievement)
+        {
+
+        }
+
+
+		//
 		public SteamManager Instance { get; set; }
 
 
@@ -167,6 +183,8 @@ namespace CaveGame.Client
 			if (SteamInitialized)
 				SteamAPI.Shutdown();
 		}
+
+		
 
 		private void PollStats()
 		{

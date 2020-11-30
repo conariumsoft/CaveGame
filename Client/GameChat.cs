@@ -85,10 +85,10 @@ namespace CaveGame.Client
 			}
 		}
 
-		public void Draw(SpriteBatch spriteBatch)
+		public void Draw(GraphicsEngine GFX)
 		{
 			int textHeight = 14;
-			SpriteFont font = GameFonts.Arial10;
+			SpriteFont font = GFX.Fonts.Arial10;
 
 			if (ChatSize == GameChatSize.Small)
 			{
@@ -97,14 +97,14 @@ namespace CaveGame.Client
 
 			if (ChatSize == GameChatSize.Normal)
 			{
-				font = GameFonts.Arial14;
+				font = GFX.Fonts.Arial14;
 				textHeight = 20;
 
 			}
 
 			if (ChatSize == GameChatSize.Large)
 			{
-				font = GameFonts.Arial16;
+				font = GFX.Fonts.Arial16;
 				textHeight = 24;
 			}
 
@@ -113,18 +113,17 @@ namespace CaveGame.Client
 			#region Draw box
 			Color backgroundColor = new Color(0, 0, 0, 0.75f);
 			Vector2 chatsize = new Vector2(500, 15* textHeight);
-			Vector2 chatpos = new Vector2(0, GameGlobals.Height - 30 - (15 * textHeight));
+			Vector2 chatpos = new Vector2(0, GFX.WindowSize.Y - 30 - (15 * textHeight));
 
 			Color inputBoxColor = new Color(0.15f, 0.15f, 0.25f);
-			Vector2 inputBoxPosition = new Vector2(0, GameGlobals.Height-30);
+			Vector2 inputBoxPosition = new Vector2(0, GFX.WindowSize.Y - 30);
 			Vector2 inputBoxSize = new Vector2(chatsize.X, 20);
-			spriteBatch.Begin();
+			GFX.Begin();
 			if (Open)
 			{
-				
-				spriteBatch.Rect(backgroundColor, chatpos, chatsize);
-				spriteBatch.Rect(inputBoxColor, inputBoxPosition, inputBoxSize);
-				spriteBatch.OutlineRect(new Color(0.0f, 0.0f, 0.0f), chatpos, chatsize);
+				GFX.Rect(backgroundColor, chatpos, chatsize);
+				GFX.Rect(inputBoxColor, inputBoxPosition, inputBoxSize);
+				GFX.OutlineRect(new Color(0.0f, 0.0f, 0.0f), chatpos, chatsize);
 			}
 			#endregion
 
@@ -134,8 +133,8 @@ namespace CaveGame.Client
 			lock (MessageHistory)
 				foreach (Message message in MessageHistory.ToArray().Reverse())
 				{
-					var pos = new Vector2(0, GameGlobals.Height - 20 - ((count+1)*textHeight));
-					spriteBatch.Print(font, message.TextColor, pos, message.Text);
+					var pos = new Vector2(0, GFX.WindowSize.Y - 20 - ((count+1)*textHeight));
+					GFX.Text(font, message.Text, pos, message.TextColor);
 					iter--;
 					count++;
 
@@ -160,21 +159,21 @@ namespace CaveGame.Client
 
 					//Debug.WriteLine("{0}|{1}|{2}", beforeText, middleText, afterText);
 
-					spriteBatch.Rect(Color.Blue, inputBoxPosition + new Vector2(start.X, 0), end);
+					GFX.Rect(Color.Blue, inputBoxPosition + new Vector2(start.X, 0), end);
 
 					// first section
-					spriteBatch.Print(font, Color.White, inputBoxPosition, beforeText);
-					spriteBatch.Print(font, Color.Black, inputBoxPosition + new Vector2(start.X, 0), middleText);
-					spriteBatch.Print(font, Color.White, inputBoxPosition + new Vector2(start.X + end.X, 0), afterText);
+					GFX.Text(font, beforeText , inputBoxPosition, Color.White);
+					GFX.Text(font, middleText , inputBoxPosition + new Vector2(start.X, 0), Color.Black);
+					GFX.Text(font, afterText, inputBoxPosition + new Vector2(start.X + end.X, 0), Color.White);
 				} else
 				{
-					spriteBatch.Print(font, new Color(1.0f, 1.0f, 1.0f), inputBoxPosition, inputBox.DisplayText);
+					GFX.Text(font, inputBox.DisplayText, inputBoxPosition, new Color(1.0f, 1.0f, 1.0f));
 				}
 				
 			}
 			
 
-			spriteBatch.End();
+			GFX.End();
 		}
 	}
 }

@@ -16,20 +16,18 @@ namespace CaveGame.Core.Inventory
 	public abstract class FurnitureItem : Item
 	{
 		public override int MaxStack => 99;
-		public virtual Texture2D ItemTexture { get; }
 
-		public override void Draw(SpriteBatch sb, Vector2 position, float scale)
+		public void Draw(GraphicsEngine GFX, Texture2D ItemTexture, Vector2 position, float scale)
 		{
-			sb.Draw(ItemTexture, position, null, Color.White, 0, Vector2.Zero, scale * 2, SpriteEffects.None, 0);
+			GFX.Sprite(ItemTexture, position, null, Color.White, Rotation.Zero, Vector2.Zero, scale * 2, SpriteEffects.None, 0);
 		}
+		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale) { }
 	}
 
 	public class FurnaceItem : FurnitureItem
 	{
-#if CLIENT
-		public override Texture2D ItemTexture => ItemTextures.Furnace;
-#endif
-		public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
+		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale) => Draw(GFX, GFX.Furnace, position, scale);
+        public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
 		{
 			MouseState mouse = Mouse.GetState();
 
@@ -52,9 +50,7 @@ namespace CaveGame.Core.Inventory
 
 	public class DoorItem : FurnitureItem
 	{
-#if CLIENT
-		public override Texture2D ItemTexture => ItemTextures.Door;
-#endif
+		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale) => Draw(GFX, GFX.Furnace, position, scale);
 		public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
 		{
 			MouseState mouse = Mouse.GetState();
@@ -77,19 +73,15 @@ namespace CaveGame.Core.Inventory
 
 	public class WorkbenchItem : FurnitureItem
 	{
-#if CLIENT
-		public override Texture2D ItemTexture => ItemTextures.Workbench;
-#endif
+		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale) => Draw(GFX, GFX.Workbench, position, scale);
 		public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
 		{
 			MouseState mouse = Mouse.GetState();
-
 			var mp = client.Camera.ScreenToWorldCoordinates(mouse.Position.ToVector2());
 			Point pos = new Point(
 				(int)Math.Floor(mp.X / Globals.TileSize),
 				(int)Math.Floor(mp.Y / Globals.TileSize)
 			);
-
 			if (Furniture.Workbench.CanPlace(client.World, pos.X, pos.Y))
 			{
 				stack.Quantity--;

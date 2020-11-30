@@ -14,6 +14,7 @@ using CaveGame.Core.FileUtil;
 using CaveGame.Core.Inventory;
 using CaveGame.Core.Generic;
 using DataManagement;
+using System.Collections.Generic;
 
 namespace CaveGame.Core.Network
 {
@@ -80,6 +81,8 @@ namespace CaveGame.Core.Network
 		SExplosion,
 		PlayerThrowItemAction,
 		SpawnBombEntity,
+		SpawnWurmholeEntity,
+		TriggerWurmholeEntity,
 		SpawnItemStackEntity,
 		PlaceFurniture, RemoveFurniture,
 		OpenDoor, CloseDoor, TimeOfDay,
@@ -87,7 +90,7 @@ namespace CaveGame.Core.Network
 		UpdateContainer,
 		DamageTile,
 		GivePlayerItem, // Temporary for testing?
-
+		AdminCommand
 	}
 
 
@@ -374,6 +377,38 @@ namespace CaveGame.Core.Network
 		public SpawnBombEntityPacket(byte[] data) : base(data) { }
 	}
 
+	public class SpawnWurmholeEntityPacket : Packet
+    {
+		public int EntityNetworkID
+        {
+			get => Payload.ReadInt(0);
+			set => Payload.WriteInt(0, value);
+        }
+		
+
+		public SpawnWurmholeEntityPacket(byte[] data) : base(data) { }
+		public SpawnWurmholeEntityPacket(int entityNetworkID) : base(PacketType.SpawnWurmholeEntity) 
+        {
+			Payload = new byte[8];
+			EntityNetworkID = entityNetworkID;
+        }
+    }
+
+	public class TriggerWurmholeEntityPacket : Packet
+    {
+		public int EntityNetworkID
+		{
+			get => Payload.ReadInt(0);
+			set => Payload.WriteInt(0, value);
+		}
+		public TriggerWurmholeEntityPacket(byte[] data) : base(data) { }
+		public TriggerWurmholeEntityPacket(int entityNetworkID) : base(PacketType.TriggerWurmholeEntity) // should be PacketType.TriggerWurmholeEntity
+		{
+			Payload = new byte[8];
+			EntityNetworkID = entityNetworkID;
+		}
+	}
+
     public class SpawnItemStackPacket : Packet {
 
 		public int EntityNetworkID
@@ -391,20 +426,15 @@ namespace CaveGame.Core.Network
         {
 			get
             {
-				int quantity = Payload.ReadInt(12); 
-				var binary = Metabinary.Deserialize(Payload, 16);
-				Metabinary.DebugText(binary);
-				return new ItemStack { Quantity = quantity, Item = Item.FromMetadataComplex(binary) };
+				int quantity = Payload.ReadInt(12);
+				Payload.ReadStringAuto(16, Encoding.ASCII, out string itemname);
+				return new ItemStack { Quantity = quantity, Item = Item.FromName(itemname) };
             }
 			set
             {
-				Metabinary data = value.Item.GetMetadataComplex();
-
-				byte[] bytedata = data.Serialize();
-				
-				Payload = new byte[16+bytedata.Length];
+				Payload = new byte[16+4+Encoding.ASCII.GetByteCount(value.Item.Name)];
 				Payload.WriteInt(12, value.Quantity);
-				Array.Copy(bytedata, 0, Payload, 16, bytedata.Length);
+				Payload.WriteStringAuto(16, value.Item.Name, Encoding.ASCII);
             }
         }
 
@@ -425,21 +455,19 @@ namespace CaveGame.Core.Network
         {
 			get
 			{
-				int quantity = TypeSerializer.ToInt(Payload, 0);
-				var binary = Metabinary.Deserialize(Payload, 4);
-				Metabinary.DebugText(binary);
-				return new ItemStack { Quantity = quantity, Item = Item.FromMetadataComplex(binary) };
+				int quantity = Payload.ReadInt(0);
+				Payload.ReadStringAuto(4, Encoding.ASCII, out string itemname);
+				return new ItemStack { Quantity = quantity, Item = Item.FromName(itemname) };
 			}
 			set
 			{
-				Metabinary data = value.Item.GetMetadataComplex();
-				byte[] bytedata = data.Serialize();
-				Payload = new byte[bytedata.Length + 4];
-
-				TypeSerializer.FromInt(ref Payload, 0, value.Quantity);
-				Array.Copy(bytedata, 0, Payload, 4, bytedata.Length);
+				Payload = new byte[4 + 4 + Encoding.ASCII.GetByteCount(value.Item.Name)];
+				Payload.WriteInt(0, value.Quantity);
+				Payload.WriteStringAuto(4, value.Item.Name, Encoding.ASCII);
 			}
 		}
+
+
 
 
 		public GivePlayerItemPacket(byte[] data) : base(data) { }
@@ -962,8 +990,81 @@ namespace CaveGame.Core.Network
 		{
 		}
 
-		
 	}
+
+	public class AdminCommandPacket : Packet
+    {
+		// 0 - PlayerNetworkID int
+		// 4 - CommandStringLength int
+		//
+		//
+		//
+		//
+		//
+		//
+
+		public string Command
+		{
+			get
+            {
+				Payload.ReadStringAuto(4, Encoding.ASCII, out string ret);
+				return ret;
+            }
+			set => Payload.WriteStringAuto(4, value, Encoding.ASCII);
+		}
+
+
+		public int CommandByteDataLength => Payload.ReadInt(4);
+
+		public int PlayerNetworkID
+        {
+			get => Payload.ReadInt(0);
+			set => Payload.WriteInt(0, value);
+        }
+
+
+
+		public string[] Arguments
+        {
+			get
+            {
+				int index = 4+CommandByteDataLength+4;
+				int expectedStrings = Payload.ReadInt(index);
+				List<string> argdata = new List<string>();
+				index += 4;
+
+				for (int i = 0; i < expectedStrings; i++)
+                {
+					index += Payload.ReadStringAuto(index, Encoding.ASCII, out string result);
+					argdata.Add(result);
+				}
+				return argdata.ToArray();
+			}
+			set
+            {	
+				int index = 4+CommandByteDataLength+4;
+				Payload.WriteInt(index, value.Length);
+				index += 4;
+
+				foreach (string str in value)
+					index += Payload.WriteStringAuto(index, str, Encoding.ASCII);
+            }
+        }
+
+		public AdminCommandPacket(byte[] data) : base(data) { }
+		public AdminCommandPacket(string command, string[] args, int playerNetworkID) : base(PacketType.AdminCommand) {
+			// get size?
+			int size = 8+ Encoding.ASCII.GetBytes(command).Length + 4;
+			foreach (var str in args)
+				size += Encoding.ASCII.GetBytes(str).Length + 4;
+
+			Payload = new byte[size];
+			Command = command;
+			Arguments = args;
+			PlayerNetworkID = playerNetworkID;
+		}
+	}
+
 
 	public class PlaceWallPacket : Packet
 	{

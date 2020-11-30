@@ -21,17 +21,17 @@ namespace CaveGame.Core.Game.Tiles
 
 		}
 
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 color)
 		{
 			Vector2 position = new Vector2(x * Globals.TileSize, y * Globals.TileSize);
 			if (TileState == 0) // Upright
-				sb.Draw(tilesheet, position, Quad, color.MultiplyAgainst(Color), 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+				GFX.Sprite(GFX.TileSheet, position, Quad, color.MultiplyAgainst(Color), Rotation.Zero, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
 			if (TileState == 1) // Right
-				sb.Draw(tilesheet, position, Quad, color.MultiplyAgainst(Color), MathHelper.ToRadians(90), Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+				GFX.Sprite(GFX.TileSheet, position, Quad, color.MultiplyAgainst(Color), Rotation.FromDeg(90), Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
 			if (TileState == 2) // Bottom
-				sb.Draw(tilesheet, position, Quad, color.MultiplyAgainst(Color), MathHelper.ToRadians(180), Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+				GFX.Sprite(GFX.TileSheet, position, Quad, color.MultiplyAgainst(Color), Rotation.FromDeg(180), Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
 			if (TileState == 3) // Left
-				sb.Draw(tilesheet, position, Quad, color.MultiplyAgainst(Color), MathHelper.ToRadians(270), Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+				GFX.Sprite(GFX.TileSheet, position, Quad, color.MultiplyAgainst(Color), Rotation.FromDeg(270), Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
 
 			//base.Draw(tilesheet, sb, x, y, color);
 		}
@@ -58,11 +58,11 @@ namespace CaveGame.Core.Game.Tiles
 			}
 		}
 
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 color)
 		{
 			Vector2 position = new Vector2((x * Globals.TileSize) + (x.Mod(4)), (y * Globals.TileSize));
 
-			sb.Draw(tilesheet, position, Quad, color.MultiplyAgainst(Color));
+			GFX.Sprite(GFX.TileSheet, position, Quad, color.MultiplyAgainst(Color));
 		}
 
 		public void TileUpdate(IGameWorld world, int x, int y)
@@ -87,7 +87,7 @@ namespace CaveGame.Core.Game.Tiles
 				world.SetTile(x, y, new Air()); // grass sometimes randomly dies
 		}
 
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 color)
 		{
 			Vector2 position = new Vector2(x * Globals.TileSize, y * Globals.TileSize);
 			Rectangle quad = TileMap.TallGrass;
@@ -99,7 +99,7 @@ namespace CaveGame.Core.Game.Tiles
 			if (state == 1)
 				quad = TileMap.TallGrass3;
 
-			sb.Draw(tilesheet, position, quad, color.MultiplyAgainst(Color));
+			GFX.Sprite(GFX.TileSheet, position, quad, color.MultiplyAgainst(Color));
 			//base.Draw(tilesheet, sb, x, y, color);
 		}
 
@@ -126,7 +126,7 @@ namespace CaveGame.Core.Game.Tiles
 				world.SetTile(x, y, new Air()); // grass sometimes randomly dies
 		}
 
-		public override void Draw(Texture2D tilesheet, SpriteBatch sb, int x, int y, Light3 color)
+		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 color)
 		{
 			Vector2 position = new Vector2(x * Globals.TileSize, y * Globals.TileSize);
 			Rectangle quad = TileMap.TallGrass;
@@ -138,7 +138,7 @@ namespace CaveGame.Core.Game.Tiles
 			if (state == 1)
 				quad = TileMap.TallGrass3;
 
-			sb.Draw(tilesheet, position, quad, color.MultiplyAgainst(Color));
+			GFX.Sprite(GFX.TileSheet, position, quad, color.MultiplyAgainst(Color));
 			//base.Draw(tilesheet, sb, x, y, color);
 		}
 

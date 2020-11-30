@@ -162,15 +162,15 @@ namespace CaveGame.Core
 		//	}
 		}
 
-		private void DrawForegroundBuffer(Texture2D tilesheet, GraphicsDevice device, SpriteBatch sb)
+		private void DrawForegroundBuffer(GraphicsEngine GFX)
 		{
 			if (ForegroundRenderBuffer == null)
-				ForegroundRenderBuffer = new RenderTarget2D(device, ChunkSize * Globals.TileSize, ChunkSize * Globals.TileSize);
+				ForegroundRenderBuffer = new RenderTarget2D(GFX.GraphicsDevice, ChunkSize * Globals.TileSize, ChunkSize * Globals.TileSize);
 
-			device.SetRenderTarget(ForegroundRenderBuffer);
-			device.Clear(Color.Black * 0f);
+			GFX.GraphicsDevice.SetRenderTarget(ForegroundRenderBuffer);
+			GFX.Clear(Color.Black * 0f);
 
-			sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 			Tile tile;
 
 			for (int x = 0; x < ChunkSize; x++)
@@ -179,24 +179,22 @@ namespace CaveGame.Core
 				{
 					tile = GetTile(x, y);
 					if (tile.ID > 0)
-					{
-						tile.Draw(tilesheet, sb, x, y, Lights[x, y]);
-					}
+						tile.Draw(GFX, x, y, Lights[x, y]);
 				}
 			}
-			sb.End();
-			device.SetRenderTarget(null);
+			GFX.End();
+			GFX.GraphicsDevice.SetRenderTarget(null);
 		}
 
-		private void DrawBackgroundBuffer(Texture2D tilesheet, GraphicsDevice device, SpriteBatch sb)
+		private void DrawBackgroundBuffer(GraphicsEngine GFX)
 		{
 			if (BackgroundRenderBuffer == null)
-				BackgroundRenderBuffer = new RenderTarget2D(device, ChunkSize * Globals.TileSize, ChunkSize * Globals.TileSize);
+				BackgroundRenderBuffer = new RenderTarget2D(GFX.GraphicsDevice, ChunkSize * Globals.TileSize, ChunkSize * Globals.TileSize);
 
-			device.SetRenderTarget(BackgroundRenderBuffer);
-			device.Clear(Color.Black * 0f);
+			GFX.GraphicsDevice.SetRenderTarget(BackgroundRenderBuffer);
+			GFX.Clear(Color.Black * 0f);
 
-			sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 			Wall wall;
 
 			for (int x = 0; x < ChunkSize; x++)
@@ -206,22 +204,22 @@ namespace CaveGame.Core
 					wall = GetWall(x, y);
 					if (wall.ID > 0)
 					{
-						wall.Draw(tilesheet, sb, x, y, Lights[x, y]);
+						wall.Draw(GFX, x, y, Lights[x, y]);
 					}
 				}
 			}
-			sb.End();
-			device.SetRenderTarget(null);
+			GFX.End();
+			GFX.GraphicsDevice.SetRenderTarget(null);
 		}
 
-		public void Draw(Texture2D tilesheet, GraphicsDevice device, SpriteBatch sb)
+		public void Draw(GraphicsEngine GFX)
 		{
 
 			Chunk.RefreshedThisFrame = true;
 				// cock and ball torture
 			UpdateRenderBuffer = false;
-			DrawBackgroundBuffer(tilesheet, device, sb);
-			DrawForegroundBuffer(tilesheet, device, sb);
+			DrawBackgroundBuffer(GFX);
+			DrawForegroundBuffer(GFX);
 		}
 	}
 }
