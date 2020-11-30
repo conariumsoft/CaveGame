@@ -35,7 +35,7 @@ namespace CaveGame.Client
 
 		public void LoadShader(ContentManager GameContent)
         {
-			WaterpixelsShader = GameContent.Load<Effect>("ShaderTest");
+			WaterpixelsShader = GameContent.Load<Effect>("Shaders/Waterpixels");
         }
 
 		public void Update(GameTime gt) {

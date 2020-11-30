@@ -91,7 +91,7 @@ namespace CaveGame.Client
 
 
 			IsMouseVisible = true;
-			Content.RootDirectory = "Content";
+			Content.RootDirectory = "Assets";
 			Window.AllowUserResizing = true;
 			Window.AllowAltF4 = true;
 

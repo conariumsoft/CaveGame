@@ -40,16 +40,6 @@
     <DefineConstants>TRACE;CLIENT</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Content\chars.png" />
-    <None Remove="Content\tiles.png" />
-    <None Remove="Icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Assets\Textures\chars.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +87,9 @@
       <HintPath>Steamworks\Windows64\Steamworks.NET.dll</HintPath>
       <Private>true</Private>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets\Sound\mu\" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(ProjectDir)Assets\*.*&quot; &quot;$(TargetDir)Assets\\&quot; /E /I /F /Y" />

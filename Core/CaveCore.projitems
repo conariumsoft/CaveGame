@@ -12,7 +12,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)AssetLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Camera.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FileUtil\FilePathSanitizer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\CraftingRecipes\Recipe.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Bee.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Projectiles.cs" />

@@ -13,6 +13,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ConsoleOuputWrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LocalServer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NetworkServer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameServer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Plugin.cs" />

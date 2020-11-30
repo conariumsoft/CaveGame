@@ -82,10 +82,10 @@ buttonContainer.Parent = buttonList;
 local GetButton = require("Assets.Scripts.MenuScripts.MenuButton");
 local GetInactiveButton = require("Assets.Scripts.MenuScripts.InactiveMenuButton");
 
-local spb = GetInactiveButton("SINGLEPLAYER", buttonContainer);
---spb.OnLMBClick:Bind(function(ev, mousedata)
-	--menumanager.CurrentPage = menumanager.Pages["creditsmenu"];
---end)
+local spb = GetButton("SINGLEPLAYER", buttonContainer);
+spb.OnLMBClick:Bind(function(ev, mousedata)
+	menumanager.CurrentPage = menumanager.Pages["singleplayermenu"];
+end)
 
 -- example of 9slice
 --[[local slicer = NineSlice(script, {

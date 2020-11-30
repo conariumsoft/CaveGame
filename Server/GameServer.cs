@@ -27,48 +27,16 @@ using CaveGame.Core.Inventory;
 
 namespace CaveGame.Server
 {
-	public interface IPluginAPIServer: IGameServer
+	public interface IPluginAPIServer : IGameServer
 	{
 		DateTime Time { get; }
 		IMessageOutlet Output { get; }
 
 	}
 
-	public class ServerCommand
-	{
-		public delegate void SCommandHandler(ServerCommand command, params string[] args);
-		public string Keyword;
-		public string Description;
-		public List<string> Args;
 
-		public ServerCommand(string cmd, string desc, List<string> args)
-		{
-			Keyword = cmd;
-			Description = desc;
-			Args = args;
-		}
 
-	}
-
-	public class CommandEventArgs : LuaEventArgs
-    {
-
-		public Player Sender { get; set; }
-		public string Command { get; private set; }
-		public List<string> Arguments { get; private set; }
-
-		public CommandEventArgs(string cmd, List<string> args)
-        {
-			Command = cmd;
-			Arguments = args;
-        }
-		public CommandEventArgs(string cmd, List<string> args, Player player)
-		{
-			Command = cmd;
-			Arguments = args;
-			Sender = player;
-		}
-	}
+	
 
 	public class PlayerChatMessageEventArgs : LuaEventArgs
     {
@@ -91,8 +59,6 @@ namespace CaveGame.Server
     }
 
 
-
-
 	public class EntityManager : IEntityManager
     {
 		public EntityManager() { }
@@ -106,36 +72,14 @@ namespace CaveGame.Server
         }
     }
 
-	public class GameServer : IPluginAPIServer, IGameServer
+	public class GameServer : IGameServer
 	{
 
 		
 
-		public LuaEvent<PlayerEventArgs> OnPlayerJoinedServer = new LuaEvent<PlayerEventArgs>();
-		public LuaEvent<PlayerEventArgs> OnPlayerLeftServer = new LuaEvent<PlayerEventArgs>();
-		public LuaEvent<PlayerChatMessageEventArgs> OnChatMessageFromClient = new LuaEvent<PlayerChatMessageEventArgs>();
-		public LuaEvent<CommandEventArgs> OnServerCommand = new LuaEvent<CommandEventArgs>();
+		
 
-		public List<ServerCommand> Commands { get; set; }
-		public void BindCommand(ServerCommand command)
-		{
-			Commands.Add(command);
-		}
-		public void BindCommand(string cmd, string descr, LuaTable args)
-		{
-			var argsList = new List<string>();
-
-			foreach (var arg in args.Values)
-			{
-				argsList.Add((string)arg);
-			}
-
-			ServerCommand command = new ServerCommand(cmd, descr, argsList);
-			Commands.Add(command);
-		}
-
-		public PluginManager PluginManager;
-		public string Information = "";
+		
 		public bool Running { get; set; }
 
 		public DateTime Time => DateTime.Now;
@@ -154,32 +98,12 @@ namespace CaveGame.Server
 
 		private NetworkServer server;
 
-		public void OnCommand(string msg)
-		{
-			Output.Out("> "+msg);
-
-			string cleaned = msg.Trim();
-
-			string[] keywords = cleaned.Split(' ');
-
-			foreach (ServerCommand cmdDef in Commands)
-			{
-				if (keywords[0] == cmdDef.Keyword)
-				{
-					//cmdDef.InvokeCommand(keywords.Skip(1).ToArray());
-					OnServerCommand.Invoke(new CommandEventArgs(cmdDef.Keyword, keywords.Skip(1).ToList()));
-					return;
-				}
-			}
-			Output.Out("No command " + keywords[0] + " found!", new Color(1.0f, 0, 0));
-		}
+		
 		
 
 		public EntityManager EntityManager { get; private set; }
 		public int TickRate { get; private set; }
 		public List<User> ConnectedUsers { get; private set; }
-
-		
 
 		public ServerWorld World { get; private set; }
 		public string ServerName { get; private set; }
@@ -197,11 +121,9 @@ namespace CaveGame.Server
 			entity.EntityNetworkID = EntityManager.GetNextEntityNetworkID();
 			World.SpawnEntity(entity);
 		}
-		public void LoadPlugins() => PluginManager.LoadPlugins(this);
+		
 
 		public GameServer(ServerConfig config) {
-
-			Commands = new List<ServerCommand>();
 			ServerName = config.ServerName;
 			ServerMOTD = config.ServerMOTD;
 			MaxPlayers = config.MaxPlayers;
@@ -214,11 +136,7 @@ namespace CaveGame.Server
 			World.Server = this;
 
 			EntityManager = new EntityManager();
-			PluginManager = new PluginManager();
-			
 		}
-
-		
 
 		public void Start()
 		{
@@ -226,9 +144,9 @@ namespace CaveGame.Server
 			Running = true;
 		}
 
-		public void Shutdown()
+		public virtual void Shutdown()
 		{
-			PluginManager.UnloadPlugins();
+			
 			Console.WriteLine("Shutting Down. Not Saving while testing worldgen");
 			//World.SaveData();
 			Thread.Sleep(100);
@@ -264,7 +182,6 @@ namespace CaveGame.Server
 		}
 
 
-
 		#region NetworkListenerMethods
 		private void OnServerInfoRequested(NetworkMessage msg)
 		{
@@ -280,7 +197,17 @@ namespace CaveGame.Server
 				),
 			msg.Sender);
 		}
-		private void OnPlayerConnects(NetworkMessage msg)
+
+
+		protected virtual void OnPlayerConnects(User newuser, Player plr)
+        {
+			SendTo(new AcceptJoinPacket(newuser.UserNetworkID, plr.EntityNetworkID), newuser);
+			SendToAllExcept(new PlayerJoinedPacket(plr.EntityNetworkID, plr.DisplayName, plr.Color), newuser);
+			SendTo(new TimeOfDayPacket(World.TimeOfDay), newuser);
+		}
+
+
+		protected virtual void OnPlayerRequestConnect(NetworkMessage msg)
 		{
 			RequestJoinPacket packet = new RequestJoinPacket(msg.Packet.GetBytes());
 
@@ -319,30 +246,23 @@ namespace CaveGame.Server
 			plr.User = newuser;
 			SpawnEntity(plr);
 
+			OnPlayerConnects(newuser, plr);
 			//PluginManager.CallOnPlayerJoined(plr);
-			OnPlayerJoinedServer.Invoke(new PlayerEventArgs(plr));
+			
 			newuser.PlayerEntity = plr;
 
-			SendTo(new AcceptJoinPacket(newuser.UserNetworkID, plr.EntityNetworkID), newuser);
-			SendToAllExcept(new PlayerJoinedPacket(plr.EntityNetworkID, plr.DisplayName, plr.Color), newuser);
-			SendTo(new TimeOfDayPacket(World.TimeOfDay), newuser);
+			
 		}
-		private void OnClientQuit(NetworkMessage msg, User user)
+		protected virtual void OnClientQuit(NetworkMessage msg, User user)
 		{
 			QuitPacket packet = new QuitPacket(msg.Packet.GetBytes());
 
-			
-
 			if (World.FindEntityOfID(packet.EntityID, out Player player))
-            {
-				OnPlayerLeftServer.Invoke(new PlayerEventArgs(player));
 				World.Entities.Remove(player);
-			}
 				
 
 			SendToAll(new PlayerLeftPacket(packet.EntityID));
 			ConnectedUsers.Remove(user);
-			OutputAndChat(String.Format("{0} has left the server.", user.Username));
 		}
 		private void OnPlayerPosition(NetworkMessage msg, User user)
 		{
@@ -369,13 +289,10 @@ namespace CaveGame.Server
 
 			SendToAllExcept(packet, user);
 		}
-		private void OnClientChat(NetworkMessage msg, User user)
+		protected virtual void OnClientChat(NetworkMessage msg, User user)
 		{
 			ClientChatMessagePacket chatMessagePacket = new ClientChatMessagePacket(msg.Packet.GetBytes());
-			if (OnChatMessageFromClient.Invoke(new PlayerChatMessageEventArgs(user.PlayerEntity, chatMessagePacket.Message)))
-			{
-				Chat(user.Username + ": " + chatMessagePacket.Message);
-			}
+			Chat(user.Username + ": " + chatMessagePacket.Message);
 		}
 		private void OnPlayerPlaceTile(NetworkMessage msg, User user)
 		{
@@ -575,7 +492,7 @@ namespace CaveGame.Server
 					OnServerInfoRequested(msg);
 
 				if (msg.Packet.Type == PacketType.CRequestJoin)
-					OnPlayerConnects(msg);
+					OnPlayerRequestConnect(msg);
 
 
 				User user = GetConnectedUser(msg.Sender);
@@ -615,11 +532,9 @@ namespace CaveGame.Server
 			}
 		}
 
-
-
 		float tileticker = 0;
 
-		protected void InternalUserKick(User user)
+		protected virtual void InternalUserKick(User user)
 		{
 			Output?.Out("[server " + DateTime.Now.ToString("HH:mm:ss.ff") + "] Kicked user: " + user.DisconnectReason);
 			SendTo(new KickPacket(user.DisconnectReason), user);
@@ -638,9 +553,9 @@ namespace CaveGame.Server
         }
 
 
-		public void Update(GameTime gt)
+		public virtual void Update(GameTime gt)
 		{
-			Information = String.Format("{0} Players", ConnectedUsers.Count);
+			
 			float delta = (float)gt.ElapsedGameTime.TotalSeconds;
 
 
@@ -744,11 +659,7 @@ namespace CaveGame.Server
 			}
 		}
 
-		public void ClientRun()
-		{
-			server.Run();
-		}
-
+		// Should be run on it's own thread
 		public void Run()
 		{
 			server.Run();

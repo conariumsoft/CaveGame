@@ -64,7 +64,7 @@ namespace CaveGame.Server
 			CreateDirectoryIfNull(Path.Combine("Worlds", WorldName, "Chunks"));
 
 			// Serialize world info into file.
-			XmlWriter worldXml = XmlWriter.Create(Path.Combine("Worlds", WorldName, @"\WorldMetadata.xml"));
+			XmlWriter worldXml = XmlWriter.Create(Path.Combine("Worlds", WorldName, "WorldMetadata.xml"));
 			worldXml.WriteStartDocument();
 			worldXml.WriteStartElement("Metadata");
 
