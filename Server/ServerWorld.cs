@@ -114,13 +114,17 @@ namespace CaveGame.Server
 
 		private bool HasChunkOnFile(ChunkCoordinates coords)
 		{
-			return File.Exists(Path.Combine"Worlds\" + WorldName + @"\Chunks\" + coords.GetHashCode());
+			return File.Exists(Path.Combine("Worlds", WorldName, "Chunks",  coords.GetHashCode().ToString()));
 		}
 
 		private Chunk RetrieveChunkFromFile(ChunkCoordinates coords)
 		{
 			Chunk chunk = new Chunk(coords.X, coords.Y);
-			chunk.FromData(File.ReadAllBytes(@"Worlds\" + WorldName + @"\Chunks\" + coords.GetHashCode()));
+			chunk.FromData(
+				File.ReadAllBytes(
+					Path.Combine("Worlds", WorldName, "Chunks", coords.GetHashCode().ToString())
+				)
+			);
 
 			return chunk;
 		}
@@ -324,7 +328,6 @@ namespace CaveGame.Server
 			serverRandomTileUpdateTask.Update(gt);
 			serverTileUpdateTask.Update(gt);
 
-			
 
 			foreach (var ent in Entities.ToArray())
 				ent.ServerUpdate(Server, gt);

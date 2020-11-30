@@ -291,7 +291,7 @@ namespace CaveGame.Client
 				tex2D.SetData<Color>(colors);
 				if (string.IsNullOrEmpty(filename))
 				{
-					filename = $"Screenshots\\{DateTime.Now.ToFileTime()}.png";
+					filename = Path.Combine("Screenshots", DateTime.Now.ToFileTime()+".png");
 				}
 				using (FileStream stream = File.Create(filename))
 				{

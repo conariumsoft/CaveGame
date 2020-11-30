@@ -119,11 +119,11 @@ Game Context: {Game.CurrentGameContext}<br/>
             {
 				string name = "crash.html";//$"crash_{DateTime.Now.ToString("MM-dd-yy-HH-mm-ss")}.html";
 				File.WriteAllText(name, crashReportHTML);
-				CaveGame.Core.OperatingSystem.OpenUrl(Path.GetFullPath(name));
+				CaveGame.Core.OperatingSystem.OpenUrl(Path.GetFullPath("Crashlogs", name));
 			} else {
 				string name = $"crash_{DateTime.Now.ToString("MM-dd-yy-HH-mm-ss")}.html";
 				File.WriteAllText(name, crashReportHTML);
-				CaveGame.Core.OperatingSystem.OpenUrl(Path.GetFullPath(name));
+				CaveGame.Core.OperatingSystem.OpenUrl(Path.GetFullPath("Crashlogs", name));
 			}
 			
 		}

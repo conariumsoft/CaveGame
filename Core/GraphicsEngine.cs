@@ -11,8 +11,24 @@ using System.Threading.Tasks;
 
 namespace CaveGame.Core
 {
+    
+
+
     using Circle = List<Vector2>;
     using Arc = List<Vector2>;
+
+    public class MissingGameDataException : ApplicationException { 
+        public string MissingFilename { get; set; }
+        public string MissingFilepath { get; set; }
+        public string FilePurpose { get; set; }
+        public string WhatToDo { get; set; }
+
+
+    }
+    public class MissingContentFolderException : MissingGameDataException { }
+    public class MissingScriptException : MissingGameDataException { }
+    public class MissingSoundEffectException : MissingGameDataException { }
+    public class MissingTextureException : MissingGameDataException { }
 
     public static class ShapeCache
     {
@@ -100,6 +116,8 @@ namespace CaveGame.Core
 
     public class GraphicsEngine : IGraphicsEngine
     {
+
+
         public bool LoadFonts { get; set; }
 
         public static GraphicsEngine Instance { get; private set; }
@@ -173,21 +191,21 @@ namespace CaveGame.Core
 
         public void LoadAssets(GraphicsDevice graphicsDevice)
         {
-           // var texturesPath = Path.Combine("Assets", "Textures");
-           // if (Directory.Exists(texturesPath))
-          //  {
-                foreach (var tex in Directory.GetFiles("Assets/Textures/", "*.png"))
-                {
-                    //Texture2D loaded = AssetLoader.LoadTexture(graphicsDevice, tex);
-                    LoadingQueue.Enqueue(new TextureDef(
-                        tex.Replace("Assets/Textures/", ""),
-                        tex
-                    ));
-                    TotalTextures++;
-                }
-                
-            //}
+            var texturesPath = Path.Combine("Assets", "Textures");
+            if (!Directory.Exists(texturesPath))
+                throw new MissingContentFolderException { MissingFilename = "texturesPath" };
 
+            foreach (var tex in Directory.GetFiles(texturesPath, "*.png"))
+            {
+                LoadingQueue.Enqueue(new TextureDef(
+                    tex.Replace(texturesPath, ""),
+                    tex
+                ));
+                TotalTextures++;
+            }
+
+
+            var entityTexturesPath = Path.Combine("Assets", "Entities");
             foreach (var tex in Directory.GetFiles("Assets/Entities/", "*.png"))
             {
                 // Texture2D loaded = AssetLoader.LoadTexture(graphicsDevice, tex);

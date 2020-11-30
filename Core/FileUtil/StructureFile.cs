@@ -167,11 +167,17 @@ namespace CaveGame.Core.FileUtil
 					foreach (Layer layer in Layers)
 					{
 
-						using (var tstream = new BinaryWriter(archive.CreateEntry("layers/" + layer.LayerID + "/tiles.l").Open()))
+						using (var tstream = new BinaryWriter(archive.CreateEntry(
+							Path.Combine("layers", layer.LayerID, "tiles.l")
+						).Open()))
 							tstream.Write(layer.SaveTiles());
-						using (var wstream = new BinaryWriter(archive.CreateEntry("layers/" + layer.LayerID + "/walls.l").Open()))
+						using (var wstream = new BinaryWriter(archive.CreateEntry(
+							Path.Combine("layers", layer.LayerID, "walls.l")
+						).Open()))
 							wstream.Write(layer.SaveWalls());
-						using (var fstream = new StreamWriter(archive.CreateEntry("layers/" + layer.LayerID + "/furniture.xml").Open()))
+						using (var fstream = new StreamWriter(archive.CreateEntry(
+							Path.Combine("layers", layer.LayerID, "furniture.xml")
+						).Open()))
 							furnitureWriter.Serialize(fstream, layer.Furniture);
 					}
 				}
@@ -183,7 +189,7 @@ namespace CaveGame.Core.FileUtil
 		public static StructureFile LoadStructure(string filepath)
 		{
 
-			string tempDirectory = Path.GetTempPath()+"structure\\";
+			string tempDirectory = Path.Combine(Path.GetTempPath(), "structure");
 			if (Directory.Exists(tempDirectory))
 				Directory.Delete(tempDirectory, true);
 			ZipFile.ExtractToDirectory(filepath, tempDirectory);
@@ -192,27 +198,27 @@ namespace CaveGame.Core.FileUtil
 			XmlSerializer reader = new XmlSerializer(typeof(StructureFile));
 			StructureFile structure;
 
-			using (var stream = File.Open(tempDirectory + "/structure.xml", FileMode.Open, FileAccess.Read))
+			using (var stream = File.Open(Path.Combine(tempDirectory,  "structure.xml"), FileMode.Open, FileAccess.Read))
 				structure = (StructureFile)reader.Deserialize(stream);
 			XmlSerializer furnitureReader = new XmlSerializer(typeof(List<Furniture>));
 
-			foreach (string directory in Directory.GetDirectories(tempDirectory+"layers"))
+			foreach (string directory in Directory.GetDirectories(Path.Combine(tempDirectory, "layers")))
 			{
 				Layer layer = new Layer(structure);
 				layer.Visible = true;
 				layer.Structure = structure;
-				layer.LayerID = directory.Replace(tempDirectory + "layers", "");
-				layer.LoadTiles(File.ReadAllBytes(directory+"/tiles.l"));
-				layer.LoadWalls(File.ReadAllBytes(directory+"/walls.l"));
+				layer.LayerID = directory.Replace(Path.Combine(tempDirectory, "layers"), "");
+				layer.LoadTiles(File.ReadAllBytes(Path.Combine(directory, "tiles.l")));
+				layer.LoadWalls(File.ReadAllBytes(Path.Combine(directory, "walls.l")));
 
-				using (var stream = File.Open(directory + "/furniture.xml", FileMode.Open, FileAccess.Read))
+				using (var stream = File.Open(Path.Combine(directory, "furniture.xml"), FileMode.Open, FileAccess.Read))
 					layer.Furniture = (List<Furniture>)furnitureReader.Deserialize(stream);
 
 				structure.Layers.Add(layer);
 
 			}
 			structure.Filepath = filepath;
-			Directory.Delete(Path.GetTempPath() + "structure\\", true);
+			Directory.Delete(tempDirectory, true);
 			return structure;				
 		}
 
