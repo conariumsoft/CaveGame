@@ -61,22 +61,28 @@ namespace CaveGame.Core.Network
 	public enum PacketType : uint
 	{
 		#region Agnostic-Sender Packets
-		nPing = 0,
-
-
+		netPing = 0,
+		netDamageTile, 
+		netPlaceTile,
+		netPlaceWall,
+		netDamageWall,
+		netOpenDoor, netCloseDoor,
+		netPlaceFurniture,
+		netEntityPhysicsUpdate,
+		netPlayerState,
 		#endregion
 
 		#region Client-Sender Packets
 		cHandshake,
-		cPlaceTile,
-		cPlaceWall,
-		cDamageTile,
-		cDamageWall,
 		cRequestLogin,
 		cConfirmLogin,
 		cLogout,
 		cSendChatMessage,
-		cChangeTimeOfDay,
+		cRequestChunk,
+		cAdminCommand,
+		cThrowItem,
+		cDamageFurniture,
+		
 		#endregion
 
 		#region Server-Sender Packets
@@ -89,18 +95,21 @@ namespace CaveGame.Core.Network
 		sAcceptLogin,
 		sRejectLogin,
 		sSpawnEntityGeneric,
+		sProvokeEntityGeneric,
 		sSpawnItemStackEntity,
 		sRemoveEntity,
-		sEntityPhysicsUpdate,
+		
 		sOpenDoor, sCloseDoor,
 		sPlaceFurniture, sRemoveFurniture,
-		sDamageTile,
+		
 		sGivePlayerItem,
 		sPlayerState,
 		sPlayerPeerJoined,
 		sPlayerPeerLeft,
 		sExplosion,
 		sUpdateTimeOfDay,
+		sTransmitContainer,
+		sUpdateContainer,
 		#endregion
 
 		/*cGetServerInfo = 0,
@@ -142,8 +151,6 @@ namespace CaveGame.Core.Network
 		Wurmhole,
 		Arrow,
 		Dynamite,
-
-
     }
 
 	public class Packet
@@ -288,40 +295,22 @@ namespace CaveGame.Core.Network
 		}
 		public SpawnEntityGenericPacket(byte[] data) : base(data) { }
 	}
-
-
-	public class SpawnWurmholeEntityPacket : Packet
+	public class ProvokeEntityGenericPacket : Packet
     {
 		public int EntityNetworkID
-        {
+		{
 			get => Payload.ReadInt(0);
 			set => Payload.WriteInt(0, value);
+		}
+
+		public ProvokeEntityGenericPacket(int entityid) : base(PacketType.sProvokeEntityGeneric)
+        {
+			Payload = new byte[4];
+			EntityNetworkID = entityid;
         }
+		public ProvokeEntityGenericPacket(byte[] data) : base(data) { }
 		
-
-		public SpawnWurmholeEntityPacket(byte[] data) : base(data) { }
-		public SpawnWurmholeEntityPacket(int entityNetworkID) : base(PacketType.SpawnWurmholeEntity) 
-        {
-			Payload = new byte[8];
-			EntityNetworkID = entityNetworkID;
-        }
     }
-
-	public class TriggerWurmholeEntityPacket : Packet
-    {
-		public int EntityNetworkID
-		{
-			get => Payload.ReadInt(0);
-			set => Payload.WriteInt(0, value);
-		}
-		public TriggerWurmholeEntityPacket(byte[] data) : base(data) { }
-		public TriggerWurmholeEntityPacket(int entityNetworkID) : base(PacketType.TriggerWurmholeEntity) // should be PacketType.TriggerWurmholeEntity
-		{
-			Payload = new byte[8];
-			EntityNetworkID = entityNetworkID;
-		}
-	}
-
     public class SpawnItemStackPacket : Packet {
 
 		public int EntityNetworkID
@@ -352,7 +341,7 @@ namespace CaveGame.Core.Network
         }
 
 
-		public SpawnItemStackPacket(Vector2 position, ItemStack stack, int networkID) : base(PacketType.SpawnItemStackEntity)
+		public SpawnItemStackPacket(Vector2 position, ItemStack stack, int networkID) : base(PacketType.sSpawnItemStackEntity)
         {
 			ItemStack = stack; // Reminder: set ItemStack first to initalize payload size
 			// this is bad practice, but it works.
@@ -361,7 +350,6 @@ namespace CaveGame.Core.Network
         }
 		public SpawnItemStackPacket(byte[] data) : base(data) { }
 	}
-
 	public class GivePlayerItemPacket : Packet
     {
 		public ItemStack Reward
@@ -384,7 +372,7 @@ namespace CaveGame.Core.Network
 
 
 		public GivePlayerItemPacket(byte[] data) : base(data) { }
-		public GivePlayerItemPacket(ItemStack reward) : base(PacketType.GivePlayerItem)
+		public GivePlayerItemPacket(ItemStack reward) : base(PacketType.sGivePlayerItem)
         {
 			
 			Reward = reward;
@@ -416,14 +404,13 @@ namespace CaveGame.Core.Network
 
 		public DamageTilePacket(byte[] data) : base(data) { }
 
-		public DamageTilePacket(Point worldPosition, int damage) : base(PacketType.DamageTile) {
+		public DamageTilePacket(Point worldPosition, int damage) : base(PacketType.netDamageTile) {
 			Payload = new byte[16];
 			Position = worldPosition;
 			Damage = damage;
 		}
 		
     }
-
 	public class DropEntityPacket : Packet
 	{
 		public int EntityID
@@ -432,19 +419,17 @@ namespace CaveGame.Core.Network
 			set => TypeSerializer.FromInt(ref Payload, 0, value);
 
 		}
-		public DropEntityPacket(int entityid) : base(PacketType.SDestroyEntity)
+		public DropEntityPacket(int entityid) : base(PacketType.sRemoveEntity)
 		{
 			Payload = new byte[8];
 			EntityID = entityid;
 		}
 		public DropEntityPacket(byte[] data) : base(data) { }
 	}
-
-
 	public class TransferContainerPacket : Packet
     {
 		
-		public TransferContainerPacket(Container container) : base(PacketType.TransferContainer)
+		public TransferContainerPacket(Container container) : base(PacketType.sTransmitContainer)
         {
 			Container = container;
         }
@@ -454,9 +439,6 @@ namespace CaveGame.Core.Network
 			set => Payload = value.ToMetabinary().Serialize();
         }
     }
-
-	
-
 	public class EntityPositionPacket : Packet
 	{
 		public int EntityID
@@ -490,7 +472,7 @@ namespace CaveGame.Core.Network
         }
 		
 
-		public EntityPositionPacket(int id, int health, Vector2 position, Vector2 velocity, Vector2 nextPosition) : base(PacketType.ServerEntityPhysicsState) {
+		public EntityPositionPacket(int id, int health, Vector2 position, Vector2 velocity, Vector2 nextPosition) : base(PacketType.netEntityPhysicsUpdate) {
 			Payload = new byte[32];
 			EntityID = id;
 			Health = health;
@@ -499,7 +481,7 @@ namespace CaveGame.Core.Network
 			NextPosition = nextPosition;
 		}
 
-		public EntityPositionPacket(IEntity entity) : base(PacketType.ServerEntityPhysicsState)
+		public EntityPositionPacket(IEntity entity) : base(PacketType.netEntityPhysicsUpdate)
         {
 			Payload = new byte[32];
 			EntityID = entity.EntityNetworkID;
@@ -514,10 +496,9 @@ namespace CaveGame.Core.Network
 
 		public EntityPositionPacket(byte[] bytes) : base(bytes) { }
 	}
-
 	public class PlaceFurniturePacket : Packet
 	{
-		public PlaceFurniturePacket(byte furnitureid, int netid, int x, int y) : base(PacketType.PlaceFurniture) {
+		public PlaceFurniturePacket(byte furnitureid, int netid, int x, int y) : base(PacketType.sPlaceFurniture) {
 			Payload = new byte[16];
 			FurnitureID = furnitureid;
 			NetworkID = netid;
@@ -546,7 +527,6 @@ namespace CaveGame.Core.Network
 			set { TypeSerializer.FromInt(ref Payload, 8, value); }
 		}
 	}
-
 	public class OpenDoorPacket : Packet
 	{
 		public int FurnitureNetworkID {
@@ -557,7 +537,7 @@ namespace CaveGame.Core.Network
 			get { return (Direction)Payload[5]; }
 			set { Payload[5] = (byte)value;}
 		}
-		public OpenDoorPacket(int id, Direction dir) : base(PacketType.OpenDoor) {
+		public OpenDoorPacket(int id, Direction dir) : base(PacketType.sOpenDoor) {
 			Payload = new byte[16];
 			FurnitureNetworkID = id;
 			Direction = dir;
@@ -571,7 +551,7 @@ namespace CaveGame.Core.Network
 			get { return TypeSerializer.ToInt(Payload, 0); }
 			set { TypeSerializer.FromInt(ref Payload, 0, value); }
 		}
-		public CloseDoorPacket(int id) : base(PacketType.CloseDoor)
+		public CloseDoorPacket(int id) : base(PacketType.sCloseDoor)
 		{
 			Payload = new byte[8];
 			FurnitureNetworkID = id;
@@ -581,7 +561,7 @@ namespace CaveGame.Core.Network
 
 	public class RemoveFurniturePacket : Packet
 	{
-		public RemoveFurniturePacket(int id) : base(PacketType.RemoveFurniture) {
+		public RemoveFurniturePacket(int id) : base(PacketType.sRemoveFurniture) {
 			Payload = new byte[12];
 			FurnitureNetworkID = id;
 		}
@@ -617,7 +597,7 @@ namespace CaveGame.Core.Network
 			set { Payload[5].Set(1, value); }
 		}
 
-		public PlayerStatePacket(Direction f, bool grounded, bool walk) : base(PacketType.PlayerState)
+		public PlayerStatePacket(Direction f, bool grounded, bool walk) : base(PacketType.netPlayerState)
 		{
 			Payload = new byte[16];
 
@@ -631,11 +611,6 @@ namespace CaveGame.Core.Network
 
 	}
 
-	public class PlayerInputPacket : Packet
-	{
-		public PlayerInputPacket() : base(PacketType.CPlayerInput) { }
-	}
-
 	public class ClientChatMessagePacket : Packet
 	{
 		public string Message
@@ -644,7 +619,7 @@ namespace CaveGame.Core.Network
 			set { Payload = Encoding.UTF8.GetBytes(value); }
 		}
 
-		public ClientChatMessagePacket(string msg) : base(PacketType.CChatMessage) {
+		public ClientChatMessagePacket(string msg) : base(PacketType.cSendChatMessage) {
 			Message = msg;
 		}
 
@@ -687,13 +662,13 @@ namespace CaveGame.Core.Network
 
 		public ServerChatMessagePacket(byte[] data) : base(data) { }
 
-		public ServerChatMessagePacket(string msg) : base(PacketType.ServerChatMessage) {
+		public ServerChatMessagePacket(string msg) : base(PacketType.sChatMessage) {
 			Payload = new byte[140];
 			TextColor = Color.White;
 			Message = msg;
 		}
 
-		public ServerChatMessagePacket(string msg, Color col) : base(PacketType.ServerChatMessage) {
+		public ServerChatMessagePacket(string msg, Color col) : base(PacketType.sChatMessage) {
 			Payload = new byte[140];
 			TextColor = col;
 			Message = msg;
@@ -758,7 +733,7 @@ namespace CaveGame.Core.Network
 			}
 		}
 		public ChunkDownloadPacket(byte[] bytes) : base(bytes) { }
-		public ChunkDownloadPacket(Chunk chunk) : base(PacketType.SDownloadChunk)
+		public ChunkDownloadPacket(Chunk chunk) : base(PacketType.sDownloadChunk)
 		{
 			Payload = new byte[10000];
 			StoredChunk = chunk;
@@ -784,7 +759,7 @@ namespace CaveGame.Core.Network
 			set { TypeSerializer.FromFloat(ref Payload, 1, value.Radians); }
 		}
 
-		public PlayerThrowItemPacket(ThrownItem item, Rotation dir) : base(PacketType.PlayerThrowItemAction)
+		public PlayerThrowItemPacket(ThrownItem item, Rotation dir) : base(PacketType.cThrowItem)
 		{
 			Payload = new byte[20];
 			Item = item;
@@ -803,14 +778,7 @@ namespace CaveGame.Core.Network
 
 	public class AdminCommandPacket : Packet
     {
-		// 0 - PlayerNetworkID int
-		// 4 - CommandStringLength int
-		//
-		//
-		//
-		//
-		//
-		//
+
 
 		public string Command
 		{
@@ -861,7 +829,7 @@ namespace CaveGame.Core.Network
         }
 
 		public AdminCommandPacket(byte[] data) : base(data) { }
-		public AdminCommandPacket(string command, string[] args, int playerNetworkID) : base(PacketType.AdminCommand) {
+		public AdminCommandPacket(string command, string[] args, int playerNetworkID) : base(PacketType.cAdminCommand) {
 			// get size?
 			int size = 8+ Encoding.ASCII.GetBytes(command).Length + 4;
 			foreach (var str in args)
@@ -904,7 +872,7 @@ namespace CaveGame.Core.Network
 			set => Payload.WriteInt(8, value);
 		}
 		public PlaceWallPacket(byte[] data) : base(data) { }
-		public PlaceWallPacket(short wallID, byte tileState, byte damage, int worldX, int worldY) : base(PacketType.PlaceWall)
+		public PlaceWallPacket(short wallID, byte tileState, byte damage, int worldX, int worldY) : base(PacketType.netPlaceWall)
 		{
 			Payload = new byte[16];
 			WallID = wallID;
@@ -942,7 +910,7 @@ namespace CaveGame.Core.Network
 			set => Payload.WriteInt(8, value);//{ TypeSerializer.FromInt(ref Payload, 8, value); }
 		}
 		public PlaceTilePacket(byte[] data) : base(data) { }
-		public PlaceTilePacket(short tileID, byte tileState, byte damage, int worldX, int worldY) : base(PacketType.PlaceTile) {
+		public PlaceTilePacket(short tileID, byte tileState, byte damage, int worldX, int worldY) : base(PacketType.netPlaceTile) {
 			Payload = new byte[24];
 			TileID = tileID;
 			TileState = tileState;
@@ -979,7 +947,7 @@ namespace CaveGame.Core.Network
 		public RequestChunkPacket(byte[] bytes) : base(bytes) {
 			//Payload = new byte[8];
 		}
-		public RequestChunkPacket(ChunkCoordinates coords) : base(PacketType.CRequestChunk)
+		public RequestChunkPacket(ChunkCoordinates coords) : base(PacketType.cRequestChunk)
 		{
 			Payload = new byte[8];
 			X = coords.X;

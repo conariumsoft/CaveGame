@@ -136,25 +136,40 @@ namespace CaveGame.Server
 			EntityManager = new EntityManager();
 		}
 
-
-
-		public delegate void NetworkListener(User user, NetworkMessage message);
+		public delegate void NetworkListener(NetworkMessage message, User user);
 
 		private Dictionary<PacketType, NetworkListener> NetworkEvents;
-		private void InitNetworkEvents() => NetworkEvents = new Dictionary<PacketType, NetworkListener()
+		private void InitNetworkEvents() => NetworkEvents = new Dictionary<PacketType, NetworkListener>()
 		{
-			[PacketType.ClientQuit]
+			[PacketType.cLogout] = OnClientLogout,
+			[PacketType.cAdminCommand] = OnAdminCommandInput,
+			[PacketType.cSendChatMessage] = OnClientChat,
+			[PacketType.cRequestChunk] = OnClientRequestChunk,
+			[PacketType.netPlaceFurniture] = OnClientPlaceFurniture,
+			[PacketType.cDamageFurniture] = OnClientDamageFurniture,
+			[PacketType.netDamageTile] = OnClientDamageTile,
+			[PacketType.netPlaceTile] = OnClientPlaceTile,
+			[PacketType.netDamageWall] = OnClientDamageWall,
+			[PacketType.netPlaceWall] = OnClientPlaceWall,
+			[PacketType.cThrowItem] = OnClientThrowItem,
+			[PacketType.netCloseDoor] = OnClientCloseDoor,
+			[PacketType.netOpenDoor] = OnClientOpenDoor,
+			[PacketType.netEntityPhysicsUpdate] = OnPlayerPosition,
+			[PacketType.netPlayerState] = OnPlayerState,
 		};
-		
 
 
 		#region NetworkListenerMethods
-		private void OnServerInfoRequested(NetworkMessage msg)
+		private void OnClientDamageWall(NetworkMessage message, User user)
+		{
+			throw new NotImplementedException();
+		}
+		private void HandshakeResponse(NetworkMessage msg)
 		{
 
 			string[] playerslist = ConnectedUsers.Select(z => z.Username).ToArray();
 			server.SendPacket(
-				new ServerInformationReplyPacket(
+				new HandshakeResponsePacket(
 					Globals.ProtocolVersion,
 					ServerName,
 					ServerMOTD,
@@ -163,17 +178,17 @@ namespace CaveGame.Server
 				),
 			msg.Sender);
 		}
-
-
 		protected virtual void OnPlayerConnects(User newuser, Player plr)
         {
 			SendTo(new AcceptJoinPacket(newuser.UserNetworkID, plr.EntityNetworkID), newuser);
 			SendToAllExcept(new PlayerJoinedPacket(plr.EntityNetworkID, plr.DisplayName, plr.Color), newuser);
 			SendTo(new TimeOfDayPacket(World.TimeOfDay), newuser);
 		}
+		protected virtual void OnClientLoginSuccess(NetworkMessage msg)
+        {
 
-
-		protected virtual void OnPlayerRequestConnect(NetworkMessage msg)
+        }
+		protected virtual void OnClientRequestLogin(NetworkMessage msg)
 		{
 			RequestJoinPacket packet = new RequestJoinPacket(msg.Packet.GetBytes());
 
@@ -223,7 +238,7 @@ namespace CaveGame.Server
 
 
 		}
-		protected virtual void OnClientQuit(NetworkMessage msg, User user)
+		protected virtual void OnClientLogout(NetworkMessage msg, User user)
 		{
 			DisconnectPacket packet = new DisconnectPacket(msg.Packet.GetBytes());
 
@@ -265,7 +280,7 @@ namespace CaveGame.Server
 			ClientChatMessagePacket chatMessagePacket = new ClientChatMessagePacket(msg.Packet.GetBytes());
 			Chat(user.Username + ": " + chatMessagePacket.Message);
 		}
-		private void OnPlayerPlaceTile(NetworkMessage msg, User user)
+		private void OnClientPlaceTile(NetworkMessage msg, User user)
 		{
 			PlaceTilePacket packet = new PlaceTilePacket(msg.Packet.GetBytes());
 
@@ -289,7 +304,7 @@ namespace CaveGame.Server
 			server.SendPacket(chunkpacket, msg.Sender);
 		}
 
-		private void OnPlayerPlaceWall(NetworkMessage msg, User user)
+		private void OnClientPlaceWall(NetworkMessage msg, User user)
 		{
 			PlaceWallPacket packet = new PlaceWallPacket(msg.Packet.GetBytes());
 
@@ -301,7 +316,7 @@ namespace CaveGame.Server
 
 		int bombcount = 0;
 		float bombVelocity = 3.5f;
-		private void OnPlayerThrowItemAction(NetworkMessage msg, User user)
+		private void OnClientThrowItem(NetworkMessage msg, User user)
 		{
 			PlayerThrowItemPacket packet = new PlayerThrowItemPacket(msg.Packet.GetBytes());
 
@@ -317,13 +332,13 @@ namespace CaveGame.Server
 				};
 				
 				SpawnEntity(bomb);
-				SendToAll(new SpawnBombEntityPacket(bomb.EntityNetworkID));
+				SendToAll(new SpawnEntityGenericPacket(bomb.EntityNetworkID, NetEntityType.Bomb));
 				bombcount++;
 			}
 		}
 
 		int furniturecount = 0;
-		private void OnPlaceFurniture(NetworkMessage msg, User user)
+		private void OnClientPlaceFurniture(NetworkMessage msg, User user)
 		{
 			PlaceFurniturePacket packet = new PlaceFurniturePacket(msg.Packet.GetBytes());
 
@@ -339,7 +354,7 @@ namespace CaveGame.Server
 			SendToAll(packet);
 			furniturecount++;
 		}
-		private void OnRemoveFurniture(NetworkMessage msg, User user)
+		private void OnClientDamageFurniture(NetworkMessage msg, User user)
 		{
 			RemoveFurniturePacket packet = new RemoveFurniturePacket(msg.Packet.GetBytes());
 			var match = World.Furniture.FirstOrDefault(t => t.FurnitureNetworkID == packet.FurnitureNetworkID);
@@ -349,7 +364,7 @@ namespace CaveGame.Server
 				SendToAllExcept(packet, user);
 			}
 		}
-		private void OnPlayerClosesDoor(NetworkMessage msg, User user) {
+		private void OnClientCloseDoor(NetworkMessage msg, User user) {
 			CloseDoorPacket packet = new CloseDoorPacket(msg.Packet.GetBytes());
 			var match = World.Furniture.FirstOrDefault(t=>t.FurnitureNetworkID == packet.FurnitureNetworkID);
 			if (match!=null && match is WoodenDoor confirmedDoor)
@@ -358,7 +373,7 @@ namespace CaveGame.Server
 				SendToAllExcept(packet, user);
 			}
 		}
-		private void OnPlayerOpensDoor(NetworkMessage msg, User user)
+		private void OnClientOpenDoor(NetworkMessage msg, User user)
 		{
 			OpenDoorPacket packet = new OpenDoorPacket(msg.Packet.GetBytes());
 			var match = World.Furniture.FirstOrDefault(t => t.FurnitureNetworkID == packet.FurnitureNetworkID);
@@ -374,7 +389,7 @@ namespace CaveGame.Server
 			}
 		}
 
-        private void OnPlayerDamageTile(NetworkMessage msg, User user)
+        private void OnClientDamageTile(NetworkMessage msg, User user)
         {
             DamageTilePacket packet = new DamageTilePacket(msg.Packet.GetBytes());
 
@@ -422,7 +437,7 @@ namespace CaveGame.Server
                         }
 						wurm.NextPosition = spawnPos;
 						World.Entities.Add(wurm);
-						SendToAll(new SpawnWurmholeEntityPacket(wurm.EntityNetworkID));
+						SendToAll(new SpawnEntityGenericPacket(wurm.EntityNetworkID, NetEntityType.Wurmhole));
 
 						return;
                     }
@@ -442,7 +457,7 @@ namespace CaveGame.Server
 						}
 						bomb.NextPosition = spawnPos;
 						World.Entities.Add(bomb);
-						SendToAll(new SpawnBombEntityPacket(bomb.EntityNetworkID));
+						SendToAll(new SpawnEntityGenericPacket(bomb.EntityNetworkID, NetEntityType.Bomb));
 
 						return;
 					}
@@ -459,11 +474,14 @@ namespace CaveGame.Server
 			{
 				NetworkMessage msg = server.GetLatestMessage();
 
-				if (msg.Packet.Type == PacketType.GetServerInfo)
-					OnServerInfoRequested(msg);
+				if (msg.Packet.Type == PacketType.cHandshake)
+					HandshakeResponse(msg);
 
-				if (msg.Packet.Type == PacketType.CRequestJoin)
-					OnPlayerRequestConnect(msg);
+				if (msg.Packet.Type == PacketType.cRequestLogin)
+					OnClientRequestLogin(msg);
+
+				if (msg.Packet.Type == PacketType.cConfirmLogin)
+					OnClientLoginSuccess(msg);
 
 
 				User user = GetConnectedUser(msg.Sender);
@@ -471,9 +489,13 @@ namespace CaveGame.Server
 					continue;
 
 				user.KeepAlive = 0;
-				
-				if (msg.Packet.Type == PacketType.ClientQuit)
-					OnClientQuit(msg, user);
+
+				foreach (var ev in NetworkEvents)
+					if (ev.Key == msg.Packet.Type)
+						ev.Value.Invoke(msg, user);
+
+				/*if (msg.Packet.Type == PacketType.ClientQuit)
+					OnClientLogout(msg, user);
 				if (msg.Packet.Type == PacketType.ServerEntityPhysicsState)
 					OnPlayerPosition(msg, user);
 				if (msg.Packet.Type == PacketType.PlayerState)
@@ -498,8 +520,8 @@ namespace CaveGame.Server
 					OnPlayerClosesDoor(msg, user);
 				if (msg.Packet.Type == PacketType.DamageTile)
 					OnPlayerDamageTile(msg, user);
-				if (msg.Packet.Type == PacketType.AdminCommand)
-					OnAdminCommandInput(msg, user);
+				if (msg.Packet.Type == PacketType.cAdminCommand)
+					OnAdminCommandInput(msg, user);*/
 			}
 		}
 
@@ -561,12 +583,12 @@ namespace CaveGame.Server
 					if (entity is Wurmhole wurmhole && !entity.Dead)
                     {
 						// TODO: remove dipshit hack;
-						if (wurmhole.Triggered)
+						if (wurmhole.Provoked)
                         {
 							if (wurmhole.TriggerNetworkHandled == false)
                             {
 								wurmhole.TriggerNetworkHandled = true;
-								SendToAll(new TriggerWurmholeEntityPacket(wurmhole.EntityNetworkID));
+								SendToAll(new ProvokeEntityGenericPacket(wurmhole.EntityNetworkID));
                             }
                         }
 					}

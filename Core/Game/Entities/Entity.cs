@@ -12,7 +12,10 @@ namespace CaveGame.Core.Game.Entities
 
 	public interface ICanBleed { }
 	
-
+	public interface IProvokable {
+		bool Provoked { get; }
+		void Provoke();
+	}
 	public interface IEntity : IDamageSource
 	{
 		Vector2 Position { get; set; }

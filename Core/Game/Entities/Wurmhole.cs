@@ -11,7 +11,7 @@ using System.Text;
 namespace CaveGame.Core.Game.Entities
 {
     // Würmhole
-    public class Wurmhole : PhysicsEntity, IServerPhysicsObserver, IClientPhysicsObserver, IThinker, ICanBleed
+    public class Wurmhole : PhysicsEntity, IServerPhysicsObserver, IClientPhysicsObserver, IThinker, ICanBleed, IProvokable
     {
         #region Sprite Quads
         public static Rectangle SP_IDLE0 = new Rectangle(0, 0, 16, 16);
@@ -68,7 +68,7 @@ namespace CaveGame.Core.Game.Entities
         public override Vector2 TopLeft => Position - new Vector2(8, 8);
         public override Vector2 Friction => new Vector2(0.25f, 0.25f);
 
-        public bool Triggered { get; set; }
+        public bool Provoked { get; private set; }
 
         public bool TriggerNetworkHandled { get; set; }
         public override int MaxHealth => 20;
@@ -86,7 +86,6 @@ namespace CaveGame.Core.Game.Entities
         {
             animationTimer = 0;
             triggeredAnimationTimer = 0;
-            Triggered = false;
             TriggerNetworkHandled = false;
 
         }
@@ -97,7 +96,7 @@ namespace CaveGame.Core.Game.Entities
             animationTimer += gt.GetDelta()*5;
 
 
-            if (Triggered)
+            if (Provoked)
             {
                 triggeredAnimationTimer += gt.GetDelta()*8;
             }
@@ -106,7 +105,7 @@ namespace CaveGame.Core.Game.Entities
 
         public override void ServerUpdate(IGameServer server, GameTime gt)
         {
-            if (Triggered)
+            if (Provoked)
             {
                 triggeredAnimationTimer += gt.GetDelta()*8; // LUL
                 if (triggeredAnimationTimer > DEATH_FRAMES.Length+2)
@@ -147,7 +146,7 @@ namespace CaveGame.Core.Game.Entities
 
                         if (entity is Bomb bomb && distance < 5)
                         {
-                            Triggered = true;
+                            Provoked = true;
                             bomb.Dead = true;
                         }
                         if (entity is ItemstackEntity itemstk && distance < 3)
@@ -168,7 +167,7 @@ namespace CaveGame.Core.Game.Entities
             Rectangle currentQuad = SP_IDLE0;
 
 
-            if (Triggered)
+            if (Provoked)
             {
                 currentQuad = DEATH_FRAMES[Math.Min((int)triggeredAnimationTimer, DEATH_FRAMES.Length-1)];
             } else
@@ -196,5 +195,7 @@ namespace CaveGame.Core.Game.Entities
         {
             throw new NotImplementedException();
         }
+
+        public void Provoke() => Provoked = true;
     }
 }

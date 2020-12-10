@@ -122,14 +122,14 @@ namespace StandaloneServer
 			base.Shutdown();
         }
 
-        protected override void OnClientQuit(NetworkMessage msg, User user)
+        protected override void OnClientLogout(NetworkMessage msg, User user)
         {
 			DisconnectPacket packet = new DisconnectPacket(msg.Packet.GetBytes());
 
 			if (World.FindEntityOfID(packet.LeavingEntityID, out Player player))
 				if (OnPlayerLeftServer.Invoke(new PlayerEventArgs(player)))
 					OutputAndChat(String.Format("{0} has left the server.", user.Username));
-			base.OnClientQuit(msg, user);
+			base.OnClientLogout(msg, user);
         }
 
         protected override void OnClientChat(NetworkMessage msg, User user)

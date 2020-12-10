@@ -8,11 +8,10 @@ using System.Linq;
 using System.Text;
 using CaveGame.Client;
 using CaveGame.Client.UI;
+using CaveGame.Core.LuaInterop;
 
 namespace CaveGame.Core
 {
-
-
 	public class Script
 	{
 		public static void print(params string[] strs)
@@ -198,6 +197,8 @@ namespace CaveGame.Core
 			consoleLua = new Lua();
 			consoleLua.LoadCLRPackage();
 			consoleLua["console"] = this;
+			consoleLua["game"] = game;
+			consoleLua.DoString(LuaSnippets.UtilityFunctions);
 			consoleLua.DoString("function print(data) console:LuaPrint(tostring(data)) end");
 		}
 

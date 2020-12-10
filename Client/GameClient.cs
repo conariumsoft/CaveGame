@@ -24,11 +24,14 @@ using CaveGame.Client.DebugTools;
 using CaveGame.Core.Network.Packets;
 using System.Linq;
 using System.Collections.Generic;
-
+using CaveGame.Core.Game;
 
 namespace CaveGame.Client
 {
-	using BombEntity = CaveGame.Core.Game.Entities.Bomb;
+	using BombEntity     = Core.Game.Entities.Bomb;
+	using ArrowEntity    = Core.Game.Entities.Arrow;
+	using WurmholeEntity = Core.Game.Entities.Wurmhole;
+	using DynamiteEntity = Core.Game.Entities.Dynamite;
 
 	public class GameClient : IGameContext, IGameClient
 	{
@@ -89,19 +92,19 @@ namespace CaveGame.Client
 			[PacketType.sPlayerPeerJoined] = OnPeerJoined,
 			[PacketType.sPlayerPeerLeft]  = OnPeerLeft,
 			[PacketType.sRemoveEntity] = OnRemoveEntity,
-			[PacketType.sEntityPhysicsUpdate] = OnEntityPhysUpdate,
+			[PacketType.netEntityPhysicsUpdate] = OnEntityPhysUpdate,
 			[PacketType.sExplosion] = OnExplosion,
 			[PacketType.sSpawnEntityGeneric] = OnEntitySpawnGeneric,
-			[PacketType.PlaceFurniture] = OnPlaceFurniture,
-			[PacketType.RemoveFurniture] = OnRemoveFurniture,
-			[PacketType.OpenDoor] = OnPlayerOpensDoor,
-			[PacketType.CloseDoor] = OnPlayerClosesDoor,
-			[PacketType.TimeOfDay] = OnServerChangedTimeOfDay,
-			[PacketType.SpawnItemStackEntity] = OnItemStackEntitySpawned,
-			[PacketType.DamageTile] = OnDamageTile,
-			[PacketType.GivePlayerItem] = GiveItToMeDaddy,
-			[PacketType.SpawnWurmholeEntity] = OnSpawnedWurmhole,
-			[PacketType.TriggerWurmholeEntity] = OnWurmholeTriggered,
+			[PacketType.sPlaceFurniture] = OnPlaceFurniture,
+			[PacketType.sRemoveFurniture] = OnRemoveFurniture,
+			[PacketType.sOpenDoor] = OnPlayerOpensDoor,
+			[PacketType.sCloseDoor] = OnPlayerClosesDoor,
+			[PacketType.sUpdateTimeOfDay] = OnServerChangedTimeOfDay,
+			[PacketType.sSpawnItemStackEntity] = OnItemStackEntitySpawned,
+			[PacketType.netDamageTile] = OnDamageTile,
+			[PacketType.sGivePlayerItem] = GiveItToMeDaddy,
+			[PacketType.sProvokeEntityGeneric] = OnEntityProvokedGeneric,
+			[PacketType.netPlayerState] = OnPlayerAnimationStateUpdate,
 		};
 
 		public GameClient(CaveGameGL _game)
@@ -266,7 +269,7 @@ namespace CaveGame.Client
 
 			entity.Health = packet.Health;
 
-			if (entity is Player plr )
+			if (entity is Player plr)
 			{
 				if (packet.EntityID == MyPlayerID)
 					return;
@@ -366,19 +369,10 @@ namespace CaveGame.Client
 		}
 
 
-		private void SpawnBomb(int networkID) => World.Entities.Add(new BombEntity { 
-			EntityNetworkID = networkID,
-			RemoteControlled = true,
-		});
-
-		private void SpawnWurmhole(int networkID) => World.Entities.Add(new Wurmhole {
-			EntityNetworkID = networkID,
-		});
-
-		private void SpawnArrow(int networkID) => World.Entities.Add(new ArrowEntity
-        {
-
-        })
+		private void SpawnBomb(int ID)     => World.Entities.Add(new BombEntity    {EntityNetworkID = ID});
+		private void SpawnWurmhole(int ID) => World.Entities.Add(new WurmholeEntity{EntityNetworkID = ID});
+		private void SpawnArrow(int ID)    => World.Entities.Add(new ArrowEntity   {EntityNetworkID = ID});
+		private void SpawnDynamite(int ID) => World.Entities.Add(new DynamiteEntity{EntityNetworkID = ID});
 
 
 		private void OnEntitySpawnGeneric(NetworkMessage message)
@@ -482,21 +476,17 @@ namespace CaveGame.Client
 
         }
 
-		private void OnWurmholeTriggered(NetworkMessage msg)
+		private void OnEntityProvokedGeneric(NetworkMessage msg)
 		{
-			TriggerWurmholeEntityPacket packet = new TriggerWurmholeEntityPacket(msg.Packet.GetBytes());
-
+			ProvokeEntityGenericPacket packet = new(msg.Packet.GetBytes());
 			var entity = World.FindEntityOfID(packet.EntityNetworkID);
-
-			if (entity is Wurmhole wurmhole)
-            {
-				wurmhole.Triggered = true;
-            }
+			if (entity is IProvokable provokable)
+				provokable.Provoke();
 		}
 
 		private void OnServerHandshakeReply(NetworkMessage msg)
         {
-			ServerInformationReplyPacket packet = new(msg.Packet.GetBytes());
+			HandshakeResponsePacket packet = new(msg.Packet.GetBytes());
 
 			var protocolMatches = (packet.ServerProtocolVersion == Globals.ProtocolVersion);
 
@@ -739,7 +729,7 @@ namespace CaveGame.Client
 			//gameClient = new NetworkClient("127.0.0.1:40269");
 			//gameClient.Output = Game.Console;
 			gameClient.Start();
-			gameClient.SendPacket(new GetServerInformationPacket(Globals.ProtocolVersion));
+			gameClient.SendPacket(new InitServerHandshakePacket(Globals.ProtocolVersion));
 			
 			//gameClient.SendPacket(new RequestJoinPacket("jooj"));
 		}

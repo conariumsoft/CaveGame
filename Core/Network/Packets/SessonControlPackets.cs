@@ -9,15 +9,15 @@ namespace CaveGame.Core.Network.Packets
 	/// <summary>
 	/// 
 	/// </summary>
-	public class GetServerInformationPacket : Packet
+	public class InitServerHandshakePacket : Packet
 	{
-		public GetServerInformationPacket(int protocol) : base(PacketType.GetServerInfo)
+		public InitServerHandshakePacket(int protocol) : base(PacketType.cHandshake)
 		{
 			Payload = new byte[4];
 			ClientProtocolVersion = protocol;
 		}
 
-		public GetServerInformationPacket(byte[] data) : base(data) { }
+		public InitServerHandshakePacket(byte[] data) : base(data) { }
 		/// <summary> 
 		/// index 0, size 4 
 		/// </summary>
@@ -31,7 +31,7 @@ namespace CaveGame.Core.Network.Packets
 	/// <summary>
 	/// 
 	/// </summary>
-	public class ServerInformationReplyPacket : Packet
+	public class HandshakeResponsePacket : Packet
 	{
 
 		public int ServerProtocolVersion { get => Payload.ReadInt(0); set => Payload.WriteInt(0, value); }
@@ -55,8 +55,8 @@ namespace CaveGame.Core.Network.Packets
 			get => Payload.ReadStringArray(168, Encoding.ASCII, 16, 10);
 			set => Payload.WriteStringArray(168, Encoding.ASCII, 16, 10, value);
 		}
-		public ServerInformationReplyPacket(byte[] data) : base(data) { }
-		public ServerInformationReplyPacket(int protocol, string name, string motd, int maxplayers, string[] connected) : base(PacketType.ServerInfoReply)
+		public HandshakeResponsePacket(byte[] data) : base(data) { }
+		public HandshakeResponsePacket(int protocol, string name, string motd, int maxplayers, string[] connected) : base(PacketType.sHandshakeResponse)
 		{
 			Payload = new byte[480];
 			ServerProtocolVersion = protocol;
@@ -73,7 +73,7 @@ namespace CaveGame.Core.Network.Packets
 		public int YourUserNetworkID   { get => Payload.ReadInt(0);	 set => Payload.WriteInt(0, value); }
 		public int YourPlayerNetworkID { get => Payload.ReadInt(4);	 set => Payload.WriteInt(4, value); }
 
-		public AcceptJoinPacket(int userid, int playerid) : base(PacketType.SAcceptJoin)
+		public AcceptJoinPacket(int userid, int playerid) : base(PacketType.sAcceptLogin)
 		{
 			Payload = new byte[12];
 			YourPlayerNetworkID = playerid;
@@ -93,7 +93,7 @@ namespace CaveGame.Core.Network.Packets
 		public int LeavingEntityID { get => Payload.ReadInt(0); set => Payload.WriteInt(0, value); }
 		public UserDisconnectReason DisconnectReason { get => (UserDisconnectReason)Payload[4]; set => Payload[4] = (byte)value; }
 
-		public DisconnectPacket(int entityID, UserDisconnectReason disconnectReason) : base(PacketType.ClientQuit)
+		public DisconnectPacket(int entityID, UserDisconnectReason disconnectReason) : base(PacketType.cLogout)
 		{
 			Payload = new byte[8];
 			LeavingEntityID = entityID;
@@ -108,7 +108,7 @@ namespace CaveGame.Core.Network.Packets
 			get => Payload.ReadString(0, 128, Encoding.ASCII);
 			set => Payload.WriteString(0, value, Encoding.ASCII, 128);
 		}
-		public RejectJoinPacket(string reason) : base(PacketType.SDenyJoin)
+		public RejectJoinPacket(string reason) : base(PacketType.sRejectLogin)
 		{
 			Payload = new byte[192];
 			RejectReason = reason;
@@ -157,7 +157,7 @@ namespace CaveGame.Core.Network.Packets
 				Payload[6] = value.B;
 			}
 		}
-		public PlayerJoinedPacket(int id, string user, Color color) : base(PacketType.SPlayerJoined)
+		public PlayerJoinedPacket(int id, string user, Color color) : base(PacketType.sPlayerPeerJoined)
 		{
 			Payload = new byte[128];
 			EntityID = id;
@@ -174,7 +174,7 @@ namespace CaveGame.Core.Network.Packets
 			set { TypeSerializer.FromInt(ref Payload, 0, value); }
 		}
 		public PlayerLeftPacket(byte[] bytes) : base(bytes) { }
-		public PlayerLeftPacket(int id) : base(PacketType.SPlayerLeft)
+		public PlayerLeftPacket(int id) : base(PacketType.sPlayerPeerLeft)
 		{
 			Payload = new byte[4];
 			EntityID = id;
@@ -193,7 +193,7 @@ namespace CaveGame.Core.Network.Packets
 			set { Payload = Encoding.UTF8.GetBytes(value); }
 		}
 		public RequestJoinPacket(byte[] bytes) : base(bytes) { }
-		public RequestJoinPacket(string username) : base(PacketType.CRequestJoin)
+		public RequestJoinPacket(string username) : base(PacketType.cRequestLogin)
 		{
 			RequestedName = username;
 		}
@@ -203,7 +203,7 @@ namespace CaveGame.Core.Network.Packets
 	{
 
 
-		public KickPacket(string reason) : base(PacketType.SKick)
+		public KickPacket(string reason) : base(PacketType.sKick)
 		{
 			Payload = new byte[128];
 			KickReason = reason;

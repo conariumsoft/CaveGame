@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Game\CraftingRecipes\Recipe.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Arrow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Bee.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Dynamite.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Projectiles.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Wurmhole.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Inventory\Container.cs" />

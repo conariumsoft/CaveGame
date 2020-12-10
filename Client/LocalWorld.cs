@@ -205,10 +205,10 @@ namespace CaveGame.Client
             {
 				if (entity is IPhysicsEntity physicsEntity  && entity is ICanBleed && physicsEntity.Position.Distance(Blast.Position) < 60)
                 {
-					for (int i = -40; i < 40; i += 4)
+					for (int i = -45; i < 45; i += 2)
 					{
 						var blast_direction = Blast.Position.LookAt(entity.Position);
-						var result = TileRaycast(physicsEntity.Position, Rotation.FromDeg(Rotation.FromUnitVector(blast_direction).Degrees + i), rand.Next(10, 40));
+						var result = TileRaycast(physicsEntity.Position, Rotation.FromDeg(Rotation.FromUnitVector(blast_direction).Degrees + i), rand.Next(10, 60));
 						if (result.Hit)
 						{
 							Vector2 rounded = result.Intersection.ToPoint().ToVector2();
