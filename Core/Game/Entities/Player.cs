@@ -14,10 +14,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using CaveGame.Core.Game.Items;
 
 namespace CaveGame.Core.Game.Entities
 {
-	public class Player : PhysicsEntity, IPhysicsObject, IPositional, IVelocity, INextPosition, IHorizontalDirectionState
+	public class Player : PhysicsEntity, ICanBleed, IServerPhysicsObserver
 	{
 
 		public override Vector2 BoundingBox => new Vector2(6, 12);
@@ -30,7 +31,7 @@ namespace CaveGame.Core.Game.Entities
 		public bool OnRope { get; set; }
 		public User User { get; set; }
 		public string DisplayName { get; set; }
-		public HorizontalDirection Facing { get; set; }
+		public Direction Facing { get; set; }
 		public Color Color { get; set; }
 		public bool Walking { get; set; }
 
@@ -59,5 +60,6 @@ namespace CaveGame.Core.Game.Entities
 			walkingAnimationTimer += (float)gt.ElapsedGameTime.TotalSeconds * 5;
 			base.ClientUpdate(client, gt);
 		}
+		public void ServerPhysicsTick(IServerWorld world, float step) => PhysicsStep(world, step);
 	}
 }

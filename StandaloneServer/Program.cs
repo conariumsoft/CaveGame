@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using CaveGame.Core;
 
 namespace StandaloneServer
 {
@@ -45,7 +46,8 @@ namespace StandaloneServer
 			//GameServer server = new GameServer(config);
 
 			ServerConfig config = Configuration.Load<ServerConfig>("Config.xml", true);
-			StandaloneGameServer server = new StandaloneGameServer(config);
+			WorldMetadata worldMDT = new WorldMetadata { Name = config.World, Seed = 420 };
+			StandaloneGameServer server = new StandaloneGameServer(config, worldMDT);
 			server.Output = consoleWrapper;
 
 			_consoleCtrlHandler += s =>

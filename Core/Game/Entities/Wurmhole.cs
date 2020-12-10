@@ -11,7 +11,7 @@ using System.Text;
 namespace CaveGame.Core.Game.Entities
 {
     // Würmhole
-    public class Wurmhole : PhysicsEntity, IServerPhysicsObserver, IClientPhysicsObserver, IThinker
+    public class Wurmhole : PhysicsEntity, IServerPhysicsObserver, IClientPhysicsObserver, IThinker, ICanBleed
     {
         #region Sprite Quads
         public static Rectangle SP_IDLE0 = new Rectangle(0, 0, 16, 16);

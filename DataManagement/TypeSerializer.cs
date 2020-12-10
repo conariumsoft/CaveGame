@@ -47,7 +47,29 @@ namespace DataManagement
         public static void WriteDouble(this byte[] data, int index, double value) => FromDouble(ref data, index, value);
         public static string ReadString(this byte[] data, int index, int length, Encoding encoder) => ToString(encoder, data, index, length);
 
+        public static string[] ReadStringArray(this byte[] data, int index, Encoding encoder, int stringlength, int count)
+        {
+            string[] list = new string[count];
+            for (int i = 0; i < 10; i++)
+            {
+                list[i] = data.ReadString(index + (i * stringlength), stringlength, encoder);
+            }
+            return list;
+        }
 
+        public static void WriteStringArray(this byte[] data, int index, Encoding encoder, int strlength, int count, string[] list)
+        {
+            int idx = index;
+            foreach (string val in list)
+            {
+                if (idx > count)
+                    return;
+
+                data.WriteString(index + (idx * strlength), val, encoder, strlength);
+                idx++;
+            }
+
+        }
 
         public static void WriteString(this byte[] data, int index, string msg, Encoding encoder, int length) => FromString(ref data, encoder, msg, index, length);
 

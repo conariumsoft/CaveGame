@@ -125,8 +125,6 @@ namespace CaveGame.Client
 						DrawItemSlot(gfx, InventoryDrawPosition, new Point(x, y), UIScale, stack);
 				}
 			}
-
-
 		}
 
 		private void DrawHotbar(GraphicsEngine gfx)
@@ -166,6 +164,9 @@ namespace CaveGame.Client
             {
 				DrawMouseHeldItem(gfx);
             }
+
+			
+
 
 		}
 		private int lastScroll = 0;

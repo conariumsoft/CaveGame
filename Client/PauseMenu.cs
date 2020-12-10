@@ -15,6 +15,7 @@ namespace CaveGame.Client
 		public PauseMenu(GameClient client)
         {
 			Client = client;
+
         }
 		public GameClient Client { get; private set; }
 		public UIRoot Menu { get; private set; }
@@ -40,13 +41,16 @@ namespace CaveGame.Client
 
 		public void Update(GameTime gt) {
 
-			if (Open)
+			if (Menu!=null && Open)
 				Menu.Update(gt);
 		}
 
 
 		public void Draw(GraphicsEngine gfx)
         {
+			if (Menu==null)
+				ConstructPauseMenu(gfx);
+
 			if (Open)
 				Menu.Draw(gfx);
         }
@@ -97,7 +101,7 @@ namespace CaveGame.Client
 
 		public void TryClientExit(TextButton tbtn, MouseState ms)
         {
-
+			Client.OverrideDisconnect();
         }
 	}
 }

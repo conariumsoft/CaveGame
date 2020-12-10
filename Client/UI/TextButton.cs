@@ -12,41 +12,36 @@ using CaveGame.Core;
 
 namespace CaveGame.Client.UI
 {
-	public interface IClickable
+	public interface IButtonWidget
 	{
-		public bool MouseOver { get; set; }
-		public bool MouseDown { get; set; }
-	}
+        bool MouseDown { get; }
+		bool Selected { get; set; }
+		Color UnselectedBGColor { get; set; }
+		Color SelectedBGColor { get; set; }
+    }
 
-	public class TextButton: Label
+	public class TextButton: Label, IButtonWidget
 	{
 
 		public TextButton(NLua.Lua state, NLua.LuaTable table) : base(state, table) { }
-		public TextButton() : base(){}
+		public TextButton() : base() {}
 
 		public Color UnselectedBGColor { get; set; }
 		public Color SelectedBGColor { get; set; }
 		public bool Selected { get; set; }
-		public bool MouseOver { get; private set; }
+        public bool MouseDown { get; private set; }
 
 		public delegate void ClickHandler(TextButton sender, MouseState mouse);
 
 		public event ClickHandler OnLeftClick;
 		public event ClickHandler OnRightClick;
-		public event ClickHandler OnMouseEnter;
-		public event ClickHandler OnMouseExit;
 
-		public LuaEvent<LuaEventArgs> OnLMBClick = new LuaEvent<LuaEventArgs>();
+        public LuaEvent<LuaEventArgs> OnLMBClick = new LuaEvent<LuaEventArgs>();
 		public LuaEvent<LuaEventArgs> OnRMBClick = new LuaEvent<LuaEventArgs>();
 
-		protected MouseState prevMouse;
+		protected MouseState prevMouse = Mouse.GetState();
 
-		protected bool IsMouseInside(MouseState mouse)
-		{
-			return (mouse.X > AbsolutePosition.X && mouse.Y > AbsolutePosition.Y
-				&& mouse.X < (AbsolutePosition.X + AbsoluteSize.X)
-				&& mouse.Y < (AbsolutePosition.Y + AbsoluteSize.Y));
-		}
+
 
 		public override void Update(GameTime gt)
 		{
@@ -54,55 +49,44 @@ namespace CaveGame.Client.UI
 
 			Selected = IsMouseInside(mouse);
 
-			if (prevMouse != null)
-			{
-				if (Selected && !IsMouseInside(prevMouse))
-				{
-					OnMouseEnter?.Invoke(this, mouse);
-					GameSounds.MenuBlip?.Play(1.0f, 1, 0.0f);
-				}
-					
 
-				if (!Selected && IsMouseInside(prevMouse))
-				{
-					OnMouseExit?.Invoke(this, mouse);
-					GameSounds.MenuBlip?.Play(0.8f, 1, 0.0f);
-				}
-					
+            if (Selected && !IsMouseInside(prevMouse))
+                GameSounds.MenuBlip?.Play(1.0f, 1, 0.0f);
 
-				if (Selected && CaveGameGL.ClickTimer > (1/60.0f))
+
+            if (!Selected && IsMouseInside(prevMouse))
+                GameSounds.MenuBlip?.Play(0.8f, 1, 0.0f);
+
+            if (Selected && CaveGameGL.ClickTimer > (1/60.0f)) 
+			{ 
+				if (mouse.LeftButton == ButtonState.Pressed && (prevMouse.LeftButton != ButtonState.Pressed)) 
+				{ 
+					GameSounds.MenuBlip?.Play(1.0f, 0.9f, 0.0f); 
+					OnLeftClick?.Invoke(this, mouse); 
+					OnLMBClick.Invoke(new LuaEventArgs()); 
+					CaveGameGL.ClickTimer = 0; 
+                }
+
+                    
+				if (mouse.RightButton == ButtonState.Pressed && (prevMouse.RightButton != ButtonState.Pressed)) 
 				{
-					if (mouse.LeftButton == ButtonState.Pressed && !(prevMouse.LeftButton == ButtonState.Pressed))
-					{
-						GameSounds.MenuBlip?.Play(1.0f, 0.9f, 0.0f);
-						OnLeftClick?.Invoke(this, mouse);
-						OnLMBClick.Invoke(new LuaEventArgs());
-						CaveGameGL.ClickTimer = 0;
-					}
+                    
+					GameSounds.MenuBlip?.Play(1.0f, 0.9f, 0.0f);
+                    OnRightClick?.Invoke(this, mouse);
+                    OnRMBClick.Invoke(new LuaEventArgs()); 
+					CaveGameGL.ClickTimer = 0; 
+                }
 						
+            }
 
-					if (mouse.RightButton == ButtonState.Pressed && !(prevMouse.RightButton == ButtonState.Pressed))
-					{
-						GameSounds.MenuBlip?.Play(1.0f, 0.9f, 0.0f);
-						OnRightClick?.Invoke(this, mouse);
-						OnRMBClick.Invoke(new LuaEventArgs());
-						CaveGameGL.ClickTimer = 0;
-					}
-						
-				}
-
-			}
 
 
 			prevMouse = mouse;
 
 
-			if (Selected)
-				BGColor = SelectedBGColor;
-			else
-				BGColor = UnselectedBGColor;
+			BGColor = Selected ? SelectedBGColor : UnselectedBGColor;
 
-			base.Update(gt);
+            base.Update(gt);
 		}
 
 		public override void Draw(GraphicsEngine GFX)

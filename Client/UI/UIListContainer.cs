@@ -5,11 +5,21 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using Microsoft.Xna.Framework.Input;
 
 namespace CaveGame.Client.UI
 {
 	public class UIListContainer : UINode
 	{
+
+
+		public bool MouseOver => Parent.MouseOver;
+		public bool IsMouseInside(MouseState ms) => Parent.IsMouseInside(ms);
+        public UINode FindFirstChildWithName(string name) => Children.First(t => t.Name == name);
+        public List<UINode> FindChildrenWithName(string name) => Children.FindAll(t => t.Name == name);
+
+
 		private UINode _parent;
 		public UINode Parent
 		{
@@ -67,8 +77,7 @@ namespace CaveGame.Client.UI
 
 		public void Update(GameTime gt)
 		{
-
-			double delta = gt.ElapsedGameTime.TotalSeconds;
+            double delta = gt.ElapsedGameTime.TotalSeconds;
 
 			double alphaCapped = Math.Clamp(delta * 100.0, 1 / 1000.0, 0.5);
 

@@ -24,6 +24,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using CaveGame.Core.Inventory;
+using CaveGame.Core.Network.Packets;
 
 namespace CaveGame.Server
 {
@@ -31,7 +32,6 @@ namespace CaveGame.Server
 	{
 		DateTime Time { get; }
 		IMessageOutlet Output { get; }
-
 	}
 
 
@@ -74,10 +74,6 @@ namespace CaveGame.Server
 
 	public class GameServer : IGameServer
 	{
-
-		
-
-		
 
 		
 		public bool Running { get; set; }
@@ -123,7 +119,9 @@ namespace CaveGame.Server
 		}
 		
 
-		public GameServer(ServerConfig config) {
+		public GameServer(ServerConfig config, WorldMetadata worldmdt) {
+			InitNetworkEvents();
+
 			ServerName = config.ServerName;
 			ServerMOTD = config.ServerMOTD;
 			MaxPlayers = config.MaxPlayers;
@@ -132,54 +130,22 @@ namespace CaveGame.Server
 			ticker = 0;
 			server = new NetworkServer(config.Port);
 			ConnectedUsers = new List<User>();
-			World = new ServerWorld(new WorldConfiguration { Name = config.World, Seed = 420 });
+			World = new ServerWorld(worldmdt);
 			World.Server = this;
 
 			EntityManager = new EntityManager();
 		}
 
-		public void Start()
-		{
-			server.Start();
-			Running = true;
-		}
 
-		public virtual void Shutdown()
-		{
-			
-			Console.WriteLine("Shutting Down. Not Saving while testing worldgen");
-			//World.SaveData();
-			Thread.Sleep(100);
-		}
 
-		public void SendTo(Packet p, User user) {
-			server.SendPacket(p, user.EndPoint);
-		}
-		public void SendToAll(Packet p) {
-			foreach (var user in ConnectedUsers)
-				server.SendPacket(p, user.EndPoint);
-		}
-		public void SendToAllExcept(Packet p, User exclusion) {
-			foreach (var user in ConnectedUsers)
-			{
-				if (!user.Equals(exclusion))
-					server.SendPacket(p, user.EndPoint);
-			}
-		}
-		public User GetConnectedUser(IPEndPoint ep)
-		{
-			foreach (User usr in ConnectedUsers)
-				if (usr.EndPoint.Equals(ep))
-					return usr;
+		public delegate void NetworkListener(User user, NetworkMessage message);
 
-			return null;
-
-		}
-		public void OutputAndChat(string text)
+		private Dictionary<PacketType, NetworkListener> NetworkEvents;
+		private void InitNetworkEvents() => NetworkEvents = new Dictionary<PacketType, NetworkListener()
 		{
-			Chat(text);
-			Output?.Out(String.Format("[{0} {1}] {2}", "server", DateTime.Now.ToString("HH:mm:ss.ff"), text));
-		}
+			[PacketType.ClientQuit]
+		};
+		
 
 
 		#region NetworkListenerMethods
@@ -239,40 +205,45 @@ namespace CaveGame.Server
 			foreach (var furniture in World.Furniture)
 				SendTo(new PlaceFurniturePacket((byte)furniture.ID, furniture.FurnitureNetworkID, furniture.Position.X, furniture.Position.Y), newuser);
 
+			int thisPeerNetworkID = EntityManager.GetNextEntityNetworkID();
 
 			Player plr = new Player();
 			plr.Color = Color.White;
 			plr.DisplayName = packet.RequestedName;
 			plr.User = newuser;
-			SpawnEntity(plr);
+			plr.EntityNetworkID = thisPeerNetworkID;
+			World.SpawnEntity(plr);
 
-			OnPlayerConnects(newuser, plr);
+			
 			//PluginManager.CallOnPlayerJoined(plr);
 			
 			newuser.PlayerEntity = plr;
+			newuser.UserNetworkID = thisPeerNetworkID;
+			OnPlayerConnects(newuser, plr);
 
-			
+
 		}
 		protected virtual void OnClientQuit(NetworkMessage msg, User user)
 		{
-			QuitPacket packet = new QuitPacket(msg.Packet.GetBytes());
+			DisconnectPacket packet = new DisconnectPacket(msg.Packet.GetBytes());
 
-			if (World.FindEntityOfID(packet.EntityID, out Player player))
+			if (World.FindEntityOfID(packet.LeavingEntityID, out Player player))
 				World.Entities.Remove(player);
 				
 
-			SendToAll(new PlayerLeftPacket(packet.EntityID));
+			SendToAll(new PlayerLeftPacket(packet.LeavingEntityID));
 			ConnectedUsers.Remove(user);
 		}
-		private void OnPlayerPosition(NetworkMessage msg, User user)
+		private void OnPlayerPosition(NetworkMessage msg, User user) // player tells us their state
 		{
+			// TODO: make server more authoritative, prevent cheating
 			EntityPositionPacket packet = new EntityPositionPacket(msg.Packet.GetBytes());
 
 			if (World.FindEntityOfID(packet.EntityID, out Player player))
 			{
-				player.Position = new Vector2(packet.PosX, packet.PosY);
-				player.NextPosition = new Vector2(packet.NextX, packet.NextY);
-				player.Velocity = new Vector2(packet.VelX, packet.VelY);
+				player.Position = packet.Position;
+				player.NextPosition = packet.NextPosition;
+				player.Velocity = packet.Velocity;
 			}
 		}
 		private void OnPlayerState(NetworkMessage msg, User user)
@@ -393,9 +364,9 @@ namespace CaveGame.Server
 			var match = World.Furniture.FirstOrDefault(t => t.FurnitureNetworkID == packet.FurnitureNetworkID);
 			if (match != null && match is WoodenDoor confirmedDoor)
 			{
-				if (packet.Direction == HorizontalDirection.Left)
+				if (packet.Direction == Direction.Left)
 					confirmedDoor.State = DoorState.OpenLeft;
-				if (packet.Direction == HorizontalDirection.Right)
+				if (packet.Direction == Direction.Right)
 				{
 					confirmedDoor.State = DoorState.OpenRight;
 				}
@@ -580,15 +551,15 @@ namespace CaveGame.Server
 				ticker = 0;
 				foreach(var entity in World.Entities)
 				{
+
+					if (entity.Dead)
+						continue;
+
+					var packet = new EntityPositionPacket(entity);
+					SendToAll(packet);
+
 					if (entity is Wurmhole wurmhole && !entity.Dead)
                     {
-						var pos = new EntityPositionPacket(wurmhole.EntityNetworkID,
-							wurmhole.Position.X, wurmhole.Position.Y,
-							wurmhole.Velocity.X, wurmhole.Velocity.Y,
-							wurmhole.NextPosition.X, wurmhole.NextPosition.Y);
-						SendToAll(pos);
-
-
 						// TODO: remove dipshit hack;
 						if (wurmhole.Triggered)
                         {
@@ -598,34 +569,6 @@ namespace CaveGame.Server
 								SendToAll(new TriggerWurmholeEntityPacket(wurmhole.EntityNetworkID));
                             }
                         }
-					}
-
-					if (entity is Player player)
-					{
-						var pos = new EntityPositionPacket(player.EntityNetworkID, 
-							player.Position.X, player.Position.Y,
-							player.Velocity.X, player.Velocity.Y,
-							player.NextPosition.X, player.NextPosition.Y);
-						//Output?.Out("DT_OUT: " + pos.ToString());
-						SendToAll(pos);
-					}
-					if (entity is Core.Game.Entities.Bomb bomb && !entity.Dead)
-					{
-						var pos = new EntityPositionPacket(bomb.EntityNetworkID,
-							bomb.Position.X, bomb.Position.Y,
-							bomb.Velocity.X, bomb.Velocity.Y,
-							bomb.NextPosition.X, bomb.NextPosition.Y);
-						//Output?.Out("DT_OUT: " + pos.ToString());
-						SendToAll(pos);
-					}
-					if (entity is ItemstackEntity itementity && !entity.Dead)
-					{
-						var pos = new EntityPositionPacket(itementity.EntityNetworkID,
-							itementity.Position.X, itementity.Position.Y,
-							itementity.Velocity.X, itementity.Velocity.Y,
-							itementity.NextPosition.X, itementity.NextPosition.Y);
-						//Output?.Out("DT_OUT: " + pos.ToString());
-						SendToAll(pos);
 					}
 				}
 			}
@@ -657,6 +600,46 @@ namespace CaveGame.Server
 					}
 				}
 			}
+		}
+
+		public void Start()
+		{
+			server.Start();
+			Running = true;
+		}
+		public virtual void Shutdown()
+		{
+			GameConsole.Log("Shutting Down. Not Saving while testing worldgen");
+			World.SaveData();
+			Thread.Sleep(100);
+		}
+		public void SendTo(Packet p, User user) => server.SendPacket(p, user.EndPoint);
+		public void SendToAll(Packet p)
+		{
+			foreach (var user in ConnectedUsers)
+				server.SendPacket(p, user.EndPoint);
+		}
+		public void SendToAllExcept(Packet p, User exclusion)
+		{
+			foreach (var user in ConnectedUsers)
+			{
+				if (!user.Equals(exclusion))
+					server.SendPacket(p, user.EndPoint);
+			}
+		}
+		public User GetConnectedUser(IPEndPoint ep)
+		{
+			foreach (User usr in ConnectedUsers)
+				if (usr.EndPoint.Equals(ep))
+					return usr;
+
+			return null;
+
+		}
+		public void OutputAndChat(string text)
+		{
+			Chat(text);
+			Output?.Out(String.Format("[{0} {1}] {2}", "server", DateTime.Now.ToString("HH:mm:ss.ff"), text));
 		}
 
 		// Should be run on it's own thread

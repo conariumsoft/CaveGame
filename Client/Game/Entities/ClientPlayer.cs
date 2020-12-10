@@ -17,9 +17,9 @@ namespace CaveGame.Client.Game.Entities
 			Rectangle spriteFrame = new Rectangle(0, 0, 16, 24);
 
 			int flipSprite = 0;
-			if (Facing == HorizontalDirection.Left)
+			if (Facing == Direction.Left)
 				flipSprite = 0;
-			if (Facing == HorizontalDirection.Right)
+			if (Facing == Direction.Right)
 				flipSprite = 1;
 
 
@@ -33,12 +33,8 @@ namespace CaveGame.Client.Game.Entities
 			if (!OnGround)
 				spriteFrame = new Rectangle(48, 0, 16, 24);
 
-			string hptext = Health + "/" + MaxHealth + " HP";
-			Vector2 hpbounds = gfx.Fonts.Arial8.MeasureString(Health + "/" + MaxHealth + " HP");
-			//sb.Print(GameFonts.Arial8, Color.Red, Position - new Vector2(hpbounds.X / 2, hpbounds.Y*2), );
 
-			gfx.Text(gfx.Fonts.Arial8, hptext, Position-new Vector2(0, BoundingBox.Y/2), Color.White, TextXAlignment.Center, TextYAlignment.Bottom);
-
+			DrawHealth(gfx);
 			gfx.Sprite(gfx.Player, TopLeft, spriteFrame, Color, Rotation.Zero, new Vector2(0, 0), 1, (SpriteEffects)flipSprite, 0);
 		}
 	}

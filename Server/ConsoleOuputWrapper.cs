@@ -51,7 +51,6 @@ namespace CaveGame.Server
 
 	public class ConsoleOuputWrapper : IMessageOutlet
 	{
-
 		public List<ConsoleMsg> Messages { get; set; }
 
 		public List<ConsoleMsg> BufferMessages { get; set; }
@@ -65,8 +64,6 @@ namespace CaveGame.Server
         public void Import(ConsoleMsg message)
         {
             string text = message.Text;
-
-
 
 
             if (Regex.IsMatch(text, @"%\d|(%[a-f])"))

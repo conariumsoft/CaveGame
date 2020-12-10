@@ -11,13 +11,16 @@ using Microsoft.Xna.Framework.Input;
 using System.Globalization;
 using CaveGame.Core.Network;
 using CaveGame.Core.Generic;
+using CaveGame.Server;
+using System.Threading.Tasks;
+using CaveGame.Core.Game.Items;
+using CaveGame.Core.Inventory;
 
 namespace CaveGame.Client
 {
 	public class CaveGameGL : Microsoft.Xna.Framework.Game
 	{
 		public GameSettings GameSettings { get; set; }
-
 		public IGameContext CurrentGameContext { get; set; }
 		private IGameContext PreviousGameContext { get; set; }
 
@@ -73,6 +76,27 @@ namespace CaveGame.Client
 			GraphicsDeviceManager.ApplyChanges();
 		}
 
+		// join local (singleplayer server
+		public void EnterLocalGame(WorldMetadata meta)
+        {
+			var serverCFG = new ServerConfig
+			{
+				Port = 40270, // singleplayer server uses slightly different port
+				World = meta.Name,
+                ServerName = $"LocalServer [{meta.Name}] ",
+				ServerMOTD = "Singleplayer game world.",
+			};
+			var worldMDT = meta;
+			LocalServer server = new LocalServer(serverCFG, worldMDT);
+			server.Output = Console;
+            Task.Run(() => {
+                server.Start();
+                server.Run();
+            });
+			this.CurrentGameContext = this.GameClientContext;
+			this.GameClientContext.NetworkUsername = "Player";
+            this.GameClientContext.ConnectAddress = "127.0.0.1:40270";
+        }
 
 		public CaveGameGL()
 		{
@@ -204,12 +228,22 @@ namespace CaveGame.Client
         }
 		private void CmdRequestItemstack(CommandBar sender, Command command, params string[] args)
         {
-			if (args.Length == 0)
+			int amount = 1;
+			if (args.Length == 2)
             {
-
-            } 
-			else
-				SendAdminCommand(command.Keyword, args);
+				Int32.TryParse(args[1], out amount);
+            }
+			if (args.Length > 0)
+            {
+				bool success = Item.TryFromName(args[0], out Item item);
+				if (success)
+                {
+					GameClientContext.MyPlayer.Inventory.AddItem(new ItemStack { Item = item, Quantity = amount });
+					return;
+				}
+					
+            }
+			sender.Out("No item found with matching name!");
 		}
 
 		protected override void Initialize()
@@ -230,12 +264,14 @@ namespace CaveGame.Client
 				new ("connect", "", new List<string> { }, OnDisconnectCommand),
 				new ("screenshot", "", new List<string> { }, OnScreenshot),
 				new ("time", "Set/Get time of day", new List<string> { "time" }, CmdTimeCommand),
-				new ("sv_summon", "Summon an entity", new List<string>{"entityid, xpos, ypos, metadatastring" }, CmdRequestSummonEntity)
+				new ("sv_summon", "Summon an entity", new List<string>{"entityid, xpos, ypos, metadatastring" }, CmdRequestSummonEntity),
+				new ("gimme", "Gives you an item", new List<string>{"itemid", "amount"}, CmdRequestItemstack),
 				
 			};
 			foreach (var command in commands)
 				Console.BindCommandInformation(command);
 
+			GameConsole.SetInstance(Console);
 			Components.Add(Console);
 			
 			FPSCounter = new FrameCounter(this);
@@ -249,15 +285,6 @@ namespace CaveGame.Client
 		}
 
 
-		private void CreateGameStates()
-		{
-			MenuContext = new MenuManager(this);
-			GameClientContext = new GameClient(this);
-			SettingsContext = new Settings(this);
-			Window.TextInput += SettingsContext.OnTextInput;
-			CurrentGameContext = MenuContext;
-		}
-
 		protected override void LoadContent()
 		{
 			GameSounds.LoadAssets(Content);
@@ -269,9 +296,12 @@ namespace CaveGame.Client
 			GraphicsEngine.Initialize();
 			GraphicsEngine.LoadAssets(GraphicsDevice);
 
-			//GameTextures.LoadAssets(GraphicsDevice);
-			//ItemTextures.LoadAssets(GraphicsDevice);
-			CreateGameStates();
+
+			MenuContext = new MenuManager(this);
+			GameClientContext = new GameClient(this);
+			SettingsContext = new Settings(this);
+			Window.TextInput += SettingsContext.OnTextInput;
+			CurrentGameContext = MenuContext;
 		}
 
 

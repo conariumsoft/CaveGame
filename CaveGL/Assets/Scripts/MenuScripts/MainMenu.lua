@@ -172,7 +172,7 @@ for _, text in pairs(changeLogTextEntries) do
     elseif text:find(">") then
         font = GraphicsEngine.Instance.Fonts.Arial14;
         size = 16;
-        displayedText = text:gsub(">", "")
+        displayedText = text:gsub(">", "");
     elseif text:find("-") then
         font = GraphicsEngine.Instance.Fonts.Arial10;
         size = 12;

@@ -1,4 +1,5 @@
 ﻿using CaveGame.Core.Game.Entities;
+using CaveGame.Core.Game.Items;
 using CaveGame.Core.Generic;
 using CaveGame.Core.Inventory;
 using CaveGame.Core.Network;
@@ -157,7 +158,6 @@ namespace CaveGame.Core.Game.Tiles
 			ItemStack stack = new ItemStack { Quantity = 1, Item = new TileItem(this) };
 			Drop(server, world, tilePosition, stack);
 		}
-
 		public bool Equals(Tile other)
 		{
 			return (other.ID == ID && other.TileState == TileState && other.Damage == Damage);

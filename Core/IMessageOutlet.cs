@@ -8,7 +8,6 @@ namespace CaveGame.Core
 	public interface IMessageOutlet
 	{
 		void Out(string message, Color color);
-
 		void Out(string message);
 	}
 }

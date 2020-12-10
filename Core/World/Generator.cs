@@ -14,7 +14,7 @@ namespace CaveGame.Core
 		Plains,
 		Mountains,
 		Desert,
-		
+		Badlands,
 
 	}
 
@@ -82,7 +82,7 @@ namespace CaveGame.Core
 
     public class Generator
 	{
-		public const float BIOME_SIZE = 5000.0f;//12006.5f;
+		public const float BIOME_SIZE = 10000.5f;
 		public const float BIOME_TRANSITION = 0.2f;
 
 
@@ -101,7 +101,7 @@ namespace CaveGame.Core
 		{
 			int sampleCounts = 100;
 			float biomeRepeatChance = 0.35f;
-			int biomeCount = 4;
+			int biomeCount = 5;
 
 			biomemap = new SurfaceBiome[sampleCounts];
 			SurfaceBiome previous = SurfaceBiome.Desert;
@@ -120,7 +120,6 @@ namespace CaveGame.Core
 		public Generator(int WorldSeed)
 		{
 			Seed = WorldSeed;
-
 			Octave4 = new OctaveNoise(seed: Seed, octaves: 4);
 			Octave8 = new OctaveNoise(seed: Seed, octaves: 8);
 			Octave3 = new OctaveNoise(seed: Seed, octaves: 3);
@@ -143,22 +142,22 @@ namespace CaveGame.Core
 		}
 		private float GetDesertHeight(int x)
 		{
-			float n = (float)Simplex.Noise(x / 50.420f) * 10 + (float)Octave4.Noise2D(x / 30.0f, (-x * 0.10f) + (x / 20.0f)) * 20;
+			float n = (float)Simplex.Noise(x / 100.420f) * 10 + (float)Octave4.Noise2D(x / 100.0f, (-x * 0.10f) + (x / 20.0f)) * 20;
 			return n;
 		}
 		private float GetForestHeight(int x)
 		{
 
-			float n = (float)Simplex.Noise(x/100.420f)*4 + (float)Octave4.Noise2D(x/50.0f, (-x*0.10f)+(x/20.0f))*40;
-			return 10 + n;
+			float n = (float)Simplex.Noise(x/100.420f)*10 + (float)Octave4.Noise2D(x/60.0f, (-x*0.10f)+(x/20.0f))*30;
+			return 20 + n;
 		}
 
 		private float GetMountainHeight(int x)
 		{
 			
 			float simplex = (float)Simplex.Noise(x / 50.420f);
-			float octave = (float)Octave4.Noise2D(x / 100.0f, (-x * 0.05f) + (x / 40.0f));
-			float n =   (simplex * 30) * (octave * 10);
+			float octave = (float)Octave8.Noise2D(x / 120.0f, (-x * 0.05f) + (x / 40.0f));
+			float n =   (simplex * 15) * (octave * 15);
 			float a = Simplex.Noise(x / 10.0f) * 2;
 			float b = Simplex.Noise(x / 5.0f) * 2;
 			return (a+b + 100) + n;
@@ -166,6 +165,20 @@ namespace CaveGame.Core
 		private float GetPlainsHeight(int x)
         {
 			return Simplex.Noise(x / 100.420f)*4;
+        }
+
+		private float GetBandlandsHeight(int x)
+        {
+
+			float baseline = Simplex.Noise(x / 80f) * 8;
+			float raised = (float)(Octave4.Noise2D(x / 6.0f, (-x * 0.03f))+0.5f);
+
+			if (raised > 0.8)
+				raised = (raised*5) + 25;
+            else if (raised > 0.4)
+				raised = (raised*10) + 15;
+
+            return baseline + raised;
         }
 
 		private float GetHeightmap(int x, SurfaceBiome biome)
@@ -179,6 +192,8 @@ namespace CaveGame.Core
 				return GetMountainHeight(x);
 			if (biome == SurfaceBiome.Plains)
 				return GetPlainsHeight(x);
+			if (biome == SurfaceBiome.Badlands)
+				return GetBandlandsHeight(x);
 
 
 			return 0;
@@ -266,7 +281,7 @@ namespace CaveGame.Core
 			return biomedelta;
 		}
 
-		private void MountainsPass(Chunk chunk, int chunkX, int chunkY)
+		private void MountainsPass(ref Chunk chunk, int chunkX, int chunkY)
         {
 			int worldX = ((chunk.Coordinates.X * Globals.ChunkSize) + chunkX);
 			int worldY = ((chunk.Coordinates.Y * Globals.ChunkSize) + chunkY);
@@ -309,7 +324,7 @@ namespace CaveGame.Core
 			}
 		}
 
-		private void ForestPass(Chunk chunk, int chunkX, int chunkY)
+		private void ForestPass(ref Chunk chunk, int chunkX, int chunkY)
         {
 			int worldX = ((chunk.Coordinates.X * Globals.ChunkSize) + chunkX);
 			int worldY = ((chunk.Coordinates.Y * Globals.ChunkSize) + chunkY);
@@ -338,7 +353,7 @@ namespace CaveGame.Core
 			}
 		}
 
-		private void DesertPass(Chunk chunk, int chunkX, int chunkY)
+		private void DesertPass(ref Chunk chunk, int chunkX, int chunkY)
         {
 			int worldX = ((chunk.Coordinates.X * Globals.ChunkSize) + chunkX);
 			int worldY = ((chunk.Coordinates.Y * Globals.ChunkSize) + chunkY);
@@ -367,7 +382,7 @@ namespace CaveGame.Core
 			}
 		}
 
-		private void PlainsPass(Chunk chunk, int chunkX, int chunkY)
+		private void PlainsPass(ref Chunk chunk, int chunkX, int chunkY)
         {
 			int worldX = ((chunk.Coordinates.X * Globals.ChunkSize) + chunkX);
 			int worldY = ((chunk.Coordinates.Y * Globals.ChunkSize) + chunkY);
@@ -396,6 +411,55 @@ namespace CaveGame.Core
 			}
 		}
 
+		private void BadlandsPass(ref Chunk chunk, int chunkX, int chunkY)
+        {
+			int worldX = ((chunk.Coordinates.X * Globals.ChunkSize) + chunkX);
+            int worldY = ((chunk.Coordinates.Y * Globals.ChunkSize) + chunkY);
+            float depth = worldY + GetBiomeSurface(worldX) - GetBaseSurface(worldX, worldY);
+            if (depth < 0)
+            {
+                chunk.SetTile(chunkX, chunkY, new Game.Tiles.Air());
+            }
+            else if (depth <= 3)
+            {
+                chunk.SetTile(chunkX, chunkY, new Game.Tiles.Sandstone());
+            }
+            else if (depth <= 6)
+            {
+                chunk.SetTile(chunkX, chunkY, new Game.Tiles.Clay());
+                chunk.SetWall(chunkX, chunkY, new Game.Walls.Sandstone());
+            }
+            else if (depth <= 9)
+            {
+                chunk.SetTile(chunkX, chunkY, new Game.Tiles.Sandstone());
+                chunk.SetWall(chunkX, chunkY, new Game.Walls.Sandstone());
+            }
+            else if (depth <= 12)
+            {
+                chunk.SetTile(chunkX, chunkY, new Game.Tiles.Clay());
+                chunk.SetWall(chunkX, chunkY, new Game.Walls.Sandstone());
+            }
+            else if (depth <= 15)
+            {
+                chunk.SetTile(chunkX, chunkY, new Game.Tiles.Sandstone());
+                chunk.SetWall(chunkX, chunkY, new Game.Walls.Sandstone());
+            }
+            else if (depth <= 18)
+            {
+                chunk.SetTile(chunkX, chunkY, new Game.Tiles.Clay());
+                chunk.SetWall(chunkX, chunkY, new Game.Walls.Sandstone());
+            }
+			else
+            {
+                chunk.SetWall(chunkX, chunkY, new Game.Walls.Stone());
+                var noise = Simplex.Noise(worldX / 4.0f, worldY / 4.0f) * 30;
+                if (noise + depth > 30.5)
+                    chunk.SetTile(chunkX, chunkY, new Game.Tiles.Stone());
+                else
+                    chunk.SetTile(chunkX, chunkY, new Game.Tiles.Dirt());
+            }
+		}
+
 		//public float Get
 
 		public void HeightPass(ref Chunk chunk)
@@ -416,17 +480,19 @@ namespace CaveGame.Core
 
 					// Surface Biome Generation
 					if (biome == SurfaceBiome.Mountains)
-						MountainsPass(chunk, chunkX, chunkY);
+						MountainsPass(ref chunk, chunkX, chunkY);
 
 					if (biome == SurfaceBiome.Forest)
-						ForestPass(chunk, chunkX, chunkY);
+						ForestPass(ref chunk, chunkX, chunkY);
 
 					if (biome == SurfaceBiome.Desert)
-						DesertPass(chunk, chunkX, chunkY);
+						DesertPass(ref chunk, chunkX, chunkY);
 
 					if (biome == SurfaceBiome.Plains)
-						PlainsPass(chunk, chunkX, chunkY);
+						PlainsPass(ref chunk, chunkX, chunkY);
 					
+					if (biome == SurfaceBiome.Badlands)
+						BadlandsPass(ref chunk, chunkX, chunkY);
 
 					// Cave and other structures
 

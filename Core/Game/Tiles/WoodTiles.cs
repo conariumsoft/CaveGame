@@ -1,4 +1,5 @@
-﻿using CaveGame.Core.Generic;
+﻿using CaveGame.Core.Game.Items;
+using CaveGame.Core.Generic;
 using CaveGame.Core.Inventory;
 using CaveGame.Core.WorldGeneration;
 using DataManagement;

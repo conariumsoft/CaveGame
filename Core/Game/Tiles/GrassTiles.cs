@@ -1,4 +1,5 @@
-﻿using CaveGame.Core.Inventory;
+﻿using CaveGame.Core.Game.Items;
+using CaveGame.Core.Inventory;
 #if !EDITOR
 using CaveGame.Server;
 #endif

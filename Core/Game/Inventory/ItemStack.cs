@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
+using CaveGame.Core.Game.Items;
 
 namespace CaveGame.Core.Inventory
 {

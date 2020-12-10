@@ -18,7 +18,10 @@ namespace CaveGame.Core.Game.Entities
 		public void ClientPhysicsTick(IClientWorld world, float step) => PhysicsStep(world, step);
 		public override float Mass => 0.8f;
 
-		public override Vector2 BoundingBox => new Vector2(6, 6);
+        public override int MaxHealth => 30;
+		public override int Defense => 5;
+
+        public override Vector2 BoundingBox => new Vector2(6, 6);
 
 		public override Vector2 Friction => new Vector2(0.95f, 0.95f);
 
@@ -30,47 +33,15 @@ namespace CaveGame.Core.Game.Entities
 			family.Velocity += normal*(Velocity);
 		}
 
-		public override void OnCollide(IGameWorld world, Tile t, Vector2 separation, Vector2 normal, Point tilePos)
-		{
-			if (t is ILiquid liquid)
-			{
-				if (( normal.X != 0 || normal.Y != 0))
-				{
-					InLiquid = true;
-					LiquidViscosity = liquid.Viscosity;
-
-					Velocity = new Vector2(Velocity.X / liquid.Viscosity, Velocity.Y);
-				}
-				
-				return;
-			}
-
-			if (t is Platform plat)
-			{
-				if (normal.X == 0 && normal.Y == -1 && FallThrough == false)
-				{
-					var bottom = Position.Y + BoundingBox.Y;
-
-					var blockbottom = tilePos.Y * Globals.TileSize + (Globals.TileSize / 2);
-
-					if (bottom <= blockbottom)
-					{
-						NextPosition = NextPosition + separation;
-						Velocity = new Vector2(Velocity.X * 0.90f, -Velocity.Y * 1.0f);
-						//OnGround = true;
-
-					}
-				}
-				return;
-			}
-
+        protected override void SolidCollisionReaction(IGameWorld world, Tile t, Vector2 separation, Vector2 normal, Point tilePos)
+        {
 			if (normal.Y == 1)
 			{
 				Velocity = new Vector2(Velocity.X * 0.95f, -Velocity.Y * 0.6f);
 			}
 			if (normal.Y == -1)
 			{
-				Velocity = new Vector2(Velocity.X*0.90f, -Velocity.Y * 0.8f);
+				Velocity = new Vector2(Velocity.X * 0.90f, -Velocity.Y * 0.8f);
 				//OnGround = true;
 			}
 			if (normal.X == -1)
@@ -81,18 +52,26 @@ namespace CaveGame.Core.Game.Entities
 			{
 				Velocity = new Vector2(-Velocity.X * 0.75f, Velocity.Y * 0.95f);
 			}
-			NextPosition += separation;
 		}
 
 
-		public Bomb()
+        public Bomb()
 		{
-			detonationCountdown = 5;
+			Health = MaxHealth;
 		}
 
 		void Explode(IGameWorld world)
 		{
-			world.Explosion(this.Position, 5, 2, true, true);
+			Explosion explosion = new Explosion
+			{
+				Position = this.Position,
+				Thermal = false, // TODO: sets shit on fire?
+				BlastPressure = 5,
+				BlastRadius = 5,
+			};
+
+			world.Explosion(explosion, true, true);
+			//world.Explosion(this.Position, 5, 2, true, true);
 			this.Dead = true;
 		}
 
@@ -117,10 +96,10 @@ namespace CaveGame.Core.Game.Entities
 
 		public override void ServerUpdate(IGameServer server, GameTime gt)
 		{
-			detonationCountdown -= (float)gt.ElapsedGameTime.TotalSeconds;
+			detonationCountdown += (float)gt.ElapsedGameTime.TotalSeconds*4;
 
 
-			if (detonationCountdown <= 0)
+			if (detonationCountdown > Health)
 				Explode(server.World);
 
 			base.ServerUpdate(server, gt);
@@ -128,16 +107,20 @@ namespace CaveGame.Core.Game.Entities
 
 		public void ServerPhysicsTick(IServerWorld world, float step) => PhysicsStep(world, step);
 
-		public override void Draw(GraphicsEngine gfx) => gfx.Sprite(
-			texture: gfx.BombSprite,
-			position: TopLeft,
-			quad: null,
-			color: Color.White,
-			rotation: Rotation.Zero,
-			origin: Vector2.Zero,
-			scale: 0.75f,
-			efx: SpriteEffects.None,
-			layer: 0
-		);
+		public override void Draw(GraphicsEngine gfx)
+		{
+			gfx.Sprite(
+				texture: gfx.BombSprite,
+				position: TopLeft,
+				quad: null,
+				color: Color.White,
+				rotation: Rotation.Zero,
+				origin: Vector2.Zero,
+				scale: 0.75f,
+				efx: SpriteEffects.None,
+				layer: 0
+			);
+			//DrawHealth(gfx);
+		}
     }
 }

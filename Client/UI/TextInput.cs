@@ -152,7 +152,12 @@ namespace CaveGame.Client.UI
 
 			if (currentKB.IsKeyDown(Keys.LeftControl))
 			{
-
+				if (JustPressed(Keys.A))
+                {
+					SpecialSelection = true;
+					SpecialSelectionLower = 0;
+					SpecialSelectionUpper = InputBuffer.Length;
+                }
 				if (JustPressed(Keys.C))
 				{
 					if (SpecialSelection)

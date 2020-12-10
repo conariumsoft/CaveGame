@@ -8,46 +8,36 @@ using System.Text;
 namespace CaveGame.Core.Game.Entities
 {
 
-	public interface IReplicatedProperty { }
-	public interface IPositional: IReplicatedProperty { 
+	
+
+	public interface ICanBleed { }
+	
+
+	public interface IEntity : IDamageSource
+	{
 		Vector2 Position { get; set; }
-	}
-	public interface IVelocity : IReplicatedProperty
-	{
-		Vector2 Velocity { get; set; }
-	}
-	public interface INextPosition : IReplicatedProperty
-	{
-		Vector2 NextPosition { get;set; }
-	}
-	public interface IBoundingBox { 
 		Vector2 BoundingBox { get; }
-	}
-	public interface IHorizontalDirectionState : IReplicatedProperty {
-		HorizontalDirection Facing { get; set; }
-	}
-	public interface IPhysicsObject {
-		//void PhysicsStep(IGameWorld world, float step);
-		//void OnCollide(IGameWorld world, Tiles.Tile t, Vector2 separation, Vector2 normal, Point tilePos);
-		float Mass { get; }
-
-	}
-	public interface IFriction
-	{
-		Vector2 Friction { get; }
-	}
-
-	public interface IEntity
-	{
 		int EntityNetworkID { get; set; }
 		float DurationAlive { get; set; }
 		bool Dead { get; set; }
 		int Health { get; set; }
+		int Defense { get; set; }
 		int MaxHealth { get; }
 		//void Update(IGameWorld world, GameTime gt);
 		void ClientUpdate(IGameClient client, GameTime gt);
 		void ServerUpdate(IGameServer server, GameTime gt);
 		void Draw(GraphicsEngine engine);
+		void Damage(DamageType type, IDamageSource source, int amount);
+		void Damage(DamageType type, IDamageSource source, int amount, Vector2 direction);
+	}
+
+
+	public interface IPhysicsEntity : IEntity
+    {
+		Vector2 Velocity { get; set; }
+		Vector2 NextPosition { get; set; }
+		float Mass { get; }
+		Vector2 Friction { get; }
 	}
 	public interface IThinker
     {
@@ -56,20 +46,28 @@ namespace CaveGame.Core.Game.Entities
 		float ResponseTime { get; } // time between Think() ticks
 		int IQ { get; } // affects properties within Think() such as accuracy of pathfinding
 		void Think(IGameServer server, GameTime gt);
-
     }
 
 	public class Entity: IEntity
 	{
+		#region Override Entity Properties
+		public virtual Vector2 BoundingBox { get; }
+		public virtual int Health { get; set; }
+
+		public virtual int Defense { get; set; }
+		public virtual int MaxHealth { get; }
+		public virtual Vector2 Position { get; set; }
+		#endregion
+
 		public float DurationAlive { get; set; }
 		public bool Dead { get; set; } // Gets collected on death
 		public bool RemoteControlled { get; set; }
 		public int EntityNetworkID { get; set; }
-		public int Health { get; set; }
-		public virtual int MaxHealth { get; }
+		
 		public List<StatusEffect> ActiveEffects { get; private set; }
-
-		public void ClearActiveEffects() => ActiveEffects.Clear();
+        
+        
+        public void ClearActiveEffects() => ActiveEffects.Clear();
 
 		public void AddEffect(StatusEffect effect)
 		{
@@ -81,8 +79,30 @@ namespace CaveGame.Core.Game.Entities
 		}
 
 
+		public virtual void Damage(DamageType type, IDamageSource source, int amount)
+		{
+			if (type == DamageType.ActOfGod)
+            {
+				Health -= amount;
+				return;
+            }
+
+
+			amount = Math.Max(1, amount - Defense);
+
+			Health -= amount;
+		}
+
+		public virtual void Damage(DamageType type, IDamageSource source, int amount, Vector2 direction)
+        {
+			Damage(type, source, amount);
+
+        }
+
 		public virtual void ClientUpdate(IGameClient client, GameTime gt) {
 			DurationAlive += gt.GetDelta();
+
+
 		}
 
 		public virtual void ServerUpdate(IGameServer server, GameTime gt) {
@@ -96,6 +116,11 @@ namespace CaveGame.Core.Game.Entities
 			}
 			ActiveEffects.RemoveAll(e => e.Duration < 0);
 		}
+
+		
+
 		public virtual void Draw(GraphicsEngine gfx) { }
+
+       
     }
 }

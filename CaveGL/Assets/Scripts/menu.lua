@@ -7,11 +7,13 @@ local SingleplayerMenu = require("Assets.Scripts.MenuScripts.SingleplayerMenu")
 local MultiplayerMenu = require("Assets.Scripts.MenuScripts.MultiplayerMenu")
 local TimeoutMenu = require("Assets.Scripts.MenuScripts.TimeoutMenu")
 local CreditsMenu = require("Assets.Scripts.MenuScripts.CreditsMenu")
+local NewWorldMenu = require("Assets.Scripts.MenuScripts.NewWorldMenu")
 
 menumanager.Pages:Add("mainmenu", MainMenu);
 menumanager.Pages:Add("multiplayermenu", MultiplayerMenu);
 menumanager.Pages:Add("timeoutmenu", TimeoutMenu);
 menumanager.Pages:Add("singleplayermenu", SingleplayerMenu);
 menumanager.Pages:Add("creditsmenu", CreditsMenu);
+menumanager.Pages:Add("newworldmenu", NewWorldMenu);
 
 menumanager.CurrentPage = MainMenu;

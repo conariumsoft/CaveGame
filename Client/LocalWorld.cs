@@ -1,7 +1,6 @@
 ﻿using CaveGame.Core;
 using CaveGame.Core.Game.Entities;
 using CaveGame.Core.Generic;
-using CaveGame.Core.Particles;
 using CaveGame.Core.Game.Tiles;
 using CaveGame.Core.Game.Walls;
 using DataManagement;
@@ -26,7 +25,8 @@ namespace CaveGame.Client
 		public List<ChunkCoordinates> RequestedChunks;
 		public List<ChunkCoordinates> LoadedChunks;
 
-		public LightingEngine Lighting;
+		public LightingEngine Lighting { get; set; }
+		ILightingEngine IClientWorld.Lighting => Lighting;
 
 		protected DelayedTask localTileUpdateTask;
 		protected DelayedTask localLightingUpdateTask;
@@ -183,7 +183,45 @@ namespace CaveGame.Client
 			}
 		}
 
-		private void ApplyVisualTileUpdates()
+		private void SpawnExplosionParticles(Explosion blast)
+        {
+			for (int i = 0; i < 360; i += 5)
+			{
+				float randy = r.Next(0, 10) - 5;
+				Rotation rotation = Rotation.FromDeg(i + randy);
+				Vector2 direction = new Vector2((float)Math.Sin(rotation.Radians), (float)Math.Cos(rotation.Radians));
+				float size = ((float)r.NextDouble() * 0.4f) + (blast.BlastPressure * 0.2f);
+				ParticleSystem.EmitSmokeParticle(blast.Position, Color.White, Rotation.FromDeg(0), size, direction * (blast.BlastRadius * 1.0f + ((float)r.NextDouble() * 5)));
+			}
+		}
+
+		public override void Explosion(Explosion Blast, bool DamageTiles, bool DamageEntities)
+		{
+			Random rand = new Random();
+			ExplodeTiles(Blast, false);
+			SpawnExplosionParticles(Blast);
+
+			foreach (var entity in Entities)
+            {
+				if (entity is IPhysicsEntity physicsEntity  && entity is ICanBleed && physicsEntity.Position.Distance(Blast.Position) < 60)
+                {
+					for (int i = -40; i < 40; i += 4)
+					{
+						var blast_direction = Blast.Position.LookAt(entity.Position);
+						var result = TileRaycast(physicsEntity.Position, Rotation.FromDeg(Rotation.FromUnitVector(blast_direction).Degrees + i), rand.Next(10, 40));
+						if (result.Hit)
+						{
+							Vector2 rounded = result.Intersection.ToPoint().ToVector2();
+
+							ParticleSystem.Add(new TileBloodSplatterParticle { AttachedTo = result.TileCoordinates, Position = rounded, Face = result.Face });
+						}
+					}
+
+				}
+            }
+		}
+
+        private void ApplyVisualTileUpdates()
 		{
 			foreach (var kvp in Chunks)
 			{

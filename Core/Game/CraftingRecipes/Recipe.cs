@@ -1,4 +1,5 @@
-﻿using CaveGame.Core.Inventory;
+﻿using CaveGame.Core.Game.Items;
+using CaveGame.Core.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Text;

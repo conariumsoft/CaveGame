@@ -15,8 +15,12 @@ namespace CaveGame.Core.Game.Entities
 	public interface IClientPhysicsObserver {
 		void ClientPhysicsTick(IClientWorld world, float step);
 	}
-	public abstract class PhysicsEntity : Entity, IPhysicsObject, IPositional, IVelocity, INextPosition, IBoundingBox, IFriction
+	public abstract class PhysicsEntity : Entity, IPhysicsEntity
 	{
+		public virtual Vector2 NextPosition { get; set; }
+		public virtual Vector2 Velocity { get; set; }
+		public virtual Vector2 Friction { get; }
+		public abstract float Mass { get; }
 
 		public virtual Vector2 TopLeft
 		{
@@ -26,23 +30,23 @@ namespace CaveGame.Core.Game.Entities
 		public bool FallThrough { get; set; }
 		public virtual bool InLiquid { get; set; }
 		public float LiquidViscosity { get; set; }
-		public abstract float Mass { get; }
-		public abstract Vector2 BoundingBox { get; }
-		public abstract Vector2 Friction { get; }
-
-		public virtual Vector2 Velocity { get; set; }
-		public virtual Vector2 Position { get; set; }
-		public virtual Vector2 NextPosition { get; set; }
-		//public abstract float Buoyancy { get; set; }
+		
+		public override Vector2 BoundingBox { get; }
+		public override Vector2 Position { get; set; }
+		
 
 		public virtual float Buoyancy => Mass;
-
-
 
 
 		public bool OnGround { get; set; }
 
 
+		protected virtual void DrawHealth(GraphicsEngine GFX)
+		{
+			string hptext = Health + "/" + MaxHealth + " HP";
+			Vector2 hpbounds = GFX.Fonts.Arial8.MeasureString(Health + "/" + MaxHealth + " HP");
+			GFX.Text(GFX.Fonts.Arial8, hptext, Position - new Vector2(0, BoundingBox.Y + 3), Color.White, TextXAlignment.Center, TextYAlignment.Bottom);
+		}
 
 		protected void InterpolateServerPosition() => Position = Position.Lerp(NextPosition, 0.5f);
 
@@ -111,40 +115,68 @@ namespace CaveGame.Core.Game.Entities
 			}
 		}
 
-		public virtual void OnCollide(IGameWorld world, Tile t, Vector2 separation, Vector2 normal, Point tilePos)
-		{
+		protected virtual bool LavaCollisionTest(IGameWorld world, Tile t, Vector2 separation, Vector2 normal, Point tilePos)
+        {
+			if (t is Lava _)
+            {
+				Damage(DamageType.Lava, null, 1);
+				return true;
+			}
+			return false;
+		}
 
-			if (t is IPlatformTile plat)
+		protected virtual bool PlatformCollisionTest(IGameWorld world, Tile t, Vector2 separation, Vector2 normal, Point tilePos)
+        {
+			if (t is IPlatformTile _)
 			{
 				var blockbottom = tilePos.Y * Globals.TileSize + (Globals.TileSize / 2);
-
 				PlatformCollide(blockbottom, separation, normal);
-
-				return;
+				return true;
 			}
+			return false;
+		}
 
+		protected virtual bool LiquidCollisionTest(IGameWorld world, Tile t, Vector2 separation, Vector2 normal, Point tilePos)
+        {
 			if (t is ILiquid liquid)
 			{
-				if (normal.X != 0 || normal.Y != 0 && tilePos.Y*8 <= Position.Y)
+				if (normal.X != 0 || normal.Y != 0 && tilePos.Y * 8 <= Position.Y)
 				{
 					InLiquid = true;
 					LiquidViscosity = liquid.Viscosity;
 
 					Velocity = new Vector2(Velocity.X / liquid.Viscosity, Velocity.Y);
 				}
-				return;
+				return true;
 			}
-
+			return false;
+		}
+		protected virtual void SolidCollisionReaction(IGameWorld world, Tile t, Vector2 separation, Vector2 normal, Point tilePos)
+        {
 			if (normal.Y == 1)
 			{
 				Velocity = new Vector2(Velocity.X, -Velocity.Y * 0.5f);
 			}
 			if (normal.Y == -1)
 			{
-				Velocity = new Vector2(Velocity.X*0.99f, 0); // TODO: tile friction
-
+				Velocity = new Vector2(Velocity.X * 0.99f, 0); // TODO: tile friction
 				OnGround = true;
 			}
+		}
+
+		public virtual void OnCollide(IGameWorld world, Tile t, Vector2 separation, Vector2 normal, Point tilePos)
+		{
+			if (LiquidCollisionTest(world, t, separation, normal, tilePos))
+            {
+				LavaCollisionTest(world, t, separation, normal, tilePos);
+				return;
+			}
+			
+			if (PlatformCollisionTest(world, t, separation, normal, tilePos))
+				return;
+
+
+			SolidCollisionReaction(world, t, separation, normal, tilePos);
 			NextPosition += separation;
 		}
 

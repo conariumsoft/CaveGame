@@ -1,5 +1,5 @@
 ﻿#define UI_DEBUG
-
+#define AUTOCASTING_DEBUG
 
 using CaveGame.Core;
 using CaveGame.Core.LuaInterop;
@@ -9,41 +9,36 @@ using NLua;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using Microsoft.Xna.Framework.Input;
 
 
 namespace CaveGame.Client.UI
 {
 
-
-	public interface UIRootNode
-	{
-		void Update(GameTime gt);
-		void Draw(GraphicsEngine gfx);
-		List<UINode> Children { get; }
-		bool Visible { get; }
-		bool Active { get; }
-
-		Vector2 AnchorPoint { get; set; }
-		Vector2 AbsoluteSize { get;  }
-		Vector2 AbsolutePosition { get; }
-		
-		UICoords Position { get; set; }
-		UICoords Size { get; set; }
-	}
-	public interface UINode : UIRootNode
-	{
-		
-		UINode Parent { get; }
-		string Name { get; }
-
-
-	}
-
-
-	public static class Poo
+	public static class TypeCastingHax
     {
+
+		public static void InitFromLuaPropertyTable(this object thing, Lua environment, LuaTable table)
+        {
+			foreach (KeyValuePair<object, object> kvp in environment.GetTableDict(table))
+            {
+                if (kvp.Key is string keyString)
+                {
+                    var prop = thing.GetType().GetProperty(keyString);
+                    if (prop != null)
+                    {
+#if AUTOCASTING_DEBUG
+						Debug.WriteLine("PropertySet {0} to {1} on {2}", keyString, kvp.Value.ToString(), thing.ToString());
+#endif
+						prop.SetValue(thing, Cast(prop.PropertyType, kvp.Value));
+                    }
+                }
+            }
+		}
+
 		public static object Cast(this Type Type, object data)
 		{
 			var DataParam = Expression.Parameter(typeof(object), "data");
@@ -55,119 +50,21 @@ namespace CaveGame.Client.UI
 		}
 	}
 
-	public class UIRect : UINode
-	{
 	
-		public UIRect(Lua state, LuaTable table) : base()
-		{
-			Visible = true;
-			Active = true;
-			AnchorPoint = Vector2.Zero;
-			Children = new List<UINode>();
-			BorderSize = 1f;
-
-			foreach (KeyValuePair<object, object> kvp in state.GetTableDict(table))
-			{
-				if (kvp.Key is string keyString)
-				{
-					var prop = this.GetType().GetProperty(keyString);
-					if (prop != null)
-                    {
-						Debug.WriteLine("PropertySet {0} to {1} on {2}", keyString, kvp.Value.ToString(), this.ToString());
-						prop.SetValue(this, Poo.Cast(prop.PropertyType, kvp.Value));
-                    }
-	
-				}
-			}
-		}
-
-		public bool Visible { get; set; }
-		public bool Active { get; set; }
-
-		private UINode _parent;
-		public UINode Parent
-		{
-			get { return _parent; }
-			set
-			{
-				if (_parent != null)
-					_parent.Children.Remove(this);
-				_parent = value;
-				_parent.Children.Add(this);
-			}
-		}
-		public List<UINode> Children { get; set; }
-		public Vector2 AnchorPoint { get; set; }
-		public Vector2 AbsoluteSize
-		{
-			get
-			{
-				var xSize = Size.Pixels.X + (Parent.AbsoluteSize.X * Size.Scale.X);
-				var ySize = Size.Pixels.Y + (Parent.AbsoluteSize.Y * Size.Scale.Y);
-
-				return new Vector2(xSize, ySize);
-			}
-		}
-		public Vector2 AbsolutePosition
-		{
-			get
-			{
-				var xPos = Parent.AbsolutePosition.X + Position.Pixels.X + (Parent.AbsoluteSize.X * Position.Scale.X) - (AnchorPoint.X * AbsoluteSize.X);
-				var yPos = Parent.AbsolutePosition.Y + Position.Pixels.Y + (Parent.AbsoluteSize.Y * Position.Scale.Y) - (AnchorPoint.Y * AbsoluteSize.Y);
-
-				return new Vector2(xPos, yPos);
-			}
-		}
-		public UICoords Position { get; set; }
-		public UICoords Size { get; set; }
-		public Color BGColor { get; set; }
-		public bool BorderEnabled { get; set; }
-		public float BorderSize { get; set; }
-		public Color BorderColor { get; set; }
-        public string Name { get; set; }
-
-        public UIRect()
-		{
-			Visible = true;
-			Active = true;
-			AnchorPoint = Vector2.Zero;
-			Children = new List<UINode>();
-			BorderSize = 1f;
-		}
-
-		public virtual void Update(GameTime gt)
-		{
-
-			foreach (UINode child in Children)
-			{
-				child.Update(gt);
-			}
-		}
-
-		//[Conditional("UI_DEBUG")]
-		private void DrawAnchorPoint(GraphicsEngine gfx)
-		{
-
-			gfx.Circle(new Color(0, 1, 0.0f), AbsolutePosition + (AnchorPoint*AbsoluteSize), 2);
-		}
-
-		public virtual void Draw(GraphicsEngine gfx)
-		{
-
-			gfx.Rect(BGColor, AbsolutePosition, AbsoluteSize);
-			gfx.OutlineRect(BorderColor, AbsolutePosition, AbsoluteSize, BorderSize);
-			DrawAnchorPoint(gfx);
-			foreach (UINode child in Children)
-			{
-				child.Draw(gfx);
-			}
-		}
-
-	}
 
 
 	public class UIRoot : UINode
 	{
+		public bool MouseOver => false;
+
+		public bool IsMouseInside(MouseState state) => false; // keep note this is intentionally off...
+
+        public UINode FindFirstChildWithName(string name) => Children.First(t => t.Name == name);
+        public List<UINode> FindChildrenWithName(string name) => Children.FindAll(t => t.Name == name);
+
+
+
+
 		public LuaEvent<LuaEventArgs> OnUnload = new LuaEvent<LuaEventArgs>();
 		public LuaEvent<LuaEventArgs> OnLoad = new LuaEvent<LuaEventArgs>();
 

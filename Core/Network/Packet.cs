@@ -12,7 +12,7 @@ using System.Text;
 using CaveGame.Core.Game.Inventory;
 using CaveGame.Core.FileUtil;
 using CaveGame.Core.Inventory;
-using CaveGame.Core.Generic;
+using CaveGame.Core.Game.Items;
 using DataManagement;
 using System.Collections.Generic;
 
@@ -21,10 +21,15 @@ namespace CaveGame.Core.Network
 
 	public static class MonoGameByteArrayExtensions // serialize monogame types
     {
-
+		/// <summary>
+		/// Data Length = 8 (2*float)
+		/// </summary>
+		/// <param name="data"></param>
+		/// <param name="index"></param>
+		/// <returns></returns>
 		public static Vector2 ReadVector2(this byte[] data, int index)=> new Vector2(data.ReadFloat(index), data.ReadFloat(index + 4));
 		/// <summary>
-		/// Data Length = 8 (2*int)
+		/// Data Length = 8 (2*float)
 		/// </summary>
 		/// <param name="data"></param>
 		/// <param name="index"></param>
@@ -47,52 +52,99 @@ namespace CaveGame.Core.Network
 			data[index + 1] = value.G;
 			data[index + 2] = value.B;
 			data[index + 3] = value.A;
+
+
+			byte[] somedata = new byte[20];
         }
     }
 
 	public enum PacketType : uint
 	{
-		GetServerInfo = 0,
-		ServerInfoReply,
-		CRequestJoin,
-		SAcceptJoin,
+		#region Agnostic-Sender Packets
+		nPing = 0,
+
+
+		#endregion
+
+		#region Client-Sender Packets
+		cHandshake,
+		cPlaceTile,
+		cPlaceWall,
+		cDamageTile,
+		cDamageWall,
+		cRequestLogin,
+		cConfirmLogin,
+		cLogout,
+		cSendChatMessage,
+		cChangeTimeOfDay,
+		#endregion
+
+		#region Server-Sender Packets
+		sHandshakeResponse,
+		sDownloadChunk,
+		sChatMessage,
+		sKick,
+		sUpdateTile,
+		sUpdateWall,
+		sAcceptLogin,
+		sRejectLogin,
+		sSpawnEntityGeneric,
+		sSpawnItemStackEntity,
+		sRemoveEntity,
+		sEntityPhysicsUpdate,
+		sOpenDoor, sCloseDoor,
+		sPlaceFurniture, sRemoveFurniture,
+		sDamageTile,
+		sGivePlayerItem,
+		sPlayerState,
+		sPlayerPeerJoined,
+		sPlayerPeerLeft,
+		sExplosion,
+		sUpdateTimeOfDay,
+		#endregion
+
+		/*cGetServerInfo = 0,
+		sCRequestJoin,
+		sAcceptJoin,
 		SDenyJoin,
-		SKick,
+		sKick,
 		CAcceptJoinAck,
 		CKeepAlive,
 		SKeepAliveAck,
 		CQuit,
 		CChatMessage,
-		SChatMessage,
+		ServerChatMessage,
 		SDownloadChunk,
 		STilesUpdate,
-		PlaceTile, PlaceWall,
-		CActivateTile,
-		CDamageTile,
-		CRequestChunk,
+		PlaceTile, PlaceWall,CActivateTile,CDamageTile,CRequestChunk,
 		SPlayerJoined,
-		SPlayerLeft,
-		CPlayerInput,
-		SAddPlayerEntity,
+		SPlayerLeft,CPlayerInput,	SAddPlayerEntity,
 		ServerEntityPhysicsState,
-		SDestroyEntity,
-		ClientQuit,
+		SDestroyEntity,ClientQuit,
 		PlayerState,
 		SExplosion,
 		PlayerThrowItemAction,
 		SpawnBombEntity,
 		SpawnWurmholeEntity,
-		TriggerWurmholeEntity,
-		SpawnItemStackEntity,
+		TriggerWurmholeEntitySpawnItemStackEntity,
 		PlaceFurniture, RemoveFurniture,
 		OpenDoor, CloseDoor, TimeOfDay,
 		TransferContainer,
 		UpdateContainer,
 		DamageTile,
 		GivePlayerItem, // Temporary for testing?
-		AdminCommand
+		AdminCommand*/
 	}
 
+	public enum NetEntityType : byte
+    {
+		Bomb,
+		Wurmhole,
+		Arrow,
+		Dynamite,
+
+
+    }
 
 	public class Packet
 	{
@@ -170,147 +222,47 @@ namespace CaveGame.Core.Network
 			return bob.ToString();
 		}
 	}
-	/// <summary>
-	/// 
-	/// </summary>
-	public class GetServerInformationPacket : Packet
-	{
-		public GetServerInformationPacket(int protocol) : base(PacketType.GetServerInfo)
-		{
-			Payload = new byte[4];
-			ClientProtocolVersion = protocol;
-		}
-
-		public GetServerInformationPacket(byte[] data) : base(data) { }
-		/// <summary> 
-		/// index 0, size 4 
-		/// </summary>
-		public int ClientProtocolVersion 
-		{
-			get => Payload.ReadInt(0);
-			set => Payload.WriteInt(0, value);
-		}
-	}
-	/// <summary>
-	/// 
-	/// </summary>
-	public class ServerInformationReplyPacket : Packet
-	{
-		/// <summary>
-		/// 
-		/// </summary>
-		public int ServerProtocolVersion
-		{
-			get { return TypeSerializer.ToInt(Payload, 0); }
-			set { TypeSerializer.FromInt(ref Payload, 0, value); }
-		}
-		/// <summary>
-		/// 
-		/// </summary>
-		public int MaxPlayers
-		{
-			get { return TypeSerializer.ToInt(Payload, 4); }
-			set { TypeSerializer.FromInt(ref Payload, 4, value); }
-
-		}
-		/// <summary>
-		/// 
-		/// </summary>
-		public string ServerName
-		{
-			get { return TypeSerializer.ToString(Encoding.ASCII, Payload, 8, 56); } //return Encoding.UTF8.GetString(Payload, 4, MessageLength); }
-			set { TypeSerializer.FromString(ref Payload, Encoding.ASCII, value, 8, 56); }
-		}
-		/// <summary>
-		/// 
-		/// </summary>
-		public string ServerMOTD 
-		{
-			get { return TypeSerializer.ToString(Encoding.ASCII, Payload, 64, 128); }
-			set { TypeSerializer.FromString(ref Payload, Encoding.ASCII, value, 64, 128); }
-		}
-		public string[] PlayerList // max 10
-		{
-			get {
-				string[] list = new string[10];
-				for (int i = 0; i <10; i++)
-				{
-					list[i] = TypeSerializer.ToString(Encoding.ASCII, Payload, 128 + (i * 32), 32);
-				}
-				return list;
-			}
-			set {
-				int idx = 0;
-				foreach(string val in value)
-				{
-					if (idx > 10)
-						return;
-
-
-					TypeSerializer.FromString(ref Payload, Encoding.ASCII, val, 128 + (idx * 32), 32);
-					idx++;
-				}
-			}
-		}
-		public ServerInformationReplyPacket(byte[] data) : base(data) { }
-		public ServerInformationReplyPacket(int protocol, string name, string motd, int maxplayers, string[] connected) : base(PacketType.ServerInfoReply)
-		{
-			Payload = new byte[480];
-			ServerProtocolVersion = protocol;
-			ServerName = name;
-			ServerMOTD = motd;
-			MaxPlayers = maxplayers;
-			PlayerList = connected;
-		}
-	}
 
 	public class TimeOfDayPacket : Packet
 	{
 		public float Time
 		{
-			get { return TypeSerializer.ToFloat(Payload, 0); }
-			set { TypeSerializer.FromFloat(ref Payload, 0, value); }
+			get => Payload.ReadFloat(0);
+			set => Payload.WriteFloat(0, value);
 		}
 		public TimeOfDayPacket(byte[] data) : base(data) { }
-		public TimeOfDayPacket(float time) : base(PacketType.TimeOfDay)
+		public TimeOfDayPacket(float time) : base(PacketType.sUpdateTimeOfDay)
 		{
-			Payload = new byte[12];
+			Payload = new byte[4];
 			Time = time;
 		}
 	}
-
 	public class ExplosionPacket : Packet
 	{
-		public ExplosionPacket(Vector2 pos, float radius, float strength, bool harmtiles, bool harmentities) : base(PacketType.SExplosion) {
+		public Explosion Explosion
+        {
+			get => new Explosion
+			{
+				Position = Payload.ReadVector2(0), // 8 bytes (8)
+				BlastRadius = Payload.ReadFloat(8), // 4 bytes (12)
+				BlastPressure = Payload.ReadFloat(12)// 4 bytes (16)			
+			};
+
+			set
+            {
+				Payload.WriteVector2(0, value.Position);
+				Payload.WriteFloat(8, value.BlastRadius);
+				Payload.WriteFloat(12, value.BlastPressure);
+            }
+        }
+		public ExplosionPacket(Explosion explosion, bool harmtiles, bool harmentities) : base(PacketType.sExplosion) {
 			Payload = new byte[20];
-			X = pos.X;
-			Y = pos.Y;
-			Strength = strength;
-			Radius = radius;
+			Explosion = explosion;
 			DamageEntities = harmentities;
 			DamageTiles = harmtiles;
 		}
 		public ExplosionPacket(byte[] data) : base(data) { }
-		public float X
-		{
-			get { return TypeSerializer.ToFloat(Payload, 0); }
-			set { TypeSerializer.FromFloat(ref Payload, 0, value); }
-		}
-		public float Y
-		{
-			get { return TypeSerializer.ToFloat(Payload, 4); }
-			set { TypeSerializer.FromFloat(ref Payload, 4, value); }
-		}
-		public float Radius
-		{
-			get { return TypeSerializer.ToFloat(Payload, 8); }
-			set { TypeSerializer.FromFloat(ref Payload, 8, value); }
-		}
-		public float Strength
-		{
-			get { return TypeSerializer.ToFloat(Payload, 12); }
-			set { TypeSerializer.FromFloat(ref Payload, 12, value); }
-		}
+
 		public bool DamageTiles
 		{
 			get { return Payload[16].Get(0); }
@@ -322,60 +274,21 @@ namespace CaveGame.Core.Network
 			set { Payload[16].Set(1, value); }
 		}
 	}
+	public class SpawnEntityGenericPacket : Packet
+    {
+		public int EntityNetworkID { get => Payload.ReadInt(0); set => Payload.WriteInt(0, value); }
 
-	public class KickPacket : Packet
-	{
-		public KickPacket(string reason) : base(PacketType.SKick)
+		public NetEntityType EntityType { get => (NetEntityType)Payload[4]; set => Payload[4] = (byte)value; } 
+
+		public SpawnEntityGenericPacket(int id, NetEntityType type) : base(PacketType.sSpawnEntityGeneric)
 		{
-			Payload = new byte[128];
-			KickReason = reason;
-
-		}
-		public KickPacket(byte[] bytes) : base(bytes) { }
-		public byte KickReasonLength
-		{
-			get { return Payload[0]; }
-			set { Payload[0] = value; }
-		}
-		public string KickReason
-		{
-			get { return Encoding.UTF8.GetString(Payload, 1, KickReasonLength); }
-			set
-			{
-
-				KickReasonLength = (byte)value.Length;
-
-				Encoding.UTF8.GetBytes(value.ToCharArray(), 0, KickReasonLength).CopyTo(Payload, 1);
-
-
-			}
-		}
-	}
-	// Client requests connection
-	public class RequestJoinPacket : Packet
-	{
-		public string RequestedName
-		{
-			get { return Encoding.UTF8.GetString(Payload); }
-			set { Payload = Encoding.UTF8.GetBytes(value); }
-		}
-		public RequestJoinPacket(byte[] bytes) : base(bytes) { }
-		public RequestJoinPacket(string username) : base(PacketType.CRequestJoin) {
-			RequestedName = username;
-		}
-	}
-	public class SpawnBombEntityPacket : Packet
-	{
-		public int EntityNetworkID { 
-			get { return TypeSerializer.ToInt(Payload, 0); }
-			set { TypeSerializer.FromInt(ref Payload, 0, value); }
-		}
-		public SpawnBombEntityPacket(int id) : base(PacketType.SpawnBombEntity) {
 			Payload = new byte[12];
 			EntityNetworkID = id;
+			EntityType = type;
 		}
-		public SpawnBombEntityPacket(byte[] data) : base(data) { }
+		public SpawnEntityGenericPacket(byte[] data) : base(data) { }
 	}
+
 
 	public class SpawnWurmholeEntityPacket : Packet
     {
@@ -542,167 +455,63 @@ namespace CaveGame.Core.Network
         }
     }
 
-	public class AcceptJoinPacket : Packet
-	{
-		public int YourUserNetworkID { 
-			get { return TypeSerializer.ToInt(Payload, 0); }
-			set { TypeSerializer.FromInt(ref Payload, 0, value); }
-		}
-		public int YourPlayerNetworkID {
-			get { return TypeSerializer.ToInt(Payload, 4); }
-			set { TypeSerializer.FromInt(ref Payload, 4, value); }
-		}	
-		public AcceptJoinPacket(int userid, int playerid) : base(PacketType.SAcceptJoin) {
-			Payload = new byte[12];
-			YourPlayerNetworkID = playerid;
-			YourUserNetworkID = userid;
-		}
-		public AcceptJoinPacket(byte[] bytes) : base(bytes) { }
-	}
-	public class QuitPacket : Packet
-	{
-		public int EntityID
-		{
-			get { return TypeSerializer.ToInt(Payload, 0); }
-			set { TypeSerializer.FromInt(ref Payload, 0, value); }
-		}
-		public QuitPacket(int id) : base(PacketType.ClientQuit) {
-			Payload = new byte[8];
-			EntityID = id;
-		}
-		public QuitPacket(byte[] data) : base(data) { }
-	}
-	public class RejectJoinPacket : Packet
-	{
-		public string RejectReason
-		{
-			get { return TypeSerializer.ToString(Encoding.ASCII, Payload, 0, 128); }
-			set { TypeSerializer.FromString(ref Payload, Encoding.ASCII, value, 0, 128); }
-		}
-		public RejectJoinPacket(string reason) : base(PacketType.SDenyJoin) {
-			Payload = new byte[192];
-			RejectReason = reason;
-		}
-		public RejectJoinPacket(byte[] bytes) : base(bytes) { }
-	}
-	public class PlayerJoinedPacket : Packet
-	{
-		// encode stuff about the playe
-		public int EntityID
-		{
-			get { return TypeSerializer.ToInt(Payload, 0); }
-			set { TypeSerializer.FromInt(ref Payload, 0, value); }
-		}
-		public byte UsernameLength
-		{
-			get { return Payload[10]; }
-			set { Payload[10] = value; }
-		}
-		public string Username
-		{
-			get { return Encoding.UTF8.GetString(Payload, 12, UsernameLength); }
-			set {
-
-				UsernameLength = (byte)value.Length;
-
-				Encoding.UTF8.GetBytes(value.ToCharArray(), 0, UsernameLength).CopyTo(Payload, 12);
-				
-			
-			}
-		}
-		public Color PlayerColor
-		{
-			get {
-				byte r = Payload[4];
-				byte g = Payload[5];
-				byte b = Payload[6];
-				return new Color(r, g, b);
-			}
-			set {
-				Payload[4] = value.R;
-				Payload[5] = value.G;
-				Payload[6] = value.B;
-			}
-		}
-		public PlayerJoinedPacket(int id, string user, Color color) : base(PacketType.SPlayerJoined) {
-			Payload = new byte[128];
-			EntityID = id;
-			Username = user;
-			PlayerColor = color;
-		}
-		public PlayerJoinedPacket(byte[] bytes) : base(bytes) { }
-	}
-	public class PlayerLeftPacket : Packet
-	{
-		public int EntityID
-		{
-			get { return TypeSerializer.ToInt(Payload, 0); }
-			set { TypeSerializer.FromInt(ref Payload, 0, value); }
-		}
-		public PlayerLeftPacket(byte[] bytes) : base(bytes) { }
-		public PlayerLeftPacket(int id) : base(PacketType.SPlayerLeft) {
-			Payload = new byte[4];
-			EntityID = id;
-		}
-	}
+	
 
 	public class EntityPositionPacket : Packet
 	{
-		public override string ToString()
-		{
-			return String.Format("netid {0}[{1}] x {2}[{3}] y {4}[{5}]",
-				EntityID, DumpHex(Payload, 0, 4),
-				PosX, DumpHex(Payload, 4, 4),
-				PosY, DumpHex(Payload, 8, 4)
-
-			);
-		}
 		public int EntityID
 		{
-			get { return TypeSerializer.ToInt(Payload, 0); }
-			set { TypeSerializer.FromInt(ref Payload, 0, value); }
+			get => Payload.ReadInt(0);
+			set => Payload.WriteInt(0, value);
 		}
-		public float PosX
+
+		public int Health
 		{
-			get { return TypeSerializer.ToFloat(Payload, 4); }
-			set { TypeSerializer.FromFloat(ref Payload, 4, value); }
+			get => Payload.ReadInt(4);
+			set => Payload.WriteInt(4, value);
 		}
-		public float PosY
-		{
-			get { return TypeSerializer.ToFloat(Payload, 8); }
-			set { TypeSerializer.FromFloat(ref Payload, 8, value); }
-		}
-		public float VelX
-		{
-			get { return TypeSerializer.ToFloat(Payload, 12); }
-			set { TypeSerializer.FromFloat(ref Payload, 12, value); }
-		}
-		public float VelY
-		{
-			get { return TypeSerializer.ToFloat(Payload, 16); }
-			set { TypeSerializer.FromFloat(ref Payload, 16, value); }
-		}
-		public float NextX
-		{
-			get { return TypeSerializer.ToFloat(Payload, 20); }
-			set { TypeSerializer.FromFloat(ref Payload, 20, value); }
-		}
-		public float NextY
-		{
-			get { return TypeSerializer.ToFloat(Payload, 24); }
-			set { TypeSerializer.FromFloat(ref Payload, 24, value); }
-		}
-		public EntityPositionPacket(int entityid, float x, float y, 
-			float vx=0, float vy=0, float nx = 0, float ny = 0) : base(PacketType.ServerEntityPhysicsState) {
+
+		public Vector2 Position
+        {
+			get => Payload.ReadVector2(8);
+			set => Payload.WriteVector2(8, value);
+        }
+
+		public Vector2 Velocity
+        {
+			get => Payload.ReadVector2(16);
+			set => Payload.WriteVector2(16, value);
+        }
+
+		public Vector2 NextPosition
+        {
+			get => Payload.ReadVector2(24);
+			set => Payload.WriteVector2(24, value);
+        }
+		
+
+		public EntityPositionPacket(int id, int health, Vector2 position, Vector2 velocity, Vector2 nextPosition) : base(PacketType.ServerEntityPhysicsState) {
 			Payload = new byte[32];
-			EntityID = entityid;
-			PosX = x;
-			PosY = y;
-			VelX = vx;
-			VelY = vy;
-			NextX = nx;
-			NextY = ny;
+			EntityID = id;
+			Health = health;
+			Position = position;
+			Velocity = velocity;
+			NextPosition = nextPosition;
 		}
+
+		public EntityPositionPacket(IEntity entity) : base(PacketType.ServerEntityPhysicsState)
+        {
+			Payload = new byte[32];
+			EntityID = entity.EntityNetworkID;
+			Health = entity.Health;
+			Position = entity.Position;
+			if (entity is IPhysicsEntity physics)
+            {
+				Velocity = physics.Velocity;
+				NextPosition = physics.NextPosition;
+			}
+        }
+
 		public EntityPositionPacket(byte[] bytes) : base(bytes) { }
 	}
 
@@ -744,11 +553,11 @@ namespace CaveGame.Core.Network
 			get { return TypeSerializer.ToInt(Payload, 0); }
 			set { TypeSerializer.FromInt(ref Payload, 0, value); }
 		}
-		public HorizontalDirection Direction {
-			get { return (HorizontalDirection)Payload[5]; }
+		public Direction Direction {
+			get { return (Direction)Payload[5]; }
 			set { Payload[5] = (byte)value;}
 		}
-		public OpenDoorPacket(int id, HorizontalDirection dir) : base(PacketType.OpenDoor) {
+		public OpenDoorPacket(int id, Direction dir) : base(PacketType.OpenDoor) {
 			Payload = new byte[16];
 			FurnitureNetworkID = id;
 			Direction = dir;
@@ -791,9 +600,9 @@ namespace CaveGame.Core.Network
 			get => Payload.ReadInt(0);
 			set => Payload.WriteInt(0, value);
 		}
-		public HorizontalDirection Facing
+		public Direction Facing
 		{
-			get { return (HorizontalDirection)Payload[4]; }
+			get { return (Direction)Payload[4]; }
 			set { Payload[4] = (byte)value; }
 		}
 
@@ -808,7 +617,7 @@ namespace CaveGame.Core.Network
 			set { Payload[5].Set(1, value); }
 		}
 
-		public PlayerStatePacket(HorizontalDirection f, bool grounded, bool walk) : base(PacketType.PlayerState)
+		public PlayerStatePacket(Direction f, bool grounded, bool walk) : base(PacketType.PlayerState)
 		{
 			Payload = new byte[16];
 
@@ -878,13 +687,13 @@ namespace CaveGame.Core.Network
 
 		public ServerChatMessagePacket(byte[] data) : base(data) { }
 
-		public ServerChatMessagePacket(string msg) : base(PacketType.SChatMessage) {
+		public ServerChatMessagePacket(string msg) : base(PacketType.ServerChatMessage) {
 			Payload = new byte[140];
 			TextColor = Color.White;
 			Message = msg;
 		}
 
-		public ServerChatMessagePacket(string msg, Color col) : base(PacketType.SChatMessage) {
+		public ServerChatMessagePacket(string msg, Color col) : base(PacketType.ServerChatMessage) {
 			Payload = new byte[140];
 			TextColor = col;
 			Message = msg;

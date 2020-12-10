@@ -325,7 +325,7 @@ namespace CaveGame.Core.Furniture
 
 			if (State == DoorState.Closed)
 			{
-				if (player.Facing == HorizontalDirection.Left)
+				if (player.Facing == Direction.Left)
 				{
 					if (world.IsCellOccupied(pos.X - 1, pos.Y))
 						return;

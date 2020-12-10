@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using CaveGame.Core.FileUtil;
+using CaveGame.Core.Game.Items;
 using CaveGame.Core.Inventory;
 using DataManagement;
 

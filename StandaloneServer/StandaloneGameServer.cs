@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CaveGame.Core;
+using CaveGame.Core.Network.Packets;
 
 namespace StandaloneServer
 {
@@ -99,7 +101,7 @@ namespace StandaloneServer
 			Output.Out("No command " + keywords[0] + " found!", new Color(1.0f, 0, 0));
 		}
 
-		public StandaloneGameServer(ServerConfig config) : base(config) 
+		public StandaloneGameServer(ServerConfig config, WorldMetadata worldMDT) : base(config, worldMDT) 
 		{
 			Commands = new List<ServerCommand>();
 			PluginManager = new PluginManager();
@@ -122,9 +124,9 @@ namespace StandaloneServer
 
         protected override void OnClientQuit(NetworkMessage msg, User user)
         {
-			QuitPacket packet = new QuitPacket(msg.Packet.GetBytes());
+			DisconnectPacket packet = new DisconnectPacket(msg.Packet.GetBytes());
 
-			if (World.FindEntityOfID(packet.EntityID, out Player player))
+			if (World.FindEntityOfID(packet.LeavingEntityID, out Player player))
 				if (OnPlayerLeftServer.Invoke(new PlayerEventArgs(player)))
 					OutputAndChat(String.Format("{0} has left the server.", user.Username));
 			base.OnClientQuit(msg, user);

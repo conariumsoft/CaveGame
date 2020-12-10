@@ -16,23 +16,19 @@ using CaveGame.Core.Game.Tiles;
 
 namespace CaveGame.Server
 {
-	public class WorldConfiguration
-	{
-		public int Seed { get; set; }
-		public string Name { get; set; }
-		public float TimeOfDay { get; set; }
-
-		[XmlArray("FurnitureList")]
-		[XmlArrayItem("Furniture")]
-		public List<FurnitureTile> Furniture { get; set; }
-	}
+	
 
 	public class ServerWorld : Core.World, IServerWorld
 	{
+
+
+
+		public int WorldSeed => Metadata.Seed;
+		public string WorldName => Metadata.Name;
+
 		private ConcurrentQueue<IEntity> entityQueue;
 		public void SpawnEntity(IEntity entity) => entityQueue.Enqueue(entity);
-		public int WorldSeed { get; }
-		public string WorldName { get; }
+		
 		public GameServer Server { get; set; }
 		public Generator Generator { get; set; }
 
@@ -44,8 +40,29 @@ namespace CaveGame.Server
 
 		public override List<FurnitureTile> Furniture { get; protected set; }
 
-		private ServerWorld() : base()
+		public WorldMetadata Metadata { get; private set; }
+
+
+		public ServerWorld(WorldMetadata metadata)
 		{
+			Metadata = metadata;
+
+            CreateDirectoryIfNull(Path.Combine("Worlds", WorldName));
+            CreateDirectoryIfNull(Path.Combine("Worlds", WorldName, "Chunks"));
+
+            // Serialize world info into file.
+            XmlWriter worldXml = XmlWriter.Create(Path.Combine("Worlds", WorldName, "WorldMetadata.xml"));
+            worldXml.WriteStartDocument();
+            worldXml.WriteStartElement("Metadata");
+
+            worldXml.WriteElementString("Name", WorldName);
+            worldXml.WriteElementString("Seed", WorldSeed.ToString());
+            worldXml.WriteElementString("TimeOfDay", TimeOfDay.ToString());
+
+
+            worldXml.WriteEndDocument();
+            worldXml.Close();
+
 			entityQueue = new ConcurrentQueue<IEntity>();
 			serverTileUpdateTask = new DelayedTask(ApplyTileUpdates, 1 / 10.0f);
 			serverRandomTileUpdateTask = new DelayedTask(ApplyRandomTileTicksToLoadedChunks, 1 / 5.0f);
@@ -53,43 +70,7 @@ namespace CaveGame.Server
 			Tile.InitializeManager(WorldSeed);
 		}
 
-
-		public ServerWorld(WorldConfiguration config) : this()
-		{
-			WorldName = config.Name;
-			WorldSeed = config.Seed;
-
-			CreateDirectoryIfNull("Worlds");
-			CreateDirectoryIfNull(Path.Combine("Worlds",  WorldName));
-			CreateDirectoryIfNull(Path.Combine("Worlds", WorldName, "Chunks"));
-
-			// Serialize world info into file.
-			XmlWriter worldXml = XmlWriter.Create(Path.Combine("Worlds", WorldName, "WorldMetadata.xml"));
-			worldXml.WriteStartDocument();
-			worldXml.WriteStartElement("Metadata");
-
-			worldXml.WriteElementString("Name", WorldName);
-			worldXml.WriteElementString("Seed", WorldSeed.ToString());
-			worldXml.WriteElementString("TimeOfDay", TimeOfDay.ToString());
-
-
-			worldXml.WriteEndDocument();
-			worldXml.Close();
-		}
-
-		// Load from file 
-		public ServerWorld(string worldname) : this()
-		{
-			
-
-			XmlDocument worldmeta = new XmlDocument();
-			worldmeta.Load(Path.Combine("Worlds",  worldname, @"WorldMetadata.xml"));
-
-			WorldName = worldname;
-			WorldSeed = Int32.Parse(worldmeta["Metadata"]["Seed"].InnerText);
-		}
-
-		private void CreateDirectoryIfNull(string fname)
+		private static void CreateDirectoryIfNull(string fname)
 		{
 			if (!System.IO.Directory.Exists(fname))
 				System.IO.Directory.CreateDirectory(fname);
@@ -97,7 +78,8 @@ namespace CaveGame.Server
 
 		public void SaveData()
 		{
-			foreach(var kvp in Chunks)
+			CreateDirectoryIfNull(Path.Combine("Worlds", WorldName));
+			foreach (var kvp in Chunks)
 			{
 				Chunk chunk = kvp.Value;
 				File.WriteAllBytes(Path.Combine("Worlds", WorldName, "Chunks", kvp.Key.GetHashCode().ToString()), chunk.ToData());
@@ -258,56 +240,23 @@ namespace CaveGame.Server
 			));
 		}
 
-		public override void Explosion(Vector2 pos, float strength, float radius, bool damageTiles, bool damageEntities)
+        protected override void InflictExplosionDamageOnEntity(Explosion Blast, IEntity Entity, int Damage, Vector2 Direction, float Kickback)
 		{
-			Server.SendToAll(new ExplosionPacket(pos, radius, strength, damageTiles, damageEntities));
+			Entity.Damage(
+				type: DamageType.Explosion,
+				source: Blast,
+				amount: Damage,
+				direction: Direction
+			);
 
-			if (damageEntities)
-			{
-				foreach (var ent in Entities)
-				{
-					if (ent is IPositional entpos && ent is IVelocity vel)
-					{
+			base.InflictExplosionDamageOnEntity(Blast, Entity, Damage, Direction, Kickback);
+        }
 
-						var dist = (entpos.Position - pos).Length();
-						var power = Math.Min((1 / dist) * strength * 8.5f, 350);
-						var unitVec = (entpos.Position - pos);
-						unitVec.Normalize();
-
-						vel.Velocity += unitVec * power;// * power);
-
-					}
-				}
-			}
-
-			if (damageTiles)
-			{
-				for (int x = -12; x < 12; x++)
-				{
-					for (int y = -12; y < 12; y++)
-					{
-						Vector2 thisPosVec = pos + new Vector2(x * Globals.TileSize, y * Globals.TileSize);
-
-						float dist = (thisPosVec - pos).Length() / Globals.TileSize;
-
-						var damage = Math.Max((strength*3) - (dist*3), 0);
-
-						var centroid = new Point((int)pos.X / Globals.TileSize, (int)pos.Y / Globals.TileSize) + new Point(x, y);
-						var tile = GetTile(centroid.X, centroid.Y);
-
-						if (tile is ILiquid)
-							continue;
-
-						tile.Damage += (byte)Math.Ceiling(damage);
-
-						if (tile.Damage > tile.Hardness)
-						{
-							BreakTile(centroid.X, centroid.Y);
-						}
-					}
-				}
-			}
-
+        //public void Explosion(Explosion Blast) => Explosion(Blast, true, true);
+        public override void Explosion(Explosion Blast, bool DamageTiles, bool DamageEntities)
+		{
+			Server.SendToAll(new ExplosionPacket(Blast, DamageTiles, DamageEntities));
+			base.Explosion(Blast, DamageTiles, DamageEntities);
 		}
 
 		public override void OnCollectDeadEntity(IEntity ent)

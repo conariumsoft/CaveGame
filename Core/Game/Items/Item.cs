@@ -1,6 +1,4 @@
-﻿#if CLIENT
-using CaveGame.Client;
-#endif
+﻿
 using CaveGame.Core.Game.Entities;
 using CaveGame.Core.Furniture;
 using CaveGame.Core.Network;
@@ -16,8 +14,10 @@ using System.Linq;
 using CaveGame.Core.Game.Walls;
 using DataManagement;
 using CaveGame.Core.Generic;
+using CaveGame.Core.Inventory;
 
-namespace CaveGame.Core.Inventory
+namespace CaveGame.Core.Game.Items
+
 {
 	public enum ItemID : short
 	{
@@ -36,9 +36,9 @@ namespace CaveGame.Core.Inventory
 		short ID { get; }
 		int MaxStack { get; }
 		string Name { get; }
-#if CLIENT
+
 		void Draw(GraphicsEngine GFX, Vector2 position, float scale);
-#endif
+
 	}
 
 	public class Item : IItem
@@ -58,16 +58,27 @@ namespace CaveGame.Core.Inventory
 		public virtual int MaxStack => 99;
 		public virtual string Name => this.GetType().Name;
 		public virtual string DisplayName => Name;
+
+		public bool MouseDown { get; set; }
+
 		public void Draw(GraphicsEngine GFX, Texture2D texture, Vector2 position, float scale)
 		{
 			GFX.Sprite(texture, position, null, Color.Gray, Rotation.Zero, Vector2.Zero, scale, SpriteEffects.None, 0);
 		} // pseudo- default draw
 		public virtual void Draw(GraphicsEngine GFX, Vector2 position, float scale) {}
-		public virtual void OnClientLMBDown(Player player, IGameClient client, ItemStack stack) { }
-		public virtual void OnClientLMBUp(Player player, IGameClient client) {}
+		public virtual void OnClientLMBDown(Player player, IGameClient client, ItemStack stack)
+        {
+			MouseDown = true;
+        }
+		public virtual void OnClientLMBUp(Player player, IGameClient client)
+        {
+			MouseDown = false;
+        }
 		public virtual void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt) { }
 		public virtual void OnClientSelected(Player player, IGameClient client) { }
 		public virtual void OnServerUse(Player player, IGameWorld world) { }
+
+		public virtual void OnClientDraw(GraphicsEngine GFX) {}
 
 		public virtual Metabinary GetMetadataComplex()
         {
@@ -82,6 +93,38 @@ namespace CaveGame.Core.Inventory
 			
 			return tag;
         }
+
+		public static bool TryFromName(string name, out Item item)
+		{
+			item = null;
+			if (name.StartsWith("TileItem"))
+			{
+				var tilename = name.Substring(9);
+				item = new TileItem(Tile.FromName(tilename));
+				return true;
+			}
+			if (name.StartsWith("WallItem"))
+			{
+				var wallname = name.Substring(9);
+				item = new WallItem(Wall.FromName(wallname));
+				return true;
+			}
+
+			var basetype = typeof(Item);
+			var types = basetype.Assembly.GetTypes().Where(type => type.IsSubclassOf(basetype));
+
+
+			foreach (var type in types)
+			{
+				if (name == type.Name)
+                {
+					item =  (Item)type.GetConstructor(Type.EmptyTypes).Invoke(null);
+					return true;
+				}
+					
+			}
+			return false;
+		}
 
 		public static Item FromName(string name)
 		{
@@ -163,6 +206,7 @@ namespace CaveGame.Core.Inventory
 					//client.World.SetTile(x, y, new Tiles.Air());
 				}
 			}
+			base.OnClientLMBHeld(player, client, stack, gt);
 		}
 		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale)
 		{
@@ -218,6 +262,7 @@ namespace CaveGame.Core.Inventory
 				client.Send(new PlaceWallPacket(0, 0, 0, x, y));
 				client.World.SetWall(x, y, new Game.Walls.Air());
 			}
+            base.OnClientLMBHeld(player, client, stack, gt);
 		}
 		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale) => Draw(GFX, GFX.WallScraper, position, scale);
 	}
@@ -256,6 +301,7 @@ namespace CaveGame.Core.Inventory
 				client.Send(new PlaceWallPacket(Wall.ID, 0, 0, x, y));
 				client.World.SetWall(x, y, Game.Walls.Wall.FromID(Wall.ID));
 			}
+            base.OnClientLMBHeld(player, client, stack, gt);
 		}
 
 		public override Metabinary GetMetadataComplex()
@@ -309,8 +355,8 @@ namespace CaveGame.Core.Inventory
 					client.Send(new PlaceTilePacket(Tile.ID, 0, 0, x, y));
 					client.World.SetTile(x, y, Tile.FromID(Tile.ID));
 				}
-				
-			}
+            }
+            base.OnClientLMBHeld(player, client, stack, gt);
 		}
 
         public override Metabinary GetMetadataComplex()
@@ -344,14 +390,95 @@ namespace CaveGame.Core.Inventory
 			unitVec.Normalize();
 
 			client.Send(new PlayerThrowItemPacket(ThrownItem.Bomb, Rotation.FromUnitVector(unitVec)));
+            base.OnClientLMBDown(player, client, stack);
 		}
-
-
 
 		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale) => Draw(GFX, GFX.BombSprite, position, scale);
 	}
 
+	public class RaycastTesterItem : Item
+    {
+		public override int MaxStack => 1;
 
+		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale) => Draw(GFX, GFX.Bong, position, scale);
+
+		public Vector2 RaySurfaceNormal { get; set; }
+		public Vector2 RayEndpoint { get; set; }
+        public Vector2 RayStartpoint { get; set; }
+
+		public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
+        {
+
+			RayStartpoint = player.Position;
+
+			MouseState mouse = Mouse.GetState();
+
+			var mp = client.Camera.ScreenToWorldCoordinates(mouse.Position.ToVector2());
+
+			
+			var unitVec = (mp - player.Position);
+            unitVec.Normalize();
+
+			var result = client.World.TileRaycast(player.Position, Rotation.FromUnitVector(unitVec));
+            
+			if (result.Hit)
+            {
+				RayEndpoint = result.Intersection;
+				RaySurfaceNormal = result.SurfaceNormal;
+				
+			}
+
+            base.OnClientLMBHeld(player, client, stack, gt);
+        }
+
+        public override void OnClientDraw(GraphicsEngine GFX)
+        {
+			if (MouseDown)
+            {
+                GFX.Line(Color.Green, RayStartpoint, RayEndpoint, 1.0f);
+                GFX.Line(Color.Yellow, RayEndpoint, RayEndpoint + (RaySurfaceNormal * 10), 1.0f);
+			}
+
+
+            base.OnClientDraw(GFX);
+        }
+    }
+
+	public class SplatterItem : Item
+    {
+		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale) => Draw(GFX, GFX.Bong, position, scale);
+		public override int MaxStack => 99;
+
+		float gelta;
+
+        public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
+        {
+			gelta += gt.GetDelta();
+
+			if (gelta < 0.05)
+				return;
+
+			gelta = 0;
+
+			MouseState mouse = Mouse.GetState();
+
+			var mp = client.Camera.ScreenToWorldCoordinates(mouse.Position.ToVector2());
+
+
+			var unitVec = (mp - player.Position);
+			unitVec.Normalize();
+
+			var result = client.World.TileRaycast(player.Position, Rotation.FromUnitVector(unitVec));
+
+			if (result.Hit)
+			{
+				Vector2 rounded = result.Intersection.ToPoint().ToVector2();
+
+
+				client.World.ParticleSystem.Add(new TileBloodSplatterParticle { Position = rounded, Face = result.Face});
+			}
+		}
+    }
 
 	// items
 	public abstract class Ingot : Item

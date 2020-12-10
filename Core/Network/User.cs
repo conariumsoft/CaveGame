@@ -11,7 +11,7 @@ namespace CaveGame.Core.Network
 	{
 		public IPEndPoint EndPoint { get; set; }
 		public string Username { get; set; }
-		public int UserNetworkID { get; private set; }
+		public int UserNetworkID { get; set; }
 		public float KeepAlive { get; set; }
 		public Player PlayerEntity { get; set; }
 
@@ -25,7 +25,6 @@ namespace CaveGame.Core.Network
 		
 		public User()
 		{
-			UserNetworkID = this.GetHashCode();
 			dispatchedPackets = new ConcurrentQueue<Packet>();
 		}
 

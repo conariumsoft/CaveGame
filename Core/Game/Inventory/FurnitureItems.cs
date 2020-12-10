@@ -10,8 +10,9 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using CaveGame.Core.Inventory;
 
-namespace CaveGame.Core.Inventory
+namespace CaveGame.Core.Game.Items
 {
 	public abstract class FurnitureItem : Item
 	{

@@ -9,7 +9,6 @@ using CaveGame.Core.Furniture;
 using CaveGame.Core.Generic;
 using CaveGame.Core.Inventory;
 using CaveGame.Core.Network;
-using CaveGame.Core.Particles;
 using CaveGame.Core.Game.Tiles;
 using CaveGame.Core.Game.Walls;
 using Microsoft.Xna.Framework;
@@ -20,121 +19,16 @@ using System.Diagnostics;
 using System.Threading;
 using CaveGame.Client.Game.Entities;
 using CaveGame.Core.Game.Inventory;
+using CaveGame.Core.Game.Items;
 using CaveGame.Client.DebugTools;
+using CaveGame.Core.Network.Packets;
+using System.Linq;
+using System.Collections.Generic;
+
 
 namespace CaveGame.Client
 {
-	// The testbench for building the server/client archite ture
-	public class Hotbar
-	{
-		
-
-		public int Index { get; set; }
-
-		public Item[] ItemSet =
-		{
-			new TileItem(new Core.Game.Tiles.Stone()),
-			new TileItem(new Core.Game.Tiles.Glass()),
-			new TileItem(new Grass()),
-			new TileItem(new Mycelium()),
-			new TileItem(new Core.Game.Tiles.Dirt()),
-			new TileItem(new Core.Game.Tiles.OakLeaves()),
-			new TileItem(new Core.Game.Tiles.ClayBrick()),
-			new TileItem(new Core.Game.Tiles.StoneBrick()),
-			new TileItem(new Torch()),
-			new TileItem(new RedTorch()),
-			new TileItem(new BlueTorch()),
-			new TileItem(new GreenTorch()),
-			new TileItem(new Core.Game.Tiles.OakPlank()),
-			new TileItem(new Core.Game.Tiles.PinePlank()),
-			new TileItem(new Core.Game.Tiles.RedwoodPlank()),
-			new TileItem(new Core.Game.Tiles.EbonyPlank()),
-			new TileItem(new CopperOre()),
-			new TileItem(new UraniumOre()),
-			new TileItem(new CobaltOre()),
-			new TileItem(new GoldOre()),
-			new TileItem(new IronOre()),
-			new TileItem(new TNT()),
-			new TileItem(new Platform()),
-			new TileItem(new Rope()),
-			new TileItem(new Water()),
-			new TileItem(new Lava()),
-			new TileItem(new Sludge()),
-			new WallItem(new Core.Game.Walls.OakPlank()),
-			new WallItem(new Core.Game.Walls.StoneBrick()),
-			new WallItem(new Core.Game.Walls.CarvedStoneBrick()),
-			new WallItem(new Core.Game.Walls.CarvedSandstoneBrick()),
-			new WallItem(new Core.Game.Walls.MossyStoneBrick()),
-			new WallItem(new Core.Game.Walls.Dirt()),
-			new WallItem(new Core.Game.Walls.Stone()),
-			new BombItem(),
-			//TODO: new DynamiteItem(),
-			new DoorItem(),
-			new WorkbenchItem(),
-			new FurnaceItem(),
-			new GenericPickaxe(),
-			new GenericWallScraper(),
-			
-		};
-
-		
-
-		public void Update(GameTime gt)
-		{
-			
-
-			
-			
-
-		}
-
-
-		public void Draw(GraphicsEngine GFX)
-		{
-			GFX.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
-			int travel = 0;
-
-			Vector2 pos = new Vector2(GFX.WindowSize.X - ( (24 * (ItemSet.Length-1))+48), 2);
-
-			for (int i = 0; i < ItemSet.Length; i++)
-			{
-				if (Index == i)
-				{
-					GFX.Rect(
-						color: new Color(0.8f, 0.8f, 0.8f), 
-						position: pos+new Vector2(travel, 0), 
-						size: new Vector2(48, 48)
-					);
-					ItemSet[i].Draw(GFX, pos + new Vector2(travel, 0), 3f);
-
-					Vector2 dim = GFX.Fonts.Arial14.MeasureString(ItemSet[Index].Name);
-					float x = Math.Min(GFX.WindowSize.X - dim.X, pos.X+travel + 24 - (dim.X / 2));
-					x = Math.Max(pos.X, x);
-
-					GFX.Text(
-						font: GFX.Fonts.Arial14, 
-						text: ItemSet[Index].Name, 
-						position: new Vector2(x, pos.Y + 48)
-					);
-
-					travel += 48;
-				}
-				else
-				{
-					GFX.Rect(
-						color: new Color(0.3f, 0.3f, 0.3f), 
-						position: pos + new Vector2(travel, 0), 
-						size: new Vector2(24, 24)
-					);
-					ItemSet[i].Draw(GFX, pos + new Vector2(travel, 0), 1.5f);
-					travel += 24;
-				}
-			}
-
-
-			GFX.End();
-		}
-	}
+	using BombEntity = CaveGame.Core.Game.Entities.Bomb;
 
 	public class GameClient : IGameContext, IGameClient
 	{
@@ -167,11 +61,6 @@ namespace CaveGame.Client
 
 		private int IntitalScrollValue;
 
-		//bool pauseMenuOpen;
-		//UIRoot pauseMenu;
-
-		
-
 
 		PauseMenu PauseMenu { get; set; }
 		
@@ -185,8 +74,41 @@ namespace CaveGame.Client
 			Game.CurrentGameContext = Game.MenuContext;
 		}
 
+
+		private Dictionary<PacketType, NetworkListener> NetworkEvents;
+		private void InitNetworkEvents() => NetworkEvents = new Dictionary<PacketType, NetworkListener>()
+		{
+			[PacketType.sHandshakeResponse]   = OnServerHandshakeReply,
+			[PacketType.sChatMessage] = OnServerSendChatMessage,
+			[PacketType.sPlayerState] = OnPlayerAnimationStateUpdate,
+			[PacketType.sDownloadChunk] = DownloadChunk,
+			[PacketType.sUpdateTile] = UpdateTile,
+			[PacketType.sUpdateWall] = UpdateWall,
+			[PacketType.sRejectLogin] = OnServerRejectLogin,
+			[PacketType.sAcceptLogin] = OnServerAcceptLogin,
+			[PacketType.sPlayerPeerJoined] = OnPeerJoined,
+			[PacketType.sPlayerPeerLeft]  = OnPeerLeft,
+			[PacketType.sRemoveEntity] = OnRemoveEntity,
+			[PacketType.sEntityPhysicsUpdate] = OnEntityPhysUpdate,
+			[PacketType.sExplosion] = OnExplosion,
+			[PacketType.sSpawnEntityGeneric] = OnEntitySpawnGeneric,
+			[PacketType.PlaceFurniture] = OnPlaceFurniture,
+			[PacketType.RemoveFurniture] = OnRemoveFurniture,
+			[PacketType.OpenDoor] = OnPlayerOpensDoor,
+			[PacketType.CloseDoor] = OnPlayerClosesDoor,
+			[PacketType.TimeOfDay] = OnServerChangedTimeOfDay,
+			[PacketType.SpawnItemStackEntity] = OnItemStackEntitySpawned,
+			[PacketType.DamageTile] = OnDamageTile,
+			[PacketType.GivePlayerItem] = GiveItToMeDaddy,
+			[PacketType.SpawnWurmholeEntity] = OnSpawnedWurmhole,
+			[PacketType.TriggerWurmholeEntity] = OnWurmholeTriggered,
+		};
+
 		public GameClient(CaveGameGL _game)
 		{
+			InitNetworkEvents();
+
+
 			Game = _game;
 
 			MouseState mouse = Mouse.GetState();
@@ -208,9 +130,7 @@ namespace CaveGame.Client
 			
 
 		}
-
 		public void Send(Packet p)=>gameClient.SendPacket(p);
-
 		public void SendChatMessage(object sender, string message)
 		{
 			Chat.Open = false;
@@ -221,12 +141,11 @@ namespace CaveGame.Client
 			if (MyPlayer != null) {
 
 				World.ClientDisconnect();
-				gameClient.SendPacket(new QuitPacket(MyPlayer.EntityNetworkID));
+				gameClient.SendPacket(new DisconnectPacket(MyPlayer.EntityNetworkID, UserDisconnectReason.LogOff));
 				gameClient.Stop();
 			}
 
 		}
-
 		private void ChunkUnloadingCheck()
 		{
 
@@ -243,7 +162,6 @@ namespace CaveGame.Client
 			}
 			//	}
 		}
-
 		private void ChunkLoadingCheckUpdate()
 		{
 			if (MyPlayer!=null)
@@ -276,6 +194,7 @@ namespace CaveGame.Client
 
 		#region NetworkListenerMethods
 
+		public delegate void NetworkListener(NetworkMessage message);
 
 		private void DownloadChunk(NetworkMessage message)
 		{
@@ -336,7 +255,7 @@ namespace CaveGame.Client
 				World.Entities.Remove(entity);
 
 		}
-		private void OnEntityPosition(NetworkMessage message)
+		private void OnEntityPhysUpdate(NetworkMessage message)
 		{
 			EntityPositionPacket packet = new EntityPositionPacket(message.Packet.GetBytes());
 
@@ -345,32 +264,32 @@ namespace CaveGame.Client
 			if (entity == null)
 				return;
 
+			entity.Health = packet.Health;
 
 			if (entity is Player plr )
 			{
 				if (packet.EntityID == MyPlayerID)
 					return;
 
-				plr.NextPosition = new Vector2(packet.NextX, packet.NextY);
+				plr.NextPosition = packet.NextPosition;
 				return;
 			}
-	
+			entity.Position = packet.Position;
+			if (entity is IPhysicsEntity physical)
+            {
+				physical.Velocity = packet.Velocity;
+				physical.NextPosition = packet.NextPosition;
+			}
+			
 
-			if (entity is IPositional positional)
-				positional.Position = new Vector2(packet.PosX, packet.PosY);
-
-			if (entity is IVelocity velocity)
-				velocity.Velocity = new Vector2(packet.VelX, packet.VelY);
-
-			if (entity is INextPosition next)
-				next.NextPosition = new Vector2(packet.NextX, packet.NextY);
+				
 		}
-		private void OnChatMessage(NetworkMessage message)
+		private void OnServerSendChatMessage(NetworkMessage message)
 		{
 			ServerChatMessagePacket packet = new ServerChatMessagePacket(message.Packet.GetBytes());
 			Chat.AddMessage(packet.Message, packet.TextColor);
 		}
-		private void OnPlayerState(NetworkMessage message)
+		private void OnPlayerAnimationStateUpdate(NetworkMessage message)
 		{
 			PlayerStatePacket packet = new PlayerStatePacket(message.Packet.GetBytes());
 
@@ -383,7 +302,7 @@ namespace CaveGame.Client
 				plr.Facing = packet.Facing;
 			}
 		}
-		private void OnServerDenyJoining(NetworkMessage message)
+		private void OnServerRejectLogin(NetworkMessage message)
 		{
 			RejectJoinPacket packet = new RejectJoinPacket(message.Packet.GetBytes());
 			// TODO: send player to the rejection screen
@@ -391,7 +310,7 @@ namespace CaveGame.Client
 			Game.CurrentGameContext = Game.MenuContext;
 			Game.MenuContext.TimeoutMessage = packet.RejectReason;
 		}
-		private void OnServerAcceptJoining(NetworkMessage message)
+		private void OnServerAcceptLogin(NetworkMessage message)
 		{
 			AcceptJoinPacket packet = new AcceptJoinPacket(message.Packet.GetBytes());
 
@@ -399,13 +318,15 @@ namespace CaveGame.Client
 			MyUserID = packet.YourUserNetworkID;
 			MyPlayerID = packet.YourPlayerNetworkID;
 
+			GameConsole.Log($"{MyUserID}", Color.GreenYellow);
 			// create me player
 			LocalPlayer myplayer = new LocalPlayer();
 			myplayer.EntityNetworkID = MyPlayerID;
 			MyPlayer = myplayer;
 			World.Entities.Add(myplayer);
 			Inventory.Player = myplayer;
-			Inventory.Container.ForceSetSlot(0, 0, new ItemStack {Item = new CopperPickaxe(), Quantity = 1 });
+			Inventory.Container.ForceSetSlot(0, 0, new ItemStack { Item = new RaycastTesterItem(), Quantity = 1 });
+			//Inventory.Container.ForceSetSlot(0, 0, new ItemStack {Item = new CopperPickaxe(), Quantity = 1 });
 			Inventory.Container.ForceSetSlot(0, 1, new ItemStack { Item = new IronPickaxe(), Quantity = 1 });
 			Inventory.Container.ForceSetSlot(0, 2, new ItemStack { Item = new LeadPickaxe(), Quantity = 1 });
 			Inventory.Container.ForceSetSlot(1, 0, new ItemStack { Item = new TileItem(new Core.Game.Tiles.OakPlank()), Quantity = 999 });
@@ -430,33 +351,52 @@ namespace CaveGame.Client
 		{
 			ExplosionPacket packet = new ExplosionPacket(msg.Packet.GetBytes());
 
-			Vector2 pos = new Vector2(packet.X, packet.Y);
+			Explosion explosion = packet.Explosion;
 
-			if (pos.Distance(Camera.Position) > 2000) return;
-			float dist =  (1.0f/Math.Clamp(pos.Distance(Camera.Position), 0.2f, 200f)) * 200f;
-			Camera.Shake(dist, dist);
+			float DistanceFromCamera = explosion.Position.Distance(Camera.Position);
 
-			for (int i = 0; i<360; i+=5)
-			{
-				float randy = r.Next(0, 10)-5;
-				Rotation rotation = Rotation.FromDeg(i+randy);
-				Vector2 direction = new Vector2((float)Math.Sin(rotation.Radians), (float)Math.Cos(rotation.Radians));
-				float size = ((float)r.NextDouble() *0.4f) + (packet.Strength*0.2f);
-				World.ParticleSystem.EmitSmokeParticle(pos, Color.White, Rotation.FromDeg(0), size, direction* (packet.Radius*1.0f+((float)r.NextDouble()*5)));
-			}
+			if (DistanceFromCamera > 2000) return;
+			float ClampedDistance =  (1.0f/Math.Clamp(DistanceFromCamera, 0.2f, 200f)) * 200f;
+
+			Vector2 direction = explosion.Position.LookAt(Camera.Position);
+
+			Camera.Shake(ClampedDistance * direction.X, ClampedDistance * direction.Y);
+
+			World.Explosion(packet.Explosion, packet.DamageTiles, packet.DamageEntities);
 		}
 
-		private void OnBombSpawned(NetworkMessage message)
-		{
-			
-			SpawnBombEntityPacket packet = new SpawnBombEntityPacket(message.Packet.GetBytes());
-			Core.Game.Entities.Bomb b = new Core.Game.Entities.Bomb();
-			b.EntityNetworkID = packet.EntityNetworkID;
-			b.RemoteControlled = true;
-			World.Entities.Add(b);
+
+		private void SpawnBomb(int networkID) => World.Entities.Add(new BombEntity { 
+			EntityNetworkID = networkID,
+			RemoteControlled = true,
+		});
+
+		private void SpawnWurmhole(int networkID) => World.Entities.Add(new Wurmhole {
+			EntityNetworkID = networkID,
+		});
+
+		private void SpawnArrow(int networkID) => World.Entities.Add(new ArrowEntity
+        {
+
+        })
+
+
+		private void OnEntitySpawnGeneric(NetworkMessage message)
+        {
+			SpawnEntityGenericPacket packet = new(message.Packet.GetBytes());
+
+			if (packet.EntityType == NetEntityType.Bomb)
+				SpawnBomb(packet.EntityNetworkID);
+			if (packet.EntityType == NetEntityType.Wurmhole)
+				SpawnWurmhole(packet.EntityNetworkID);
+			if (packet.EntityType == NetEntityType.Arrow)
+				SpawnArrow(packet.EntityNetworkID);
+			if (packet.EntityType == NetEntityType.Dynamite)
+				SpawnDynamite(packet.EntityNetworkID);
 		}
 
-		private void OnDestroyEntity(NetworkMessage message)
+
+		private void OnRemoveEntity(NetworkMessage message)
 		{
 			DropEntityPacket packet = new DropEntityPacket(message.Packet.GetBytes());
 			if (World.FindEntityOfID(packet.EntityID, out IEntity entity))
@@ -504,9 +444,9 @@ namespace CaveGame.Client
 			var possibleF = World.GetFurniture(packet.FurnitureNetworkID);
 			if (possibleF != null && possibleF is WoodenDoor door)
 			{
-				if (packet.Direction == HorizontalDirection.Left)
+				if (packet.Direction == Direction.Left)
 					door.State = DoorState.OpenLeft;
-				if (packet.Direction == HorizontalDirection.Right)
+				if (packet.Direction == Direction.Right)
 					door.State = DoorState.OpenRight;
 			}
 		}
@@ -542,16 +482,6 @@ namespace CaveGame.Client
 
         }
 
-
-		private void OnSpawnedWurmhole(NetworkMessage msg)
-        {
-			SpawnWurmholeEntityPacket packet = new SpawnWurmholeEntityPacket(msg.Packet.GetBytes());
-
-			Wurmhole wurm = new Wurmhole();
-			wurm.EntityNetworkID = packet.EntityNetworkID;
-			World.Entities.Add(wurm);
-        }
-
 		private void OnWurmholeTriggered(NetworkMessage msg)
 		{
 			TriggerWurmholeEntityPacket packet = new TriggerWurmholeEntityPacket(msg.Packet.GetBytes());
@@ -564,63 +494,46 @@ namespace CaveGame.Client
             }
 		}
 
+		private void OnServerHandshakeReply(NetworkMessage msg)
+        {
+			ServerInformationReplyPacket packet = new(msg.Packet.GetBytes());
+
+			var protocolMatches = (packet.ServerProtocolVersion == Globals.ProtocolVersion);
+
+			if (!protocolMatches)
+            {
+				Game.CurrentGameContext = Game.MenuContext;
+				Game.MenuContext.CurrentPage = Game.MenuContext.Pages["timeoutmenu"];
+
+				if (packet.ServerProtocolVersion > Globals.ProtocolVersion)
+					Game.MenuContext.TimeoutMessage = "Your client is running an outdated version!";
+				else
+					Game.MenuContext.TimeoutMessage = "Server is running on an outdated version!";
+
+				return;
+			}
+
+
+			GameConsole.Log($"Server handshake! sprotocol: {packet.ServerProtocolVersion} (matches)", Color.PaleVioletRed);
+			GameConsole.Log($"Connecting to {packet.ServerName}", Color.PaleVioletRed);
+			GameConsole.Log($"{packet.ServerName}: {packet.ServerMOTD}", Color.White);
+			int currentPlrCount = packet.PlayerList.Where(str => str.Length > 0).Count();
+			GameConsole.Log($"Connected players ({currentPlrCount}):", Color.PaleVioletRed);
+			foreach (var name in packet.PlayerList.Where(str => str.Length > 0))
+				GameConsole.Log($"    {name}", Color.LightBlue);
+			GameConsole.Log($"Requesting game session...");
+			gameClient.SendPacket(new RequestJoinPacket(NetworkUsername));
+		}
+
 		#endregion
-		// gameclient
 		private void ReadIncomingPackets()
 		{
 			while (gameClient.HaveIncomingMessage())
 			{
 				NetworkMessage msg = gameClient.GetLatestMessage();
-
-				if (msg.Packet.Type == PacketType.SChatMessage)
-					OnChatMessage(msg);
-				if (msg.Packet.Type == PacketType.PlayerState)
-					OnPlayerState(msg);
-				if (msg.Packet.Type == PacketType.SDownloadChunk)
-					DownloadChunk(msg);
-				if (msg.Packet.Type == PacketType.PlaceTile)
-					UpdateTile(msg);
-				if (msg.Packet.Type == PacketType.PlaceWall)
-					UpdateWall(msg);
-				if (msg.Packet.Type == PacketType.SDenyJoin)
-					OnServerDenyJoining(msg);
-				if (msg.Packet.Type == PacketType.SAcceptJoin)
-					OnServerAcceptJoining(msg);
-				if (msg.Packet.Type == PacketType.SPlayerJoined)
-					OnPeerJoined(msg);
-				if (msg.Packet.Type == PacketType.SPlayerLeft)
-					OnPeerLeft(msg);
-				if (msg.Packet.Type == PacketType.SDestroyEntity)
-					OnDestroyEntity(msg);
-				if (msg.Packet.Type == PacketType.ServerEntityPhysicsState)
-					OnEntityPosition(msg);
-				if (msg.Packet.Type == PacketType.SExplosion)
-					OnExplosion(msg);
-				if (msg.Packet.Type == PacketType.SpawnBombEntity)
-					OnBombSpawned(msg);
-				if (msg.Packet.Type == PacketType.PlaceFurniture)
-					OnPlaceFurniture(msg);
-				if (msg.Packet.Type == PacketType.RemoveFurniture)
-					OnRemoveFurniture(msg);
-				if (msg.Packet.Type == PacketType.OpenDoor)
-					OnPlayerOpensDoor(msg);
-				if (msg.Packet.Type == PacketType.CloseDoor)
-					OnPlayerClosesDoor(msg);
-				if (msg.Packet.Type == PacketType.TimeOfDay)
-					OnServerChangedTimeOfDay(msg);
-				if (msg.Packet.Type == PacketType.SpawnItemStackEntity)
-					OnItemStackEntitySpawned(msg);
-                if (msg.Packet.Type == PacketType.DamageTile)
-                    OnDamageTile(msg);
-				if (msg.Packet.Type == PacketType.GivePlayerItem)
-					GiveItToMeDaddy(msg);
-				if (msg.Packet.Type == PacketType.SpawnWurmholeEntity)
-					OnSpawnedWurmhole(msg);
-				if (msg.Packet.Type == PacketType.TriggerWurmholeEntity)
-					OnWurmholeTriggered(msg);
-
-
-				// DickSack
+				foreach(var ev in NetworkEvents)
+					if (ev.Key == msg.Packet.Type)
+						ev.Value.Invoke(msg);
 			}
 		}
 
@@ -696,10 +609,11 @@ namespace CaveGame.Client
 						Math.Round(MyPlayer.Velocity.Y, 2)
 				);
 				
-				string networkData = String.Format("pin {0}, pout {1} myid {2}",
+				string networkData = String.Format("pin {0}, pout {1} myid {2} ipaddr {3}",
 						gameClient.ReceivedCount,
 						gameClient.SentCount,
-						MyPlayer?.EntityNetworkID
+						MyPlayer?.EntityNetworkID,
+						ConnectAddress
 				);
 				
 				string worldData = String.Format("tid {0}, state {1} tdmg {2} wid {3} wdmg {4} light {5}",
@@ -775,6 +689,11 @@ namespace CaveGame.Client
 			
 			World.ParticleSystem.Draw(GFX);
 
+			if (!Inventory.EquippedItem.Equals(ItemStack.Empty))
+			{
+				Inventory.EquippedItem.Item?.OnClientDraw(GFX);
+			}
+
 			MouseState mouse = Mouse.GetState();
 
 			var mp = Camera.ScreenToWorldCoordinates(mouse.Position.ToVector2());
@@ -804,11 +723,12 @@ namespace CaveGame.Client
 			//	TODO: Consolidate draw calls
 			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
 			Inventory.Draw(GFX);
+            PauseMenu.Draw(GFX);
 			GFX.End();
 			DrawDebugInfo(GFX);
 			Chat.Draw(GFX);
 
-			PauseMenu.Draw(GFX);
+			
 		}
 
 		public void Load()
@@ -819,7 +739,8 @@ namespace CaveGame.Client
 			//gameClient = new NetworkClient("127.0.0.1:40269");
 			//gameClient.Output = Game.Console;
 			gameClient.Start();
-			gameClient.SendPacket(new RequestJoinPacket(NetworkUsername));
+			gameClient.SendPacket(new GetServerInformationPacket(Globals.ProtocolVersion));
+			
 			//gameClient.SendPacket(new RequestJoinPacket("jooj"));
 		}
 
@@ -840,16 +761,7 @@ namespace CaveGame.Client
 					Inventory.EquippedItem.Item.OnClientLMBHeld(MyPlayer, this, Inventory.EquippedItem, gt);
 				}
 			}
-				
-
-			// Just Released
-			//if (mouse.LeftButton == ButtonState.Released && previous.LeftButton == ButtonState.Pressed)
-			//	Hotbar.ItemSet[Hotbar.Index].OnClientLMBUp(MyPlayer, this);
-
-			// Continued Left Mouse Down
 			
-				
-
 			// Object interaction
 			if (mouse.RightButton == ButtonState.Pressed && previous.RightButton == ButtonState.Released)
 			{
@@ -861,10 +773,7 @@ namespace CaveGame.Client
 				var maybeFurniture = World.GetFurnitureAt(pos.X, pos.Y);
 
 				if (maybeFurniture!=null)
-				{
-					//if (maybeFurniture is WoodenDoor door)
-						maybeFurniture.OnPlayerInteracts(MyPlayer, World, this);
-				}
+					maybeFurniture.OnPlayerInteracts(MyPlayer, World, this);
 
 			}
 			previous = mouse;
@@ -878,8 +787,7 @@ namespace CaveGame.Client
 			if (MyPlayer != null)
 			{
 				gameClient?.SendPacket(
-					new EntityPositionPacket(MyPlayer.EntityNetworkID, MyPlayer.Position.X, MyPlayer.Position.Y,
-						MyPlayer.Velocity.X, MyPlayer.Velocity.Y, MyPlayer.NextPosition.X, MyPlayer.NextPosition.Y)
+					new EntityPositionPacket(MyPlayer)
 				);
 
 				gameClient?.SendPacket(new PlayerStatePacket(MyPlayer.Facing, MyPlayer.OnGround, MyPlayer.Walking));
@@ -933,16 +841,22 @@ namespace CaveGame.Client
         {
 			currentKB = Keyboard.GetState();
 
-			if (PressedThisFrame(Keys.P))
+			if (PressedThisFrame(Keys.P) && !MyPlayer.IgnoreInput)
 				if (MyPlayer != null) // teleport
 					MyPlayer.NextPosition = Camera.ScreenToWorldCoordinates(Mouse.GetState().Position.ToVector2());
 
 
 
-			if (PressedThisFrame(Keys.Escape))
-				PauseMenu.Open = !PauseMenu.Open;
+			if (PressedThisFrame(Keys.Escape)) {
+				if (Chat.Open == true)
+					Chat.Open = false;
+				else if (Game.Console.Open == true)
+					Game.Console.Open = false;
+				else
+					PauseMenu.Open = !PauseMenu.Open;
+			}
 
-			if (PressedThisFrame(Keys.Tab))
+			if (PressedThisFrame(Keys.Tab) && !MyPlayer.IgnoreInput)
 				Inventory.InventoryOpen = !Inventory.InventoryOpen;
 
 
@@ -958,6 +872,7 @@ namespace CaveGame.Client
 		
 		public void Update(GameTime gt)
 		{
+			
 			UpdateInputs();
 
 			Camera.Update(gt);

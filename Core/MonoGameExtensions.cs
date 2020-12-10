@@ -12,6 +12,13 @@ namespace CaveGame.Core
 
 	public static class MonoGameExtensions
 	{
+		public static Vector2 LookAt(this Vector2 origin, Vector2 goal)
+        {
+			Vector2 UnitVector = (goal - origin);
+			UnitVector.Normalize();
+			return UnitVector;
+		}
+
 		public static float Distance(this Vector2 a, Vector2 b) => (a - b).Length();
 
 		public static Color Inverse(this Color color)
@@ -40,7 +47,6 @@ namespace CaveGame.Core
 				MathematicsExtensions.Lerp(a.Y, b.Y, alpha)
 			);
 		}
-
 
 		public static Color Sub(this Color a, Color b)
 		{

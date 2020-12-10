@@ -39,20 +39,6 @@ _G.list = list
 		public static LuaTable GetEmptyTable(this Lua state) => (LuaTable)state.DoString("return {}")[0];
 
 
-		public static LuaTable ArrayToTable<T>(this Lua state, T[] list)
-		{
-			LuaTable table = state.GetEmptyTable(); ;
-			for (int i = 0; i < list.Length; i++)
-				table[i + 1] = list[i];
-			return table;
-		}
 
-		public static LuaTable ListToTable<T>(this Lua state, List<T> list)
-        {
-			LuaTable table = state.GetEmptyTable();
-			for (int i = 0; i < list.Count; i++)
-				table[i + 1] = list[i];
-			return table;
-		}
 	}
 }

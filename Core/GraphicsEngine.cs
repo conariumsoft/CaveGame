@@ -272,7 +272,6 @@ namespace CaveGame.Core
             LoadFonts = true;
         }
 
-        float ardeusIsADipshit;
 
         public void Update(GameTime gt)
         {
@@ -292,8 +291,8 @@ namespace CaveGame.Core
 
         public void Clear(Color color) => GraphicsDevice.Clear(color);
         public void End() => SpriteBatch.End();
-        public void Begin() => SpriteBatch.Begin();
-        public void Begin(SpriteSortMode sorting = SpriteSortMode.Deferred, BlendState blending = null, SamplerState sampling = null, DepthStencilState depthStencil = null, RasterizerState rasterizing = null, Effect effect = null, Matrix? transform = null)
+        public void Begin(SpriteSortMode sorting = SpriteSortMode.Deferred, BlendState blending = null, SamplerState sampling = null, DepthStencilState depthStencil = null, 
+            RasterizerState rasterizing = null, Effect effect = null, Matrix? transform = null)
         {
             SpriteBatch.Begin(sorting, blending, sampling, depthStencil, rasterizing, effect, transform);
         }
@@ -359,8 +358,10 @@ namespace CaveGame.Core
         public void Sprite(Texture2D texture, Vector2 position) => Sprite(texture, position, Color.White);
         public void Sprite(Texture2D texture, Vector2 position, Color color) => SpriteBatch.Draw(texture, position, color);
         public void Sprite(Texture2D texture, Vector2 position, Rectangle? quad, Color color) => SpriteBatch.Draw(texture, position, quad, color);
-        public void Sprite(Texture2D texture, Vector2 position, Rectangle? quad, Color color, Rotation rotation, Vector2 origin, Vector2 scale, SpriteEffects efx, float layer) => SpriteBatch.Draw(texture,position,quad,color,rotation.Degrees,origin,scale,efx,layer);
-        public void Sprite(Texture2D texture, Vector2 position, Rectangle? quad, Color color, Rotation rotation, Vector2 origin, float scale, SpriteEffects efx, float layer) => SpriteBatch.Draw(texture, position, quad, color, rotation.Degrees, origin, scale, efx, layer);
+        public void Sprite(Texture2D texture, Vector2 position, Rectangle? quad, Color color, Rotation rotation, Vector2 origin, Vector2 scale, SpriteEffects efx, float layer) => 
+            SpriteBatch.Draw(texture,position,quad,color,rotation.Radians, origin,scale,efx,layer);
+        public void Sprite(Texture2D texture, Vector2 position, Rectangle? quad, Color color, Rotation rotation, Vector2 origin, float scale, SpriteEffects efx, float layer) => 
+            SpriteBatch.Draw(texture, position, quad, color, rotation.Radians, origin, scale, efx, layer);
         public void Text(string text, Vector2 position) => Text(Fonts.Arial10, text, position);
         public void Text(string text, Vector2 position, Color color) => SpriteBatch.DrawString(Fonts.Arial10, text, position, color);
         public void Text(SpriteFont font, string text, Vector2 position) => Text(font, text, position, Color.White, TextXAlignment.Left, TextYAlignment.Top);

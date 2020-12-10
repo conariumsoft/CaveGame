@@ -117,7 +117,7 @@ namespace CaveGame.Client.Game.Entities
 							velX -= step * horizspeed;
 						}
 
-						Facing = HorizontalDirection.Left;
+						Facing = Direction.Left;
 					}
 
 
@@ -128,7 +128,7 @@ namespace CaveGame.Client.Game.Entities
 						{
 							velX += step * horizspeed;
 						}
-						Facing = HorizontalDirection.Right;
+						Facing = Direction.Right;
 					}
 				}
 				

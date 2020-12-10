@@ -11,12 +11,20 @@ using DataManagement;
 
 namespace CaveGame.Core
 {
-	
+	public struct Explosion : IDamageSource
+    {
+		public Vector2 Position { get; set; }
+		public float BlastRadius { get; set; }
+		public float BlastPressure { get; set; }
+		public bool Thermal { get; set; }
+
+
+    }
 
 	public interface IGameWorld
 	{
 		float TimeOfDay { get; set; }
-		void Explosion(Vector2 pos, float strength, float radius, bool damageTiles, bool damageEntities);
+		void Explosion(Explosion Blast, bool DamageTiles, bool DamageEntities);
 		List<IEntity> Entities { get; }
 		List<Furniture.FurnitureTile> Furniture { get; }
 		Tile GetTile(int x, int y);
@@ -34,12 +42,22 @@ namespace CaveGame.Core
 		void RemoveFurniture(FurnitureTile furn);
 		FurnitureTile GetFurniture(int networkID);
 		void Update(GameTime gt);
-	}
+        CastResult TileRaycast(Vector2 origin, Rotation direction, float maxDistance = 1000f, bool detectLiquids = false, bool detectNonSolids = false);
+    }
 
 	public interface IServerWorld : IGameWorld { }
 
-	public interface IClientWorld: IGameWorld { }
+	public interface IClientWorld: IGameWorld 
+	{
+		ParticleEmitter ParticleSystem { get; }
+		ILightingEngine Lighting { get; }
+	}
 
+	public enum GameSessionType
+    {
+        Singleplayer,
+		Multiplayer,
+    }
 	public abstract class World : IGameWorld
 	{
 
@@ -100,6 +118,8 @@ namespace CaveGame.Core
 		public List<IEntity> Entities { get; protected set; }
 
 		public virtual List<Furniture.FurnitureTile> Furniture { get; protected set; }
+
+		public GameSessionType SessionType { get; set; }
 
 		public void SetTileNetworkUpdated(int x, int y)
 		{
@@ -285,7 +305,86 @@ namespace CaveGame.Core
 
 		protected virtual void PhysicsStep() { }
 
-		public virtual void Explosion(Vector2 pos, float strength, float radius, bool damageTiles, bool damageEntities) { }
+		protected const float MAX_BLAST_DISTANCE = 80;
+		protected const float MAX_DAMAGE = 70;
+
+
+
+
+		protected virtual void InflictExplosionDamageOnEntity(Explosion Blast, IEntity Entity, int Damage, Vector2 Direction, float KickBack)
+        {
+			if (Entity is IPhysicsEntity MovingEntity)
+            {
+				Entity.Damage(
+					type: DamageType.Explosion,
+					source: Blast,
+					amount: Damage,
+					direction: Direction
+				);
+
+				MovingEntity.Velocity += Direction * KickBack;
+			}
+			
+		}
+
+		protected virtual void ExplodeAffectEntities(Explosion Blast, bool DamageEntities = true)
+        {
+			foreach (var ent in Entities)
+			{
+				if (ent is IPhysicsEntity physicsEntity)
+				{
+					var dist = physicsEntity.Position.Distance(Blast.Position);
+					if (dist < MAX_BLAST_DISTANCE)
+                    {
+						var power = Math.Min((1 / dist) * Blast.BlastPressure * 7f, 350);
+						var unitVec = (physicsEntity.Position - Blast.Position);
+						unitVec.Normalize();
+						int damage = (int)Math.Max(MAX_DAMAGE - dist, 1);
+
+						InflictExplosionDamageOnEntity(Blast, ent, damage, unitVec, power);
+					}	
+				}
+			}
+		}
+
+		protected virtual void ExplodeTiles(Explosion Blast, bool DropTiles = true, int MaxSquareRadius = 12)
+        {
+			for (int x = -MaxSquareRadius; x < MaxSquareRadius; x++)
+			{
+				for (int y = -MaxSquareRadius; y < MaxSquareRadius; y++)
+				{
+					Vector2 ThisTilePos = Blast.Position + new Vector2(x * Globals.TileSize, y * Globals.TileSize);
+
+					float dist = (ThisTilePos - Blast.Position).Length() / Globals.TileSize;
+
+					var damage = Math.Max((Blast.BlastPressure * 3) - (dist * 3), 0);
+
+					var centroid = new Point((int)Blast.Position.X / Globals.TileSize, (int)Blast.Position.Y / Globals.TileSize) + new Point(x, y);
+					var tile = GetTile(centroid.X, centroid.Y);
+
+					if (tile is ILiquid)
+						continue;
+
+
+					tile.Damage += (byte)Math.Ceiling(damage);
+
+					if (tile.Damage > tile.Hardness)
+                    {
+						if (DropTiles)
+							BreakTile(centroid.X, centroid.Y);
+						else
+							SetTile(centroid.X, centroid.Y, new Game.Tiles.Air());
+					}
+				}
+			}
+		}
+
+		public virtual void Explosion(Explosion Blast, bool DamageTiles, bool DamageEntities) {
+			if (DamageTiles)
+				ExplodeTiles(Blast);
+
+			ExplodeAffectEntities(Blast, DamageEntities);
+		}
 
 		public bool ContainsFurniture(int x, int y) {
 			foreach (var furn in Furniture)
@@ -344,7 +443,74 @@ namespace CaveGame.Core
 			return false;
 		}
 
-		protected DelayedTask physicsTask;
+        public CastResult TileRaycast(Vector2 origin, Rotation direction, float maxDistance = 120, bool detectLiquids = false, bool detectNonSolids = false)
+        {
+			const float ray_accuracy = 0.15f;
+
+			Vector2 last_pt = origin;
+
+			for (float i = 0; i < maxDistance; i += ray_accuracy)
+			{
+				Vector2 current_pt = origin + (direction.ToUnitVector() * i);
+
+				Point tile_coords = new Point(
+				(int)	Math.Floor(current_pt.X / 8),
+				(int)	Math.Floor(current_pt.Y / 8)
+				);
+
+                Tile tileAt = GetTile(tile_coords.X, tile_coords.Y);
+
+				if (tileAt.ID > 0 && !(tileAt is INonSolid))
+				{
+                    Vector2 tile_corner = (tile_coords.ToVector2() * 8);
+                    Vector2 tile_size = new Vector2(8, 8);
+
+
+					LineSegment ray_travel_segment = new LineSegment(origin, current_pt);
+					Rectangle tile_rect = new Rectangle(tile_corner.ToPoint(), tile_size.ToPoint());
+
+					if (CollisionSolver.Intersects(ray_travel_segment, tile_rect, out Vector2 intersection, out Face face))
+                    {
+						Vector2 normal = Vector2.Zero;
+
+						if (face == Face.Top)
+							normal = new Vector2(0, -1);
+						if (face == Face.Bottom)
+							normal = new Vector2(0, 1);
+						if (face == Face.Left)
+							normal = new Vector2(-1, 0);
+						if (face == Face.Right)
+							normal = new Vector2(1, 0);
+
+						return new CastResult
+						{
+							Hit = true,
+							Intersection = intersection,
+							SurfaceNormal = normal,
+							TileCoordinates = tile_coords,
+							Face = face
+						};
+					}
+
+					/*if (CollisionSolver.CheckAABB(ray_check_center, new Vector2(4, 4), tile_center, tile_half))
+                    {
+						var separation = CollisionSolver.GetSeparationAABB(ray_check_center, new Vector2(4, 4), tile_center, tile_half);
+						//if (separation.X != 0 && separation.Y != 0)
+                        //{
+							var normal = CollisionSolver.GetNormalAABB(separation, direction.ToUnitVector());
+                            return new CastResult {
+								Hit = true,
+								SurfaceNormal = normal,
+								Intersection = current_pt-separation,
+							};
+                       // }
+                    }*/
+                }
+			}
+			return new CastResult { Hit = false };
+        }
+
+        protected DelayedTask physicsTask;
 
 		public World()
 		{

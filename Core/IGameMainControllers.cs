@@ -92,7 +92,6 @@ namespace CaveGame.Core
 
 		void Begin(SpriteSortMode sorting = SpriteSortMode.Deferred, BlendState blending = null, SamplerState sampling = null, 
 			DepthStencilState depthStencil = null, RasterizerState rasterizing = null, Effect effect = null, Matrix? transform = null);
-		void Begin();
 		void End();
 
     }

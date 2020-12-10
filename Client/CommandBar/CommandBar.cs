@@ -257,28 +257,37 @@ namespace CaveGame.Core
 			return additional;
 		}
 
+		RasterizerState rastering = new RasterizerState() { ScissorTestEnable = true };
+		const float line_height = 16;
 		public void Draw(GraphicsEngine GFX)
 		{
 			if (!Open)
 				return;
 			#region Draw box
-			Color backgroundColor = new Color(0, 0, 0, 0.75f);
+			Color backgroundColor = new Color(0.01f, 0.01f, 0.01f, 0.75f);
 			Vector2 screenSize = new Vector2(Game.Window.ClientBounds.Width, Game.Window.ClientBounds.Height);
-			Vector2 consoleSize = screenSize - new Vector2(200, 200);
-			Vector2 consolePosition = new Vector2(100, 100);
+			Vector2 consoleSize = screenSize - new Vector2(300, 200);
+			Vector2 consolePosition = new Vector2(150, 100);
 
 			Color inputBoxColor = new Color(0.15f, 0.15f, 0.25f);
 			Vector2 inputBoxPosition = consolePosition + new Vector2(0, consoleSize.Y - 20);
 			Vector2 inputBoxSize = new Vector2(consoleSize.X, 20);
 
-			GFX.Begin();
+			GFX.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, rastering);
+			GFX.OutlineRect(new Color(0.5f, 0.5f, 0.5f), consolePosition - new Vector2(2, 2), consoleSize + new Vector2(4, 4), 2);
+			Rectangle current = GFX.GraphicsDevice.ScissorRectangle;
+			GFX.GraphicsDevice.ScissorRectangle = new Rectangle(consolePosition.ToPoint(), consoleSize.ToPoint());
+			
 			GFX.Rect(backgroundColor, consolePosition, consoleSize);
 			GFX.Rect(inputBoxColor, inputBoxPosition, inputBoxSize);
-			GFX.OutlineRect(new Color(0.0f, 0.0f, 0.0f), consolePosition, consoleSize);
+			
 			#endregion
 
+
+			var font = GFX.Fonts.Arial10;
+
 			//Draw message history
-			
+
 			lock (MessageHistory)
 			{
 				int iter = MessageHistory.Count;
@@ -292,16 +301,13 @@ namespace CaveGame.Core
 					string text = message.Text.WrapText(GFX.Fonts.Arial10, consoleSize.X);
 					visIter++;
 					visIter += text.Count(c => c == '\n');
-					GFX.Text(text, consolePosition + new Vector2(0, (consoleSize.Y - 20) - (visIter * 14)), message.TextColor);
+					GFX.Text(font, text, consolePosition + new Vector2(0, (consoleSize.Y - 20) - (visIter * line_height)), message.TextColor);
 					
 				}
 			}
 				
-				
-				
 			// Autocomplete suggestion
 			if (inputBox.SpecialSelection == false && (inputBox.InputBuffer != "" || autocompletemenuOpen == true)) {
-
 					string cleaned = inputBox.InputBuffer;
 
 					foreach (Command cmd in Commands)
@@ -309,7 +315,7 @@ namespace CaveGame.Core
 						if (cmd.Keyword.StartsWith(cleaned))
 						{
 
-							GFX.Text(InputBufferProcess(cmd.Keyword) + " " + GetArgsInfo(cmd), inputBoxPosition , new Color(0.5f, 0.5f, 0.0f));
+							GFX.Text(font, InputBufferProcess(cmd.Keyword) + " " + GetArgsInfo(cmd), inputBoxPosition , new Color(0.5f, 0.5f, 0.0f));
 							break;
 						}
 					}
@@ -321,23 +327,23 @@ namespace CaveGame.Core
 							autocompleteOptionIndex++;
 
 					if (autocompleteOptionIndex > 0)
-						GFX.Rect(new Color(0.0f, 0.0f, 0.0f, 0.2f), inputBoxPosition - new Vector2(-5, (autocompleteOptionIndex + 1) * 14), new Vector2(300, autocompleteOptionIndex * 14));
+						GFX.Rect(new Color(0.1f, 0.1f, 0.1f), inputBoxPosition - new Vector2(0, (autocompleteOptionIndex + 1) * line_height), new Vector2(400, autocompleteOptionIndex * line_height));
 
 					var iterator2 = 0;
 					foreach (Command cmd in Commands)
 					{
 						if (cmd.Keyword.StartsWith(cleaned))
 						{
-							GFX.Text(cmd.Keyword + " " + GetArgsInfo(cmd), inputBoxPosition - new Vector2(-5, (iterator2 + 2) * 14), new Color(1.0f, 1.0f, 0));
+							GFX.Text(font, cmd.Keyword + " " + GetArgsInfo(cmd), inputBoxPosition - new Vector2(-5, (iterator2 + 2) * line_height), new Color(1.0f, 1.0f, 0));
 							iterator2++;
 						}
 				}
 			}
-				
+			
 
 			if (inputBox.SpecialSelection)
 			{
-				var font = GFX.Fonts.Arial10;
+				
 				var beforeText = inputBox.GetScissorTextBefore();
 				var middleText = inputBox.GetScissorTextDuring();
 				var afterText = inputBox.GetScissorTextAfter();
@@ -347,16 +353,17 @@ namespace CaveGame.Core
 				GFX.Rect(Color.Blue, inputBoxPosition + new Vector2(start.X, 0), end);
 
 				// first section
-				GFX.Text(beforeText,  inputBoxPosition, Color.White);
-				GFX.Text(middleText, inputBoxPosition + new Vector2(start.X, 0), Color.Black);
-				GFX.Text(afterText, inputBoxPosition + new Vector2(start.X + end.X, 0), Color.White);
+				GFX.Text(font, beforeText,  inputBoxPosition, Color.White);
+				GFX.Text(font, middleText, inputBoxPosition + new Vector2(start.X, 0), Color.Black);
+				GFX.Text(font, afterText, inputBoxPosition + new Vector2(start.X + end.X, 0), Color.White);
 			} else
 			{
 				// Input buffer
-				GFX.Text(inputBox.DisplayText, inputBoxPosition, new Color(1.0f, 1.0f, 1.0f));
+				GFX.Text(font, inputBox.DisplayText, inputBoxPosition, new Color(1.0f, 1.0f, 1.0f));
 			}
 
-
+			GFX.GraphicsDevice.ScissorRectangle = current;
+			
 			GFX.End();
 		}
 

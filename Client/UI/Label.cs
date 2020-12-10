@@ -195,11 +195,15 @@ namespace CaveGame.Client.UI
 		public int TextWrappingCount { get; private set; }
 
 
-		public Label(NLua.Lua state, NLua.LuaTable table) : base(state, table) {
-
+		public Label(NLua.Lua state, NLua.LuaTable table) : this() {
+            this.InitFromLuaPropertyTable(state, table);
 		}
 
-		public Label() : base(){}
+		public Label() : base()
+        {
+			Font = GraphicsEngine.Instance.Fonts.Arial10;
+			Text = "Label";
+        }
 
 		public override void Update(GameTime gt)
 		{
