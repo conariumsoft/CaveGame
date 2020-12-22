@@ -32,6 +32,11 @@ namespace CaveGame.Core.Network
         {
 			return dispatchedPackets.Count > 0;
         }
+		public void SendDispatchMessages(IGameServer server)
+        {
+			if (DispatcherHasMessage())
+				server.SendTo(PopDispatcherQueue(), this);
+		}
 
 		public Packet PopDispatcherQueue()
         {

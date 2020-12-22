@@ -39,23 +39,23 @@ namespace CaveGame.Client
 
 		public static void LoadAssets(ContentManager Content)
 		{
-			Content.RootDirectory = "Assets";
-			MenuBlip = Content.Load<SoundEffect>("Sound/click1");
+			Content.RootDirectory = Path.Combine("assets", "sound");
+			MenuBlip = Content.Load<SoundEffect>("click1");
 
-			Mu_Big_Brother = Content.Load<Song>("Sound/mu/big_brother");
-			Mu_Cliff = Content.Load<Song>("Sound/mu/cliff");
-			Mu_Hey_Bella = Content.Load<Song>("Sound/mu/hey_bella");
-			Mu_Mithril_Ocean = Content.Load<Song>("Sound/mu/mithril_ocean");
-			AmbientLava = Content.Load<Song>("Sound/ambient/lava");
-			AmbientBirds1 = Content.Load<Song>("Sound/ambient/birds1");
-			AmbientBirds2 = Content.Load<Song>("Sound/ambient/birds2");
-			AmbientBirds3 = Content.Load<Song>("Sound/ambient/birds3");
-			AmbientBirds4 = Content.Load<Song>("Sound/ambient/birds4");
-			AmbientBirds5 = Content.Load<Song>("Sound/ambient/birds5");
-			AmbientBirds6 = Content.Load<Song>("Sound/ambient/birds6");
-			AmbientBirds7 = Content.Load<Song>("Sound/ambient/birds7");
-			AmbientCreepy1 = Content.Load<Song>("Sound/ambient/birds1");
-			AmbientBirds7 = Content.Load<Song>("Sound/ambient/birds1");
+			Mu_Big_Brother = Content.Load<Song>("mu/big_brother");
+			Mu_Cliff = Content.Load<Song>("mu/cliff");
+			Mu_Hey_Bella = Content.Load<Song>("mu/hey_bella");
+			Mu_Mithril_Ocean = Content.Load<Song>("mu/mithril_ocean");
+			AmbientLava = Content.Load<Song>("ambient/lava");
+			AmbientBirds1 = Content.Load<Song>("ambient/birds1");
+			AmbientBirds2 = Content.Load<Song>("ambient/birds2");
+			AmbientBirds3 = Content.Load<Song>("ambient/birds3");
+			AmbientBirds4 = Content.Load<Song>("ambient/birds4");
+			AmbientBirds5 = Content.Load<Song>("ambient/birds5");
+			AmbientBirds6 = Content.Load<Song>("ambient/birds6");
+			AmbientBirds7 = Content.Load<Song>("ambient/birds7");
+			AmbientCreepy1 = Content.Load<Song>("ambient/birds1");
+			AmbientBirds7 = Content.Load<Song>("ambient/birds1");
 		}
 	}
 }

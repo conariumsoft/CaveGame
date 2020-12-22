@@ -13,38 +13,49 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Collections.Concurrent;
 using CaveGame.Core.Game.Tiles;
+using DataManagement;
 
 namespace CaveGame.Server
 {
-	
-
 	public class ServerWorld : Core.World, IServerWorld
 	{
-
-
-
 		public int WorldSeed => Metadata.Seed;
 		public string WorldName => Metadata.Name;
 
-		private ConcurrentQueue<IEntity> entityQueue;
-		public void SpawnEntity(IEntity entity) => entityQueue.Enqueue(entity);
-		
+		private ConcurrentQueue<IEntity> EntityQueue { get; set; }
+		public void SpawnEntity(IEntity entity) => EntityQueue.Enqueue(entity);
+
+		private Queue<Point> TileNetworkUpdateQueue { get; set; }
+		private Queue<Point> WallNetworkUpdateQueue { get; set; }
+
+		public void RequestTileNetworkUpdate(Point position) => TileNetworkUpdateQueue.Enqueue(position);
+		public void RequestWallNetworkUpdate(Point position) => WallNetworkUpdateQueue.Enqueue(position);
+
 		public GameServer Server { get; set; }
 		public Generator Generator { get; set; }
 
 		public Dictionary<ChunkCoordinates, bool> LoadedChunks;
 
-		protected DelayedTask serverTileUpdateTask;
-		protected DelayedTask serverRandomTileUpdateTask;
+		protected RepeatingIntervalTask TileUpdateTask { get; set; }
+		protected RepeatingIntervalTask RandomTileUpdateTask { get; set; }
+		//protected RepeatingIntervalTask 
 
+		
 
 		public override List<FurnitureTile> Furniture { get; protected set; }
 
 		public WorldMetadata Metadata { get; private set; }
 
 
-		public ServerWorld(WorldMetadata metadata)
+		public ServerWorld(WorldMetadata metadata) : base()
 		{
+			TileNetworkUpdateQueue = new Queue<Point>();
+			WallNetworkUpdateQueue = new Queue<Point>();
+
+			Context = NetworkContext.Server;
+			//SessionType = GameSessionType.
+
+
 			Metadata = metadata;
 
             CreateDirectoryIfNull(Path.Combine("Worlds", WorldName));
@@ -63,11 +74,53 @@ namespace CaveGame.Server
             worldXml.WriteEndDocument();
             worldXml.Close();
 
-			entityQueue = new ConcurrentQueue<IEntity>();
-			serverTileUpdateTask = new DelayedTask(ApplyTileUpdates, 1 / 10.0f);
-			serverRandomTileUpdateTask = new DelayedTask(ApplyRandomTileTicksToLoadedChunks, 1 / 5.0f);
+			WorldTimedTasks.Add(new(ProcessTileUpdateRequests, 1 / 10.0f));
+			WorldTimedTasks.Add(new(DoRandomTileTicks, 1 / 5.0f));
+			WorldTimedTasks.Add(new(SendTileNetworkUpdates, 1 / 5.0f));
+
+
+			EntityQueue = new ConcurrentQueue<IEntity>();
+			//serverTileUpdateTask = new RepeatingIntervalTask(TileUpdates, 1 / 10.0f);
+			
+			//serverRandomTileUpdateTask = new RepeatingIntervalTask(ApplyRandomTileTicksToLoadedChunks, 1 / 5.0f);
 			Generator = new Generator(WorldSeed);
 			Tile.InitializeManager(WorldSeed);
+		}
+
+
+        public override void SetTile(int x, int y, Tile t)
+        {
+            base.SetTile(x, y, t);
+			RequestTileNetworkUpdate(new Point(x, y));
+        }
+
+		public virtual void SetTileNetworkUpdated(int x, int y)
+		{
+			//throw new NotImplementedException();
+		}
+
+		public override void BreakTile(int x, int y)
+		{
+			GetTile(x, y).Drop(Server, this, new Point(x, y));
+			SetTile(x, y, new Air());
+			base.BreakTile(x, y);
+		}
+
+		private void ProcessTileUpdateRequests()
+		{
+			
+			int count = TileUpdateQueue.Count;
+			for (int i = 0; i < count-1; i++)
+            {
+				Point coords = TileUpdateQueue.Dequeue();
+				//bool success = TileUpdateQueue.TryDequeue(out coords);
+				if (GetTile(coords) is ITileUpdate tile)
+					tile.TileUpdate(this, coords.X, coords.Y);
+
+
+				foreach (var furn in Furniture.ToArray())
+					furn.OnTileUpdate(this, coords.X, coords.Y);
+			}
 		}
 
 		private static void CreateDirectoryIfNull(string fname)
@@ -128,7 +181,6 @@ namespace CaveGame.Server
 				Generator.HeightPass(ref chunk);
 				//World.Chunks.Add(coords, chunk);
 				Chunks.TryAdd(coords, chunk);
-				chunk.ClearUpdateQueue();
 			}
 
 			if (!chunk.DungeonPassCompleted)
@@ -146,7 +198,6 @@ namespace CaveGame.Server
 							//World.Chunks.Add(newCoords, thischunk);
 							Chunks.TryAdd(newCoords, thischunk);
 							Generator.HeightPass(ref thischunk);
-							thischunk.ClearUpdateQueue();
 						}
 					}
 				}
@@ -162,6 +213,10 @@ namespace CaveGame.Server
 			return chunk;
 		}
 
+
+		public Task<Chunk> LoadChunk(ChunkCoordinates coords) { return null; }// TODO: Implement
+		public Task<bool> UnloadChunk(ChunkCoordinates coords) { return null; }// TODO: Implement
+
 		protected override void PhysicsStep()
 		{
 			foreach (IEntity entity in Entities.ToArray())
@@ -169,12 +224,7 @@ namespace CaveGame.Server
 					physicsObserver.ServerPhysicsTick(this, PhysicsStepIncrement);
 		}
 
-		public override void BreakTile(int x, int y)
-        {
-			GetTile(x, y).Drop(Server, this, new Point(x, y));
-			SetTile(x, y, new Air());
-            base.BreakTile(x, y);
-        }
+		
         public override void RemoveFurniture(Core.Furniture.FurnitureTile furn)
 		{
 			
@@ -183,37 +233,18 @@ namespace CaveGame.Server
 			//base.RemoveFurniture(furn);
 		}
 
+		private void SendTileNetworkUpdates()
+        {
+			foreach (var tileCoords in TileNetworkUpdateQueue.DequeueAll())
+				Server.SendToAll(new PlaceTilePacket(tileCoords, GetTile(tileCoords)));
 
-		private void TileUpdates(Chunk chunk)
-		{
-			for (int x = 0; x < Globals.ChunkSize; x++)
-			{
-				for (int y = 0; y < Globals.ChunkSize; y++)
-				{
-					if (chunk.TileUpdate[x, y] == true)
-					{
-						chunk.TileUpdate[x, y] = false;
-
-						int worldX = (chunk.Coordinates.X * Globals.ChunkSize) + x;
-						int worldY = (chunk.Coordinates.Y * Globals.ChunkSize) + y;
-						foreach (var furn in Furniture.ToArray())
-							furn.OnTileUpdate(this, worldX, worldY);
-
-
-						if (chunk.GetTile(x, y) is ITileUpdate tile)
-							tile.TileUpdate(this, worldX, worldY);
-					}
-				}
-			}
+			foreach (var wallCoords in WallNetworkUpdateQueue.DequeueAll())
+				Server.SendToAll(new PlaceWallPacket(wallCoords, GetWall(wallCoords)));
 		}
 
-		private void ApplyTileUpdates()
-		{
-			foreach (var kvp in Chunks)
-				TileUpdates(kvp.Value);
-		}
+        
 
-		private async void ApplyRandomTileTicksToLoadedChunks()
+        private async void DoRandomTileTicks()
 		{
 			await (Task.Run(() =>
 		{
@@ -267,15 +298,10 @@ namespace CaveGame.Server
 
 		public override void Update(GameTime gt)
 		{
-			for (int i = 0; i < entityQueue.Count; i++)
-            {
-				bool success = entityQueue.TryDequeue(out var newEntity);
-				if (success)
-					Entities.Add(newEntity);
-            }
 
-			serverRandomTileUpdateTask.Update(gt);
-			serverTileUpdateTask.Update(gt);
+			for (int i = 0; i < EntityQueue.Count; i++)
+				if (EntityQueue.TryDequeue(out IEntity entity))
+					Entities.Add(entity);
 
 
 			foreach (var ent in Entities.ToArray())

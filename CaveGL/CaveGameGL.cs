@@ -15,35 +15,28 @@ using CaveGame.Server;
 using System.Threading.Tasks;
 using CaveGame.Core.Game.Items;
 using CaveGame.Core.Inventory;
+using DataManagement;
 
 namespace CaveGame.Client
 {
 	public class CaveGameGL : Microsoft.Xna.Framework.Game
 	{
+		// TODO: If running local server, shutdown server when player leaves the world
 		public GameSettings GameSettings { get; set; }
 		public IGameContext CurrentGameContext { get; set; }
 		private IGameContext PreviousGameContext { get; set; }
-
-		#region Game States
-		public GameClient GameClientContext;
-		public Menu.MenuManager MenuContext;
-		public Menu.Settings SettingsContext;
-		#endregion
-
+		public GameClient GameClientContext { get; private set; }
+		public Menu.MenuManager MenuContext { get; private set; }
+		public Menu.Settings SettingsContext { get; private set; }
 		public GraphicsEngine GraphicsEngine { get; private set; }
 		public GraphicsDeviceManager GraphicsDeviceManager { get; private set; }
 		public SpriteBatch SpriteBatch { get; private set; }
-		#region GameComponents
-		public CommandBar Console { get; private set; }
+		public CommandBar Console { get; private set; } // TOOD: Change Name of CommandBar class to Console
 		public FrameCounter FPSCounter { get; private set; }
 		public Splash Splash { get; private set; }
-		#endregion
-
-		public static float ClickTimer;
-
-		
-
 		public SteamManager SteamManager { get; private set; }
+		public static float ClickTimer { get; set; }
+
 
 		public void OnSetFPSLimit(int limit)
 		{
@@ -57,7 +50,7 @@ namespace CaveGame.Client
 			}
 		}
 
-		public void OnSetChatSize(GameChatSize size) {}
+		public void OnSetChatSize(GameChatSize size) { }
 
 		public void OnSetFullscreen(bool full)
 		{
@@ -78,32 +71,45 @@ namespace CaveGame.Client
 
 		// join local (singleplayer server
 		public void EnterLocalGame(WorldMetadata meta)
-        {
+		{
 			var serverCFG = new ServerConfig
 			{
 				Port = 40270, // singleplayer server uses slightly different port
 				World = meta.Name,
-                ServerName = $"LocalServer [{meta.Name}] ",
+				ServerName = $"LocalServer [{meta.Name}] ",
 				ServerMOTD = "Singleplayer game world.",
 			};
 			var worldMDT = meta;
 			LocalServer server = new LocalServer(serverCFG, worldMDT);
 			server.Output = Console;
-            Task.Run(() => {
-                server.Start();
-                server.Run();
-            });
-			this.CurrentGameContext = this.GameClientContext;
-			this.GameClientContext.NetworkUsername = "Player";
-            this.GameClientContext.ConnectAddress = "127.0.0.1:40270";
-        }
+			Task.Run(server.Start);
+
+			StartClient(SteamManager.SteamUsername, "127.0.0.1:40270");
+			CurrentGameContext = GameClientContext;
+			GameClientContext.OnShutdown += server.Shutdown;
+		}
+
+
+		public void StartClient(string userName, string address) 
+		{
+			GameClientContext?.Dispose();
+			GameClientContext = new GameClient(this);
+			GameClientContext.NetworkUsername = userName;
+			GameClientContext.ConnectAddress = address;
+			CurrentGameContext = GameClientContext;
+		}
+
 
 		public CaveGameGL()
 		{
+			IsMouseVisible = true;
+			Content.RootDirectory = "Assets";
+			Window.AllowUserResizing = true;
+			Window.AllowAltF4 = true;
+
 			GameSettings = Configuration.Load<GameSettings>("settings.xml", true);
 			SteamManager = new SteamManager(this);
 			
-
 			GraphicsDeviceManager = new GraphicsDeviceManager(this) 
 			{
 				PreferredBackBufferWidth = 1280,
@@ -113,41 +119,29 @@ namespace CaveGame.Client
 				PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8
 			};
 
-
-			IsMouseVisible = true;
-			Content.RootDirectory = "Assets";
-			Window.AllowUserResizing = true;
-			Window.AllowAltF4 = true;
-
 			GraphicsEngine = new GraphicsEngine();
-
-			
 			Splash = new Splash();
+
+			FPSCounter = new FrameCounter(this);
+			Components.Add(FPSCounter);
 
 #if DEBUG
 			GraphicsEngine.LoadingDelay = 0.05f;
-			Splash.SplashTimer = 5f;
+			Splash.SplashTimer = 3f;
 #endif
 			OnSetFPSLimit(GameSettings.FPSLimit);
 		}
 
-		void Window_ClientSizeChanged(object sender, EventArgs e)
-		{
-			GraphicsEngine.WindowSize = Window.ClientBounds.Size.ToVector2();
-			if (GameClientContext != null)
-			{
-				GameClientContext.Camera.Bounds = Window.ClientBounds;
-				GameClientContext.Camera._screenSize = new Vector2(Window.ClientBounds.Width, Window.ClientBounds.Height);
-			}
-			
-		}
 
+		void Window_ClientSizeChanged(object sender, EventArgs e) => GraphicsEngine.WindowSize = Window.ClientBounds.Size.ToVector2();
+
+
+		#region GameConsole Commands
 		private void OnTeleportCommand(CommandBar sender, Command command, params string[] args)
 		{
 			if (args.Length < 2)
 			{
 				sender.Out("Please provide a valid coordinate!", Color.Red);
-
 				return;
 			}
 
@@ -182,7 +176,7 @@ namespace CaveGame.Client
 		{
 			if (CurrentGameContext == GameClientContext)
 			{
-				GameClientContext.OverrideDisconnect();
+				GameClientContext.Disconnect();
 
 			} else
 			{
@@ -201,7 +195,6 @@ namespace CaveGame.Client
 				TakeScreenshot();
 				sender.Out("Screenshot taken!");
 			}
-			
 		}
 		private void SendAdminCommand(string command, params string[] args) => GameClientContext.Send(new AdminCommandPacket(command, args, GameClientContext.MyPlayer.EntityNetworkID));
 		private void CmdTimeCommand(CommandBar sender, Command command, params string[] args)
@@ -245,16 +238,22 @@ namespace CaveGame.Client
             }
 			sender.Out("No item found with matching name!");
 		}
+		#endregion
 
-		protected override void Initialize()
+		public void GoToMainMenu()
 		{
-			Window.TextInput += TextInputManager.OnTextInput;
-			Window.ClientSizeChanged += new EventHandler<EventArgs>(Window_ClientSizeChanged);
-			OnSetFullscreen(GameSettings.Fullscreen);
+			CurrentGameContext = MenuContext;
+			MenuContext.CurrentPage = MenuContext.Pages["mainmenu"];
+		}
+		public void GoToTimeoutPage(string timeout)
+		{
+			CurrentGameContext = MenuContext;
+			MenuContext.CurrentPage = MenuContext.Pages["timeoutmenu"];
+			MenuContext.TimeoutMessage = timeout;
+		}
 
-
-			Console = new CommandBar(this);
-
+		private void InitCommands()
+        {
 			// epic new .NET 5 feature
 			Command[] commands =
 			{
@@ -266,21 +265,26 @@ namespace CaveGame.Client
 				new ("time", "Set/Get time of day", new List<string> { "time" }, CmdTimeCommand),
 				new ("sv_summon", "Summon an entity", new List<string>{"entityid, xpos, ypos, metadatastring" }, CmdRequestSummonEntity),
 				new ("gimme", "Gives you an item", new List<string>{"itemid", "amount"}, CmdRequestItemstack),
-				
+
 			};
-			foreach (var command in commands)
-				Console.BindCommandInformation(command);
+			commands.ForEach(c => Console.BindCommandInformation(c));
+			//commands.ForEach(Console.BindCommandInformation);
+		}
+
+
+		protected override void Initialize()
+		{
+			Window.TextInput += TextInputManager.OnTextInput;
+			Window.ClientSizeChanged += new EventHandler<EventArgs>(Window_ClientSizeChanged);
+			OnSetFullscreen(GameSettings.Fullscreen);
+
+			Console = new CommandBar(this);
+			InitCommands();
 
 			GameConsole.SetInstance(Console);
 			Components.Add(Console);
-			
-			FPSCounter = new FrameCounter(this);
-			Components.Add(FPSCounter);
-
-
 			SteamManager.Initialize();
 			Components.Add(SteamManager);
-
 			base.Initialize();
 		}
 
@@ -300,6 +304,7 @@ namespace CaveGame.Client
 			MenuContext = new MenuManager(this);
 			GameClientContext = new GameClient(this);
 			SettingsContext = new Settings(this);
+
 			Window.TextInput += SettingsContext.OnTextInput;
 			CurrentGameContext = MenuContext;
 		}

@@ -4,11 +4,21 @@ using System.Runtime.InteropServices;
 
 namespace CaveGame.Core
 {
+
+	/// <summary>
+	/// A structure representing lighting value in-game
+	/// Roughly equatable to a color struct, but with specialized
+	/// methods for dealing with light calculation
+	/// </summary>
 	[StructLayout(LayoutKind.Explicit)]
 	public struct Light3 : IEquatable<Light3>
 	{
 		public static Light3 Dark = new Light3(0, 0, 0);
-		public static Light3 Ambience = new Light3(16, 16, 16);
+		public static Light3 Moonlight = new Light3(128, 128, 128);
+		public static Light3 Dawn = new Light3(96, 96, 40);
+		public static Light3 Ambience = new Light3(255, 255, 255);
+		public static Light3 Daylight = new Light3(255, 255, 255);
+		public static Light3 Dusk = new Light3(96, 60, 40);
 
 		[FieldOffset(0)] public byte Red;
 		[FieldOffset(1)] public byte Blue;
@@ -21,20 +31,35 @@ namespace CaveGame.Core
 			Blue = b;
 		}
 
-		public bool Equals(Light3 other)
-		{
-			return (other.Red == Red && other.Blue == Blue && other.Green == Green);
-		}
-		private static double Squirt = Math.Sqrt(15.0);
+		public Light3(float r, float g, float b)
+        {
+			Red =   (byte)(r * 255);
+			Green = (byte)(g * 255);
+			Blue =  (byte)(b * 255);
+        }
+
+		public bool Equals(Light3 other)=>(other.Red == Red && other.Blue == Blue && other.Green == Green);
+
+
+		public Color ToColor() => new Color(Red, Green, Blue);
+
+
 		public Color MultiplyAgainst(Color col)
 		{
 			return new Color(
-				(col.R / 255.0f) * (float)(Math.Sqrt(Red / 30.0f)),
-				 (col.G / 255.0f) * (float)(Math.Sqrt(Green / 30.0f)),
-				(col.B / 255.0f) * (float)(Math.Sqrt(Blue / 30.0f)),
+				(col.R / 255.0f) * (Red / 255.0f),
+				 (col.G / 255.0f) * (Green / 255.0f),
+				(col.B / 255.0f) * (Blue / 255.0f),
 				col.A
 			);
 		}
+
+		public static Color operator *(Light3 l, Color c) => l.MultiplyAgainst(c);
+		public static Color operator *(Color c, Light3 l) => l.MultiplyAgainst(c);
+
+		public static Light3 operator +(Light3 a, Light3 b) => new Light3(a.Red + b.Red, a.Green + b.Green, a.Blue + b.Blue);
+
+		public static Light3 operator -(Light3 a, Light3 b) => new Light3(a.Red - b.Red, a.Green -b.Green, a.Blue - b.Blue);
 
 		public Light3 Absorb(byte opacity)
 		{

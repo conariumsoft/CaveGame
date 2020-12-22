@@ -49,7 +49,7 @@
     <TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="Assets\Scripts\MainMenu.lua">
+	  <!--None Update="Assets\Scripts\MainMenu.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Scripts\menu.lua">
@@ -57,8 +57,8 @@
     </None>
     <None Update="Assets\Scripts\SingleplayerMenu.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Textures\icon.png">
+    </None-->
+    <None Update="assets\Textures\icon.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
@@ -89,9 +89,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Assets\Sound\mu\" />
+    <Folder Include="assets\sound\mu\" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(ProjectDir)Assets\*.*&quot; &quot;$(TargetDir)Assets\\&quot; /E /I /F /Y" />
+    <Exec Command="xcopy &quot;$(ProjectDir)assets\*.*&quot; &quot;$(TargetDir)assets\\&quot; /E /I /F /Y" />
   </Target>
 </Project>

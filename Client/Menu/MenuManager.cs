@@ -70,7 +70,7 @@ namespace CaveGame.Client.Menu
 			luastate["_G.script"] = luastate;
             luastate.DoString(@"_G.oldprint = print; _G.print = function(str) game.Console:LuaPrint(str) end");
 			luastate.DoString(LuaSnippets.UtilityFunctions);
-			luastate.DoFile(Path.Combine("Assets", "Scripts", "menu.lua"));
+			luastate.DoFile(Path.Combine("assets", "scripts", "menu.lua"));
 		}
 
 		public void Load()

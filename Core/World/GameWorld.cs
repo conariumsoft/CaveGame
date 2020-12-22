@@ -21,8 +21,18 @@ namespace CaveGame.Core
 
     }
 
+	public enum NetworkContext
+    {
+		Server,
+		Client
+    }
+
 	public interface IGameWorld
 	{
+		bool IsServer();
+		bool IsClient();
+
+		NetworkContext Context { get; }
 		float TimeOfDay { get; set; }
 		void Explosion(Explosion Blast, bool DamageTiles, bool DamageEntities);
 		List<IEntity> Entities { get; }
@@ -32,7 +42,7 @@ namespace CaveGame.Core
 		void GetTile(int x, int y, out Tile t);
 		Wall GetWall(int x, int y);
 		void SetWall(int x, int y, Wall w);
-		void SetTileNetworkUpdated(int x, int y);
+		
 		void DoUpdatePropogation(int x, int y);
 		void BreakTile(int x, int y);
 		void SetTileUpdated(int x, int y);
@@ -42,10 +52,16 @@ namespace CaveGame.Core
 		void RemoveFurniture(FurnitureTile furn);
 		FurnitureTile GetFurniture(int networkID);
 		void Update(GameTime gt);
-        CastResult TileRaycast(Vector2 origin, Rotation direction, float maxDistance = 1000f, bool detectLiquids = false, bool detectNonSolids = false);
-    }
+        TileRaycastResult   TileRaycast(Vector2 origin, Rotation direction, float maxDistance = 100f, bool detectLiquids = false, bool detectNonSolids = false);
+		EntityRaycastResult EntityRaycast(Vector2 origin, Rotation direction, float maxDistance = 100f);
+	}
 
-	public interface IServerWorld : IGameWorld { }
+	public interface IServerWorld : IGameWorld 
+	{
+		//void SetTileNetworkUpdated(int x, int y);
+		void RequestTileNetworkUpdate(Point p);
+		void RequestWallNetworkUpdate(Point p);
+	}
 
 	public interface IClientWorld: IGameWorld 
 	{
@@ -60,97 +76,117 @@ namespace CaveGame.Core
     }
 	public abstract class World : IGameWorld
 	{
+		public bool IsServer() => (Context == NetworkContext.Server);
+		public bool IsClient() => (Context == NetworkContext.Client);
+
+
+		
 
 		public float TimeOfDay { get; set; }
 		public Light3[] AmbientLights = // depends on time of day
 		{
-			new Light3(0,0,0), //0 or 24
-			new Light3(0,0,0), //1
-			new Light3(0,0,0), //2
-			new Light3(0,0,0), //3
-			new Light3(0,0,0), //4
-			new Light3(0,0,0), //5
-			new Light3(0,0,0), //6
-			new Light3(0,0,0), //7
-			new Light3(0,0,0), //8
-			new Light3(0,0,0), //9
-			new Light3(0,0,0), //10
-			new Light3(0,0,0), //11
-			new Light3(0,0,0), //12
-			new Light3(0,0,0), //13
-			new Light3(0,0,0), //14
-			new Light3(0,0,0), //15
-			new Light3(0,0,0), //16
-			new Light3(0,0,0), //17
-			new Light3(0,0,0), //18
-			new Light3(0,0,0), //19
-			new Light3(0,0,0), //20
-			new Light3(0,0,0), //21
-			new Light3(0,0,0), //22
-			new Light3(0,0,0), //23
+			Light3.Moonlight, //0 or 24
+			Light3.Moonlight, //1
+			Light3.Moonlight, //2
+			Light3.Moonlight, //3
+			new Light3(60, 40, 40), //4
+			new Light3(70, 70, 40), //5
+			new Light3(90, 90, 60), //6
+			new Light3(128, 128, 90), //7
+			Light3.Daylight, //8
+			Light3.Daylight, //9
+			Light3.Daylight, //10
+			Light3.Daylight, //11
+			Light3.Daylight, //12
+			Light3.Daylight, //13
+			Light3.Daylight, //14
+			Light3.Daylight, //15
+			Light3.Daylight, //16
+			Light3.Daylight, //17
+			Light3.Moonlight, //18
+			Light3.Moonlight, //19
+			Light3.Moonlight, //20
+			Light3.Moonlight, //21
+			Light3.Moonlight, //22
+			Light3.Moonlight, //23
 		};
 
-		public Color[] SkyColors =
-		{
-			new Color(0, 2, 6), new Color(5, 5, 30), //0 or 24
-			new Color(2, 2, 10), new Color(16, 16, 40), //2
-			new Color(2, 2, 10), new Color(20, 20, 45), //4
-			new Color(8, 9, 50), new Color(85, 85, 40),  //6
-			new Color(40, 60, 90), new Color(90, 90, 190), //8
-			new Color(70, 90, 130), new Color(110, 110, 230), //10
-			new Color(70, 80, 170), new Color(170, 170, 255), //12
-			new Color(80, 100, 140), new Color(140, 140, 250), //14
-			new Color(35, 41, 60), new Color(60, 80, 140), //14
-			new Color(50, 32, 50), new Color(170, 100, 70), // 18
-			new Color(25, 25, 55), new Color(92, 52, 23), //20
-			new Color(5, 7, 14),  new Color(9, 23, 45), //22
-		};
+		
 		#region PhysicsConstants
 		public const float PhysicsStepIncrement = 1 / 100.0f;
 		public const float Gravity = 6.0f;
 		public const float AirResistance = 1.5f;
 		public const float TerminalVelocity = 180.0f;
-		
+
 
 		#endregion
+
+		protected List<RepeatingIntervalTask> WorldTimedTasks { get; set; }
+
+		public World()
+		{
+			TileUpdateQueue = new UniqueQueue<Point>();
+			WallUpdateQueue = new UniqueQueue<Point>();
+			Entities = new List<IEntity>();
+			Chunks = new ConcurrentDictionary<ChunkCoordinates, Chunk>();
+			Furniture = new List<Furniture.FurnitureTile>();
+
+			WorldTimedTasks = new List<RepeatingIntervalTask>();
+			WorldTimedTasks.Add(new RepeatingIntervalTask(PhysicsStep, PhysicsStepIncrement, TimeStepProcedure.SubtractIncrement));
+		}
+
+
+		protected UniqueQueue<Point> TileUpdateQueue { get; set; }
+		protected UniqueQueue<Point> WallUpdateQueue { get; set; }
+
+		public void RequestTileUpdate(Point position)=>TileUpdateQueue.Enqueue(position);
+		public void RequestWallUpdate(Point position) => WallUpdateQueue.Enqueue(position);
 
 		public ConcurrentDictionary<ChunkCoordinates, Chunk> Chunks { get; set; }
 		public List<IEntity> Entities { get; protected set; }
 
 		public virtual List<Furniture.FurnitureTile> Furniture { get; protected set; }
 
-		public GameSessionType SessionType { get; set; }
+		public GameSessionType SessionType { get; protected set; }
+        public NetworkContext Context { get; protected set; }
 
-		public void SetTileNetworkUpdated(int x, int y)
-		{
-			int chunkX = (int)Math.Floor((double)x / Globals.ChunkSize);
-			int chunkY = (int)Math.Floor((double)y / Globals.ChunkSize);
 
-			var tileX = x.Mod(Globals.ChunkSize);
-			var tileY = y.Mod(Globals.ChunkSize);
-
-			var coords = new ChunkCoordinates(chunkX, chunkY);
-			if (Chunks.ContainsKey(coords))
-			{
-				var chunk = Chunks[coords];
-				chunk.NetworkUpdated[tileX, tileY] = true;
-			}
-		}
 
 		public virtual void SetTileNoLight(int x, int y, Tile t)
 		{
 			throw new NotImplementedException();
 		}
-
-
 		public virtual void BreakTile(int x, int y)
         {
 
         }
 
-		public void SetTile(Point p, Tile t)=>SetTile(p.X, p.Y, t);
-		public Tile GetTile (Point p) => GetTile(p.X, p.Y);
 
+		
+
+
+		
+		public Tile GetTile(int x, int y)
+		{
+			Coordinates6D coordinates = Coordinates6D.FromWorld(x, y);
+
+			var cc = new ChunkCoordinates(coordinates.ChunkX, coordinates.ChunkY);
+
+			if (Chunks.ContainsKey(cc))
+				return Chunks[cc].GetTile(coordinates.TileX, coordinates.TileY);
+			return new Game.Tiles.Void();
+		}
+		public Tile GetTile(Point coords) => GetTile(coords.X, coords.Y);
+		public void GetTile(int x, int y, out Tile t)
+		{
+			Coordinates6D coordinates = Coordinates6D.FromWorld(x, y);
+
+			var cc = new ChunkCoordinates(coordinates.ChunkX, coordinates.ChunkY);
+			t = new Game.Tiles.Void();
+			if (Chunks.ContainsKey(cc))
+				t = Chunks[cc].GetTile(coordinates.TileX, coordinates.TileY);
+
+		}
 		public virtual void SetTile(int x, int y, Tile t)
 		{
 			
@@ -169,6 +205,46 @@ namespace CaveGame.Core
 			}
 			DoUpdatePropogation(x, y);
 		}
+		public void SetTile(Point p, Tile t) => SetTile(p.X, p.Y, t);
+
+		public Wall GetWall(int x, int y)
+		{
+			Coordinates6D coordinates = Coordinates6D.FromWorld(x, y);
+
+			var cc = new ChunkCoordinates(coordinates.ChunkX, coordinates.ChunkY);
+
+			if (Chunks.ContainsKey(cc))
+				return Chunks[cc].GetWall(coordinates.TileX, coordinates.TileY);
+			return new Game.Walls.Void();
+		}
+		public Wall GetWall(Point coords) => GetWall(coords.X, coords.Y);
+		public void GetWall(int x, int y, out Wall w)
+		{
+			Coordinates6D coordinates = Coordinates6D.FromWorld(x, y);
+
+			var cc = new ChunkCoordinates(coordinates.ChunkX, coordinates.ChunkY);
+			w = new Game.Walls.Void();
+			if (Chunks.ContainsKey(cc))
+				w = Chunks[cc].GetWall(coordinates.TileX, coordinates.TileY);
+
+		}
+		public virtual void SetWall(int x, int y, Wall w)
+		{
+			Coordinates6D coordinates = Coordinates6D.FromWorld(x, y);
+
+			var cc = new ChunkCoordinates(coordinates.ChunkX, coordinates.ChunkY);
+
+			if (Chunks.ContainsKey(cc))
+				Chunks[cc].SetWall(coordinates.TileX, coordinates.TileY, w);
+		}
+		public void SetWall(Point p, Wall w) => SetWall(p.X, p.Y, w);
+
+		
+		
+		
+
+		
+
 		public void SetTileUpdated(int x, int y)
 		{
 			int chunkX = (int)Math.Floor((double)x / Globals.ChunkSize);
@@ -182,66 +258,17 @@ namespace CaveGame.Core
 			if (Chunks.ContainsKey(coords))
 			{
 				var chunk = Chunks[coords];
-				chunk.SetTileUpdated(tileX, tileY);
+				//chunk.SetTileUpdated(tileX, tileY);
 			}
 		}
+
 		public void DoUpdatePropogation(int x, int y)
 		{
-			SetTileUpdated(x, y);
-			SetTileUpdated(x, y + 1);
-			SetTileUpdated(x, y - 1);
-			SetTileUpdated(x + 1, y);
-			SetTileUpdated(x - 1, y);
-		}
-		public Tile GetTile(int x, int y)
-		{
-			Coordinates6D coordinates = Coordinates6D.FromWorld(x, y);
-
-			var cc = new ChunkCoordinates(coordinates.ChunkX, coordinates.ChunkY);
-
-			if (Chunks.ContainsKey(cc))
-				return Chunks[cc].GetTile(coordinates.TileX, coordinates.TileY);
-			return new Game.Tiles.Void();
-		}
-		public void GetTile(int x, int y, out Tile t)
-		{
-			Coordinates6D coordinates = Coordinates6D.FromWorld(x, y);
-
-			var cc = new ChunkCoordinates(coordinates.ChunkX, coordinates.ChunkY);
-			t = new Game.Tiles.Void();
-			if (Chunks.ContainsKey(cc))
-				t = Chunks[cc].GetTile(coordinates.TileX, coordinates.TileY);
-			
-		}
-		public Wall GetWall(int x, int y)
-		{
-			Coordinates6D coordinates = Coordinates6D.FromWorld(x, y);
-
-			var cc = new ChunkCoordinates(coordinates.ChunkX, coordinates.ChunkY);
-
-			if (Chunks.ContainsKey(cc))
-				return Chunks[cc].GetWall(coordinates.TileX, coordinates.TileY);
-			return new Game.Walls.Void();
-		}
-		public void GetWall(int x, int y, out Wall w)
-		{
-			Coordinates6D coordinates = Coordinates6D.FromWorld(x, y);
-
-			var cc = new ChunkCoordinates(coordinates.ChunkX, coordinates.ChunkY);
-			w = new Game.Walls.Void();
-			if (Chunks.ContainsKey(cc))
-				w = Chunks[cc].GetWall(coordinates.TileX, coordinates.TileY);
-			
-		}
-
-		public virtual void SetWall(int x, int y, Wall w)
-		{
-			Coordinates6D coordinates = Coordinates6D.FromWorld(x, y);
-
-			var cc = new ChunkCoordinates(coordinates.ChunkX, coordinates.ChunkY);
-
-			if (Chunks.ContainsKey(cc))
-				Chunks[cc].SetWall(coordinates.TileX, coordinates.TileY, w);
+			RequestTileUpdate(new Point(x, y));
+			RequestTileUpdate(new Point(x, y + 1));
+			RequestTileUpdate(new Point(x, y - 1));
+			RequestTileUpdate(new Point(x + 1, y));
+			RequestTileUpdate(new Point(x - 1, y));
 		}
 
 		public virtual void OnCollectDeadEntity(IEntity ent)
@@ -294,13 +321,14 @@ namespace CaveGame.Core
 
 			TimeOfDay += (float)gt.ElapsedGameTime.TotalSeconds/30.0f;
 
+			//Profiler.Start("EntityClear");
+
 			foreach (var ent in Entities.ToArray())
 				if (ent.Dead)
 					OnCollectDeadEntity(ent);
 
-			//Entities.RemoveAll(e => e.Dead);
-
-			physicsTask.Update(gt);
+			foreach (var task in WorldTimedTasks)
+				task.Update(gt);
 		}
 
 		protected virtual void PhysicsStep() { }
@@ -443,82 +471,62 @@ namespace CaveGame.Core
 			return false;
 		}
 
-        public CastResult TileRaycast(Vector2 origin, Rotation direction, float maxDistance = 120, bool detectLiquids = false, bool detectNonSolids = false)
-        {
-			const float ray_accuracy = 0.15f;
 
-			Vector2 last_pt = origin;
+		const float ray_accuracy = 0.15f;
 
+
+		public TileRaycastResult TileRaycast(Vector2 origin, Rotation direction, float maxDistance = 120, bool detectLiquids = false, bool detectNonSolids = false)
+		{
 			for (float i = 0; i < maxDistance; i += ray_accuracy)
 			{
 				Vector2 current_pt = origin + (direction.ToUnitVector() * i);
 
 				Point tile_coords = new Point(
-				(int)	Math.Floor(current_pt.X / 8),
-				(int)	Math.Floor(current_pt.Y / 8)
+				(int)Math.Floor(current_pt.X / 8),
+				(int)Math.Floor(current_pt.Y / 8)
 				);
 
-                Tile tileAt = GetTile(tile_coords.X, tile_coords.Y);
+				Tile tileAt = GetTile(tile_coords.X, tile_coords.Y);
 
-				if (tileAt.ID > 0 && !(tileAt is INonSolid))
-				{
-                    Vector2 tile_corner = (tile_coords.ToVector2() * 8);
-                    Vector2 tile_size = new Vector2(8, 8);
+				if (tileAt.ID == 0 || (tileAt is INonSolid))
+					continue;
 
 
-					LineSegment ray_travel_segment = new LineSegment(origin, current_pt);
-					Rectangle tile_rect = new Rectangle(tile_corner.ToPoint(), tile_size.ToPoint());
+                Vector2 tile_corner = (tile_coords.ToVector2() * 8);
+                Vector2 tile_size = new Vector2(8, 8);
+				LineSegment ray_travel_segment = new LineSegment(origin, current_pt);
+				Rectangle tile_rect = new Rectangle(tile_corner.ToPoint(), tile_size.ToPoint());
 
-					if (CollisionSolver.Intersects(ray_travel_segment, tile_rect, out Vector2 intersection, out Face face))
-                    {
-						Vector2 normal = Vector2.Zero;
+				if (!CollisionSolver.Intersects(ray_travel_segment, tile_rect, out Vector2 intersection, out Face face))
+					continue;
 
-						if (face == Face.Top)
-							normal = new Vector2(0, -1);
-						if (face == Face.Bottom)
-							normal = new Vector2(0, 1);
-						if (face == Face.Left)
-							normal = new Vector2(-1, 0);
-						if (face == Face.Right)
-							normal = new Vector2(1, 0);
 
-						return new CastResult
-						{
-							Hit = true,
-							Intersection = intersection,
-							SurfaceNormal = normal,
-							TileCoordinates = tile_coords,
-							Face = face
-						};
-					}
+				Vector2 normal = face.ToSurfaceNormal();
 
-					/*if (CollisionSolver.CheckAABB(ray_check_center, new Vector2(4, 4), tile_center, tile_half))
-                    {
-						var separation = CollisionSolver.GetSeparationAABB(ray_check_center, new Vector2(4, 4), tile_center, tile_half);
-						//if (separation.X != 0 && separation.Y != 0)
-                        //{
-							var normal = CollisionSolver.GetNormalAABB(separation, direction.ToUnitVector());
-                            return new CastResult {
-								Hit = true,
-								SurfaceNormal = normal,
-								Intersection = current_pt-separation,
-							};
-                       // }
-                    }*/
-                }
+				return new TileRaycastResult { Hit = true, Intersection = intersection, SurfaceNormal = normal, TileCoordinates = tile_coords, Face = face };
+		
 			}
-			return new CastResult { Hit = false };
+			return new TileRaycastResult { Hit = false };
         }
 
-        protected DelayedTask physicsTask;
-
-		public World()
-		{
-			physicsTask = new DelayedTask(PhysicsStep, PhysicsStepIncrement, TimeStepProcedure.SubtractIncrement);
-
-			Entities = new List<IEntity>();
-			Chunks = new ConcurrentDictionary<ChunkCoordinates, Chunk>();
-			Furniture = new List<Furniture.FurnitureTile>();
+        public EntityRaycastResult EntityRaycast(Vector2 origin, Rotation direction, float maxDistance = 100)
+        {
+			for (float i = 0; i < maxDistance; i += ray_accuracy)
+			{
+				Vector2 intersection;
+				Face side;
+				foreach (IEntity candidate in Entities)
+				{
+					Vector2 current_pt = origin + (direction.ToUnitVector() * i);
+					if (!CollisionSolver.Intersects(new LineSegment(origin, current_pt), candidate.GetCollisionRect(), out intersection, out side))
+						continue;
+					return new EntityRaycastResult{Hit = true,Face = side, Intersection = intersection,Target = candidate,SurfaceNormal = side.ToSurfaceNormal()};
+				}
+			}
+			return new EntityRaycastResult { Hit = false };
 		}
+
+
+		
 	}
 }

@@ -82,7 +82,10 @@ namespace CaveGame.Core.Network
 		cAdminCommand,
 		cThrowItem,
 		cDamageFurniture,
-		
+		cDamageTile,
+		cPlaceTile,
+		cPlaceWall,
+		cDamageWall,
 		#endregion
 
 		#region Server-Sender Packets
@@ -254,7 +257,6 @@ namespace CaveGame.Core.Network
 				BlastRadius = Payload.ReadFloat(8), // 4 bytes (12)
 				BlastPressure = Payload.ReadFloat(12)// 4 bytes (16)			
 			};
-
 			set
             {
 				Payload.WriteVector2(0, value.Position);
@@ -439,7 +441,7 @@ namespace CaveGame.Core.Network
 			set => Payload = value.ToMetabinary().Serialize();
         }
     }
-	public class EntityPositionPacket : Packet
+	public class EntityPhysicsStatePacket : Packet
 	{
 		public int EntityID
 		{
@@ -472,7 +474,7 @@ namespace CaveGame.Core.Network
         }
 		
 
-		public EntityPositionPacket(int id, int health, Vector2 position, Vector2 velocity, Vector2 nextPosition) : base(PacketType.netEntityPhysicsUpdate) {
+		public EntityPhysicsStatePacket(int id, int health, Vector2 position, Vector2 velocity, Vector2 nextPosition) : base(PacketType.netEntityPhysicsUpdate) {
 			Payload = new byte[32];
 			EntityID = id;
 			Health = health;
@@ -481,7 +483,7 @@ namespace CaveGame.Core.Network
 			NextPosition = nextPosition;
 		}
 
-		public EntityPositionPacket(IEntity entity) : base(PacketType.netEntityPhysicsUpdate)
+		public EntityPhysicsStatePacket(IEntity entity) : base(PacketType.netEntityPhysicsUpdate)
         {
 			Payload = new byte[32];
 			EntityID = entity.EntityNetworkID;
@@ -494,7 +496,7 @@ namespace CaveGame.Core.Network
 			}
         }
 
-		public EntityPositionPacket(byte[] bytes) : base(bytes) { }
+		public EntityPhysicsStatePacket(byte[] bytes) : base(bytes) { }
 	}
 	public class PlaceFurniturePacket : Packet
 	{
@@ -743,6 +745,7 @@ namespace CaveGame.Core.Network
 	public enum ThrownItem : byte
 	{
 		Bomb,
+		Arrow,
 	}
 
 	public class PlayerThrowItemPacket : Packet
@@ -881,6 +884,7 @@ namespace CaveGame.Core.Network
 			WorldX = worldX;
 			WorldY = worldY;
 		}
+		public PlaceWallPacket(Point coords, Wall w) : this(w.ID, 0, w.Damage, coords.X, coords.Y) { }
 	}
 	public class PlaceTilePacket : Packet 
 	{
@@ -918,6 +922,15 @@ namespace CaveGame.Core.Network
 			WorldX = worldX;
 			WorldY = worldY;
 		}
+		public PlaceTilePacket(Point coords, Tile t) : this(t.ID, t.TileState, t.Damage, coords.X, coords.Y) { }
+	}
+	public class ServerUpdateTilePacket : Packet
+    {
+		public ServerUpdateTilePacket() : base(PacketType.sUpdateTile) { }
+    }
+	public class ServerUpdateWallPacket : Packet
+	{
+		public ServerUpdateWallPacket() : base(PacketType.sUpdateWall) { }
 	}
 	// temporary?
 	public class RequestChunkPacket : Packet

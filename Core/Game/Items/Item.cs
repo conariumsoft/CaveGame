@@ -59,13 +59,15 @@ namespace CaveGame.Core.Game.Items
 		public virtual string Name => this.GetType().Name;
 		public virtual string DisplayName => Name;
 
+		public virtual Texture2D Texture { get; }
+
 		public bool MouseDown { get; set; }
 
 		public void Draw(GraphicsEngine GFX, Texture2D texture, Vector2 position, float scale)
 		{
 			GFX.Sprite(texture, position, null, Color.Gray, Rotation.Zero, Vector2.Zero, scale, SpriteEffects.None, 0);
 		} // pseudo- default draw
-		public virtual void Draw(GraphicsEngine GFX, Vector2 position, float scale) {}
+		public virtual void Draw(GraphicsEngine GFX, Vector2 position, float scale) => Draw(GFX, Texture, position, scale);
 		public virtual void OnClientLMBDown(Player player, IGameClient client, ItemStack stack)
         {
 			MouseDown = true;
@@ -201,7 +203,7 @@ namespace CaveGame.Core.Game.Items
 
 				if (client.World.GetTile(x, y).ID != 0)
 				{
-					client.Send(new DamageTilePacket(new Point(x, y), 2));
+					client.Send(new DamageTilePacket(new Point(x, y), Strength));
 					//client.Send(new PlaceTilePacket(0, 0, 0, x, y));
 					//client.World.SetTile(x, y, new Tiles.Air());
 				}
@@ -372,12 +374,33 @@ namespace CaveGame.Core.Game.Items
 		}
 	}
 
+	public class BowItem : Item {
+        public override int MaxStack => 1;
+        public override void OnClientLMBDown(Player player, IGameClient client, ItemStack stack)
+        {
+			// TODO: Find and comsume arrows in inventory
+			bool hasArrows = true;
+
+
+			if (!hasArrows)
+				return;
+
+			MouseState mouse = Mouse.GetState();
+
+			var mp = client.Camera.ScreenToWorldCoordinates(mouse.Position.ToVector2());
+
+			var unitLookVector = player.Position.LookAt(mp);
+
+			client.Send(new PlayerThrowItemPacket(ThrownItem.Arrow, Rotation.FromUnitVector(unitLookVector)));
+
+            base.OnClientLMBDown(player, client, stack);
+        }
+        public override void Draw(GraphicsEngine GFX, Vector2 position, float scale) => Draw(GFX, GFX.BowSprite, position, scale);
+	}
 
 	public class BombItem : Item
 	{
 		public override int MaxStack => 99;
-
-
 		public override void OnClientLMBDown(Player player, IGameClient client, ItemStack stack)
 		{
 			stack.Quantity--;

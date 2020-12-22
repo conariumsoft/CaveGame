@@ -9,12 +9,13 @@
     <Import_RootNamespace>CaveGame.Client</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)DebugTools\DebugInformation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DebugTools\GraphRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DebugTools\Profiler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSounds.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DebugTools\ChunkGridLineRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\LocalPlayer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\PeerPlayer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\ClientPlayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InputManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Input\KeyPressDetector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\Multiplayer.cs" />
@@ -28,7 +29,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)LocalWorld.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Menu\UITheme.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)NetworkClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Network\NetworkClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IGameContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PauseMenu.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SavedWorldManager.cs" />
@@ -37,6 +38,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)UI\ScrollRect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\UINode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\UIRect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)World\ChunkRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)World\Sky.cs" />
     <Compile Include="..\Client\Menu\MenuManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PlayerContainerFrontend.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Label.cs" />
@@ -51,5 +54,8 @@
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Network\" />
   </ItemGroup>
 </Project>

@@ -170,7 +170,7 @@ namespace CaveGame.Client.Menu
 				GameSounds.MenuBlip?.Play(0.8f, 1, 0.0f);
 			}
 			fpsCapSlider.OnValueChanged += onFpsCapSliderChanged;
-			fpsCapSlider.SetIndex(GameSettings.CurrentSettings.FPSLimitIndex);
+			//fpsCapSlider.SetIndex(GameSettings.CurrentSettings.FPSLimitIndex);
 
 			Label chatSizeText = new Label
 			{
@@ -199,7 +199,7 @@ namespace CaveGame.Client.Menu
 				GameSounds.MenuBlip?.Play(0.8f, 1, 0.0f);
 			}
 			chatSizeSlider.OnValueChanged += onChatSliderChanged;
-			chatSizeSlider.SetIndex((int)GameSettings.CurrentSettings.ChatSize);
+			//chatSizeSlider.SetIndex((int)GameSettings.CurrentSettings.ChatSize);
 
 			void bindButtonClick(TextButton b, MouseState m)
 			{

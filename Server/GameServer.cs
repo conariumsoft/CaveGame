@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using CaveGame.Core.Inventory;
 using CaveGame.Core.Network.Packets;
+using CaveGame.Core.Generic;
 
 namespace CaveGame.Server
 {
@@ -32,12 +33,9 @@ namespace CaveGame.Server
 	{
 		DateTime Time { get; }
 		IMessageOutlet Output { get; }
+
+
 	}
-
-
-
-	
-
 	public class PlayerChatMessageEventArgs : LuaEventArgs
     {
 		public Player Player { get; private set; }
@@ -72,10 +70,13 @@ namespace CaveGame.Server
         }
     }
 
+
+
 	public class GameServer : IGameServer
 	{
+		public delegate void ThrowDelegate(Rotation rotation, Player player);
+		public delegate void NetworkListener(NetworkMessage message, User user);
 
-		
 		public bool Running { get; set; }
 
 		public DateTime Time => DateTime.Now;
@@ -86,6 +87,8 @@ namespace CaveGame.Server
 		public void Message(User user, string msg, Color color) => SendTo(new ServerChatMessagePacket(msg, color), user);
 
 
+		public Entity GetEntity(int networkID) => (Entity)World.FindEntityOfID(networkID);
+
 		public IMessageOutlet Output
 		{
 			get { return server.Output; }
@@ -94,8 +97,6 @@ namespace CaveGame.Server
 
 		private NetworkServer server;
 
-		
-		
 
 		public EntityManager EntityManager { get; private set; }
 		public int TickRate { get; private set; }
@@ -107,7 +108,6 @@ namespace CaveGame.Server
 		public int MaxPlayers { get; private set; }
 		
 
-        float ticker;
 
 		IEntityManager IGameServer.EntityManager => EntityManager;
 		IServerWorld IGameServer.World => World;
@@ -117,8 +117,8 @@ namespace CaveGame.Server
 			entity.EntityNetworkID = EntityManager.GetNextEntityNetworkID();
 			World.SpawnEntity(entity);
 		}
-		
 
+		RepeatingIntervalTask[] ServerTasks;
 		public GameServer(ServerConfig config, WorldMetadata worldmdt) {
 			InitNetworkEvents();
 
@@ -127,16 +127,22 @@ namespace CaveGame.Server
 			MaxPlayers = config.MaxPlayers;
 
 			TickRate = config.TickRate;
-			ticker = 0;
+			
 			server = new NetworkServer(config.Port);
 			ConnectedUsers = new List<User>();
 			World = new ServerWorld(worldmdt);
 			World.Server = this;
 
 			EntityManager = new EntityManager();
+
+			ServerTasks = new RepeatingIntervalTask[]
+			{
+				new (ReplicateNetworkEntitiesPhysicalStates, 1.0f/20.0f),
+
+			};
+
 		}
 
-		public delegate void NetworkListener(NetworkMessage message, User user);
 
 		private Dictionary<PacketType, NetworkListener> NetworkEvents;
 		private void InitNetworkEvents() => NetworkEvents = new Dictionary<PacketType, NetworkListener>()
@@ -160,6 +166,8 @@ namespace CaveGame.Server
 
 
 		#region NetworkListenerMethods
+
+		protected virtual void OnPing(NetworkMessage msg, User user)=> SendTo(msg.Packet, user); // response
 		private void OnClientDamageWall(NetworkMessage message, User user)
 		{
 			throw new NotImplementedException();
@@ -252,7 +260,7 @@ namespace CaveGame.Server
 		private void OnPlayerPosition(NetworkMessage msg, User user) // player tells us their state
 		{
 			// TODO: make server more authoritative, prevent cheating
-			EntityPositionPacket packet = new EntityPositionPacket(msg.Packet.GetBytes());
+			EntityPhysicsStatePacket packet = new EntityPhysicsStatePacket(msg.Packet.GetBytes());
 
 			if (World.FindEntityOfID(packet.EntityID, out Player player))
 			{
@@ -289,7 +297,7 @@ namespace CaveGame.Server
 			t.TileState = packet.TileState;
 			t.Damage = packet.Damage;
 			World.SetTile(packet.WorldX, packet.WorldY, t);
-			//SendToAll(packet);
+			SendToAll(packet);
 		}
 		private void OnClientRequestChunk(NetworkMessage msg, User user)
 		{
@@ -314,30 +322,31 @@ namespace CaveGame.Server
 
 		}
 
-		int bombcount = 0;
 		float bombVelocity = 3.5f;
+		float arrowVelocity = 3.0f;
+
+		private TEntity SpawnThrowable<TEntity>(Rotation dir, Vector2 startpos, float vel, NetEntityType entityType) where TEntity: IEntity, IPhysicsEntity, new()
+        {
+			TEntity entity = new TEntity
+			{ Velocity = dir.ToUnitVector() * vel, Position = startpos, NextPosition = startpos};
+			SpawnEntity(entity);
+			SendToAll(new SpawnEntityGenericPacket(entity.EntityNetworkID, entityType));
+			return entity;
+		}
+
+		private void OnThrowBomb(Rotation dir, Vector2 pos, float force) => SpawnThrowable<Bomb>(dir, pos, force, NetEntityType.Bomb);
+		private void OnShootArrow(Rotation dir, Vector2 pos, float force) => SpawnThrowable<Arrow>(dir, pos, force, NetEntityType.Arrow);
+
 		private void OnClientThrowItem(NetworkMessage msg, User user)
 		{
 			PlayerThrowItemPacket packet = new PlayerThrowItemPacket(msg.Packet.GetBytes());
-
 			Player p = user.PlayerEntity;
-
 			if (packet.Item == ThrownItem.Bomb)
-			{
-                Core.Game.Entities.Bomb bomb = new Core.Game.Entities.Bomb
-                {
-					Velocity = packet.ThrownDirection.ToUnitVector() * bombVelocity,
-					Position = p.Position,
-					NextPosition = p.NextPosition,
-				};
-				
-				SpawnEntity(bomb);
-				SendToAll(new SpawnEntityGenericPacket(bomb.EntityNetworkID, NetEntityType.Bomb));
-				bombcount++;
-			}
+				OnThrowBomb(packet.ThrownDirection, p.Position, bombVelocity);
+			if (packet.Item == ThrownItem.Arrow)
+				OnShootArrow(packet.ThrownDirection, p.Position, arrowVelocity);
 		}
 
-		int furniturecount = 0;
 		private void OnClientPlaceFurniture(NetworkMessage msg, User user)
 		{
 			PlaceFurniturePacket packet = new PlaceFurniturePacket(msg.Packet.GetBytes());
@@ -352,7 +361,6 @@ namespace CaveGame.Server
 
 			packet.NetworkID = f.FurnitureNetworkID;
 			SendToAll(packet);
-			furniturecount++;
 		}
 		private void OnClientDamageFurniture(NetworkMessage msg, User user)
 		{
@@ -396,14 +404,12 @@ namespace CaveGame.Server
 			var tile = World.GetTile(packet.Position.X, packet.Position.Y);
 
 			tile.Damage += (byte)packet.Damage;
-			Debug.WriteLine("tile damage:" + tile.Damage);
-			SendToAllExcept(packet, user);
+			SendToAll(packet);
 			if (tile.Damage >= tile.Hardness)
             {
-				Debug.WriteLine("Tile Break");
 				tile.Drop(this, World, packet.Position);
 				World.SetTile(packet.Position.X, packet.Position.Y, new Air());
-				//SendToAll(new PlaceTilePacket(0, 0, 0, packet.Position.X, packet.Position.Y));
+				SendToAll(new PlaceTilePacket(0, 0, 0, packet.Position.X, packet.Position.Y));
             }
 			
         }
@@ -476,10 +482,8 @@ namespace CaveGame.Server
 
 				if (msg.Packet.Type == PacketType.cHandshake)
 					HandshakeResponse(msg);
-
 				if (msg.Packet.Type == PacketType.cRequestLogin)
 					OnClientRequestLogin(msg);
-
 				if (msg.Packet.Type == PacketType.cConfirmLogin)
 					OnClientLoginSuccess(msg);
 
@@ -493,7 +497,7 @@ namespace CaveGame.Server
 				foreach (var ev in NetworkEvents)
 					if (ev.Key == msg.Packet.Type)
 						ev.Value.Invoke(msg, user);
-
+				#region old shit
 				/*if (msg.Packet.Type == PacketType.ClientQuit)
 					OnClientLogout(msg, user);
 				if (msg.Packet.Type == PacketType.ServerEntityPhysicsState)
@@ -522,8 +526,9 @@ namespace CaveGame.Server
 					OnPlayerDamageTile(msg, user);
 				if (msg.Packet.Type == PacketType.cAdminCommand)
 					OnAdminCommandInput(msg, user);*/
+				#endregion
 			}
-		}
+        }
 
 		float tileticker = 0;
 
@@ -536,98 +541,57 @@ namespace CaveGame.Server
 			ConnectedUsers.Remove(user);
 		}
 
-		protected void DispatchUserMessages(User user)
-        {
-			if (user.DispatcherHasMessage())
-            {
-				Packet p = user.PopDispatcherQueue();
-				SendTo(p, user);
-            }
-        }
 
+		// generic entity physics replication
+		protected virtual void ReplicateNetworkEntitiesPhysicalStates()
+		{
+			foreach (var entity in World.Entities)
+			{
+				if (entity.Dead)
+					continue;
+
+				SendToAll(new EntityPhysicsStatePacket(entity));
+
+
+				if (entity is Wurmhole wurmhole && !entity.Dead)
+				{
+					// TODO: remove dipshit hack;
+					if (wurmhole.Provoked && wurmhole.TriggerNetworkHandled == false)
+					{
+						wurmhole.TriggerNetworkHandled = true;
+						SendToAll(new ProvokeEntityGenericPacket(wurmhole.EntityNetworkID));
+					}
+				}
+			}
+		}
+
+		public virtual void HandleUserConnectionStates()
+        {
+
+        }
 
 		public virtual void Update(GameTime gt)
 		{
-			
-			float delta = (float)gt.ElapsedGameTime.TotalSeconds;
-
-
-			ConnectedUsers.Where(u => u.Kicked == true).ForEach(InternalUserKick);
-			ConnectedUsers.ForEach(u => DispatchUserMessages(u));
-
-			foreach(var user in ConnectedUsers.ToArray())
-			{
-
-				user.KeepAlive += delta;
-
-				if (user.KeepAlive > 10.0f)
-				{
-					user.Kick("Network Timeout");
-				}
-			}
-
-			ticker += delta;
-
-			if (ticker > 1/ 20.0f)
-			{
-				ticker = 0;
-				foreach(var entity in World.Entities)
-				{
-
-					if (entity.Dead)
-						continue;
-
-					var packet = new EntityPositionPacket(entity);
-					SendToAll(packet);
-
-					if (entity is Wurmhole wurmhole && !entity.Dead)
-                    {
-						// TODO: remove dipshit hack;
-						if (wurmhole.Provoked)
-                        {
-							if (wurmhole.TriggerNetworkHandled == false)
-                            {
-								wurmhole.TriggerNetworkHandled = true;
-								SendToAll(new ProvokeEntityGenericPacket(wurmhole.EntityNetworkID));
-                            }
-                        }
-					}
-				}
-			}
-
 			ReadIncomingPackets();
+			HandleUserConnectionStates();
+
+			ServerTasks.ForEach(t => t.Update(gt));
+
+			ConnectedUsers.ForEach(u => u.SendDispatchMessages(this));
+			ConnectedUsers.ForEach(u => u.KeepAlive += gt.GetDelta());
+			ConnectedUsers.Where(u => u.KeepAlive > 10.0f).ForEach(u => u.Kick("Network Timeout"));
+			ConnectedUsers.ToArray().Where(u => u.Kicked == true).ForEach(InternalUserKick); // InvalidOperationException
+			
 			World.Update(gt);
-			tileticker += delta;
-
-			if (tileticker > (1/5.0f))
-			{
-				tileticker = 0;
-				foreach (var kvp in World.Chunks)
-				{
-					Chunk c = kvp.Value;
-
-					for (int x = 0; x < Chunk.ChunkSize; x++)
-					{
-						for (int y = 0; y < Chunk.ChunkSize; y++)
-						{
-							if (c.NetworkUpdated[x, y] == true)
-							{
-								c.NetworkUpdated[x, y] = false;
-								var t = c.Tiles[x, y];
-								var w = c.Walls[x, y];
-								SendToAll(new PlaceTilePacket(t.ID, t.TileState, t.Damage, (c.Coordinates.X * Chunk.ChunkSize) + x, (c.Coordinates.Y * Chunk.ChunkSize) + y));
-								SendToAll(new PlaceWallPacket(w.ID, 0, w.Damage, (c.Coordinates.X * Chunk.ChunkSize) + x, (c.Coordinates.Y * Chunk.ChunkSize) + y));
-							}
-						}
-					}
-				}
-			}
+			server.Update(gt);
 		}
 
 		public void Start()
 		{
 			server.Start();
 			Running = true;
+
+			Task.Run(GameserverThreadLoop);
 		}
 		public virtual void Shutdown()
 		{
@@ -664,10 +628,9 @@ namespace CaveGame.Server
 			Output?.Out(String.Format("[{0} {1}] {2}", "server", DateTime.Now.ToString("HH:mm:ss.ff"), text));
 		}
 
-		// Should be run on it's own thread
-		public void Run()
+		public void GameserverThreadLoop()
 		{
-			server.Run();
+			
 
 			Stopwatch timing = new Stopwatch();
 
@@ -684,9 +647,6 @@ namespace CaveGame.Server
 
 				Thread.Sleep(TickRate);
 			}
-		}
-
-
-		
+		}		
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,7 +13,6 @@ namespace CaveGame.Core
 		Down,
 	}
 
-
 	/// <summary>
 	/// Cardinal Directions. Generally used for surface face of a tile.
 	/// </summary>
@@ -23,9 +23,8 @@ namespace CaveGame.Core
 		Left,
 		Right
 	}
-
 	public enum Compass
-    {
+	{
 		North = 0,
 		Northeast = 45,
 		East = 90,
@@ -34,37 +33,23 @@ namespace CaveGame.Core
 		Southwest = 225,
 		West = 270,
 		Northwest = 315
-    }
-
-	public static class CardinalDirectionExtension
-    {
-		public static Rotation ToRotation(this Compass dir) => Rotation.FromDeg((int)dir);
-    }
-
-
-	/// <summary>
-	/// Applied to the following:
-	/// IEntity, Explosion, and certain tile classes
-	/// </summary>
-	public interface IDamageSource { }
-
-	public enum DamageType
-	{
-		Frostbite,
-		Fire,
-		Lava,
-		BluntForceTrauma,
-		PunctureTrauma,
-		Electrocution,
-		LacerationTrauma,
-		Neurotoxin,
-		Poison,
-		Explosion,
-		Psionic,
-		Asphyxiation,
-		ActOfGod,
 	}
 
-
-
+	public static class CardinalDirectionExtension
+	{
+		public static Rotation ToRotation(this Compass dir) => Rotation.FromDeg((int)dir);
+		public static Vector2 ToSurfaceNormal(this Face face)
+		{
+			Vector2 normal = Vector2.Zero;
+			if (face == Face.Top)
+				normal = new Vector2(0, -1);
+			if (face == Face.Bottom)
+				normal = new Vector2(0, 1);
+			if (face == Face.Left)
+				normal = new Vector2(-1, 0);
+			if (face == Face.Right)
+				normal = new Vector2(1, 0);
+			return normal;
+		}
+	}
 }

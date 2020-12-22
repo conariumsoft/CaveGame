@@ -11,7 +11,7 @@ namespace CaveGame.Core.Generic
 		SubtractIncrement
 	}
 
-	public class DelayedTask
+	public class RepeatingIntervalTask
 	{
 		public TimeStepProcedure TimeStepProcedure { get; set; }
 		public bool Active { get; set; }
@@ -23,7 +23,7 @@ namespace CaveGame.Core.Generic
 		private Action job;
 
 
-		public DelayedTask(Action action, float timeIncrement, TimeStepProcedure procedure = TimeStepProcedure.SetToZero) 
+		public RepeatingIntervalTask(Action action, float timeIncrement, TimeStepProcedure procedure = TimeStepProcedure.SetToZero) 
 		{
 			Active = true;
 			job = action;

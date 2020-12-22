@@ -16,18 +16,8 @@ using System.Threading.Tasks;
 namespace CaveGame.Server
 {
 
-	public class NetworkServer
+	public class NetworkServer : SharedNetworkSubsystem
 	{
-
-		public readonly int Port;
-
-		public int ProtocolVersion;
-
-
-		public IMessageOutlet Output { get; set; }
-
-		private UdpClient udpClient;
-		
 
 		private ConcurrentQueue<NetworkMessage> incomingMessages;
 		private ConcurrentQueue<Tuple<Packet, IPEndPoint>> outgoingMessages;
@@ -37,22 +27,13 @@ namespace CaveGame.Server
 		public NetworkServer(int port)
 		{
 
-			udpClient = new UdpClient(port, AddressFamily.InterNetwork);
+			UdpSocket = new UdpClient(port, AddressFamily.InterNetwork);
+			IOControlFixICMPBullshit();
 
 			Port = port;
 			incomingMessages = new ConcurrentQueue<NetworkMessage>();
 			outgoingMessages = new ConcurrentQueue<Tuple<Packet, IPEndPoint>>();
 
-		}
-
-		private string DumpHex(byte[] data)
-		{
-			StringBuilder bob = new StringBuilder();
-			for (int i = 0; i < data.Length; i++)
-			{
-				bob.Append(String.Format("{0:X2} ", data[i]));
-			}
-			return bob.ToString();
 		}
 
 		private void NetworkThread()
@@ -63,7 +44,7 @@ namespace CaveGame.Server
 			while (listening.Value)
 			{
 				
-				bool canRead = udpClient.Available > 0;
+				bool canRead = UdpSocket.Available > 0;
 
 				// Read in message if we have any data
 				if (canRead)
@@ -72,27 +53,22 @@ namespace CaveGame.Server
 					IPEndPoint ep = new IPEndPoint(IPAddress.Any, 0);
 					try
 					{
-						byte[] data = udpClient.Receive(ref ep);
+						byte[] data = UdpSocket.Receive(ref ep);
 
 						NetworkMessage nm = new NetworkMessage();
 						nm.Sender = ep;
 						nm.Packet = new Packet(data);
 						nm.ReceiveTime = DateTime.Now;
 
-
-#if PACKETDEBUG
-				Output?.Out(String.Format("PK_IN: [{0}] at [{1} {2}] from [{3}]", nm.Packet.Type.ToString(), nm.ReceiveTime.ToLongTimeString(), nm.ReceiveTime.Millisecond, nm.Sender.ToString()));
-				Output?.Out(String.Format("DATUM: [{0}]", DumpHex(nm.Packet.Payload)));
-				Output?.Out("");
-#endif
-
+						PacketsReceived++;
+						InternalReceiveCount += nm.Packet.Payload.Length;
+						TotalBytesReceived += nm.Packet.Payload.Length;
 						incomingMessages.Enqueue(nm);
 					} catch(SocketException ex)
 					{
 						Output?.Out(ex.Message);
-					}
-					
 
+					}
 
 				//	Output?.Out("server: "+nm.ToString());
 				}
@@ -105,17 +81,15 @@ namespace CaveGame.Server
 					bool have = outgoingMessages.TryDequeue(out msg);
 					if (have)
 					{
-					#if PACKETDEBUG
-						Output?.Out(String.Format("PK_OUT: [{0}] at [{1} {2}] to [{3}]", msg.Item1.Type.ToString(), DateTime.Now.ToLongTimeString(), DateTime.Now.Millisecond, msg.Item2.ToString()));
-						Output?.Out(String.Format("DATUM: [{0}]", DumpHex(msg.Item1.Payload)));
-						Output?.Out("");
-					#endif
-						msg.Item1.Send(udpClient, msg.Item2);
+						Packet packet = msg.Item1;
+						IPEndPoint target = msg.Item2;
+						packet.Send(UdpSocket, target);
+						PacketsSent++;
+						TotalBytesSent += packet.Payload.Length;
+						InternalSendCount += packet.Payload.Length;
 					}
 					
 				}
-
-
 
 				// If Nothing happened, take a nap
 				if (!canRead && (numToWrite == 0))
@@ -127,10 +101,7 @@ namespace CaveGame.Server
 		{
 			listening.Value = true;
 			Output?.Out(String.Format("server: listening on port {0}",  Port), Color.Coral);
-		}
-		public void Run() {
 			Task.Factory.StartNew(NetworkThread);
-			Output?.Out("server: Network listener thread created", Color.Coral);
 		}
 
 		public bool HaveIncomingMessage()
@@ -147,13 +118,19 @@ namespace CaveGame.Server
 			{
 				return msg;
 			}
-			throw new Exception("No Message Queued! Used HaveIncomingMessage() to check!");
+			throw new Exception("No Message Queued! Use HaveIncomingMessage() to check!");
 		}
 
 		public void SendPacket(Packet packet, IPEndPoint target)
 		{
-			//Output?.Out("server: Sending packet " + packet.Type.ToString(), Color.Coral);
 			outgoingMessages.Enqueue(new Tuple<Packet, IPEndPoint>(packet, target));
+		}
+
+
+		public override void Update(GameTime gt)
+		{
+			base.Update(gt);
+				
 		}
 
 		public void Cleanup() { }

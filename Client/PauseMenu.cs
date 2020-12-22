@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace CaveGame.Client
@@ -36,7 +37,8 @@ namespace CaveGame.Client
 
 		public void LoadShader(ContentManager GameContent)
         {
-			WaterpixelsShader = GameContent.Load<Effect>("Shaders/Waterpixels");
+			GameContent.RootDirectory = Path.Combine("assets", "shaders");
+			WaterpixelsShader = GameContent.Load<Effect>("Waterpixels");
         }
 
 		public void Update(GameTime gt) {
@@ -101,7 +103,7 @@ namespace CaveGame.Client
 
 		public void TryClientExit(TextButton tbtn, MouseState ms)
         {
-			Client.OverrideDisconnect();
+			Client.Disconnect();
         }
 	}
 }

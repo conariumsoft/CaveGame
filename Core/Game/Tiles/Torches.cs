@@ -89,27 +89,27 @@ namespace CaveGame.Core.Game.Tiles
 	}
 	public class Torch : BaseTorch, ILightEmitter
 	{
-		public Light3 Light => new Light3(20, 20, 12);
+		public Light3 Light => new Light3(1f, 0.9f, 0.7f);
 		public override Color FlameColor => new Color(1, 1, 0.8f);
 	}
 	public class WhiteTorch : BaseTorch, ILightEmitter
 	{
-		public Light3 Light => new Light3(20, 20, 20);
+		public Light3 Light => new Light3(1f, 1f, 1f);
 		public override Color FlameColor => new Color(1, 1, 1f);
 	}
 	public class GreenTorch : BaseTorch, ILightEmitter
 	{
-		public Light3 Light => new Light3(0, 20, 0);
+		public Light3 Light => new Light3(0f, 1.2f, 0f);
 		public override Color FlameColor => new Color(0.1f, 1, 0.1f);
 	}
 	public class RedTorch : BaseTorch, ILightEmitter
 	{
-		public Light3 Light => new Light3(20, 0, 0);
+		public Light3 Light => new Light3(1.2f, 0, 0);
 		public override Color FlameColor => new Color(1, 0.1f, 0.1f);
 	}
 	public class BlueTorch : BaseTorch, ILightEmitter
 	{
-		public Light3 Light => new Light3(0, 0, 20);
+		public Light3 Light => new Light3(0, 0, 1.2f);
 		public override Color FlameColor => new Color(0.2f, 0.2f, 1.0f);
 	}
 }

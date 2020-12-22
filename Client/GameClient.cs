@@ -1,82 +1,89 @@
 ﻿//#define SERVER
 
-using CaveGame;
-using CaveGame.Client;
+using CaveGame.Client.DebugTools;
+using CaveGame.Client.Game.Entities;
 using CaveGame.Client.UI;
 using CaveGame.Core;
-using CaveGame.Core.Game.Entities;
 using CaveGame.Core.Furniture;
+using CaveGame.Core.Game.Entities;
+using CaveGame.Core.Game.Items;
+using CaveGame.Core.Game.Tiles;
+using CaveGame.Core.Game.Walls;
 using CaveGame.Core.Generic;
 using CaveGame.Core.Inventory;
 using CaveGame.Core.Network;
-using CaveGame.Core.Game.Tiles;
-using CaveGame.Core.Game.Walls;
+using CaveGame.Core.Network.Packets;
+using DataManagement;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.Diagnostics;
-using System.Threading;
-using CaveGame.Client.Game.Entities;
-using CaveGame.Core.Game.Inventory;
-using CaveGame.Core.Game.Items;
-using CaveGame.Client.DebugTools;
-using CaveGame.Core.Network.Packets;
-using System.Linq;
 using System.Collections.Generic;
-using CaveGame.Core.Game;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CaveGame.Client
 {
-	using BombEntity     = Core.Game.Entities.Bomb;
-	using ArrowEntity    = Core.Game.Entities.Arrow;
-	using WurmholeEntity = Core.Game.Entities.Wurmhole;
-	using DynamiteEntity = Core.Game.Entities.Dynamite;
+
+
+
+
+    using ArrowEntity = Core.Game.Entities.Arrow;
+    using BombEntity = Core.Game.Entities.Bomb;
+    using DynamiteEntity = Core.Game.Entities.Dynamite;
+    using WurmholeEntity = Core.Game.Entities.Wurmhole;
+
+	public delegate void ClientShutdown();
 
 	public class GameClient : IGameContext, IGameClient
 	{
-		public static float CameraZoom = 2.0f;
-		public bool ChunkLock { get; set; }
-		protected ChunkGridLineRenderer chunkGridTool;// = new ChunkGridLineRenderer();
-		public bool ShowChunkBoundaries { get; set; }
-		public CaveGameGL Game { get; private set; }
-		public GameChat Chat { get; private set; }
+
+		public event ClientShutdown OnShutdown;
+
 		public string NetworkUsername { get; set; }
 		public string ConnectAddress { get; set; }
 		public bool Active { get; set; }
+
+		public static float CameraZoom = 2.0f;
+
+		public bool ShowChunkBoundaries { get; set; }
+
+		public CaveGameGL Game { get; private set; }
+		public GameChat Chat { get; private set; }
+		public LocalWorld World { get; private set; }
+		public PlayerContainerFrontend Inventory { get; set; }
+		public Camera2D Camera { get;  }
+
+		protected NetworkClient NetClient { get; set; }
+
+
+		protected struct FpsSample : GraphSample
+        {
+			public double Value { get; set; }
+
+        }
+		
+		protected GraphRenderer<FpsSample> FPSGraph { get; private set; }
+
+
 		Microsoft.Xna.Framework.Game IGameContext.Game => Game;
 		IClientWorld IGameClient.World => World;
 		//public Hotbar Hotbar { get; set; }
-		public PlayerContainerFrontend Inventory { get; set; }
-		public LocalWorld World { get; private set; }
-		private NetworkClient gameClient;
-		public Camera2D Camera { get; }
+		
 		public int ChunkingRadius { get; set; }
 
 		int MyUserID;
 		int MyPlayerID;
 
+		
+
 		public Game.Entities.LocalPlayer MyPlayer { get; private set; }
-
-		private DelayedTask chunkUnloadingTask;
-		DelayedTask playerStateReplicationTask;
-		DelayedTask chunkLoadingTask;
-
-		private int IntitalScrollValue;
 
 
 		PauseMenu PauseMenu { get; set; }
-		
 
-		private void onClientExit(TextButton sender, MouseState state)=>OverrideDisconnect();
-	
-		public void OverrideDisconnect()
-		{
-			PauseMenu.Open = false;
-			Disconnect();
-			Game.CurrentGameContext = Game.MenuContext;
-		}
-
+		protected List<RepeatingIntervalTask> ClientTasks { get; set; }
 
 		private Dictionary<PacketType, NetworkListener> NetworkEvents;
 		private void InitNetworkEvents() => NetworkEvents = new Dictionary<PacketType, NetworkListener>()
@@ -87,6 +94,10 @@ namespace CaveGame.Client
 			[PacketType.sDownloadChunk] = DownloadChunk,
 			[PacketType.sUpdateTile] = UpdateTile,
 			[PacketType.sUpdateWall] = UpdateWall,
+
+			[PacketType.netPlaceTile] = UpdateTile,
+			[PacketType.netPlaceWall] = UpdateWall,
+
 			[PacketType.sRejectLogin] = OnServerRejectLogin,
 			[PacketType.sAcceptLogin] = OnServerAcceptLogin,
 			[PacketType.sPlayerPeerJoined] = OnPeerJoined,
@@ -107,51 +118,82 @@ namespace CaveGame.Client
 			[PacketType.netPlayerState] = OnPlayerAnimationStateUpdate,
 		};
 
+        internal void Dispose()
+        {
+            //throw new NotImplementedException();
+        }
+
+        public float ServerKeepAlive { get; set; }
+
 		public GameClient(CaveGameGL _game)
 		{
+			Game = _game;
 			InitNetworkEvents();
 
-
-			Game = _game;
-
-			MouseState mouse = Mouse.GetState();
-
 			World     = new LocalWorld(this);
-			Camera    = new Camera2D(Game.GraphicsDevice.Viewport) { Zoom = CameraZoom };
+			Camera    = new Camera2D{ Zoom = CameraZoom };
 			Chat      = new GameChat(this);
 			PauseMenu = new PauseMenu(this);
 			Inventory = new PlayerContainerFrontend();
 
-			IntitalScrollValue = mouse.ScrollWheelValue;
+			ClientTasks = new List<RepeatingIntervalTask>
+			{
+				new RepeatingIntervalTask(ReplicatePlayerState, 1 / 10.0f),
+				new RepeatingIntervalTask(ChunkUnloadingCheck, 1/2.0f),
+				new RepeatingIntervalTask(ChunkLoadingCheckUpdate, 1 / 2.0f),
+			};
 
-			playerStateReplicationTask = new DelayedTask(ReplicatePlayerState, 1 / 10.0f);
-			chunkUnloadingTask = new DelayedTask(ChunkUnloadingCheck, 1/2.0f);
-			chunkLoadingTask = new DelayedTask(ChunkLoadingCheckUpdate, 1 / 2.0f);
+
+			FPSGraph = new GraphRenderer<FpsSample>
+			{
+				BackgroundColor = new Color(0.1f, 0.1f, 0.1f)*0.5f,
+				ScreenPosition = new Vector2(50, 400),
+				GraphSize = new Vector2(500, 200),
+				GraphName = "FPS",
+				YAxisMin = 0,
+				Scale = 1000,
+				YAxisMax = 120,
+				DataSet = new GraphRecorder<FpsSample>
+                {
+					SampleCount = 500,
+					Color = Color.Yellow,
+
+                },
+
+			};
+
 
 
 			ChunkingRadius = 1;
-			
+		}
 
+		
+		private void Uncouple()
+        {
+			PauseMenu.Open = false;
+
+			World?.ClientDisconnect(); // start cleaning up server
+
+			NetClient?.Logout(MyUserID, UserDisconnectReason.LogOff);
+			World?.Dispose(); // destroy local world
+			OnShutdown?.Invoke(); // bound to localserver (if it exists)
+			//Dispose();
 		}
-		public void Send(Packet p)=>gameClient.SendPacket(p);
-		public void SendChatMessage(object sender, string message)
-		{
-			Chat.Open = false;
-			gameClient.SendPacket(new ClientChatMessagePacket(message));	
-		}
+
 		public void Disconnect()
 		{
-			if (MyPlayer != null) {
-
-				World.ClientDisconnect();
-				gameClient.SendPacket(new DisconnectPacket(MyPlayer.EntityNetworkID, UserDisconnectReason.LogOff));
-				gameClient.Stop();
-			}
-
+			Uncouple();
+			Game.GoToMainMenu();
 		}
+
+		public void ForcedDisconnect(string kickReason)
+        {
+			Uncouple();
+			Game.GoToTimeoutPage(kickReason);
+		}
+
 		private void ChunkUnloadingCheck()
 		{
-
 			foreach (var chunkpair in World.Chunks)
 			{
 				if (!World.LoadedChunks.Contains(chunkpair.Key))
@@ -160,10 +202,10 @@ namespace CaveGame.Client
 					{
 						World.Chunks.TryRemove(chunkpair.Key, out _);
 						World.Lighting.UnregisterChunk(chunkpair.Key);
+						chunkpair.Value.Dispose();
 					}
 				}
 			}
-			//	}
 		}
 		private void ChunkLoadingCheckUpdate()
 		{
@@ -187,7 +229,7 @@ namespace CaveGame.Client
 
 					if ((!World.Chunks.ContainsKey(chunkCoords)) && (!World.RequestedChunks.Contains(chunkCoords)))
 					{
-						gameClient.SendPacket(new RequestChunkPacket(chunkCoords));
+						NetClient.SendPacket(new RequestChunkPacket(chunkCoords));
 						World.RequestedChunks.Add(chunkCoords);
 					}
 				}
@@ -195,24 +237,36 @@ namespace CaveGame.Client
 			}
 		}
 
+		public void Send(Packet p) => NetClient.SendPacket(p);
+
 		#region NetworkListenerMethods
 
 		public delegate void NetworkListener(NetworkMessage message);
+
+		private void OnPing(NetworkMessage message) { } // dont do jack 
 
 		private void DownloadChunk(NetworkMessage message)
 		{
 			ChunkDownloadPacket chunkdata = new ChunkDownloadPacket(message.Packet.GetBytes());
 
-			Chunk chunk = chunkdata.StoredChunk;
-
-			// Did we ask for this chunk?
-			if (World.RequestedChunks.Contains(chunk.Coordinates))
+			Task.Run(() =>
 			{
-				//World.Chunks. Add(chunk.Coordinates, chunk);
-				World.Chunks.TryAdd(chunk.Coordinates, chunk);
-				World.RequestedChunks.Remove(chunk.Coordinates);
-				World.Lighting.RegisterChunk(chunk);
-			}
+			//Stopwatch stopWatch = new Stopwatch();
+			//stopWatch.Start();
+			Chunk chunk = chunkdata.StoredChunk;
+			//stopWatch.Stop();
+		//	GameConsole.Log($"ChunkDecode: {stopWatch.ElapsedMilliseconds}(ms)");
+
+				// Did we ask for this chunk?
+				if (World.RequestedChunks.Contains(chunk.Coordinates))
+				{
+					//World.Chunks. Add(chunk.Coordinates, chunk);
+					World.Chunks.TryAdd(chunk.Coordinates, chunk);
+					World.RequestedChunks.Remove(chunk.Coordinates);
+					World.Lighting.RegisterChunk(chunk);
+				}
+			});
+			
 			
 		}
 		private void UpdateTile(NetworkMessage message)
@@ -241,7 +295,7 @@ namespace CaveGame.Client
 		{
 			PlayerJoinedPacket packet = new PlayerJoinedPacket(message.Packet.GetBytes());
 
-			var player = new Game.Entities.PeerPlayer()
+			var player = new Core.Game.Entities.Player()
 			{
 				EntityNetworkID = packet.EntityID,
 				Color = packet.PlayerColor,
@@ -260,7 +314,7 @@ namespace CaveGame.Client
 		}
 		private void OnEntityPhysUpdate(NetworkMessage message)
 		{
-			EntityPositionPacket packet = new EntityPositionPacket(message.Packet.GetBytes());
+			EntityPhysicsStatePacket packet = new EntityPhysicsStatePacket(message.Packet.GetBytes());
 
 			var entity = World.FindEntityOfID(packet.EntityID);
 
@@ -463,11 +517,19 @@ namespace CaveGame.Client
         }
 
 		private void OnDamageTile(NetworkMessage msg)
-        {
-			// TODO: Implement damage texture onto tile
-			// TODO: add audio for tile being damaged
+		{
+			//GameConsole.Log("WTF BRYH");
+			DamageTilePacket packet = new DamageTilePacket(msg.Packet.GetBytes());
 
-        }
+			var tile = World.GetTile(packet.Position.X, packet.Position.Y);
+
+			tile.Damage += (byte)packet.Damage;
+
+			if (tile.Damage >= tile.Hardness)
+			{
+				World.SetTile(packet.Position.X, packet.Position.Y, new Core.Game.Tiles.Air());
+			}
+		}
 
 		private void GiveItToMeDaddy(NetworkMessage msg)
         {
@@ -512,31 +574,34 @@ namespace CaveGame.Client
 			foreach (var name in packet.PlayerList.Where(str => str.Length > 0))
 				GameConsole.Log($"    {name}", Color.LightBlue);
 			GameConsole.Log($"Requesting game session...");
-			gameClient.SendPacket(new RequestJoinPacket(NetworkUsername));
+			NetClient.SendPacket(new RequestJoinPacket(NetworkUsername));
 		}
 
 		#endregion
 		private void ReadIncomingPackets()
 		{
-			while (gameClient.HaveIncomingMessage())
+			while (NetClient.HaveIncomingMessage())
 			{
-				NetworkMessage msg = gameClient.GetLatestMessage();
+				NetworkMessage msg = NetClient.GetLatestMessage();
 				foreach(var ev in NetworkEvents)
 					if (ev.Key == msg.Packet.Type)
+                    {
+						ServerKeepAlive = 0;
 						ev.Value.Invoke(msg);
+					}
+						
 			}
 		}
 
-		private void DrawChunks(GraphicsEngine GFX)
+
+		float redrawTimer { get; set; }
+		private void RedrawChunkBuffers(GraphicsEngine GFX)
 		{
-			if (drawTimer > (1/5.0f))
+			foreach (var chunkpair in World.Chunks)
 			{
-				drawTimer = 0;
-				Chunk.RefreshedThisFrame = false;
-				foreach (var chunkpair in World.Chunks)
-				{
-					chunkpair.Value.Draw(GFX);	
-				}
+				var chunk = chunkpair.Value;
+				chunk.RedrawWallBuffer(GFX);
+				chunk.RedrawTileBuffer(GFX);
 			}
 		}
 
@@ -549,19 +614,19 @@ namespace CaveGame.Client
 
 		}
 
-		private void DrawChunkFGTextures(GraphicsEngine gfx)
+		private void DrawChunkTileTextures(GraphicsEngine gfx)
 		{
 			foreach (var chunkpair in World.Chunks)
 			{
 				
 				Chunk chunk = chunkpair.Value;
 				Vector2 pos = new Vector2(chunk.Coordinates.X * Globals.ChunkSize * Globals.TileSize, chunk.Coordinates.Y * Globals.ChunkSize * Globals.TileSize);
-				if (chunk.ForegroundRenderBuffer != null)
-					gfx.Sprite(chunk.ForegroundRenderBuffer, pos, Color.White);
+				if (chunk.TileRenderBuffer != null)
+					gfx.Sprite(chunk.TileRenderBuffer, pos, Color.White);
 
 			}
 		}
-		private void DrawChunkBGTextures(GraphicsEngine gfx)
+		private void DrawChunkWallTextures(GraphicsEngine gfx)
 		{
 			foreach (var chunkpair in World.Chunks)
 			{
@@ -569,8 +634,8 @@ namespace CaveGame.Client
 				Chunk chunk = chunkpair.Value;
 				Vector2 pos = new Vector2(chunk.Coordinates.X * Globals.ChunkSize * Globals.TileSize, chunk.Coordinates.Y * Globals.ChunkSize * Globals.TileSize);
 
-				if (chunk.BackgroundRenderBuffer != null)
-					gfx.Sprite(chunk.BackgroundRenderBuffer, pos, Color.White);
+				if (chunk.WallRenderBuffer != null)
+					gfx.Sprite(chunk.WallRenderBuffer, pos, Color.White);
 			}
 		}
 		private void DrawDebugInfo(GraphicsEngine gfx)
@@ -592,147 +657,72 @@ namespace CaveGame.Client
 
 			if (MyPlayer != null)
 			{
-				string positionData = String.Format("pos {0} {1} vel {2} {3}",
+
+				string mObjData = String.Format("entities {0} furn {1}", World.Entities.Count, World.Furniture.Count);
+
+				string[] debugStats = {
+					String.Format("pos {0} {1} vel {2} {3}, rv {4} {5}",
 						Math.Floor(MyPlayer.Position.X / Globals.TileSize),
 						Math.Floor(MyPlayer.Position.Y / Globals.TileSize),
 						Math.Round(MyPlayer.Velocity.X, 2),
-						Math.Round(MyPlayer.Velocity.Y, 2)
-				);
-				
-				string networkData = String.Format("pin {0}, pout {1} myid {2} ipaddr {3}",
-						gameClient.ReceivedCount,
-						gameClient.SentCount,
-						MyPlayer?.EntityNetworkID,
-						ConnectAddress
-				);
-				
-				string worldData = String.Format("tid {0}, state {1} tdmg {2} wid {3} wdmg {4} light {5}",
+						Math.Round(MyPlayer.Velocity.Y, 2),
+						Math.Round(MyPlayer.RecentVelocity.X, 2),
+						Math.Round(MyPlayer.RecentVelocity.Y, 2)
+				),
+					$"userid {MyUserID} netaddr {ConnectAddress}",
+					$"in {Math.Round(NetClient.BytesReceivedPerSecond/1000.0f, 2)}kb/s || {Math.Round(NetClient.TotalBytesReceived/1000.0f, 2)}kb total || {NetClient.PacketsReceived}ct",
+					$"out {Math.Round(NetClient.BytesSentPerSecond/1000.0f, 2)}kb/s || {Math.Round(NetClient.TotalBytesSent/1000.0f, 2)}kb total || {NetClient.PacketsSent}ct",
+					String.Format("tid {0}, state {1} tdmg {2} wid {3} wdmg {4} light {5}",
 						tileat.ID,
 						tileat.TileState,
 						tileat.Damage,
 						wallat.ID,
 						wallat.Damage,
 						World.GetLight((int)tileCoords.X, (int)tileCoords.Y).ToString()
-				);
-				
+				),
+					mObjData,
+				};
 
-				string mObjectData = String.Format("entities {0} furn {1}", World.Entities.Count, World.Furniture.Count);
-
-				gfx.Text(positionData, new Vector2(2, 12));
-				gfx.Text(networkData, new Vector2(2, 24));
-				gfx.Text(worldData, new Vector2(2, 36));
-				gfx.Text(mObjectData, new Vector2(2, 48));
+				int incr = 1;
+				foreach(var line in debugStats)
+                {
+					gfx.Text(line, new Vector2(2, incr * 14));
+					incr++;
+				}
 
 			}
 			gfx.End();
 		}
 
-		private void DrawSkyColor(GraphicsEngine GFX)
-		{
-			for (int y = 0; y<10; y++)
-			{
-
-
-				int hourTime = (int)Math.Floor( ( (World.TimeOfDay+1)%24)  / 2);
-				int bottom = hourTime*2;
-				int top = (hourTime*2)  + 1;
-				//float diff = World.TimeOfDay % 1;
-				var thisSection = Color.Lerp(World.SkyColors[bottom], World.SkyColors[top], y/10.0f);
-
-				int prevhourTime = (int)Math.Floor((World.TimeOfDay % 24) / 2);
-				int prevbottom = prevhourTime * 2;
-				int prevtop = (prevhourTime * 2) + 1;
-				//float diff = World.TimeOfDay % 1;
-				var prevSection = Color.Lerp(World.SkyColors[prevbottom], World.SkyColors[prevtop], y / 10.0f);
-
-				var finalColor = Color.Lerp(prevSection, thisSection, (World.TimeOfDay % 2.0f) / 2.0f);
-				float sliceHeight = Camera._screenSize.Y / 10.0f;
-				GFX.Rect(finalColor, new Vector2(0,(sliceHeight*y)), new Vector2(Camera._screenSize.X, sliceHeight + 1));
-			}
-			
-		}
-
-		public void Draw(GraphicsEngine GFX)
-		{
-
-			DrawChunks(GFX);
-
-			Game.GraphicsDevice.Clear(World.SkyColor);
-			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
-			
-			DrawSkyColor(GFX);
-			GFX.End();
-			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
-			if (PauseMenu.Open)
-				PauseMenu.DrawWaterPixelsFilter(GFX);
-				
-
-			
-			DrawChunkBGTextures(GFX);
-			DrawChunkFGTextures(GFX);
-
-			foreach (var furn in World.Furniture)
-			{
-				furn.Draw(GFX);
-			}
-			EntityRendering(GFX);
-			
-			World.ParticleSystem.Draw(GFX);
-
-			if (!Inventory.EquippedItem.Equals(ItemStack.Empty))
-			{
-				Inventory.EquippedItem.Item?.OnClientDraw(GFX);
-			}
-
-			MouseState mouse = Mouse.GetState();
-
-			var mp = Camera.ScreenToWorldCoordinates(mouse.Position.ToVector2());
-
-			mp /= 8;
-			mp.Floor();
-			var tileCoords = mp;
-			mp *= 8;
-
-
-			if (mouse.LeftButton == ButtonState.Pressed)
-			{
-				GFX.Rect(Color.Green, mp, new Vector2(8, 8));
-			} else
-			{
-				GFX.Rect(new Color(1,1,1,0.5f), mp, new Vector2(8, 8));
-			}
-
-			GFX.End();
-			if (ShowChunkBoundaries)
-			{
-				GFX.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, Camera.View);
-				chunkGridTool?.Draw(GFX, Camera);
-				GFX.End();
-			}
-
-			//	TODO: Consolidate draw calls
-			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
-			Inventory.Draw(GFX);
-            PauseMenu.Draw(GFX);
-			GFX.End();
-			DrawDebugInfo(GFX);
-			Chat.Draw(GFX);
-
-			
-		}
-
+		
 		public void Load()
 		{
 			PauseMenu.LoadShader(Game.Content);
+			if (NetworkClient.IsAddressValidIPv4(ConnectAddress))
+			{
+				FailConnect("Server address is not a valid IPv4 address!");
+				return;
+			}
+			if (NetworkClient.IsServerOnline(ConnectAddress))
+            {
+				FailConnect("Failed to connect, server may be offline!");
+				return;
+            }
+			
 
-			gameClient = new NetworkClient(ConnectAddress);
+			NetClient = new NetworkClient(ConnectAddress);
 			//gameClient = new NetworkClient("127.0.0.1:40269");
 			//gameClient.Output = Game.Console;
-			gameClient.Start();
-			gameClient.SendPacket(new InitServerHandshakePacket(Globals.ProtocolVersion));
+			NetClient.Start();
+			NetClient.SendPacket(new InitServerHandshakePacket(Globals.ProtocolVersion));
 			
 			//gameClient.SendPacket(new RequestJoinPacket("jooj"));
 		}
+
+		private void FailConnect(string reason)
+        {
+
+        }
 
 		public void Unload() {}
 		MouseState previous = Mouse.GetState();
@@ -770,17 +760,13 @@ namespace CaveGame.Client
 
 		}
 
-
 		private void ReplicatePlayerState()
 		{
 			//Debug.WriteLine("Replicating");
 			if (MyPlayer != null)
 			{
-				gameClient?.SendPacket(
-					new EntityPositionPacket(MyPlayer)
-				);
-
-				gameClient?.SendPacket(new PlayerStatePacket(MyPlayer.Facing, MyPlayer.OnGround, MyPlayer.Walking));
+				NetClient?.SendPacket(new EntityPhysicsStatePacket(MyPlayer));
+				NetClient?.SendPacket(new PlayerStatePacket(MyPlayer.Facing, MyPlayer.OnGround, MyPlayer.Walking));
 			}
 		}
 
@@ -801,7 +787,7 @@ namespace CaveGame.Client
 
 			//float ZoomFactor = ((mouse.ScrollWheelValue - IntitalScrollValue) * (Senitivity / 120)) + 2;
 
-			Vector2 MouseCameraMovement = ((mouse.Position.ToVector2() / Camera._screenSize) - new Vector2(0.5f, 0.5f)) * 5.5f;
+			Vector2 MouseCameraMovement = ((mouse.Position.ToVector2() / Camera.WindowSize) - new Vector2(0.5f, 0.5f)) * 5.5f;
 
 
 			Camera.Zoom = Math.Clamp(scroll, 0.05f, 10f);
@@ -857,22 +843,22 @@ namespace CaveGame.Client
 			previousKB = currentKB;
 		}
 
-
-		float drawTimer = 0;
-		
 		public void Update(GameTime gt)
 		{
+
+			FPSGraph.DataSet.Push(new FpsSample { Value = gt.GetDelta()});
+
+			NetClient.Update(gt);
+			redrawTimer += gt.GetDelta();
 			
+			Profiler.StartRegion("Update");
+
+			ServerKeepAlive += gt.GetDelta();
 			UpdateInputs();
 
 			Camera.Update(gt);
-			
 
-			drawTimer += (float)gt.ElapsedGameTime.TotalSeconds;
-			
-			playerStateReplicationTask.Update(gt);
-			chunkUnloadingTask.Update(gt);
-			chunkLoadingTask.Update(gt);
+			ClientTasks.ForEach(ct => ct.Update(gt));
 
 			if (MyPlayer != null)
 			{
@@ -882,14 +868,130 @@ namespace CaveGame.Client
 					MyPlayer.IgnoreInput = false;
 			}
 
-
+			Profiler.Start("UIUpdate");
 			Inventory.Update(gt);
 			PauseMenu.Update(gt);
-			Chat.Update(gt);
+
+            Chat.Update(gt);
+			Profiler.End();
+
+			//Profiler.Start("WorldUpdate");
 			World.Update(gt);
+			//Profiler.End();
+
+			Profiler.Start("Camera");
 			HotbarUpdate(gt);
 			UpdateCamera(gt);
+			Profiler.End();
+
+			Profiler.Start("ReadPackets");
 			ReadIncomingPackets();
+			Profiler.End();
+
+			Profiler.EndRegion();
+		}
+
+		protected void DrawBackgroundLayer(GraphicsEngine GFX) 
+		{
+			Game.GraphicsDevice.Clear(World.SkyColor);
+			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
+			World.Sky.DrawSkyColors(GFX);
+			GFX.End();
+		}
+		protected void DrawGameLayer(GraphicsEngine GFX) 
+		{
+			// Game Layer
+			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
+			
+			if (PauseMenu.Open)
+				PauseMenu.DrawWaterPixelsFilter(GFX);
+
+			World.Sky.DrawBackground(GFX);
+			Profiler.Start("DrawChunkCanvases");
+			DrawChunkWallTextures(GFX);
+			DrawChunkTileTextures(GFX);
+			Profiler.End();
+
+			Profiler.Start("DrawFurniture");
+			foreach (var furn in World.Furniture)
+			{
+				furn.Draw(GFX);
+			}
+			Profiler.End();
+			Profiler.Start("DrawEntities");
+			EntityRendering(GFX);
+			Profiler.End();
+
+			Profiler.Start("DrawParticles");
+			World.ParticleSystem.Draw(GFX);
+			Profiler.End();
+
+			if (!Inventory.EquippedItem.Equals(ItemStack.Empty))
+			{
+				Inventory.EquippedItem.Item?.OnClientDraw(GFX);
+			}
+
+			MouseState mouse = Mouse.GetState();
+
+			var mp = Camera.ScreenToWorldCoordinates(mouse.Position.ToVector2());
+
+			mp /= 8;
+			mp.Floor();
+			var tileCoords = mp;
+			mp *= 8;
+
+
+			if (mouse.LeftButton == ButtonState.Pressed)
+			{
+				GFX.Rect(Color.Green, mp, new Vector2(8, 8));
+			}
+			else
+			{
+				GFX.Rect(new Color(1, 1, 1, 0.5f), mp, new Vector2(8, 8));
+			}
+
+			GFX.End();
+		}
+
+		protected void DrawUILayer(GraphicsEngine GFX)
+        {
+			Profiler.Start("DrawUI");
+			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
+			Inventory.Draw(GFX);
+			PauseMenu.Draw(GFX);
+			GFX.End();
+			Chat.Draw(GFX);
+			Profiler.End();
+
+			Profiler.Start("DrawDebug");
+			DrawDebugInfo(GFX);
+			Profiler.End();
+		}
+
+		public void Draw(GraphicsEngine GFX)
+		{
+			Profiler.StartRegion("Draw");
+			
+			if (redrawTimer > (1.0f / 8.0f)) 
+			{
+				redrawTimer = 0;
+				Profiler.Start("DrawChunkBuffers");
+				RedrawChunkBuffers(GFX);
+				//Profiler.Track("DrawChunkBuffers", ()=>RedrawChunkBuffers(GFX));
+				Profiler.End("DrawChunkBuffers");
+			}
+
+			DrawBackgroundLayer(GFX);
+			DrawGameLayer(GFX);
+			DrawUILayer(GFX);
+
+
+			Profiler.EndRegion("Draw");
+
+			GFX.Begin(SpriteSortMode.Immediate);
+			Profiler.Draw(GFX);
+			FPSGraph.Draw(GFX);
+			GFX.End();
 		}
 	}
 }

@@ -25,6 +25,7 @@ namespace CaveGame.Core.Game.Tiles
 	{
 		public override void Drop(IGameServer server, IGameWorld world, Point tilePosition) { }
 		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 light) { } // leave empty
+
 	}
 	public class Vacuum { }
 	public class Fog { }

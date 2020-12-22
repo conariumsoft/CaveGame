@@ -46,13 +46,14 @@ namespace CaveGame.Core
 		public static Vector2 Origin = new Vector2(2, 2);
 		public static Vector2 Friction = new Vector2(0.8f, 0.8f);
 		public static float Mass = 0.1f;
+		public static Vector2 BoundingBox = new Vector2(2, 2);
 		public override float MaxParticleAge => 2.0f;
 
 		public Rotation Rotation { get; set; }
         public Vector2 Position { get; set; }
 
 		public Color Color { get; set; }
-		public float Scale { get; set; }
+		public Vector2 Scale { get; set; }
 		public Vector2 NextPosition;
 		public Vector2 Velocity;
 		public Vector2 Accelleration;
@@ -61,7 +62,7 @@ namespace CaveGame.Core
 
 
 
-		public void Initialize(Vector2 _position, Color _color, Rotation _rotation, float _scale, Vector2 _accel)
+		public void Initialize(Vector2 _position, Color _color, Rotation _rotation, Vector2 _scale, Vector2 _accel)
         {
 			ParticleAge = 0;
 			Position = _position;
@@ -83,6 +84,38 @@ namespace CaveGame.Core
 
 		public override void PhysicsStep(IGameWorld world, float step)
 		{
+			var tilePosition = new Point(
+				(int)Math.Floor(Position.X / Globals.TileSize),
+				(int)Math.Floor(Position.Y / Globals.TileSize)
+			);
+
+			int bb = 2;
+			for (int x = -bb; x < bb; x++)
+			{
+				for (int y = -bb; y < bb; y++)
+				{
+					Point tileBoxPos = new Point(tilePosition.X + x, tilePosition.Y + y);
+
+					var tile = world.GetTile(tileBoxPos.X, tileBoxPos.Y);
+
+					if (tile.ID != 0 && (!(tile is INonSolid) || tile is ILiquid))
+					{
+						var tileChec = (tileBoxPos.ToVector2() * Globals.TileSize) + new Vector2(4, 4);
+						var tileBoxSize = new Vector2(4, 4);
+						if (CollisionSolver.CheckAABB(NextPosition, BoundingBox * Scale, tileChec, tileBoxSize))
+						{
+							var separation = CollisionSolver.GetSeparationAABB(NextPosition, BoundingBox, tileChec, tileBoxSize);
+							var normal = CollisionSolver.GetNormalAABB(separation, Velocity);
+							if (tile.ID > 0 && !(tile is INonSolid))
+							{
+								NextPosition += separation;
+							}
+						}
+					}
+				}
+			}
+
+
 			Velocity += (Accelleration * step*3);
 			Accelleration -= (Accelleration * step*3);
 
@@ -173,6 +206,70 @@ namespace CaveGame.Core
 		}
 	}
 
+	public class ExplosionParticle : Particle
+    {
+		public static Rectangle SP_EXPLOSION0 = new Rectangle(0, 0, 32, 32);
+		public static Rectangle SP_EXPLOSION1 = new Rectangle(32, 0, 32, 32);
+		public static Rectangle SP_EXPLOSION2 = new Rectangle(64, 0, 32, 32);
+		public static Rectangle SP_EXPLOSION3 = new Rectangle(96, 0, 32, 32);
+		public static Rectangle SP_EXPLOSION4 = new Rectangle(128, 0, 32, 32);
+
+
+		public static Rectangle[] ANIM =
+		{
+			SP_EXPLOSION0,
+			SP_EXPLOSION1,
+			SP_EXPLOSION2,
+			SP_EXPLOSION3,
+			SP_EXPLOSION4,
+
+		};
+
+		public static Vector2 Origin => new Vector2(16, 16);
+
+		public override float MaxParticleAge => 0.5f;
+
+
+		public Vector2 Position { get; set; }
+		public Vector2 Scale { get; set; }
+		public Color Color { get; set; }
+		Rotation Rotation { get; set; }
+
+		Random RNG = new Random();
+
+		public ExplosionParticle()
+		{
+			Rotation = Rotation.FromDeg(RNG.Next(0, 360));
+		}
+
+        public override void Update(GameTime gt)
+        {
+			ParticleAge += (float)gt.ElapsedGameTime.TotalSeconds;
+        }
+
+        public override void PhysicsStep(IGameWorld world, float step)
+        {
+         //   base.PhysicsStep(world, step);
+        }
+
+        public override void Draw(GraphicsEngine gfx)
+        {
+
+			var quad = ANIM.GetSpriteFrame( (ParticleAge/MaxParticleAge) * (ANIM.Length-1));
+
+			gfx.Sprite(gfx.Explosion, Position, quad, Color.White, Rotation, Origin, Scale, SpriteEffects.None, 0);
+		}
+
+		public void Initialize(Vector2 _position, Color _color, Rotation _rotation, Vector2 _scale)
+		{
+			ParticleAge = 0;
+			Position = _position;
+			Color = _color;
+			Scale = _scale;
+			Dead = false;
+		}
+	}
+
 
 	public class FireParticle
 	{
@@ -197,7 +294,8 @@ namespace CaveGame.Core
 
 
 		ObjectPool<SmokeParticle> SmokeParticlePool = new ObjectPool<SmokeParticle>(() => new SmokeParticle());
-
+		//ObjectPool<SmokeParticle> SmokeParticlePool = new ObjectPool<SmokeParticle>(() => new SmokeParticle());
+		ObjectPool<ExplosionParticle> ExplosionParticlePool = new ObjectPool<ExplosionParticle>(() => new ExplosionParticle());
 
 		private List<Particle> Particles;
 		public IGameWorld World { get; set; }
@@ -212,11 +310,17 @@ namespace CaveGame.Core
 		public void Add(Particle p) => Particles.Add(p);
 
 
-		public void EmitSmokeParticle(Vector2 position, Color color, Rotation rotation, float scale, Vector2 accel)
+		public void EmitSmokeParticle(Vector2 position, Color color, Rotation rotation, Vector2 scale, Vector2 accel)
 		{
 			var myParticle = SmokeParticlePool.Get();
 
 			myParticle.Initialize(position, color, rotation, scale, accel);
+			Add(myParticle);
+		}
+		public void EmitExplosionParticle(Vector2 position)
+        {
+			var myParticle = ExplosionParticlePool.Get();
+			myParticle.Initialize(position, Color.White, Rotation.Zero, new Vector2(2.0f));
 			Add(myParticle);
 		}
 
@@ -230,13 +334,25 @@ namespace CaveGame.Core
 				if (particle.ParticleAge > particle.MaxParticleAge)
 					particle.Dead = true;
 
-				if (particle.Dead && particle is SmokeParticle smokey)
+				if (particle.Dead)
 				{
-					SmokeParticlePool.Return(smokey);
+					if (particle is SmokeParticle smokey)
+						SmokeParticlePool.Return(smokey);
+
 					Particles.Remove(particle);
 					continue;
 				}
-					
+
+
+				if (particle.Dead)
+				{
+					if (particle is ExplosionParticle bomb)
+						ExplosionParticlePool.Return(bomb);
+
+					Particles.Remove(particle);
+					continue;
+				}
+
 				particle.Update(gt);
 			}
 		}

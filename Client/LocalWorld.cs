@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using CaveGame.Core.Game.Walls;
+using CaveGame.Client.DebugTools;
 
 namespace CaveGame.Client
 {
@@ -28,26 +29,30 @@ namespace CaveGame.Client
 		public LightingEngine Lighting { get; set; }
 		ILightingEngine IClientWorld.Lighting => Lighting;
 
-		protected DelayedTask localTileUpdateTask;
-		protected DelayedTask localLightingUpdateTask;
-
-
         public override int GetHashCode()
         {
             return base.GetHashCode();
         }
 		public GameClient Client { get; set; }
+		public Sky Sky { get; private set; }
 
         public LocalWorld(GameClient client) : base()
 		{
+			Context = NetworkContext.Client;
+
 			Client = client;
-			localTileUpdateTask = new DelayedTask(ApplyVisualTileUpdates, 1 / 10.0f);
-			localLightingUpdateTask = new DelayedTask(GetLatestDataFromLightingThread, 1 / 20.0f);
+
+			Sky = new Sky(this);
 			ParticleSystem = new ParticleEmitter(this);
 			Lighting = new LightingEngine(this);
+			Lighting.On();
+
+			WorldTimedTasks.Add(new RepeatingIntervalTask(ApplyVisualTileUpdates, 1 / 10.0f));
+			WorldTimedTasks.Add(new RepeatingIntervalTask(GetLatestDataFromLightingThread, 1 / 20.0f));
+			
 			RequestedChunks = new List<ChunkCoordinates>();
 			LoadedChunks = new List<ChunkCoordinates>();
-			Lighting.On();
+			
 			Tile.InitializeManager(420);
 		}
 
@@ -56,6 +61,11 @@ namespace CaveGame.Client
 		{
 			Lighting.Off();
 		}
+
+		public void Dispose()
+        {
+
+        }
 
 		public void UnloadChunk(ChunkCoordinates coords) {}
 
@@ -68,15 +78,8 @@ namespace CaveGame.Client
 				return AmbientLights[wrapped];
 			}
 		}
-		public Color SkyColor
-		{
-			get {
-				int wrapped = ((int)Math.Floor(TimeOfDay)).Mod(24);
-				int last = ((int)Math.Floor(TimeOfDay) - 1).Mod(24);
-				float diff = TimeOfDay % 1;
-				return Color.Lerp(SkyColors[last], SkyColors[wrapped], diff);
-			}
-		}
+
+		public Color SkyColor => Sky.SkyColor;
 
 		public override void SetTileNoLight(int x, int y, Tile t)
 		{
@@ -146,53 +149,49 @@ namespace CaveGame.Client
 
 		public override void Update(GameTime gt)
 		{
-			localTileUpdateTask.Update(gt);
-			localLightingUpdateTask.Update(gt);
+			//Profiler.Start("WorldTasks");
+			//base.Update(gt);
+			//localTileUpdateTask.Update(gt);
+			//localLightingUpdateTask.Update(gt);
+			//Profiler.End();
+
+			Profiler.Start("Particles");
 			ParticleSystem.Update(gt);
+			Profiler.End();
+
+			Profiler.Start("Lighting");
 			Lighting.Update(gt);
+			Profiler.End();
 
-
+			Profiler.Start("EntityUpdate");
 			foreach (IEntity entity in Entities)
 				entity.ClientUpdate(Client, gt);
-				
 
+			Profiler.End();
+
+			TimeOfDay += (float)gt.ElapsedGameTime.TotalSeconds / 30.0f;
+
+
+			//Entities.RemoveAll(e => e.Dead);
+			//Profiler.Start("PhysicsTask");
+			//physicsTask.Update(gt);
+			//Profiler.End();
 			base.Update(gt);
+
 		}
 
-		private void LocalTileUpdates(Chunk chunk)
-		{
-			for (int x = 0; x < Globals.ChunkSize; x++)
-			{
-				for (int y = 0; y < Globals.ChunkSize; y++)
-				{
-					if (chunk.TileUpdate[x, y] == true)
-					{
-						chunk.TileUpdate[x, y] = false;
-
-
-						if (chunk.GetTile(x, y) is ILocalTileUpdate tile)
-						{
-							int worldX = (chunk.Coordinates.X * Globals.ChunkSize) + x;
-							int worldY = (chunk.Coordinates.Y * Globals.ChunkSize) + y;
-
-							tile.LocalTileUpdate(this, worldX, worldY);
-
-						}
-					}
-				}
-			}
-		}
 
 		private void SpawnExplosionParticles(Explosion blast)
         {
-			for (int i = 0; i < 360; i += 5)
+			for (int i = 0; i < 360; i += 20)
 			{
 				float randy = r.Next(0, 10) - 5;
 				Rotation rotation = Rotation.FromDeg(i + randy);
 				Vector2 direction = new Vector2((float)Math.Sin(rotation.Radians), (float)Math.Cos(rotation.Radians));
-				float size = ((float)r.NextDouble() * 0.4f) + (blast.BlastPressure * 0.2f);
-				ParticleSystem.EmitSmokeParticle(blast.Position, Color.White, Rotation.FromDeg(0), size, direction * (blast.BlastRadius * 1.0f + ((float)r.NextDouble() * 5)));
+				float size = ((float)r.NextDouble() * 0.2f) + (blast.BlastPressure * 0.1f);
+				ParticleSystem.EmitSmokeParticle(blast.Position, Color.Gray, Rotation.FromDeg(0), new Vector2(size, size), direction * (blast.BlastRadius * ((float)r.NextDouble())));
 			}
+			ParticleSystem.EmitExplosionParticle(blast.Position);
 		}
 
 		public override void Explosion(Explosion Blast, bool DamageTiles, bool DamageEntities)
@@ -216,17 +215,21 @@ namespace CaveGame.Client
 							ParticleSystem.Add(new TileBloodSplatterParticle { AttachedTo = result.TileCoordinates, Position = rounded, Face = result.Face });
 						}
 					}
-
 				}
             }
 		}
 
         private void ApplyVisualTileUpdates()
 		{
-			foreach (var kvp in Chunks)
+			
+			int count = TileUpdateQueue.Count;
+			for (int i = 0; i < count; i++)
 			{
-				LocalTileUpdates(kvp.Value);
+				Point coords = TileUpdateQueue.Dequeue();
+				if (GetTile(coords) is ILocalTileUpdate tile)
+					tile.LocalTileUpdate(this, coords.X, coords.Y);
 			}
 		}
 	}
 }
+

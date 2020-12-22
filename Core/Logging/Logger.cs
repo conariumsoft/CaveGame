@@ -11,7 +11,10 @@ namespace CaveGame.Core
             string date = DateTime.Now.ToString("yy-MM-dd");
             if (!Directory.Exists("logs"))
                 Directory.CreateDirectory("logs");
-            File.AppendAllText($"logs/log_{date}.txt", DateTime.Now.ToString("HH-mm-ss") + ": " + data + "\n");
+            File.AppendAllText(
+                Path.Combine("logs", $"log_{date}.txt"), 
+                DateTime.Now.ToString("HH-mm-ss") + ": " + data + "\n"
+            );
         }
     }
 }

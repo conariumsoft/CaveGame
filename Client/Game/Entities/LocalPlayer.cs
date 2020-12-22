@@ -14,7 +14,7 @@ namespace CaveGame.Client.Game.Entities
 
 
 
-	public class LocalPlayer : ClientPlayer, IClientPhysicsObserver
+	public class LocalPlayer : Player, IClientPhysicsObserver
 	{
 		float jumpEnergy;
 
@@ -169,7 +169,7 @@ namespace CaveGame.Client.Game.Entities
 			base.PhysicsStep(world, step);
 		}
 
-		public virtual void ClientPhysicsTick(IClientWorld world, float step) => PhysicsStep(world, step);
+		public override void ClientPhysicsTick(IClientWorld world, float step) => PhysicsStep(world, step);
 
 	}
 }

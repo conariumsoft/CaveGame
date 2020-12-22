@@ -8,12 +8,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using CaveGame.Core.Game.Walls;
+using System.Collections.Concurrent;
 
 namespace CaveGame.Core
 {
-
-
-
 	public class Chunk
 	{
 		public static bool RefreshedThisFrame = false;
@@ -26,21 +24,20 @@ namespace CaveGame.Core
 
 		public Light3[,] Lights;
 		public Tile[,] Tiles;
-		public bool[,] NetworkUpdated;
-		public bool[,] TileUpdate;
 		public Wall[,] Walls;
 		public ChunkCoordinates Coordinates;
-		public bool UpdateRenderBuffer = true;
+		public bool WallBufferNeedsRedrawn = true;
+		public bool TileBufferNeedsRedrawn = false;
 
-		public RenderTarget2D ForegroundRenderBuffer;
-		public RenderTarget2D BackgroundRenderBuffer;
+		public RenderTarget2D TileRenderBuffer { get; set; }
+		public RenderTarget2D WallRenderBuffer { get; set; }
+
 
 		public Chunk(int X, int Y)
 		{
 			Coordinates = new ChunkCoordinates(X, Y);
-			NetworkUpdated = new bool[ChunkSize, ChunkSize];
+
 			Tiles = new Tile[ChunkSize, ChunkSize];
-			TileUpdate = new bool[ChunkSize, ChunkSize];
 			Walls = new Wall[ChunkSize, ChunkSize];
 			Lights = new Light3[ChunkSize, ChunkSize];
 	
@@ -53,15 +50,22 @@ namespace CaveGame.Core
 					SetWall(x, y, new Game.Walls.Air());
 				}
 			}
-			
-			
 		}
+		bool disposed;
+		~Chunk() => Dispose(false);
 
-		public void ClearUpdateQueue()
-		{
-			NetworkUpdated = new bool[ChunkSize, ChunkSize];
-			TileUpdate = new bool[ChunkSize, ChunkSize];
-		}
+		public void Dispose() => Dispose(true);
+
+		protected void Dispose(bool disposing)
+        {
+			if (disposed)
+				return;
+			if (disposing)
+            {
+				TileRenderBuffer?.Dispose();
+				WallRenderBuffer?.Dispose();
+			}
+        }
 
 		public void FromData(byte[] data)
 		{
@@ -126,48 +130,25 @@ namespace CaveGame.Core
 			return data;
 		}
 
-
-		public void SetTileUpdated(int x, int y)
-		{
-			TileUpdate[x, y] = true;
-			UpdateRenderBuffer = true;
-		}
-
+		public Tile GetTile(int x, int y)=> Tiles[x, y];
 		public void SetTile(int x, int y, Tile t)
 		{
-			//Debug.WriteLine("TT " + t.TileState);
-			if (Tiles[x,y] == null || Tiles[x, y].Equals(t) == false)
-			{
-				Tiles[x, y] = t;
-				NetworkUpdated[x, y] = true; // TODO: Create WallReplicate and TileReplicate queues
-				UpdateRenderBuffer = true;
-			}
+			Tiles[x, y] = t;
+			TileBufferNeedsRedrawn = true;
 		}
-
-		public Tile GetTile(int x, int y)
+		public Wall GetWall(int x, int y) => Walls[x, y];
+		public void SetWall(int x, int y, Wall w)
 		{
-			return Tiles[x, y];
+			Walls[x, y] = w;
+			WallBufferNeedsRedrawn = true;
 		}
+		public void RedrawTileBuffer(GraphicsEngine GFX)
+        {
+			if (TileRenderBuffer == null)
+				TileRenderBuffer = new RenderTarget2D(GFX.GraphicsDevice, ChunkSize * Globals.TileSize, ChunkSize * Globals.TileSize);
 
-		public Wall GetWall(int x, int y) {
-			return Walls[x, y];
-		}
 
-		public void SetWall(int x, int y, Wall w) {
-		//	if (Walls[x, y] == null)
-		//	{
-				Walls[x, y] = w;
-				NetworkUpdated[x, y] = true; // TODO: Create WallReplicate and TileReplicate queues
-				UpdateRenderBuffer = true; 
-		//	}
-		}
-
-		private void DrawForegroundBuffer(GraphicsEngine GFX)
-		{
-			if (ForegroundRenderBuffer == null)
-				ForegroundRenderBuffer = new RenderTarget2D(GFX.GraphicsDevice, ChunkSize * Globals.TileSize, ChunkSize * Globals.TileSize);
-
-			GFX.GraphicsDevice.SetRenderTarget(ForegroundRenderBuffer);
+			GFX.GraphicsDevice.SetRenderTarget(TileRenderBuffer);
 			GFX.Clear(Color.Black * 0f);
 
 			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
@@ -175,7 +156,7 @@ namespace CaveGame.Core
 
 			for (int x = 0; x < ChunkSize; x++)
 			{
-				for(int y = 0; y<ChunkSize; y++)
+				for (int y = 0; y < ChunkSize; y++)
 				{
 					tile = GetTile(x, y);
 					if (tile.ID > 0)
@@ -186,12 +167,12 @@ namespace CaveGame.Core
 			GFX.GraphicsDevice.SetRenderTarget(null);
 		}
 
-		private void DrawBackgroundBuffer(GraphicsEngine GFX)
-		{
-			if (BackgroundRenderBuffer == null)
-				BackgroundRenderBuffer = new RenderTarget2D(GFX.GraphicsDevice, ChunkSize * Globals.TileSize, ChunkSize * Globals.TileSize);
+		public void RedrawWallBuffer(GraphicsEngine GFX)
+        {
+			if (WallRenderBuffer == null)
+				WallRenderBuffer = new RenderTarget2D(GFX.GraphicsDevice, ChunkSize * Globals.TileSize, ChunkSize * Globals.TileSize);
 
-			GFX.GraphicsDevice.SetRenderTarget(BackgroundRenderBuffer);
+			GFX.GraphicsDevice.SetRenderTarget(WallRenderBuffer);
 			GFX.Clear(Color.Black * 0f);
 
 			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
@@ -203,23 +184,13 @@ namespace CaveGame.Core
 				{
 					wall = GetWall(x, y);
 					if (wall.ID > 0)
-					{
 						wall.Draw(GFX, x, y, Lights[x, y]);
-					}
 				}
 			}
 			GFX.End();
 			GFX.GraphicsDevice.SetRenderTarget(null);
 		}
 
-		public void Draw(GraphicsEngine GFX)
-		{
 
-			Chunk.RefreshedThisFrame = true;
-				// cock and ball torture
-			UpdateRenderBuffer = false;
-			DrawBackgroundBuffer(GFX);
-			DrawForegroundBuffer(GFX);
-		}
 	}
 }

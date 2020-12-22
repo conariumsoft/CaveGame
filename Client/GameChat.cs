@@ -1,7 +1,6 @@
-﻿//#define SERVER
-
-using CaveGame.Client.UI;
+﻿using CaveGame.Client.UI;
 using CaveGame.Core;
+using CaveGame.Core.Network;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -31,12 +30,19 @@ namespace CaveGame.Client
 
 			inputBox = new TextInput();
 			inputBox.ClearOnReturn = true;
-			inputBox.Handler += client.SendChatMessage;
+			inputBox.Handler += SendChatMessage;
 
 			MessageHistory = new List<Message>();
 			Open = false;
 			TextInputManager.ListenTextInput += OnTextInput;
 			Client = client;
+		}
+
+
+		public void SendChatMessage(object sender, string message)
+        {
+			Open = false;
+			Client.Send(new ClientChatMessagePacket(message));
 		}
 
 		public void OnTextInput(object sender, TextInputEventArgs args)

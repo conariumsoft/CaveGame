@@ -12,11 +12,28 @@ using System.Threading.Tasks;
 
 namespace CaveGame.Core
 {
-    
-
-
     using Circle = List<Vector2>;
     using Arc = List<Vector2>;
+    public interface IGraphicsEngine
+    {
+        Vector2 WindowSize { get; set; }
+        SpriteBatch SpriteBatch { get; set; }
+
+        SpriteSortMode SpriteSortMode { get; set; }
+        BlendState BlendState { get; set; }
+        SamplerState SamplerState { get; set; }
+        DepthStencilState DepthStencilState { get; set; }
+        RasterizerState RasterizerState { get; set; }
+        Effect Shader { get; set; }
+        Matrix Matrix { get; set; }
+
+        void Begin(SpriteSortMode sorting = SpriteSortMode.Deferred, BlendState blending = null, SamplerState sampling = null,
+            DepthStencilState depthStencil = null, RasterizerState rasterizing = null, Effect effect = null, Matrix? transform = null);
+        void End();
+
+    }
+
+    
 
     public class MissingGameDataException : ApplicationException { 
         public string MissingFilename { get; set; }
@@ -101,17 +118,19 @@ namespace CaveGame.Core
         public SpriteFont ComicSans10 { get; private set; }
         public void LoadAssets(ContentManager Content)
         {
-            Arial8 = Content.Load<SpriteFont>("Fonts/Arial8");
-            Arial10 = Content.Load<SpriteFont>("Fonts/Arial10");
-            Arial12 = Content.Load<SpriteFont>("Fonts/Arial12");
-            Arial14 = Content.Load<SpriteFont>("Fonts/Arial14");
-            Arial16 = Content.Load<SpriteFont>("Fonts/Arial16");
-            Arial20 = Content.Load<SpriteFont>("Fonts/Arial20");
-            Arial30 = Content.Load<SpriteFont>("Fonts/Arial30");
-            Arial10Italic = Content.Load<SpriteFont>("Fonts/Arial10Italic");
-            Consolas10 = Content.Load<SpriteFont>("Fonts/Consolas10");
-            Consolas12 = Content.Load<SpriteFont>("Fonts/Consolas12");
-            ComicSans10 = Content.Load<SpriteFont>("Fonts/ComicSans10");
+            
+            Content.RootDirectory = Path.Combine("assets", "fonts");
+            Arial8 = Content.Load<SpriteFont>("Arial8");
+            Arial10 = Content.Load<SpriteFont>("Arial10");
+            Arial12 = Content.Load<SpriteFont>("Arial12");
+            Arial14 = Content.Load<SpriteFont>("Arial14");
+            Arial16 = Content.Load<SpriteFont>("Arial16");
+            Arial20 = Content.Load<SpriteFont>("Arial20");
+            Arial30 = Content.Load<SpriteFont>("Arial30");
+            Arial10Italic = Content.Load<SpriteFont>("Arial10Italic");
+            Consolas10 = Content.Load<SpriteFont>("Consolas10");
+            Consolas12 = Content.Load<SpriteFont>("Consolas12");
+            ComicSans10 = Content.Load<SpriteFont>("ComicSans10");
         }
     }
 
@@ -123,8 +142,10 @@ namespace CaveGame.Core
 
         public static GraphicsEngine Instance { get; private set; }
 
+
+
         #region Texture Shortcuts
-        public Texture2D Player => Textures["Entities/player.png"];
+        
         public Texture2D TitleScreen => Textures["TitleScreen.png"];
         public Texture2D EyeOfHorus => Textures["csoft.png"];
         public Texture2D ParticleSet => Textures["particles.png"];
@@ -132,29 +153,38 @@ namespace CaveGame.Core
         public Texture2D BG => Textures["menu_bg.png"];
         public Texture2D Border => Textures["border.png"];
         public Texture2D Slot => Textures["slot.png"];
+        public Texture2D CloudBackground => Textures["clouds.png"];
+        public Texture2D Starfield => Textures["stars.png"];
 
-        public Texture2D BombSprite => Textures["bomb.png"];
-		public Texture2D Bong => Textures["bong.png"];
-		public Texture2D Arrow => Textures["arrow.png"];
-		public Texture2D Bucket => Textures["bucket.png"];
-		public Texture2D BigPickaxe => Textures["bigpickaxe.png"];
-		public Texture2D Helmet => Textures["helmet.png"];
-		public Texture2D Chestplate => Textures["chestplate.png"];
-		public Texture2D Sword => Textures["sword.png"];
-		public Texture2D WallScraper => Textures["wallscraper.png"];
-		public Texture2D PickaxeNew => Textures["pickaxenew.png"];
-		public Texture2D Scroll => Textures["scroll.png"];
-		public Texture2D Dynamite => Textures["dynamite.png"];
-		public Texture2D Workbench => Textures["workbench.png"];
-		public Texture2D Potion => Textures["potion.png"];
-		public Texture2D Jetpack => Textures["jetpack.png"];
-		public Texture2D Door => Textures["door.png"];
-		public Texture2D ForestPainting => Textures["forestpainting.png"];
-		public Texture2D Ingot => Textures["ingot.png"];
-		public Texture2D Leggings => Textures["leggings.png"];
-		public Texture2D Furnace => Textures["furnace.png"];
-		public Texture2D Campfire => Textures["campfire.png"];
-        public Texture2D VoidMonster => Textures["Entities/tortured.png"];
+        public Texture2D Explosion => Textures["michaelbay.png"];
+        public Texture2D BowSprite => Textures["items:bow.png"];
+        public Texture2D BombSprite => Textures["items:bomb.png"];
+		public Texture2D Bong => Textures["items:bong.png"];
+		public Texture2D Arrow => Textures["items:arrow.png"];
+		public Texture2D Bucket => Textures["items:bucket.png"];
+		public Texture2D BigPickaxe => Textures["items:bigpickaxe.png"];
+		public Texture2D Helmet => Textures["armor:helmet.png"];
+		public Texture2D Chestplate => Textures["armor:chestplate.png"];
+		public Texture2D Sword => Textures["items:sword.png"];
+		public Texture2D WallScraper => Textures["items:wallscraper.png"];
+		public Texture2D PickaxeNew => Textures["items:pickaxenew.png"];
+		public Texture2D Scroll => Textures["items:scroll.png"];
+		public Texture2D Dynamite => Textures["items:dynamite.png"];
+		public Texture2D Workbench => Textures["items:workbench.png"];
+		public Texture2D Potion => Textures["items:potion.png"];
+		public Texture2D Jetpack => Textures["items:jetpack.png"];
+		public Texture2D Door => Textures["items:door.png"];
+		public Texture2D ForestPainting => Textures["items:forestpainting.png"];
+		public Texture2D Ingot          => Textures["items:ingot.png"];
+		public Texture2D Leggings       => Textures["armor:leggings.png"];
+		public Texture2D Furnace        => Textures["items:furnace.png"];
+		public Texture2D Campfire       => Textures["items:campfire.png"]; 
+        
+        public Texture2D Player       => Textures["entities:player.png"];
+        public Texture2D ArrowEntity => Textures["entities:arrow.png"];
+        public Texture2D VoidMonster  => Textures["entities:wurmhole.png"];
+        public Texture2D Bee          => Textures["entities:bee.png"];
+        public Texture2D Goldfish     => Textures["entities:gregothy.png"];
 
         //public static Texture2D Campfire	=> Textures["campfire.png"];
         #endregion
@@ -193,26 +223,29 @@ namespace CaveGame.Core
 
         public void LoadAssets(GraphicsDevice graphicsDevice)
         {
-            var texturesPath = Path.Combine("Assets", "Textures");
+            var texturesPath = Path.Combine("assets", "textures");
             if (!Directory.Exists(texturesPath))
                 throw new MissingContentFolderException { MissingFilename = "texturesPath" };
 
-            foreach (var tex in Directory.GetFiles("Assets/Textures/", "*.png"))
+            foreach (var tex in Directory.GetFiles(texturesPath, "*.png", SearchOption.AllDirectories))
             {
-                LoadingQueue.Enqueue(new TextureDef(
-                    tex.Replace("Assets/Textures/", ""),
-                    tex
-                ));
+                
+                var trimmedPath = tex.Replace(texturesPath + @"\", "");
+                var cleanedPath = trimmedPath.Replace(@"\", ":");
+               // GameConsole.Log($"QTexture {tex} => {cleanedPath} ");
+
+                LoadingQueue.Enqueue(new TextureDef(cleanedPath, tex));
                 TotalTextures++;
             }
 
-
-            var entityTexturesPath = Path.Combine("Assets", "Textures", "Entities");
-            foreach (var tex in Directory.GetFiles("Assets/Textures/Entities/", "*.png"))
+#if !EDITOR
+            /*var entityTexturesPath = Path.Combine("Assets", "Textures", "Entities");
+            foreach (var tex in Directory.GetFiles(entityTexturesPath, "*.png", SearchOption.AllDirectories))
             {
-                // Texture2D loaded = AssetLoader.LoadTexture(graphicsDevice, tex);
+
+                GameConsole.Log($"QTexture {tex} => {tex.Replace(entityTexturesPath + @"\", "")} ");
                 LoadingQueue.Enqueue(new TextureDef(
-                    tex.Replace("Assets/Textures/", ""),
+                    tex.Replace(entityTexturesPath + @"\", ""),
                     tex
                 ));
                 TotalTextures++;
@@ -226,7 +259,8 @@ namespace CaveGame.Core
                     tex
                 ));
                 TotalTextures++;
-            }
+            }*/
+#endif
         }
 
         public void Initialize()

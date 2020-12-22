@@ -47,6 +47,8 @@ namespace CaveGame.Client
 
 	public class SteamManager: GameComponent, ISteamManager
 	{
+
+		
 		// api members
 		public bool HasAchievement(GameSteamAchievement achievement)
         {
@@ -63,6 +65,7 @@ namespace CaveGame.Client
 		//
 		public SteamManager Instance { get; set; }
 
+        public string SteamUsername => SteamEnabled ? SteamFriends.GetPersonaName() : "Player1";
 
 		public bool SteamEnabled { get; set; }
 		public bool SteamInitialized { get; private set; }
@@ -71,7 +74,7 @@ namespace CaveGame.Client
 		Microsoft.Xna.Framework.Game game;
 		bool receivedUserStats;
 
-		DelayedTask callbackRun;
+		RepeatingIntervalTask callbackRun;
 
 		public SteamManager(Microsoft.Xna.Framework.Game _game) : base(_game)
 		{
@@ -90,7 +93,7 @@ namespace CaveGame.Client
 
 			if (SteamInitialized)
 			{
-				callbackRun = new DelayedTask(() => Steamworks.SteamAPI.RunCallbacks(), 1 / 20.0f);
+				callbackRun = new RepeatingIntervalTask(() => Steamworks.SteamAPI.RunCallbacks(), 1 / 20.0f);
 				m_OverlayActivated = Steamworks.Callback<Steamworks.GameOverlayActivated_t>.Create(Steam_OnOverlayActivated);
 				Steamworks.Callback<Steamworks.SteamShutdown_t>.Create(Steam_OnShutdown);
 				Steamworks.Callback<Steamworks.ScreenshotRequested_t>.Create(Steam_OnScreenshotRequested);

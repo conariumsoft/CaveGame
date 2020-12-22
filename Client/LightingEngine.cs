@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// TODO: Refactor and clean 
 namespace CaveGame.Client
 {
 	[StructLayout(LayoutKind.Explicit)]
@@ -28,6 +29,13 @@ namespace CaveGame.Client
 			Y = y;
 			Light = l;
 		}
+
+        public Cell(Point coords, Light3 l)
+        {
+            X = coords.X;
+            Y = coords.Y;
+            Light = l;
+        }
 
 		public void Dispose()
 		{
@@ -70,6 +78,14 @@ namespace CaveGame.Client
 			System.GC.SuppressFinalize(this);
 		}
 	}
+
+
+    internal struct InvokedLightCell
+    {
+        public Point Coords { get; set; }
+        public Light3 Value { get; set; }
+    }
+
 
     public class LightingEngine : ILightingEngine
     {
@@ -126,6 +142,7 @@ namespace CaveGame.Client
             OutputLights = new Dictionary<ChunkCoordinates, Light3[,]>();
             LocalChunks = new Dictionary<ChunkCoordinates, Chunk>();
             LightCells = new Dictionary<ChunkCoordinates, Light3[,]>();
+            InvokedCells = new ConcurrentQueue<InvokedLightCell>();
             UpdatedCells = new Queue<Cell>();
         }
 
@@ -133,6 +150,7 @@ namespace CaveGame.Client
         private ConcurrentQueue<ChunkCoordinates> RemovedChunkQueue;
         private ConcurrentQueue<TileChangedCell> ChangedTiles;
         private ConcurrentQueue<WallChangedCell> ChangedWalls;
+        private ConcurrentQueue<InvokedLightCell> InvokedCells;
         private Dictionary<ChunkCoordinates, Light3[,]> OutputLights;
 
         private Dictionary<ChunkCoordinates, Chunk> LocalChunks;
@@ -152,7 +170,7 @@ namespace CaveGame.Client
         public Light3 GetLight(int x, int y)
         {
             int chunkX = (int)Math.Floor((float)x / Globals.ChunkSize);
-            int chunkY = (int)Math.Floor((double)y / Globals.ChunkSize);
+            int chunkY = (int)Math.Floor((float)y / Globals.ChunkSize);
 
             var tileX = x.Mod(Globals.ChunkSize);
             var tileY = y.Mod(Globals.ChunkSize);
@@ -166,7 +184,9 @@ namespace CaveGame.Client
             }
             return new Light3(0, 0, 0);
         }
-        public void SetLight(int x, int y, Light3 val)
+
+        public Light3 GetLight(Point coords) => GetLight(coords.X, coords.Y);
+        private void SetLight(int x, int y, Light3 val)
         {
             int chunkX = (int)Math.Floor((double)x / Globals.ChunkSize);
             int chunkY = (int)Math.Floor((double)y / Globals.ChunkSize);
@@ -182,6 +202,14 @@ namespace CaveGame.Client
                 chunk[tileX, tileY] = val;
             }
         }
+
+        public void InvokeLight(Point coords, Light3 value)
+        {
+            UpdatedCells.Enqueue(new Cell(coords, value));
+            SetLight(coords, value);
+        }
+
+        private void SetLight(Point coords, Light3 val) => SetLight(coords.X, coords.Y, val);
         private void SetTile(int x, int y, Tile t)
         {
             int chunkX = (int)Math.Floor((double)x / Globals.ChunkSize);
@@ -278,7 +306,7 @@ namespace CaveGame.Client
                 byte opacity = Math.Max(tile.Opacity, wall.Opacity);
                 var tileLight = Light3.Dark;
                 if (tile.ID == 0 && wall.ID == 0)
-                    tileLight = Light3.Ambience;
+                    tileLight = World.Ambience;
                 else if (tile is ILightEmitter emitter)
                     tileLight = emitter.Light;
 

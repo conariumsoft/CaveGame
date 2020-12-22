@@ -9,10 +9,20 @@
     <Import_RootNamespace>CaveGame.Core</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)AssetLoader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Camera.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Enums.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GameConsole.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AssetManagement\AssetLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\DamageType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\Direction.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\GameSteamAchievement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\TextAlignment.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Camera.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ICaveGameImplementation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IDamageSource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IEntityManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IGameClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IGameServer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\INetworkingSubsystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ISteamManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\GameConsole.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\CraftingRecipes\Recipe.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Arrow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Bee.cs" />
@@ -41,39 +51,40 @@
     <Compile Include="$(MSBuildThisFileDirectory)Game\Tiles\Torches.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Tiles\VegetationTiles.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Tiles\WoodTiles.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Generic\DelayedTask.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileUtil\StructureFile.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Furniture\Furniture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generic\CircularArray.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Generic\RepeatingIntervalTask.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generic\ThreadSafeValue.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Generic\UniqueQueue.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GraphicsEngine.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IGameMainControllers.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ILightingEngine.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Logger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ILightingEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\Logger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LuaInterop\LuaEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LuaInterop\LuaInterop.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Network\SharedNetworkSubsystem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\Packets\SessonControlPackets.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\User.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataTypes\Rotation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ParticleEmitter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Shell.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)WorldMetadata.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OperatingSystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)World\WorldMetadata.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\Chunk.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\ChunkCoordinates.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Physics\CollisionSolver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CollisionSolver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Entity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\ItemstackEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Player.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileUtil\Configuration.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\GameWorld.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Globals.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IMessageOutlet.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IMessageOutlet.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MonoGameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Items\Item.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Inventory\ItemStack.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\Generator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\Light3.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Message.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Chat\ChatMessage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\NetworkMessage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\Packet.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\TypeSerializer.cs" />
@@ -91,5 +102,9 @@
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Game\Items\" />
     <Folder Include="$(MSBuildThisFileDirectory)DataTypes\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Game\Structures\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Logging\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Chat\" />
+    <Folder Include="$(MSBuildThisFileDirectory)AssetManagement\" />
   </ItemGroup>
 </Project>

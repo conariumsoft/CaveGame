@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CaveGame.Core.Game.Entities;
+using CaveGame.Core.Game.Tiles;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,14 +9,26 @@ using System.Text;
 
 namespace CaveGame.Core
 {
-	public class CastResult
+
+	public struct TileRaycastResult
     {
-        public bool Hit { get; set; }
+		public bool Hit { get; set; }
+		public Tile Target { get; set; }
 		public Point TileCoordinates { get; set; }
 		public Vector2 Intersection { get; set; }
 		public Vector2 SurfaceNormal { get; set; }
 		public Face Face { get; set; }
-    }
+		
+	}
+
+	public struct EntityRaycastResult
+    {
+		public bool Hit { get; set; }
+		public IEntity Target { get; set; }
+		public Vector2 Intersection { get; set; }
+		public Vector2 SurfaceNormal { get; set; }
+		public Face Face { get; set; }
+	}
 
 	public struct LineSegment
 	{
@@ -31,10 +45,6 @@ namespace CaveGame.Core
 			B = b;
         }
 	}
-
-
-	
-
 
 	public static class CollisionSolver
 	{
@@ -62,8 +72,6 @@ namespace CaveGame.Core
 
 			if (top_hits || bottom_hits || left_hits || right_hits)
             {
-
-
 				intersection = seg.B;
 
 				if (top_hits && seg.A.Distance(top_intersect) < seg.A.Distance(intersection))
@@ -89,14 +97,8 @@ namespace CaveGame.Core
 					intersection = right_intersect;
 					collidingface = Face.Right;
 				}
-					
-
 				return true;
 			}
-			
-
-
-
 			return false;
 		}
 

@@ -18,7 +18,6 @@ namespace CaveGame.Core.Game.Tiles
 	public class Diode { }
 	public class NORGate { }
 	public class XANDGate { }
-	public class Delay { }
 	public class Pump { }
 	public class Pipe { }
 	public class Trapdoor { }

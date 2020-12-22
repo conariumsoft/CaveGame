@@ -69,7 +69,7 @@ namespace CaveGame.Core.Game.Tiles
 
 		// Tile Properties
 		public virtual float Friction => 1;
-		public virtual byte Opacity => 3;
+		public virtual byte Opacity => 48;
 		public virtual Color Color => Color.White;
 		public virtual Rectangle Quad => TileMap.Default;
 		public virtual byte Hardness => 2;

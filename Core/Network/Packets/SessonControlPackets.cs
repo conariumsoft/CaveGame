@@ -6,6 +6,13 @@ using System.Text;
 
 namespace CaveGame.Core.Network.Packets
 {
+
+
+	public class PingPacket : Packet
+    {
+		public PingPacket() : base(PacketType.netPing) { Payload = new byte[4]; } // pretty much empty lol
+		public PingPacket(byte[] data) : base(data) { }
+    }
 	/// <summary>
 	/// 
 	/// </summary>

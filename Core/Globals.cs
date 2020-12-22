@@ -18,17 +18,17 @@ namespace CaveGame.Core
 	{
 		public const int TileSize = 8;
 		public const int ChunkSize = 32;
-		public const string CurrentVersionString = "2.2.0";
-		public const string CurrentVersionFullString = "2.2.0 Beta";
-		public const int ProtocolVersion = 2;
+		public const string CurrentVersionString = "2.3.0";
+		public const string CurrentVersionFullString = "2.3.0 Beta";
+		public const int ProtocolVersion = 3;
 
 		public static UpdateDescription[] UpdateLog =
 		{
 			new UpdateDescription
 			{
-				VersionString = "2.2.0",
-				Date = "2020 November 27",
-				UpdateName = "Multiplayer Update 2",
+				VersionString = "2.3.0",
+				Date = "2020 XX XX",
+				UpdateName = "Multiplayer Update 2.3",
 				
 				ChangeLog = new string[]{
 					"+ Added Biomes",
@@ -48,7 +48,7 @@ namespace CaveGame.Core
 				},
 				Notes = new string[]{
 					"This version will be distributed to playtesters only.",
-					"2.2.1 will be released on Steam in one week."
+					"2.3 will be released on Steam in one week."
 				},
 			},
 			new UpdateDescription

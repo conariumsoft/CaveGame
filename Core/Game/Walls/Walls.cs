@@ -36,7 +36,7 @@ namespace CaveGame.Core.Game.Walls
 
 	public class Wall
 	{
-		public virtual byte Opacity => 1;
+		public virtual byte Opacity => 4;
 		public virtual Color Color => Color.Gray;
 		public virtual Rectangle Quad => TileMap.Default;
 		public virtual byte Hardness => 2;

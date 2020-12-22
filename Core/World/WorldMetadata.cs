@@ -6,8 +6,7 @@ using System.Xml;
 
 namespace CaveGame.Core
 {
-
-	public class WorldMetadata
+    public class WorldMetadata
 	{
 		public int Seed { get; set; }
 		public string Name { get; set; }

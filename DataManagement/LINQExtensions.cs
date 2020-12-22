@@ -1,9 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace DataManagement
 {
+    public interface IStatistic
+    {
+        decimal Comparator { get; set; }
+    }
+
+
     public static class LINQExtensions
     {
         // LINQ Extensions, borrowed from Jonathan Skeet
@@ -16,5 +23,13 @@ namespace DataManagement
                 action(element);
             }
         }
+
+        public static TStat GetMean<TStat>(this TStat[] collection) where TStat : IStatistic
+        {
+            //return collection. Average();
+            return default;
+        }
+
+
     }
 }
