@@ -210,7 +210,7 @@ namespace Editor
         public int TileCount { get; private set; }
         public int WallCount { get; private set; }
 
-        DelayedTask updateBarTask;
+        RepeatingIntervalTask updateBarTask;
 
         private void LoadTileInformation()
 		{
@@ -276,7 +276,7 @@ namespace Editor
             TilesVisible = true;
             WallsVisible = true;
             GridVisible = true;
-            updateBarTask = new DelayedTask(UpdateBar, (1 / 10.0f));
+            updateBarTask = new RepeatingIntervalTask(UpdateBar, (1 / 10.0f));
             TileDisplayInfo = "Awaiting Data";
             FPSDisplayInfo = "Awaiting FPS";
             StructureDisplayInfo = "Awaiting Structure";
@@ -313,7 +313,7 @@ namespace Editor
             base.Initialize();
 
 
-            Camera = new Camera2D(GraphicsDevice.Viewport) { Zoom = 0.5f };
+            Camera = new Camera2D { Zoom = 0.5f };
             
 		}
 

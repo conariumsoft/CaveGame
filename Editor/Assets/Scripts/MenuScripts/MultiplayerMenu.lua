@@ -9,8 +9,8 @@ local MultiplayerMenu = UIRoot();
 
 local inputHistory = MultiplayerInputHistory.Load();
 
-local GetButton = require("Assets.Scripts.MenuScripts.MenuButton");
-local GetInactiveButton = require("Assets.Scripts.MenuScripts.InactiveMenuButton");
+local GetButton = require("assets.scripts.MenuScripts.MenuButton");
+local GetInactiveButton = require("assets.scripts.MenuScripts.InactiveMenuButton");
 
 local title = Label(script, {
     BGColor = Color.Transparent,

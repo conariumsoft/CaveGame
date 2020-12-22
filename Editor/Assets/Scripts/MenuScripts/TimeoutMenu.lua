@@ -23,8 +23,8 @@ local message = Label(script,
     TextXAlign = TextXAlignment.Center,
 });
 
-local GetButton = require("Assets.Scripts.MenuScripts.MenuButton");
-local GetInactiveButton = require("Assets.Scripts.MenuScripts.InactiveMenuButton");
+local GetButton = require("assets.scripts.MenuScripts.MenuButton");
+local GetInactiveButton = require("assets.scripts.MenuScripts.InactiveMenuButton");
 
 local back = GetButton("BACK", TimeoutPage)
 back.OnLMBClick:Bind(function(ev, mb)
