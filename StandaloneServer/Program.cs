@@ -56,11 +56,8 @@ namespace StandaloneServer
 				return false;
 			};
 			SetConsoleCtrlHandler(_consoleCtrlHandler, true);
-			Task.Run(() => {
-				server.LoadPlugins();
-				server.Start();
-				server.Run();
-			});
+			server.LoadPlugins();
+			Task.Run(server.Start);
 			string inputBuf = "";
 
 			
