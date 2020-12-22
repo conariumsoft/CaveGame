@@ -97,9 +97,10 @@ local function OnJoinServer(address, username)
         return;
     end
 
-    game.CurrentGameContext = game.GameClientContext;
-    game.GameClientContext.NetworkUsername = username;
-    game.GameClientContext.ConnectAddress = address;
+    game:StartClient(username, address);
+    --game.CurrentGameContext = game.GameClientContext;
+    --game.GameClientContext.NetworkUsername = username;
+    --game.GameClientContext.ConnectAddress = address;
 
     inputHistory.IPAddress = address;
     inputHistory.Username = username;

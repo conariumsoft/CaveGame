@@ -79,8 +79,8 @@ buttonContainer.Parent = buttonList;
 -- Singleplayerbutton
 
 
-local GetButton = require("Assets.Scripts.MenuScripts.MenuButton");
-local GetInactiveButton = require("Assets.Scripts.MenuScripts.InactiveMenuButton");
+local GetButton = require("assets.scripts.MenuScripts.MenuButton");
+local GetInactiveButton = require("assets.scripts.MenuScripts.InactiveMenuButton");
 
 local spb = GetButton("SINGLEPLAYER", buttonContainer);
 spb.OnLMBClick:Bind(function(ev, mousedata)
@@ -92,7 +92,7 @@ end)
 	Parent = spb,
 	Color = Color.White,
 	TextureScale = 2,
-	Texture = GameTextures.Border,
+	Texture = GraphicsEngine.Instance.Border,
 	TopLeftCornerQuad = Rectangle(0, 0, 8, 8),
 	BottomLeftCornerQuad = Rectangle(0, 16, 8, 8),
 	LeftSideQuad = Rectangle(0, 8, 8, 8),
@@ -101,7 +101,7 @@ end)
 	RightSideQuad = Rectangle(16, 8, 8, 8),
 	BottomRightCornerQuad = Rectangle(16, 16, 8, 8),
 	BottomSideQuad = Rectangle(8, 16, 8, 8)
-})]]
+})]]--
 
 
 
@@ -157,7 +157,7 @@ local updateLog = UIListContainer();
 updateLog.Padding = 2;
 updateLog.Parent = changeLogContentWindow;
 
-local changeLogTextEntries = require("Assets.Scripts.MenuScripts.ChangeLogGenerator")
+local changeLogTextEntries = require("assets.scripts.MenuScripts.ChangeLogGenerator")
 
 
 for _, text in pairs(changeLogTextEntries) do
