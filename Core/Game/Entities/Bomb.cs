@@ -12,6 +12,8 @@ using CaveGame.Client;
 
 namespace CaveGame.Core.Game.Entities
 {
+
+	[Summonable]
 	public class Bomb : PhysicsEntity, IServerPhysicsObserver, IClientPhysicsObserver
 	{
 
@@ -94,7 +96,13 @@ namespace CaveGame.Core.Game.Entities
 			base.PhysicsStep(world, step);
 		}
 
-		public override void ServerUpdate(IGameServer server, GameTime gt)
+        public override void ClientUpdate(IGameClient client, GameTime gt)
+        {
+			//client.World.Lighting.InvokeLight(Position.ToTileCoords(), new Light3(64, 32, 0));
+            base.ClientUpdate(client, gt);
+        }
+
+        public override void ServerUpdate(IGameServer server, GameTime gt)
 		{
 			detonationCountdown += (float)gt.ElapsedGameTime.TotalSeconds*4;
 
@@ -113,7 +121,7 @@ namespace CaveGame.Core.Game.Entities
 				texture: gfx.BombSprite,
 				position: TopLeft,
 				quad: null,
-				color: Color.White,
+				color: Illumination.MultiplyAgainst(Color.White),
 				rotation: Rotation.Zero,
 				origin: Vector2.Zero,
 				scale: 0.75f,

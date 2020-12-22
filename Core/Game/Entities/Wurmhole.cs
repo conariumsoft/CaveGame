@@ -11,6 +11,7 @@ using System.Text;
 namespace CaveGame.Core.Game.Entities
 {
     // Würmhole
+    [Summonable]
     public class Wurmhole : PhysicsEntity, IServerPhysicsObserver, IClientPhysicsObserver, IThinker, ICanBleed, IProvokable
     {
         #region Sprite Quads

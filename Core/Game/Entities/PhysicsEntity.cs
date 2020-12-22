@@ -18,21 +18,19 @@ namespace CaveGame.Core.Game.Entities
 	public abstract class PhysicsEntity : Entity, IPhysicsEntity
 	{
 		public virtual Vector2 NextPosition { get; set; }
+
+		public virtual Vector2 RecentVelocity { get; set; }
+
 		public virtual Vector2 Velocity { get; set; }
 		public virtual Vector2 Friction { get; }
 		public abstract float Mass { get; }
 
-		public virtual Vector2 TopLeft
-		{
-			get { return Position - BoundingBox; }
-		}
+		
 
 		public bool FallThrough { get; set; }
 		public virtual bool InLiquid { get; set; }
 		public float LiquidViscosity { get; set; }
 		
-		public override Vector2 BoundingBox { get; }
-		public override Vector2 Position { get; set; }
 		
 
 		public virtual float Buoyancy => Mass;
@@ -44,8 +42,8 @@ namespace CaveGame.Core.Game.Entities
 		protected virtual void DrawHealth(GraphicsEngine GFX)
 		{
 			string hptext = Health + "/" + MaxHealth + " HP";
-			Vector2 hpbounds = GFX.Fonts.Arial8.MeasureString(Health + "/" + MaxHealth + " HP");
-			GFX.Text(GFX.Fonts.Arial8, hptext, Position - new Vector2(0, BoundingBox.Y + 3), Color.White, TextXAlignment.Center, TextYAlignment.Bottom);
+			Vector2 namebounds = GFX.Fonts.Arial8.MeasureString(Health + "/" + MaxHealth + " HP");
+			GFX.Text(GFX.Fonts.Arial8, hptext, Position - new Vector2(0, (namebounds.Y*2) + BoundingBox.Y), Color.White, TextXAlignment.Center, TextYAlignment.Top);
 		}
 
 		protected void InterpolateServerPosition() => Position = Position.Lerp(NextPosition, 0.5f);
@@ -202,7 +200,7 @@ namespace CaveGame.Core.Game.Entities
 				(int)Math.Floor(Position.Y / Globals.TileSize)
 			);
 
-			int bb = 4;
+			int bb = 3;
 			for (int x = -bb; x < bb; x++)
 			{
 				for (int y = -bb; y < bb; y++)
@@ -234,12 +232,19 @@ namespace CaveGame.Core.Game.Entities
 			}
 		}
 
+
+
+		Vector2 previousPos = Vector2.Zero;
 		public virtual void PhysicsStep(IGameWorld world, float step)
 		{
 			CollisionTest(world, step);
 			ApplyAirResistance(world, step);
 			ApplyGravity(world, step);
 
+
+			
+			RecentVelocity = previousPos - Position;
+			previousPos = Position;
 			Position = NextPosition;
 			NextPosition += Velocity;
 

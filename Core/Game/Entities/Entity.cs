@@ -8,7 +8,11 @@ using System.Text;
 namespace CaveGame.Core.Game.Entities
 {
 
-	
+	public class GameEntityAttribute : Attribute
+    {
+
+    }
+	public class Summonable : Attribute {}
 
 	public interface ICanBleed { }
 	
@@ -18,6 +22,7 @@ namespace CaveGame.Core.Game.Entities
 	}
 	public interface IEntity : IDamageSource
 	{
+		Rectangle GetCollisionRect();
 		Vector2 Position { get; set; }
 		Vector2 BoundingBox { get; }
 		int EntityNetworkID { get; set; }
@@ -32,6 +37,7 @@ namespace CaveGame.Core.Game.Entities
 		void Draw(GraphicsEngine engine);
 		void Damage(DamageType type, IDamageSource source, int amount);
 		void Damage(DamageType type, IDamageSource source, int amount, Vector2 direction);
+		Light3 Illumination { get; }
 	}
 
 
@@ -53,6 +59,9 @@ namespace CaveGame.Core.Game.Entities
 
 	public class Entity: IEntity
 	{
+		
+		public virtual Vector2 TopLeft => Position - BoundingBox;
+
 		#region Override Entity Properties
 		public virtual Vector2 BoundingBox { get; }
 		public virtual int Health { get; set; }
@@ -68,8 +77,10 @@ namespace CaveGame.Core.Game.Entities
 		public int EntityNetworkID { get; set; }
 		
 		public List<StatusEffect> ActiveEffects { get; private set; }
-        
-        
+
+		public Light3 Illumination { get; set; }
+
+		public Rectangle GetCollisionRect() => new Rectangle(TopLeft.ToPoint(), (BoundingBox*2).ToPoint());
         public void ClearActiveEffects() => ActiveEffects.Clear();
 
 		public void AddEffect(StatusEffect effect)
@@ -105,7 +116,7 @@ namespace CaveGame.Core.Game.Entities
 		public virtual void ClientUpdate(IGameClient client, GameTime gt) {
 			DurationAlive += gt.GetDelta();
 
-
+			Illumination = client.World.Lighting.GetLight(Position.ToTileCoords());
 		}
 
 		public virtual void ServerUpdate(IGameServer server, GameTime gt) {

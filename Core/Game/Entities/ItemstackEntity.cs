@@ -13,6 +13,7 @@ using System.Text;
 namespace CaveGame.Core.Game.Entities
 {
 	// client-relevant code
+	[Summonable]
 	public partial class ItemstackEntity : PhysicsEntity, IClientPhysicsObserver
 	{
 		public override float Mass => 0.3f;
