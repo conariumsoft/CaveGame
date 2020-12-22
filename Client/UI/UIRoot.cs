@@ -1,5 +1,5 @@
 ﻿#define UI_DEBUG
-#define AUTOCASTING_DEBUG
+//#define AUTOCASTING_DEBUG
 
 using CaveGame.Core;
 using CaveGame.Core.LuaInterop;
@@ -56,6 +56,7 @@ namespace CaveGame.Client.UI
 	public class UIRoot : UINode
 	{
 		public bool MouseOver => false;
+
 
 		public bool IsMouseInside(MouseState state) => false; // keep note this is intentionally off...
 

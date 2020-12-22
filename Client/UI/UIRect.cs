@@ -1,4 +1,5 @@
-﻿using CaveGame.Core;
+﻿#define UI_DEBUG
+using CaveGame.Core;
 using Microsoft.Xna.Framework;
 using NLua;
 using System;
@@ -13,17 +14,15 @@ namespace CaveGame.Client.UI
 	public class UIRect : UINode
 	{
 		public virtual bool MouseOver => IsMouseInside(Mouse.GetState());
-
         public UINode FindFirstChildWithName(string name) => Children.First(t => t.Name == name);
         public List<UINode> FindChildrenWithName(string name) => Children.FindAll(t => t.Name == name);
-
-
 
         public bool Debugging { get; set; }
 		public bool ParentOverride { get; set; }
 
         public UIRect()
         {
+			Debugging = true;
             Visible = true;
             Active = true;
             AnchorPoint = Vector2.Zero;
@@ -31,20 +30,14 @@ namespace CaveGame.Client.UI
             BorderSize = 1f;
         }
 
-		public UIRect(Lua state, LuaTable table) : this()
-		{
-            
-			
+		public UIRect(Lua state, LuaTable table) : this() => this.InitFromLuaPropertyTable(state, table);
 
-            this.InitFromLuaPropertyTable(state, table);
-		}
 
-        public virtual bool IsMouseInside(MouseState mouse)
-        {
-            return (mouse.X > AbsolutePosition.X && mouse.Y > AbsolutePosition.Y 
-                                                 && mouse.X < (AbsolutePosition.X + AbsoluteSize.X)
-                                                 && mouse.Y < (AbsolutePosition.Y + AbsoluteSize.Y));
-        }
+        public virtual bool IsMouseInside(MouseState mouse)=>
+			(mouse.X > AbsolutePosition.X && mouse.Y > AbsolutePosition.Y 
+            && mouse.X < (AbsolutePosition.X + AbsoluteSize.X)
+            && mouse.Y < (AbsolutePosition.Y + AbsoluteSize.Y));
+        
 
 		public bool ClipsDescendants { get; set; }
 
@@ -66,26 +59,15 @@ namespace CaveGame.Client.UI
 		public List<UINode> Children { get; set; }
 		public Vector2 AnchorPoint { get; set; }
 
-		public virtual Vector2 AbsoluteSize
-		{
-			get
-			{
-				var xSize = Size.Pixels.X + (Parent.AbsoluteSize.X * Size.Scale.X);
-				var ySize = Size.Pixels.Y + (Parent.AbsoluteSize.Y * Size.Scale.Y);
-
-				return new Vector2(xSize, ySize);
-			}
-		}
-		public virtual Vector2 AbsolutePosition
-		{
-			get
-			{
-				var xPos = Parent.AbsolutePosition.X + Position.Pixels.X + (Parent.AbsoluteSize.X * Position.Scale.X) - (AnchorPoint.X * AbsoluteSize.X);
-				var yPos = Parent.AbsolutePosition.Y + Position.Pixels.Y + (Parent.AbsoluteSize.Y * Position.Scale.Y) - (AnchorPoint.Y * AbsoluteSize.Y);
-
-				return new Vector2(xPos, yPos);
-			}
-		}
+		public virtual Vector2 AbsoluteSize => new Vector2(
+			Size.Pixels.X + (Parent.AbsoluteSize.X * Size.Scale.X),
+			Size.Pixels.Y + (Parent.AbsoluteSize.Y * Size.Scale.Y)
+		);
+		
+		public virtual Vector2 AbsolutePosition => new Vector2(
+			Parent.AbsolutePosition.X + Position.Pixels.X + (Parent.AbsoluteSize.X * Position.Scale.X) - (AnchorPoint.X * AbsoluteSize.X),
+			Parent.AbsolutePosition.Y + Position.Pixels.Y + (Parent.AbsoluteSize.Y * Position.Scale.Y) - (AnchorPoint.Y * AbsoluteSize.Y)
+		);
 
 		public UICoords Position { get; set; }
 		public UICoords Size { get; set; }
@@ -105,14 +87,15 @@ namespace CaveGame.Client.UI
 			}
 		}
 
-		//[Conditional("UI_DEBUG")]
+		[Conditional("UI_DEBUG")]
 		protected void DrawAnchorPoint(GraphicsEngine gfx)
 		{
 
-            
+			gfx.Circle(new Color(0, 0, 1.0f), AbsolutePosition , 2);
+			gfx.Circle(new Color(1, 1, 0.0f), AbsolutePosition+AbsoluteSize, 2);
 			gfx.Circle(new Color(0, 1, 0.0f), AbsolutePosition + (AnchorPoint * AbsoluteSize), 2);
-			gfx.Text($"abs pos{this.AbsolutePosition} size{this.AbsoluteSize}", AbsolutePosition);
-			gfx.Text($"{this.Children.Count} children", AbsolutePosition + new Vector2(0, 12));
+			//gfx.Text($"abs pos{this.AbsolutePosition} size{this.AbsoluteSize}", AbsolutePosition);
+			//gfx.Text($"{this.Children.Count} children", AbsolutePosition + new Vector2(0, 12));
 		}
 
 		public virtual void Draw(GraphicsEngine gfx)

@@ -7,6 +7,12 @@ using Microsoft.Xna.Framework.Input;
 
 namespace CaveGame.Client.UI
 {
+	public interface ITextComponent
+    {
+
+    }
+
+
 	public interface UIRootNode
 	{
 		/// <summary>
@@ -22,8 +28,7 @@ namespace CaveGame.Client.UI
 
 		bool IsMouseInside(MouseState ms);
 
-		bool Visible { get; }
-		bool Active { get; }
+		
 
 		Vector2 AnchorPoint { get; set; }
 		Vector2 AbsoluteSize { get; }
@@ -37,7 +42,8 @@ namespace CaveGame.Client.UI
 		bool MouseOver { get; }
 		UINode Parent { get; }
 		string Name { get; }
-
+		bool Visible { get; }
+		bool Active { get; }
 
 	}
 }
