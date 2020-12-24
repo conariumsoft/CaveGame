@@ -81,12 +81,6 @@ local function Timeout(message)
 end
 
 local function OnJoinServer(address, username) 
-    if address == "localhost" then
-        address = "127.0.0.1";
-    end
-    if not address:find(":") then
-        address = address .. ":40269"
-    end
     if #address == 0 then
         Timeout("Server Address is empty! Please enter a valid IP Address!");
         return;

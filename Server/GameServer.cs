@@ -91,11 +91,11 @@ namespace CaveGame.Server
 
 		public IMessageOutlet Output
 		{
-			get { return server.Output; }
-			set { server.Output = value; }
+			get { return NetworkServer.Output; }
+			set { NetworkServer.Output = value; }
 		}
 
-		private NetworkServer server;
+		public  NetworkServer NetworkServer { get; private set; }
 
 
 		public EntityManager EntityManager { get; private set; }
@@ -128,7 +128,7 @@ namespace CaveGame.Server
 
 			TickRate = config.TickRate;
 			
-			server = new NetworkServer(config.Port);
+			NetworkServer = new NetworkServer(config.Port);
 			ConnectedUsers = new List<User>();
 			World = new ServerWorld(worldmdt);
 			World.Server = this;
@@ -138,11 +138,16 @@ namespace CaveGame.Server
 			ServerTasks = new RepeatingIntervalTask[]
 			{
 				new (ReplicateNetworkEntitiesPhysicalStates, 1.0f/20.0f),
-
+				new (PingConnectedClients, 1.0f)
 			};
 
 		}
 
+		private void PingConnectedClients()
+        {
+			foreach (var user in ConnectedUsers)
+				SendTo(new PingPacket(), user);
+        }
 
 		private Dictionary<PacketType, NetworkListener> NetworkEvents;
 		private void InitNetworkEvents() => NetworkEvents = new Dictionary<PacketType, NetworkListener>()
@@ -174,9 +179,9 @@ namespace CaveGame.Server
 		}
 		private void HandshakeResponse(NetworkMessage msg)
 		{
-
+			GameConsole.Log("Handshake response!");
 			string[] playerslist = ConnectedUsers.Select(z => z.Username).ToArray();
-			server.SendPacket(
+			NetworkServer.SendPacket(
 				new HandshakeResponsePacket(
 					Globals.ProtocolVersion,
 					ServerName,
@@ -205,7 +210,7 @@ namespace CaveGame.Server
 				// username is taken
 				if (user.Username.Equals(packet.RequestedName))
 				{
-					server.SendPacket(new RejectJoinPacket("Username is taken!"), msg.Sender);
+					NetworkServer.SendPacket(new RejectJoinPacket("Username is taken!"), msg.Sender);
 					break;
 				}
 			}
@@ -309,7 +314,7 @@ namespace CaveGame.Server
 			chunk = World.RetrieveChunk(coords);
 
 			ChunkDownloadPacket chunkpacket = new ChunkDownloadPacket(chunk);
-			server.SendPacket(chunkpacket, msg.Sender);
+			NetworkServer.SendPacket(chunkpacket, msg.Sender);
 		}
 
 		private void OnClientPlaceWall(NetworkMessage msg, User user)
@@ -476,10 +481,10 @@ namespace CaveGame.Server
 
 		private void ReadIncomingPackets()
 		{
-			while (server.HaveIncomingMessage())
+			
+			while (NetworkServer.HaveIncomingMessage())
 			{
-				NetworkMessage msg = server.GetLatestMessage();
-
+				NetworkMessage msg = NetworkServer.GetLatestMessage();
 				if (msg.Packet.Type == PacketType.cHandshake)
 					HandshakeResponse(msg);
 				if (msg.Packet.Type == PacketType.cRequestLogin)
@@ -497,36 +502,6 @@ namespace CaveGame.Server
 				foreach (var ev in NetworkEvents)
 					if (ev.Key == msg.Packet.Type)
 						ev.Value.Invoke(msg, user);
-				#region old shit
-				/*if (msg.Packet.Type == PacketType.ClientQuit)
-					OnClientLogout(msg, user);
-				if (msg.Packet.Type == PacketType.ServerEntityPhysicsState)
-					OnPlayerPosition(msg, user);
-				if (msg.Packet.Type == PacketType.PlayerState)
-					OnPlayerState(msg, user);
-				if (msg.Packet.Type == PacketType.CChatMessage)
-					OnClientChat(msg, user);
-				if (msg.Packet.Type == PacketType.PlaceTile)
-					OnPlayerPlaceTile(msg, user);
-				if (msg.Packet.Type == PacketType.PlaceWall)
-					OnPlayerPlaceWall(msg, user);
-				if (msg.Packet.Type == PacketType.CRequestChunk)
-					OnClientRequestChunk(msg, user);
-				if (msg.Packet.Type == PacketType.PlayerThrowItemAction)
-					OnPlayerThrowItemAction(msg, user);
-				if (msg.Packet.Type == PacketType.PlaceFurniture)
-					OnPlaceFurniture(msg, user);
-				if (msg.Packet.Type == PacketType.RemoveFurniture)
-					OnRemoveFurniture(msg, user);
-				if (msg.Packet.Type == PacketType.OpenDoor)
-					OnPlayerOpensDoor(msg, user);
-				if (msg.Packet.Type == PacketType.CloseDoor)
-					OnPlayerClosesDoor(msg, user);
-				if (msg.Packet.Type == PacketType.DamageTile)
-					OnPlayerDamageTile(msg, user);
-				if (msg.Packet.Type == PacketType.cAdminCommand)
-					OnAdminCommandInput(msg, user);*/
-				#endregion
 			}
         }
 
@@ -572,6 +547,7 @@ namespace CaveGame.Server
 
 		public virtual void Update(GameTime gt)
 		{
+			NetworkServer.Update(gt);
 			ReadIncomingPackets();
 			HandleUserConnectionStates();
 
@@ -582,16 +558,15 @@ namespace CaveGame.Server
 			ConnectedUsers.Where(u => u.KeepAlive > 10.0f).ForEach(u => u.Kick("Network Timeout"));
 			ConnectedUsers.ToArray().Where(u => u.Kicked == true).ForEach(InternalUserKick); // InvalidOperationException
 			
-			World.Update(gt);
-			server.Update(gt);
+			World.Update(gt);	
 		}
 
 		public void Start()
 		{
-			server.Start();
+			NetworkServer.Start();
 			Running = true;
 
-			Task.Run(GameserverThreadLoop);
+			GameserverThreadLoop();
 		}
 		public virtual void Shutdown()
 		{
@@ -599,18 +574,18 @@ namespace CaveGame.Server
 			World.SaveData();
 			Thread.Sleep(100);
 		}
-		public void SendTo(Packet p, User user) => server.SendPacket(p, user.EndPoint);
+		public void SendTo(Packet p, User user) => NetworkServer.SendPacket(p, user.EndPoint);
 		public void SendToAll(Packet p)
 		{
 			foreach (var user in ConnectedUsers)
-				server.SendPacket(p, user.EndPoint);
+				NetworkServer.SendPacket(p, user.EndPoint);
 		}
 		public void SendToAllExcept(Packet p, User exclusion)
 		{
 			foreach (var user in ConnectedUsers)
 			{
 				if (!user.Equals(exclusion))
-					server.SendPacket(p, user.EndPoint);
+					NetworkServer.SendPacket(p, user.EndPoint);
 			}
 		}
 		public User GetConnectedUser(IPEndPoint ep)

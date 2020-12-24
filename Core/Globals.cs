@@ -14,13 +14,19 @@ namespace CaveGame.Core
 		
 	}
 
+
+
 	public static class Globals
 	{
+
+		public const int DEFAULT_PORT = 40269;
+		public const int ProtocolVersion = 3;
+
 		public const int TileSize = 8;
 		public const int ChunkSize = 32;
 		public const string CurrentVersionString = "2.3.0";
 		public const string CurrentVersionFullString = "2.3.0 Beta";
-		public const int ProtocolVersion = 3;
+		
 
 		public static UpdateDescription[] UpdateLog =
 		{

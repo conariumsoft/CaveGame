@@ -26,13 +26,25 @@ using System.Threading.Tasks;
 namespace CaveGame.Client
 {
 
-
+	
 
 
     using ArrowEntity = Core.Game.Entities.Arrow;
     using BombEntity = Core.Game.Entities.Bomb;
     using DynamiteEntity = Core.Game.Entities.Dynamite;
     using WurmholeEntity = Core.Game.Entities.Wurmhole;
+
+
+	public struct AuthDetails
+	{
+		public string UserName { get; set; }
+		public string ServerAddress { get; set; }
+
+
+		public string IPAddress => "";
+		public string Port => "";
+
+	}
 
 	public delegate void ClientShutdown();
 
@@ -41,8 +53,8 @@ namespace CaveGame.Client
 
 		public event ClientShutdown OnShutdown;
 
-		public string NetworkUsername { get; set; }
-		public string ConnectAddress { get; set; }
+		public string NetworkUsername { get; private set; }
+		public string ConnectAddress { get; private set; }
 		public bool Active { get; set; }
 
 		public static float CameraZoom = 2.0f;
@@ -95,6 +107,7 @@ namespace CaveGame.Client
 			[PacketType.sUpdateTile] = UpdateTile,
 			[PacketType.sUpdateWall] = UpdateWall,
 
+			[PacketType.netPing] = OnPing,
 			[PacketType.netPlaceTile] = UpdateTile,
 			[PacketType.netPlaceWall] = UpdateWall,
 
@@ -125,7 +138,10 @@ namespace CaveGame.Client
 
         public float ServerKeepAlive { get; set; }
 
-		public GameClient(CaveGameGL _game)
+
+		public GameClient(CaveGameGL _game) { } // empty???
+
+		public GameClient(CaveGameGL _game, AuthDetails login)
 		{
 			Game = _game;
 			InitNetworkEvents();
@@ -135,6 +151,10 @@ namespace CaveGame.Client
 			Chat      = new GameChat(this);
 			PauseMenu = new PauseMenu(this);
 			Inventory = new PlayerContainerFrontend();
+
+			NetworkUsername = login.UserName;
+			NetClient = new NetworkClient(login.ServerAddress);
+			
 
 			ClientTasks = new List<RepeatingIntervalTask>
 			{
@@ -174,7 +194,7 @@ namespace CaveGame.Client
 
 			World?.ClientDisconnect(); // start cleaning up server
 
-			NetClient?.Logout(MyUserID, UserDisconnectReason.LogOff);
+			//NetClient?.Logout(MyUserID, UserDisconnectReason.LogOff);
 			World?.Dispose(); // destroy local world
 			OnShutdown?.Invoke(); // bound to localserver (if it exists)
 			//Dispose();
@@ -243,7 +263,10 @@ namespace CaveGame.Client
 
 		public delegate void NetworkListener(NetworkMessage message);
 
-		private void OnPing(NetworkMessage message) { } // dont do jack 
+		private void OnPing(NetworkMessage message)
+		{ 
+			GameConsole.Log("Ping from server");
+		} 
 
 		private void DownloadChunk(NetworkMessage message)
 		{
@@ -554,6 +577,7 @@ namespace CaveGame.Client
 
 			if (!protocolMatches)
             {
+				GameConsole.Log($"Protocol Mismatch: server {packet.ServerProtocolVersion} vs client {Globals.ProtocolVersion} ");
 				Game.CurrentGameContext = Game.MenuContext;
 				Game.MenuContext.CurrentPage = Game.MenuContext.Pages["timeoutmenu"];
 
@@ -654,43 +678,42 @@ namespace CaveGame.Client
 			var tileat = World.GetTile((int)tileCoords.X, (int)tileCoords.Y);
 			var wallat = World.GetWall((int)tileCoords.X, (int)tileCoords.Y);
 
+			List<string> debugStats = new List<string>();
+
+
+			debugStats.Add($"userid {MyUserID} netaddr {ConnectAddress}");
+
+
+			//debugStats.Add($"in {Math.Round(NetClient.BytesReceivedPerSecond / 1000.0f, 2)}kb/s || {Math.Round(NetClient.TotalBytesReceived / 1000.0f, 2)}kb total || {NetClient.PacketsReceived}ct");
+			//debugStats.Add($"out {Math.Round(NetClient.BytesSentPerSecond / 1000.0f, 2)}kb/s || {Math.Round(NetClient.TotalBytesSent / 1000.0f, 2)}kb total || {NetClient.PacketsSent}ct");
+			if (World!=null)
+				debugStats.Add($"entities {World.Entities.Count} furn {World.Furniture.Count}");
 
 			if (MyPlayer != null)
-			{
-
-				string mObjData = String.Format("entities {0} furn {1}", World.Entities.Count, World.Furniture.Count);
-
-				string[] debugStats = {
-					String.Format("pos {0} {1} vel {2} {3}, rv {4} {5}",
+				debugStats.Add(String.Format("pos {0} {1} vel {2} {3}, rv {4} {5}",
 						Math.Floor(MyPlayer.Position.X / Globals.TileSize),
 						Math.Floor(MyPlayer.Position.Y / Globals.TileSize),
 						Math.Round(MyPlayer.Velocity.X, 2),
 						Math.Round(MyPlayer.Velocity.Y, 2),
 						Math.Round(MyPlayer.RecentVelocity.X, 2),
-						Math.Round(MyPlayer.RecentVelocity.Y, 2)
-				),
-					$"userid {MyUserID} netaddr {ConnectAddress}",
-					$"in {Math.Round(NetClient.BytesReceivedPerSecond/1000.0f, 2)}kb/s || {Math.Round(NetClient.TotalBytesReceived/1000.0f, 2)}kb total || {NetClient.PacketsReceived}ct",
-					$"out {Math.Round(NetClient.BytesSentPerSecond/1000.0f, 2)}kb/s || {Math.Round(NetClient.TotalBytesSent/1000.0f, 2)}kb total || {NetClient.PacketsSent}ct",
-					String.Format("tid {0}, state {1} tdmg {2} wid {3} wdmg {4} light {5}",
+						Math.Round(MyPlayer.RecentVelocity.Y, 2)));
+
+
+			debugStats.Add(String.Format("tid {0}, state {1} tdmg {2} wid {3} wdmg {4} light {5}",
 						tileat.ID,
 						tileat.TileState,
 						tileat.Damage,
 						wallat.ID,
 						wallat.Damage,
-						World.GetLight((int)tileCoords.X, (int)tileCoords.Y).ToString()
-				),
-					mObjData,
-				};
+						World.GetLight((int)tileCoords.X, (int)tileCoords.Y).ToString()));
 
-				int incr = 1;
-				foreach(var line in debugStats)
-                {
-					gfx.Text(line, new Vector2(2, incr * 14));
-					incr++;
-				}
-
+			int incr = 1;
+			foreach(var line in debugStats)
+            {
+				gfx.Text(line, new Vector2(2, incr * 14));
+				incr++;
 			}
+
 			gfx.End();
 		}
 
@@ -698,30 +721,17 @@ namespace CaveGame.Client
 		public void Load()
 		{
 			PauseMenu.LoadShader(Game.Content);
-			if (NetworkClient.IsAddressValidIPv4(ConnectAddress))
-			{
-				FailConnect("Server address is not a valid IPv4 address!");
-				return;
-			}
-			if (NetworkClient.IsServerOnline(ConnectAddress))
-            {
-				FailConnect("Failed to connect, server may be offline!");
-				return;
-            }
-			
 
-			NetClient = new NetworkClient(ConnectAddress);
-			//gameClient = new NetworkClient("127.0.0.1:40269");
-			//gameClient.Output = Game.Console;
 			NetClient.Start();
 			NetClient.SendPacket(new InitServerHandshakePacket(Globals.ProtocolVersion));
-			
 			//gameClient.SendPacket(new RequestJoinPacket("jooj"));
 		}
 
 		private void FailConnect(string reason)
         {
-
+			Game.MenuContext.CurrentPage = Game.MenuContext.TimeoutPage;
+			Game.MenuContext.TimeoutMessage = reason;
+			Game.CurrentGameContext = Game.MenuContext;
         }
 
 		public void Unload() {}
@@ -817,6 +827,7 @@ namespace CaveGame.Client
         {
 			currentKB = Keyboard.GetState();
 
+			
 			if (PressedThisFrame(Keys.P) && !MyPlayer.IgnoreInput)
 				if (MyPlayer != null) // teleport
 					MyPlayer.NextPosition = Camera.ScreenToWorldCoordinates(Mouse.GetState().Position.ToVector2());
@@ -832,7 +843,7 @@ namespace CaveGame.Client
 					PauseMenu.Open = !PauseMenu.Open;
 			}
 
-			if (PressedThisFrame(Keys.Tab) && !MyPlayer.IgnoreInput)
+					if (PressedThisFrame(Keys.Tab) && !MyPlayer.IgnoreInput)
 				Inventory.InventoryOpen = !Inventory.InventoryOpen;
 
 
@@ -848,7 +859,7 @@ namespace CaveGame.Client
 
 			FPSGraph.DataSet.Push(new FpsSample { Value = gt.GetDelta()});
 
-			NetClient.Update(gt);
+			//NetClient.Update(gt);
 			redrawTimer += gt.GetDelta();
 			
 			Profiler.StartRegion("Update");

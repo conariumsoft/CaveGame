@@ -15,180 +15,64 @@ using System.Threading.Tasks;
 
 namespace CaveGame.Client
 {
-	public class NetworkClient : SharedNetworkSubsystem
+	public class NetworkClient: SharedNetworkSubsystem
 	{
-		public IPEndPoint EndPoint
-		{
-			get {
-				IPEndPoint output = default;
-				bool success = IPEndPoint.TryParse(ServerHostname + ":"+ServerPort, out output);
+
+
+		public override string DeviceName => "NetworkClient";
+
+        public string ServerIPAddress { get; private set; }
+		public int ServerPort { get; private set; }
+
+
+		// parses shit like "localhost"
+		public static string ParseHostnameShortcuts(string hostname)
+        {
+			hostname = hostname.Trim();
+			if (hostname.Contains("localhost"))
+				hostname = hostname.Replace("localhost", "127.0.0.1");
+
+			if (!hostname.Contains(":"))
+				hostname += ":"+Globals.DEFAULT_PORT.ToString();
+
+			return hostname;
+		}
+
+		public static IPEndPoint GetEndPointFromAddress(string hostname)
+        {
+			bool success = IPEndPoint.TryParse(ParseHostnameShortcuts(hostname), out IPEndPoint output);
+			if (success)
 				return output;
-			}
+			throw new Exception($"Invalid IP Endpoint! {hostname}, {ParseHostnameShortcuts(hostname)}");
 		}
 
+		public IPEndPoint ServerAddress { get; private set; }
 
-
-		private ThreadSafeValue<bool> running = new ThreadSafeValue<bool>(false);
-		
-		public readonly string ServerHostname;
-		public readonly int ServerPort;
-
-		private ConcurrentQueue<NetworkMessage> incomingMessages;
-		private ConcurrentQueue<Packet> outgoingMessages;
-
-
-		public static bool IsServerOnline(string hostname)
-        {
-            try
-            {
-                Ping pingSender = new Ping();
-                PingOptions options = new PingOptions();
-                options.DontFragment = true;
-                string data = "CAVEGAME CAVEGAME CAVEGAME";
-                byte[] buffer = Encoding.ASCII.GetBytes(data);
-                int timeout = 120;
-
-                PingReply reply = pingSender.Send(hostname, timeout, buffer, options);
-                if (reply.Status == IPStatus.Success)
-                    return true;
-
-            }
-            catch (Exception ex)
-            {
-
-
-            }
-			return false;
-		}
-
-		public static bool IsAddressValidIPv4(string hostname)=>IPEndPoint.TryParse(hostname, out _);
-
-		public static HandshakeResponsePacket GetServerInformation(string hostname)
-        {
-
-			var tempClient = new NetworkClient(hostname);
-			return null;
-
-			// TODO: Finish
-        }
-
-		public NetworkClient(string ipaddress)
+		public NetworkClient(string hostname) : base()
 		{
-			IPEndPoint addr;
+			running = new ThreadSafeValue<bool>(false);
+			var endpoint = GetEndPointFromAddress(hostname);// = ParseHostnameShortcuts(hostname);
 
-			bool success = IPEndPoint.TryParse(ipaddress, out addr);
+			ServerAddress = endpoint;
 
-			ServerHostname = addr.Address.ToString();
-			ServerPort = addr.Port;
+			IncomingMessages = new ConcurrentQueue<NetworkMessage>();
+            OutgoingMessages = new ConcurrentQueue<OutgoingPayload>();
+            ServerPort = endpoint.Port;
+			ServerIPAddress = endpoint.Address.ToString();
 
-			UdpSocket = new UdpClient(ServerHostname, ServerPort);
-			IOControlFixICMPBullshit();
-		}
-
-		private void FlushOutgoingPackets()
-        {
-			int outQCount = outgoingMessages.Count;
-			// write out queued messages
-			for (int i = 0; i < outQCount; i++)
-			{
-				Packet packet;
-				bool have = outgoingMessages.TryDequeue(out packet);
-
-				if (have)
-				{
-					packet.Send(UdpSocket);
-					PacketsSent++;
-					TotalBytesSent += packet.Payload.Length;
-					InternalSendCount += packet.Payload.Length;
-				}
-			}
-		}
-
-		private void ReadIncomingPackets()
-        {
-			IPEndPoint ep = new IPEndPoint(IPAddress.Any, 0);
-			byte[] data = UdpSocket.Receive(ref ep);
-
-			NetworkMessage nm = new NetworkMessage();
-			nm.Sender = ep;
-			nm.Packet = new Packet(data);
-			nm.ReceiveTime = DateTime.Now;
-
-			incomingMessages.Enqueue(nm);
-			PacketsReceived++;
-			TotalBytesReceived += nm.Packet.Payload.Length;
-			InternalReceiveCount += nm.Packet.Payload.Length;
-			LatestReceiveTimestamp = DateTime.Now;
-		}
-
-		
-		private void NetworkThreadLoop()
-		{
-			GameConsole.Log("NetworkClientSubsystem thread started.");
-			while (running.Value) {
-				bool canRead = UdpSocket.Available > 0;
-				int outgoingMessageQueueCount = outgoingMessages.Count;
-
-				// get data if there's any
-				if (canRead)
-					ReadIncomingPackets();
-
-				FlushOutgoingPackets();
-
-				// if nothing happened, take a nap
-				if (!canRead && (outgoingMessageQueueCount == 0))
-					Thread.Sleep(NAP_TIME_MILLISECONDS);
-			}
+			UdpSocket = new UdpClient(ServerIPAddress, ServerPort);
 
 			
-			UdpSocket.Close();
-			UdpSocket.Dispose();
-			GameConsole.Log("NetworkClientSubsystem thread stopped.");
-		}
-
-		public void SendPacket(Packet packet)
-		{
-			//Output?.Out("client: Sending packet " + packet.Type.ToString(), Color.Cyan);
-			outgoingMessages.Enqueue(packet);
-			LatestSendTimestamp = DateTime.Now;
+			//UdpSocket.Connect(endpoint);
+			//IOControlFixICMPBullshit();
 		}
 
 		public void Logout(int userID, UserDisconnectReason reason)
         {
 			SendPacket(new DisconnectPacket(userID, reason));
-			Stop();
+			Close();
 		}
 
-		public void Start()
-		{
-			running.Value = true;
-			Task.Factory.StartNew(NetworkThreadLoop);
-		}
-
-		public void Stop()
-		{
-			running.Value = false;
-		}
-
-		
-		public override void Update(GameTime gt)
-        {
-			base.Update(gt);
-        }
-
-		public bool HaveIncomingMessage() => incomingMessages.Count > 0;
-
-		public NetworkMessage GetLatestMessage()
-		{
-			NetworkMessage msg;
-			bool success = incomingMessages.TryDequeue(out msg);
-
-			if (success)
-			{
-				return msg;
-			}
-			throw new Exception("No Message Queued! Used HaveIncomingMessage() to check!");
-		}
-
-	}
+		public void SendPacket(Packet packet) => Send(packet);
+    }
 }

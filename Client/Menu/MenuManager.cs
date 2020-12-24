@@ -28,6 +28,9 @@ namespace CaveGame.Client.Menu
 
 		public bool Active { get; set; }
 
+
+		public UIRoot TimeoutPage => Pages["timeoutmenu"];
+
 		Microsoft.Xna.Framework.Game IGameContext.Game => Game;
 
 		public Dictionary<string, UIRoot> Pages { get; set; }
@@ -43,7 +46,12 @@ namespace CaveGame.Client.Menu
             }
 		}
 
-		public string TimeoutMessage { get; set; }
+		public string TimeoutMessage
+		{
+			get => TimeoutPage.FindNode<Label>("MessageLabel").Text;
+			set => TimeoutPage.FindNode<Label>("MessageLabel").Text = value;
+            
+		}
 
 		RasterizerState rastering;
 		public MenuManager(CaveGameGL _game)

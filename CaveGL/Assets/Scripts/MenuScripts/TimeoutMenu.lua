@@ -8,13 +8,14 @@ local TimeoutPage = UIRoot();
 
 local message = Label(script,
 {
-    BGColor = Color.Transparent,
+    Name = "MessageLabel",
+    BGColor = Color(0,0,0,0.5),
     BorderColor = Color.Transparent,
     Size = UICoords(0, 0, 1.0, 0.1),
     AnchorPoint = Vector2(0.5, 0.5),
     Position = UICoords(0, 0, 0.5, 0.3),
     Parent = TimeoutPage,
-    Text = menumanager.TimeoutMessage,
+    Text = "blank",
     TextColor = Color.White,
     Font = GraphicsEngine.Instance.Fonts.Arial16,
     BorderSize = 0,

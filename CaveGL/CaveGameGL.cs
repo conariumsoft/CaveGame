@@ -74,7 +74,7 @@ namespace CaveGame.Client
 		{
 			var serverCFG = new ServerConfig
 			{
-				Port = 40270, // singleplayer server uses slightly different port
+				Port = 40269, // singleplayer server uses slightly different port
 				World = meta.Name,
 				ServerName = $"LocalServer [{meta.Name}] ",
 				ServerMOTD = "Singleplayer game world.",
@@ -82,9 +82,9 @@ namespace CaveGame.Client
 			var worldMDT = meta;
 			LocalServer server = new LocalServer(serverCFG, worldMDT);
 			server.Output = Console;
-			Task.Run(server.Start);
+			Task.Factory.StartNew(server.Start);
 
-			StartClient(SteamManager.SteamUsername, "127.0.0.1:40270");
+			StartClient(SteamManager.SteamUsername, "127.0.0.1:40269");
 			CurrentGameContext = GameClientContext;
 			GameClientContext.OnShutdown += server.Shutdown;
 		}
@@ -93,9 +93,11 @@ namespace CaveGame.Client
 		public void StartClient(string userName, string address) 
 		{
 			GameClientContext?.Dispose();
-			GameClientContext = new GameClient(this);
-			GameClientContext.NetworkUsername = userName;
-			GameClientContext.ConnectAddress = address;
+			GameClientContext = new GameClient(this, new AuthDetails {
+				UserName      = userName, 
+				ServerAddress = address 
+			});
+
 			CurrentGameContext = GameClientContext;
 		}
 

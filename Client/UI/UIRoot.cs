@@ -63,6 +63,7 @@ namespace CaveGame.Client.UI
         public UINode FindFirstChildWithName(string name) => Children.First(t => t.Name == name);
         public List<UINode> FindChildrenWithName(string name) => Children.FindAll(t => t.Name == name);
 
+		public TNode FindNode<TNode>(string name) => (TNode)Children.Where(t => (t is TNode)).First(t => t.Name == name);
 
 
 
