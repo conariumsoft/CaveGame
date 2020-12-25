@@ -63,7 +63,10 @@ namespace CaveGame.Core.Furniture
 		}
 
 		
+		public virtual void OnClientUpdate(IGameClient client)
+        {
 
+        }
 		public virtual void OnCollide(){}
 		public virtual void OnPlayerInteracts(Player player, IGameWorld world, IGameClient client) { }
 		public virtual void Draw(GraphicsEngine gfx)

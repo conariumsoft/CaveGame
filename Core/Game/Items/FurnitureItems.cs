@@ -44,14 +44,12 @@ namespace CaveGame.Core.Game.Items
 				client.Send(new PlaceFurniturePacket((byte)FurnitureID.Furnace, 0, pos.X, pos.Y));
 			}
 		}
-
-
 	}
 
 
 	public class DoorItem : FurnitureItem
 	{
-		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale) => Draw(GFX, GFX.Furnace, position, scale);
+		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale) => Draw(GFX, GFX.Door, position, scale);
 		public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
 		{
 			MouseState mouse = Mouse.GetState();

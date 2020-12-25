@@ -123,7 +123,7 @@ namespace CaveGame.Core
 			{
 				for (int y = 0; y < Globals.ChunkSize; y++)
 				{
-					Walls[x, y].Decode(ref data, dIndex);
+					Walls[x, y].Encode(ref data, dIndex);
 					dIndex += 4;
 				}
 			}

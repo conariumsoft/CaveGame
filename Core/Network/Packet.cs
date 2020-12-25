@@ -66,13 +66,21 @@ namespace CaveGame.Core.Network
 		netPlaceTile,
 		netPlaceWall,
 		netDamageWall,
+
 		netOpenDoor, netCloseDoor,
-		netPlaceFurniture,
+
+		netPlaceFurniture, netRemoveFurniture,
 		netEntityPhysicsUpdate,
 		netPlayerState,
 		#endregion
 
 		#region Client-Sender Packets
+		// reusable packets
+		cUseFurnitureGeneric,
+
+
+		//
+
 		cHandshake,
 		cRequestLogin,
 		cConfirmLogin,
@@ -102,7 +110,7 @@ namespace CaveGame.Core.Network
 		sSpawnItemStackEntity,
 		sRemoveEntity,
 		
-		sOpenDoor, sCloseDoor,
+		//sOpenDoor, sCloseDoor,
 		sPlaceFurniture, sRemoveFurniture,
 		
 		sGivePlayerItem,
@@ -500,7 +508,7 @@ namespace CaveGame.Core.Network
 	}
 	public class PlaceFurniturePacket : Packet
 	{
-		public PlaceFurniturePacket(byte furnitureid, int netid, int x, int y) : base(PacketType.sPlaceFurniture) {
+		public PlaceFurniturePacket(byte furnitureid, int netid, int x, int y) : base(PacketType.netPlaceFurniture) {
 			Payload = new byte[16];
 			FurnitureID = furnitureid;
 			NetworkID = netid;
@@ -539,7 +547,7 @@ namespace CaveGame.Core.Network
 			get { return (Direction)Payload[5]; }
 			set { Payload[5] = (byte)value;}
 		}
-		public OpenDoorPacket(int id, Direction dir) : base(PacketType.sOpenDoor) {
+		public OpenDoorPacket(int id, Direction dir) : base(PacketType.netOpenDoor) {
 			Payload = new byte[16];
 			FurnitureNetworkID = id;
 			Direction = dir;
@@ -553,7 +561,7 @@ namespace CaveGame.Core.Network
 			get { return TypeSerializer.ToInt(Payload, 0); }
 			set { TypeSerializer.FromInt(ref Payload, 0, value); }
 		}
-		public CloseDoorPacket(int id) : base(PacketType.sCloseDoor)
+		public CloseDoorPacket(int id) : base(PacketType.netCloseDoor)
 		{
 			Payload = new byte[8];
 			FurnitureNetworkID = id;
@@ -563,7 +571,7 @@ namespace CaveGame.Core.Network
 
 	public class RemoveFurniturePacket : Packet
 	{
-		public RemoveFurniturePacket(int id) : base(PacketType.sRemoveFurniture) {
+		public RemoveFurniturePacket(int id) : base(PacketType.netRemoveFurniture) {
 			Payload = new byte[12];
 			FurnitureNetworkID = id;
 		}
@@ -609,9 +617,16 @@ namespace CaveGame.Core.Network
 		}
 
 		public PlayerStatePacket(byte[] data) : base(data) { }
-
-
 	}
+
+
+	public class ReplicateFurniturePlacedPacket : Packet
+    {
+		public ReplicateFurniturePlacedPacket() : base(PacketType.sPlaceFurniture)
+        {
+
+        }
+    }
 
 	public class ClientChatMessagePacket : Packet
 	{

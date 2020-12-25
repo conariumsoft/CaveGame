@@ -33,7 +33,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Game\StatusEffects\StatusEffect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Bomb.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\PhysicsEntity.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Game\Inventory\FurnitureItems.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Items\FurnitureItems.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Tiles\FlowerTiles.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Tiles\GlassTiles.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Tiles\GrassTiles.cs" />

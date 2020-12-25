@@ -1,10 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using DataManagement;
+using Microsoft.Xna.Framework;
 using System;
 using System.Runtime.InteropServices;
 
 namespace CaveGame.Core
 {
-
 	/// <summary>
 	/// A structure representing lighting value in-game
 	/// Roughly equatable to a color struct, but with specialized
@@ -24,6 +24,8 @@ namespace CaveGame.Core
 		[FieldOffset(1)] public byte Blue;
 		[FieldOffset(2)] public byte Green;
 
+
+
 		public Light3(byte r, byte g, byte b)
 		{
 			Red = r;
@@ -31,12 +33,12 @@ namespace CaveGame.Core
 			Blue = b;
 		}
 
-		public Light3(float r, float g, float b)
+		/*public Light3(float r, float g, float b)
         {
 			Red =   (byte)(r * 255);
 			Green = (byte)(g * 255);
 			Blue =  (byte)(b * 255);
-        }
+        }*/
 
 		public bool Equals(Light3 other)=>(other.Red == Red && other.Blue == Blue && other.Green == Green);
 
@@ -57,9 +59,9 @@ namespace CaveGame.Core
 		public static Color operator *(Light3 l, Color c) => l.MultiplyAgainst(c);
 		public static Color operator *(Color c, Light3 l) => l.MultiplyAgainst(c);
 
-		public static Light3 operator +(Light3 a, Light3 b) => new Light3(a.Red + b.Red, a.Green + b.Green, a.Blue + b.Blue);
+		public static Light3 operator +(Light3 a, Light3 b) => new Light3(a.Red.AddByte(b.Red), a.Green.AddByte(b.Green), a.Blue.AddByte(b.Blue));
 
-		public static Light3 operator -(Light3 a, Light3 b) => new Light3(a.Red - b.Red, a.Green -b.Green, a.Blue - b.Blue);
+		public static Light3 operator -(Light3 a, Light3 b) => new Light3(a.Red.SubtractByte(b.Red), a.Green.SubtractByte(b.Green), a.Blue.SubtractByte(b.Blue));
 
 		public Light3 Absorb(byte opacity)
 		{

@@ -6,6 +6,7 @@ using CaveGame.Client.UI;
 using CaveGame.Core;
 using CaveGame.Core.Furniture;
 using CaveGame.Core.Game.Entities;
+using CaveGame.Core.Game.Inventory;
 using CaveGame.Core.Game.Items;
 using CaveGame.Core.Game.Tiles;
 using CaveGame.Core.Game.Walls;
@@ -69,16 +70,6 @@ namespace CaveGame.Client
 
 		protected NetworkClient NetClient { get; set; }
 
-
-		protected struct FpsSample : GraphSample
-        {
-			public double Value { get; set; }
-
-        }
-		
-		protected GraphRenderer<FpsSample> FPSGraph { get; private set; }
-
-
 		Microsoft.Xna.Framework.Game IGameContext.Game => Game;
 		IClientWorld IGameClient.World => World;
 		//public Hotbar Hotbar { get; set; }
@@ -88,10 +79,7 @@ namespace CaveGame.Client
 		int MyUserID;
 		int MyPlayerID;
 
-		
-
 		public Game.Entities.LocalPlayer MyPlayer { get; private set; }
-
 
 		PauseMenu PauseMenu { get; set; }
 
@@ -107,28 +95,30 @@ namespace CaveGame.Client
 			[PacketType.sUpdateTile] = UpdateTile,
 			[PacketType.sUpdateWall] = UpdateWall,
 
+			// TODO: eventually stop using multi-way packets to reduce weirdness
 			[PacketType.netPing] = OnPing,
 			[PacketType.netPlaceTile] = UpdateTile,
 			[PacketType.netPlaceWall] = UpdateWall,
+			[PacketType.netOpenDoor] = OnPlayerOpensDoor,
+			[PacketType.netCloseDoor] = OnPlayerClosesDoor,
+			[PacketType.netEntityPhysicsUpdate] = OnEntityPhysUpdate,
+			[PacketType.netPlayerState] = OnPlayerAnimationStateUpdate,
+			[PacketType.netDamageTile] = OnDamageTile,
+			[PacketType.netPlaceFurniture] = OnPlaceFurniture,
+			[PacketType.netRemoveFurniture] = OnRemoveFurniture,
 
 			[PacketType.sRejectLogin] = OnServerRejectLogin,
 			[PacketType.sAcceptLogin] = OnServerAcceptLogin,
 			[PacketType.sPlayerPeerJoined] = OnPeerJoined,
 			[PacketType.sPlayerPeerLeft]  = OnPeerLeft,
 			[PacketType.sRemoveEntity] = OnRemoveEntity,
-			[PacketType.netEntityPhysicsUpdate] = OnEntityPhysUpdate,
 			[PacketType.sExplosion] = OnExplosion,
 			[PacketType.sSpawnEntityGeneric] = OnEntitySpawnGeneric,
-			[PacketType.sPlaceFurniture] = OnPlaceFurniture,
-			[PacketType.sRemoveFurniture] = OnRemoveFurniture,
-			[PacketType.sOpenDoor] = OnPlayerOpensDoor,
-			[PacketType.sCloseDoor] = OnPlayerClosesDoor,
 			[PacketType.sUpdateTimeOfDay] = OnServerChangedTimeOfDay,
 			[PacketType.sSpawnItemStackEntity] = OnItemStackEntitySpawned,
-			[PacketType.netDamageTile] = OnDamageTile,
 			[PacketType.sGivePlayerItem] = GiveItToMeDaddy,
 			[PacketType.sProvokeEntityGeneric] = OnEntityProvokedGeneric,
-			[PacketType.netPlayerState] = OnPlayerAnimationStateUpdate,
+			
 		};
 
         internal void Dispose()
@@ -164,40 +154,79 @@ namespace CaveGame.Client
 			};
 
 
-			FPSGraph = new GraphRenderer<FpsSample>
+			/*FPSGraph = new GraphRenderer<FpsSample>
 			{
-				BackgroundColor = new Color(0.1f, 0.1f, 0.1f)*0.5f,
-				ScreenPosition = new Vector2(50, 400),
-				GraphSize = new Vector2(500, 200),
+				
+				BackgroundColor = new Color(0.2f, 0.2f, 0.4f)*0.5f,
+				ScreenPosition = new Vector2(50, 500),
+				GraphSize = new Vector2(300, 120),
 				GraphName = "FPS",
 				YAxisMin = 0,
-				Scale = 1000,
-				YAxisMax = 120,
-				DataSet = new GraphRecorder<FpsSample>
-                {
-					SampleCount = 500,
-					Color = Color.Yellow,
-
-                },
+				Scale = 0.5f,
+				YAxisMax = 240,
+			};
+			AverageData = new GraphRecorder<FpsSample>
+			{
+				Boldness = 2.0f,
+				Name = "Average FPS",
+				SampleCount = 500,
+				Color = Color.Yellow,
 
 			};
+			ImmediateData = new GraphRecorder<FpsSample>
+			{
+				Boldness = 1.0f,
+				Name = "FPS",
+				SampleCount = 500,
+				Color = Color.Gray*0.5f,
+
+			};*/
 
 
 
 			ChunkingRadius = 1;
 		}
+		protected struct FpsSample : GraphSample
+		{
+			public double Value { get; set; }
+		}
 
-		
+		//protected GraphRenderer<FpsSample> FPSGraph { get; private set; }
+		//GraphRecorder<FpsSample> ImmediateData;
+		//GraphRecorder<FpsSample> AverageData;
+
 		private void Uncouple()
         {
 			PauseMenu.Open = false;
 
 			World?.ClientDisconnect(); // start cleaning up server
 
-			//NetClient?.Logout(MyUserID, UserDisconnectReason.LogOff);
+			NetClient?.Logout(MyUserID, UserDisconnectReason.LogOff);
 			World?.Dispose(); // destroy local world
 			OnShutdown?.Invoke(); // bound to localserver (if it exists)
 			//Dispose();
+		}
+
+		private void FillInventory(Container container)
+        {
+			container.ForceSetSlot(0, 0, new ItemStack { Item = new RaycastTesterItem(), Quantity = 1 });
+			//Inventory.Container.ForceSetSlot(0, 0, new ItemStack {Item = new CopperPickaxe(), Quantity = 1 });
+			container.ForceSetSlot(0, 1, new ItemStack { Item = new IronPickaxe(), Quantity = 1 });
+			container.ForceSetSlot(0, 2, new ItemStack { Item = new LeadPickaxe(), Quantity = 1 });
+			container.ForceSetSlot(1, 0, new ItemStack { Item = new TileItem(new Core.Game.Tiles.OakPlank()), Quantity = 999 });
+			container.ForceSetSlot(1, 1, new ItemStack { Item = new GenericWallScraper(), Quantity = 1 });
+			container.ForceSetSlot(2, 0, new ItemStack { Item = new TileItem(new Core.Game.Tiles.StoneBrick()), Quantity = 999 });
+			container.ForceSetSlot(3, 0, new ItemStack { Item = new TileItem(new Core.Game.Tiles.ClayBrick()), Quantity = 999 });
+			container.ForceSetSlot(4, 0, new ItemStack { Item = new BombItem(), Quantity = 999 });
+			container.ForceSetSlot(5, 0, new ItemStack { Item = new TileItem(new RedTorch()), Quantity = 999 });
+			container.ForceSetSlot(6, 0, new ItemStack { Item = new TileItem(new GreenTorch()), Quantity = 999 });
+			container.ForceSetSlot(7, 0, new ItemStack { Item = new TileItem(new BlueTorch()), Quantity = 999 });
+			container.ForceSetSlot(8, 0, new ItemStack { Item = new TileItem(new Torch()), Quantity = 999 });
+			container.ForceSetSlot(9, 0, new ItemStack { Item = new TileItem(new Water()), Quantity = 999 });
+			container.ForceSetSlot(2, 1, new ItemStack { Item = new FurnaceItem(), Quantity = 999 });
+			container.ForceSetSlot(3, 1, new ItemStack { Item = new DoorItem(), Quantity = 999 });
+			container.ForceSetSlot(4, 1, new ItemStack { Item = new WorkbenchItem(), Quantity = 999 });
+			container.ForceSetSlot(5, 1, new ItemStack { Item = new WallItem(new Core.Game.Walls.StoneBrick()), Quantity = 999 });
 		}
 
 		public void Disconnect()
@@ -265,7 +294,7 @@ namespace CaveGame.Client
 
 		private void OnPing(NetworkMessage message)
 		{ 
-			GameConsole.Log("Ping from server");
+			//GameConsole.Log("Ping from server");
 		} 
 
 		private void DownloadChunk(NetworkMessage message)
@@ -274,12 +303,8 @@ namespace CaveGame.Client
 
 			Task.Run(() =>
 			{
-			//Stopwatch stopWatch = new Stopwatch();
-			//stopWatch.Start();
-			Chunk chunk = chunkdata.StoredChunk;
-			//stopWatch.Stop();
-		//	GameConsole.Log($"ChunkDecode: {stopWatch.ElapsedMilliseconds}(ms)");
 
+				Chunk chunk = chunkdata.StoredChunk;
 				// Did we ask for this chunk?
 				if (World.RequestedChunks.Contains(chunk.Coordinates))
 				{
@@ -289,9 +314,8 @@ namespace CaveGame.Client
 					World.Lighting.RegisterChunk(chunk);
 				}
 			});
-			
-			
 		}
+
 		private void UpdateTile(NetworkMessage message)
 		{
 			PlaceTilePacket packet = new PlaceTilePacket(message.Packet.GetBytes());
@@ -405,25 +429,8 @@ namespace CaveGame.Client
 			MyPlayer = myplayer;
 			World.Entities.Add(myplayer);
 			Inventory.Player = myplayer;
-			Inventory.Container.ForceSetSlot(0, 0, new ItemStack { Item = new RaycastTesterItem(), Quantity = 1 });
-			//Inventory.Container.ForceSetSlot(0, 0, new ItemStack {Item = new CopperPickaxe(), Quantity = 1 });
-			Inventory.Container.ForceSetSlot(0, 1, new ItemStack { Item = new IronPickaxe(), Quantity = 1 });
-			Inventory.Container.ForceSetSlot(0, 2, new ItemStack { Item = new LeadPickaxe(), Quantity = 1 });
-			Inventory.Container.ForceSetSlot(1, 0, new ItemStack { Item = new TileItem(new Core.Game.Tiles.OakPlank()), Quantity = 999 });
-			Inventory.Container.ForceSetSlot(1, 1, new ItemStack { Item = new GenericWallScraper(), Quantity = 1 });
-			Inventory.Container.ForceSetSlot(2, 0, new ItemStack { Item = new TileItem(new Core.Game.Tiles.StoneBrick()), Quantity = 999 });
-			Inventory.Container.ForceSetSlot(3, 0, new ItemStack { Item = new TileItem(new Core.Game.Tiles.ClayBrick()), Quantity = 999 });
-			Inventory.Container.ForceSetSlot(4, 0, new ItemStack { Item = new BombItem(), Quantity = 999 });
-			Inventory.Container.ForceSetSlot(5, 0, new ItemStack { Item = new TileItem(new RedTorch()), Quantity = 999 });
-			Inventory.Container.ForceSetSlot(6, 0, new ItemStack { Item = new TileItem(new GreenTorch()), Quantity = 999 });
-			Inventory.Container.ForceSetSlot(7, 0, new ItemStack { Item = new TileItem(new BlueTorch()), Quantity = 999 });
-			Inventory.Container.ForceSetSlot(8, 0, new ItemStack { Item = new TileItem(new Torch()), Quantity = 999 });
-			Inventory.Container.ForceSetSlot(9, 0, new ItemStack { Item = new TileItem(new Water()), Quantity = 999 });
-
-			Inventory.Container.ForceSetSlot(2, 1, new ItemStack { Item = new WallItem(new Core.Game.Walls.ClayBrick()), Quantity = 999 });
-			Inventory.Container.ForceSetSlot(3, 1, new ItemStack { Item = new WallItem(new Core.Game.Walls.Dirt()), Quantity = 999 });
-			Inventory.Container.ForceSetSlot(4, 1, new ItemStack { Item = new WallItem(new Core.Game.Walls.OakPlank()), Quantity = 999 });
-			Inventory.Container.ForceSetSlot(5, 1, new ItemStack { Item = new WallItem(new Core.Game.Walls.StoneBrick()), Quantity = 999 });
+			FillInventory(Inventory.Container);
+			
 		}
 
 		Random r = new Random();
@@ -857,7 +864,8 @@ namespace CaveGame.Client
 		public void Update(GameTime gt)
 		{
 
-			FPSGraph.DataSet.Push(new FpsSample { Value = gt.GetDelta()});
+			//AverageData.Push(new FpsSample { Value = Game.FPSCounter.GetAverageFramerate()});
+			//ImmediateData.Push(new FpsSample { Value = Game.FPSCounter.GetExactFramerate() });
 
 			//NetClient.Update(gt);
 			redrawTimer += gt.GetDelta();
@@ -1001,7 +1009,9 @@ namespace CaveGame.Client
 
 			GFX.Begin(SpriteSortMode.Immediate);
 			Profiler.Draw(GFX);
-			FPSGraph.Draw(GFX);
+		//	FPSGraph.Draw(GFX);
+			//FPSGraph.DrawLineGraph(GFX, ImmediateData);
+		//	FPSGraph.DrawLineGraph(GFX, AverageData);
 			GFX.End();
 		}
 	}

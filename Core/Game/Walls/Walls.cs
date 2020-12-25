@@ -69,7 +69,7 @@ namespace CaveGame.Core.Game.Walls
 			datagram[3 + pushIndex] = 0; // reserved for future uses
 		}
 
-		public virtual void Decode(ref byte[] datagram, int pullIndex) { }
+		public virtual void Decode(ref byte[] datagram, int pullIndex) {}
 
 		public static Wall Deserialize(ref byte[] datagram, int pullIndex)
 		{

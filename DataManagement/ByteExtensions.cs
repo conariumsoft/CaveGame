@@ -27,11 +27,10 @@ namespace DataManagement
         public static byte WriteLowerNibble(this byte src, byte nibble) => (byte)(src & 0xF0 + nibble);
         public static byte WriteUpperNibble(this byte src, byte nibble) => (byte)(src & 0x0F + (nibble << 4));
 
-        public static byte ProtectedSubtract(this byte num, byte sub)
-        {
+        public static byte SubtractByte(this byte num, byte sub)=> (byte)Math.Max(num-sub, 0);
 
-            return (byte)Math.Max(num-sub, 0);
-        }
+        public static byte AddByte(this byte num, byte add) => (byte)Math.Min(num + add, 255);
+
 
         public static string DumpHex(this byte[] data, int index = 0) => DumpHex(data, index, data.Length);
 

@@ -19,6 +19,8 @@ namespace CaveGame.Client.DebugTools
 
     public class GraphRecorder<TSample>: GraphDataset<TSample> where TSample : GraphSample
     {
+        public float Boldness { get; set; }
+        public string Name { get; set; }
         public Color Color { get; set; }
         public int SampleCount { get; set; }
         public List<TSample> Data { get; set; }
@@ -54,7 +56,7 @@ namespace CaveGame.Client.DebugTools
 
         public float Scale { get; set; }
         public Color BackgroundColor { get; set; }
-        public GraphRecorder<TSample> DataSet { get; set; }
+        //public GraphRecorder<TSample> DataSet { get; set; }
         private void DrawBackground(GraphicsEngine GFX)
         {
             GFX.Rect(BackgroundColor, ScreenPosition, GraphSize);
@@ -67,16 +69,27 @@ namespace CaveGame.Client.DebugTools
             return datapoint.Value * Scale;
         }
 
-        private void DrawReferenceLines(GraphicsEngine GFX)
+        private void DrawReferenceLine(GraphicsEngine GFX, float value, string label, Color color)
         {
-
-            Vector2 datapoint = new Vector2(0, GraphSize.Y - (float)Scale * (1 / 60.0f));
+            Vector2 datapoint = new Vector2(0, GraphSize.Y - (float)Scale * (value));
             Vector2 linePos = ScreenPosition + datapoint;
-            GFX.Line(new Color(0.7f, 0.7f, 0.7f), linePos, linePos+GraphSize.GetX());
-            GFX.Text(GFX.Fonts.Arial10, "60fps", ScreenPosition + datapoint.GetY(), Color.White, TextXAlignment.Right, TextYAlignment.Center );
+            GFX.Line(color, linePos, linePos + GraphSize.GetX());
+            GFX.Text(GFX.Fonts.Arial10, label, ScreenPosition + datapoint.GetY(), color, TextXAlignment.Right, TextYAlignment.Center);
         }
 
-        private void DrawLineGraph(GraphicsEngine GFX, GraphDataset<TSample> data) 
+        private void DrawReferenceLines(GraphicsEngine GFX)
+        {
+            DrawReferenceLine(GFX, 120, "120FPS", Color.Gray);
+            DrawReferenceLine(GFX, 60, "60FPS", Color.Gray);
+
+
+           /* Vector2 datapoint30fps = new Vector2(0, GraphSize.Y - (float)Scale * (30.0f));
+            Vector2 linePos30fps = ScreenPosition + datapoint30fps;
+            GFX.Line(new Color(0.7f, 0.7f, 0.7f), linePos30fps, linePos30fps + GraphSize.GetX());
+            GFX.Text(GFX.Fonts.Arial10, "30fps", ScreenPosition + datapoint30fps.GetY(), Color.White, TextXAlignment.Right, TextYAlignment.Center);*/
+        }
+
+        public void DrawLineGraph(GraphicsEngine GFX, GraphRecorder<TSample> data) 
         {
             Vector2 lastDatapoint = GraphSize.GetY();
             float spacing = GraphSize.X / data.SampleCount;
@@ -89,9 +102,10 @@ namespace CaveGame.Client.DebugTools
 
             for (int idx = start; idx < data.Data.Count; idx++)
             {
-                Vector2 datapoint = new Vector2(spacing * idx, GraphSize.Y - (float)ScaleDatapoint(data.Data[idx]));
+                float clamped = Scale * (float)Math.Clamp(data.Data[idx].Value, YAxisMin, YAxisMax);
+                Vector2 datapoint = new Vector2(spacing * idx, GraphSize.Y - clamped);
 
-                GFX.Line(data.Color, ScreenPosition + lastDatapoint, ScreenPosition + datapoint);
+                GFX.Line(data.Color, ScreenPosition + lastDatapoint, ScreenPosition + datapoint, data.Boldness);
 
                 lastDatapoint = datapoint;
             }    
@@ -105,7 +119,7 @@ namespace CaveGame.Client.DebugTools
         {
             DrawBackground(GFX);
             DrawReferenceLines(GFX);
-            DrawLineGraph(GFX, DataSet);
+           //DrawLineGraph(GFX, DataSet);
         }
     }
 }
