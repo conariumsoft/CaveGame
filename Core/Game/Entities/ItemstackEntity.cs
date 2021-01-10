@@ -84,6 +84,7 @@ namespace CaveGame.Core.Game.Entities
 
 					if (this.Dead == false && player.User != null && ItemStack.Quantity > 0 && player.Position.Distance(Position) < 10)
 					{
+						
 						player.User.Send(new GivePlayerItemPacket(this.ItemStack));
 						// TODO: Add Item to player Inventory
 						this.Dead = true;

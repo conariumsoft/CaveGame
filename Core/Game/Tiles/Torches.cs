@@ -9,7 +9,6 @@ using System.Text;
 
 namespace CaveGame.Core.Game.Tiles
 {
-
 	public abstract class BaseTorch : Tile, INonSolid, ITileUpdate, IWaterBreakable
 	{
 		public override Color Color => FlameColor;
@@ -89,12 +88,12 @@ namespace CaveGame.Core.Game.Tiles
 	}
 	public class Torch : BaseTorch, ILightEmitter
 	{
-		public Light3 Light => new Light3(255, 230, 200);
+		public Light3 Light => new Light3(140, 140, 128);
 		public override Color FlameColor => new Color(1, 1, 0.8f);
 	}
 	public class WhiteTorch : BaseTorch, ILightEmitter
 	{
-		public Light3 Light => new Light3(255, 255, 255);
+		public Light3 Light => new Light3(128, 128, 128);
 		public override Color FlameColor => new Color(1, 1, 1f);
 	}
 	public class GreenTorch : BaseTorch, ILightEmitter

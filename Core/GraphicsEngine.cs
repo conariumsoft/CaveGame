@@ -33,8 +33,6 @@ namespace CaveGame.Core
 
     }
 
-    
-
     public class MissingGameDataException : ApplicationException { 
         public string MissingFilename { get; set; }
         public string MissingFilepath { get; set; }
@@ -309,18 +307,12 @@ namespace CaveGame.Core
 
         public void Update(GameTime gt)
         {
-            //ardeusIsADipshit += gt.GetDelta();
+            if (LoadingQueue.Count > 0)
+                LoadNextAsset(GraphicsDevice);
 
+            if (LoadingQueue.Count == 0)
+                ContentLoaded = true;
 
-           // if (ardeusIsADipshit > LoadingDelay)
-           // {
-               // ardeusIsADipshit = 0;
-                if (LoadingQueue.Count > 0)
-                    LoadNextAsset(GraphicsDevice);
-
-                if (LoadingQueue.Count == 0)
-                    ContentLoaded = true;
-           // }
         }
 
         public void Clear(Color color) => GraphicsDevice.Clear(color);

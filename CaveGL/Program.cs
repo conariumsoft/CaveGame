@@ -14,7 +14,7 @@ namespace Cave
 			Tile.AssertTileEnumeration();
 			using (var game = new CaveGameGL())
 			{
-#if !DEBUG
+#if !DEBUGBALLS
 
 				try
                 {

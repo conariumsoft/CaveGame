@@ -32,7 +32,7 @@ namespace CaveGame.Core.Game.Tiles
 			{
 
 				world.SetTileNoLight(x, y + 1, new TLiquid { TileState = this.TileState });
-				world.SetTileNoLight(x, y, new Air());
+				world.SetTile(x, y, new Air());
 				TileState = 0;
 			}
 
@@ -62,8 +62,8 @@ namespace CaveGame.Core.Game.Tiles
 			{
 				if (TileState % 2 == 0)
 				{
-					world.SetTileNoLight(x - 1, y, new TLiquid { TileState = 1 });
-					world.SetTileNoLight(x + 1, y, new TLiquid { TileState = 1 });
+					world.SetTile(x - 1, y, new TLiquid { TileState = 1 });
+					world.SetTile(x + 1, y, new TLiquid { TileState = 1 });
 					TileState -= 2;
 				}
 			}
@@ -71,14 +71,14 @@ namespace CaveGame.Core.Game.Tiles
 			{
 
 
-				world.SetTileNoLight(x - 1, y, new TLiquid { TileState = 1 });
+				world.SetTile(x - 1, y, new TLiquid { TileState = 1 });
 				world.DoUpdatePropogation(x, y);
 				TileState--;
 			}
 			else if (right is IWaterBreakable && TileState > 0)
 			{
 
-				world.SetTileNoLight(x + 1, y, new TLiquid { TileState = 1 });
+				world.SetTile(x + 1, y, new TLiquid { TileState = 1 });
 				world.DoUpdatePropogation(x, y);
 				TileState--;
 
@@ -171,7 +171,7 @@ namespace CaveGame.Core.Game.Tiles
 		public override float Viscosity => 1.06f;
 		public Lava() { TileState = 8; }
 
-		public Light3 Light => new Light3(32, 4, 4);
+		public Light3 Light => new Light3(192, 32, 16);
 
 		public void TileUpdate(IGameWorld world, int x, int y)
 		{

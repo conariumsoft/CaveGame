@@ -16,8 +16,8 @@ namespace CaveGame.Core
 		public static Light3 Dark = new Light3(0, 0, 0);
 		public static Light3 Moonlight = new Light3(128, 128, 128);
 		public static Light3 Dawn = new Light3(96, 96, 40);
-		public static Light3 Ambience = new Light3(255, 255, 255);
-		public static Light3 Daylight = new Light3(255, 255, 255);
+		public static Light3 Ambience = new Light3(128, 128, 128);
+		public static Light3 Daylight = new Light3(128, 128, 128);
 		public static Light3 Dusk = new Light3(96, 60, 40);
 
 		[FieldOffset(0)] public byte Red;
@@ -49,9 +49,9 @@ namespace CaveGame.Core
 		public Color MultiplyAgainst(Color col)
 		{
 			return new Color(
-				(col.R / 255.0f) * (Red / 255.0f),
-				 (col.G / 255.0f) * (Green / 255.0f),
-				(col.B / 255.0f) * (Blue / 255.0f),
+				(col.R / 255.0f) * (Red / 127.0f),
+				 (col.G / 255.0f) * (Green / 127.0f),
+				(col.B / 255.0f) * (Blue / 127.0f),
 				col.A
 			);
 		}

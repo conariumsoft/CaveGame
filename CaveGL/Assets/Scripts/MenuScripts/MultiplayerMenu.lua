@@ -33,7 +33,7 @@ local buttonList = UIRect(script,
     Size = UICoords(220, -20, 0, 0.8),
     Position = UICoords(10, 0, 0, 0.1),
     Parent = MultiplayerMenu,
-    BGColor = Color.DarkBlue,
+    BGColor = Color(0.1, 0.1, 0.1),
 });
 
 local buttons = UIListContainer();

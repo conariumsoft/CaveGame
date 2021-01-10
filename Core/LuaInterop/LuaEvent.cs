@@ -39,6 +39,7 @@ namespace CaveGame.Core.LuaInterop
 
         List<LuaBindingInstance<TArgs>> Bindings = new List<LuaBindingInstance<TArgs>>();
 
+        public event Action<TArgs> Monitor;
 
         public virtual LuaBindingInstance<TArgs> Bind(NLua.LuaFunction binding)
         {
@@ -49,7 +50,7 @@ namespace CaveGame.Core.LuaInterop
 
         public virtual bool Invoke(TArgs funcArgs)
         {
-
+            Monitor?.Invoke(funcArgs);
             foreach(LuaBindingInstance<TArgs> instance in Bindings)
             {
                 instance.Invoke(funcArgs);

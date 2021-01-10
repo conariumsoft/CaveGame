@@ -10,6 +10,12 @@ using CaveGame.Core.WorldGeneration;
 
 namespace CaveGame.Core.Game.Tiles
 {
+
+    public class LuaTile : Tile {
+		
+
+	}
+
 	public class FurniturePointer : Tile
 	{
 		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 light) { } // leave empty
@@ -23,7 +29,8 @@ namespace CaveGame.Core.Game.Tiles
 
 	public class Air : Tile, INonSolid, IWaterBreakable
 	{
-		public override void Drop(IGameServer server, IGameWorld world, Point tilePosition) { }
+        public override byte Opacity => 0;
+        public override void Drop(IGameServer server, IGameWorld world, Point tilePosition) { }
 		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 light) { } // leave empty
 
 	}

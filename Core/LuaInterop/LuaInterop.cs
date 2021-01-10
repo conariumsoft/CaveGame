@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace CaveGame.Core.LuaInterop
@@ -25,6 +26,35 @@ _G.list = list
     }
 	public static class LuaExtensions
 	{
+
+		public static void InitFromLuaPropertyTable(this object thing, Lua environment, LuaTable table)
+		{
+			foreach (KeyValuePair<object, object> kvp in environment.GetTableDict(table))
+			{
+				if (kvp.Key is string keyString)
+				{
+					var prop = thing.GetType().GetProperty(keyString);
+					if (prop != null)
+					{
+#if AUTOCASTING_DEBUG
+						Debug.WriteLine("PropertySet {0} to {1} on {2}", keyString, kvp.Value.ToString(), thing.ToString());
+#endif
+						prop.SetValue(thing, Cast(prop.PropertyType, kvp.Value));
+					}
+				}
+			}
+		}
+
+
+		public static object Cast(this Type Type, object data)
+		{
+			var DataParam = Expression.Parameter(typeof(object), "data");
+			var Body = Expression.Block(Expression.Convert(Expression.Convert(DataParam, data.GetType()), Type));
+
+			var Run = Expression.Lambda(Body, DataParam).Compile();
+			var ret = Run.DynamicInvoke(data);
+			return ret;
+		}
 
 		public static bool LoadCoreScript(string fname, out string data)
         {

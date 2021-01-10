@@ -240,6 +240,12 @@ namespace CaveGame.Client
             }
 			sender.Out("No item found with matching name!");
 		}
+
+		private void CmdForceCrash(CommandBar sender, Command command, params string[] args)
+        {
+			string text = (args.Length > 0) ? args[0] : "";
+			throw new ApplicationException($"Forced Crash: {text}");
+        }
 		#endregion
 
 		public void GoToMainMenu()
@@ -267,7 +273,7 @@ namespace CaveGame.Client
 				new ("time", "Set/Get time of day", new List<string> { "time" }, CmdTimeCommand),
 				new ("sv_summon", "Summon an entity", new List<string>{"entityid, xpos, ypos, metadatastring" }, CmdRequestSummonEntity),
 				new ("gimme", "Gives you an item", new List<string>{"itemid", "amount"}, CmdRequestItemstack),
-
+				new ("crash", "Forces the game to implode", new List<string>{"fake_reason"}, CmdForceCrash),
 			};
 			commands.ForEach(c => Console.BindCommandInformation(c));
 			//commands.ForEach(Console.BindCommandInformation);

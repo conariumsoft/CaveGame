@@ -96,9 +96,9 @@ namespace CaveGame.Server
 		}
 
 		public  NetworkServer NetworkServer { get; private set; }
-
-
 		public EntityManager EntityManager { get; private set; }
+		public ChunkManager ChunkManager { get; private set; }
+		public UserSessionManager SessionManager { get; private set; }
 		public int TickRate { get; private set; }
 		public List<User> ConnectedUsers { get; private set; }
 
@@ -127,6 +127,9 @@ namespace CaveGame.Server
 			MaxPlayers = config.MaxPlayers;
 
 			TickRate = config.TickRate;
+
+			SessionManager = new UserSessionManager(this);
+			ChunkManager = new ChunkManager(this);
 			
 			NetworkServer = new NetworkServer(config.Port);
 			ConnectedUsers = new List<User>();
@@ -260,6 +263,7 @@ namespace CaveGame.Server
 				
 
 			SendToAll(new PlayerLeftPacket(packet.LeavingEntityID));
+			SessionManager.HandleDisconnect(user);
 			ConnectedUsers.Remove(user);
 		}
 		private void OnPlayerPosition(NetworkMessage msg, User user) // player tells us their state

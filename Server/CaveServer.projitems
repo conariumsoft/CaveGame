@@ -19,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Plugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServerConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServerWorld.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserSessionManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)World\ChunkManager.cs" />
   </ItemGroup>
 </Project>

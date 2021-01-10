@@ -79,8 +79,6 @@ namespace CaveGame.Core.Network
             
         }
 
-        
-
         public virtual void Update(GameTime gt)
         {
             counter += gt.GetDelta();

@@ -33,10 +33,7 @@ namespace CaveGame.Core.Game.Items
 			MouseState mouse = Mouse.GetState();
 
 			var mp = client.Camera.ScreenToWorldCoordinates(mouse.Position.ToVector2());
-			Point pos = new Point(
-				(int)Math.Floor(mp.X / Globals.TileSize),
-				(int)Math.Floor(mp.Y / Globals.TileSize)
-			);
+			Point pos = mp.ToTileCoords();
 
 			if (Furnace.CanPlace(client.World, pos.X, pos.Y))
 			{
@@ -55,10 +52,7 @@ namespace CaveGame.Core.Game.Items
 			MouseState mouse = Mouse.GetState();
 
 			var mp = client.Camera.ScreenToWorldCoordinates(mouse.Position.ToVector2());
-			Point pos = new Point(
-				(int)Math.Floor(mp.X / Globals.TileSize),
-				(int)Math.Floor(mp.Y / Globals.TileSize)
-			);
+			Point pos = mp.ToTileCoords();
 
 			if (WoodenDoor.CanPlace(client.World, pos.X, pos.Y))
 			{

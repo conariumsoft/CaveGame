@@ -386,8 +386,8 @@ namespace CaveGame.Client
                         SetTile(recvdata.X, recvdata.Y, recvdata.Tile);
                         //var prevLight = GetLight(recvdata.Item1, recvdata.Item2);
                         //var postOpacity = recvdata.Item3.Opacity;
-                        int resetRadius = 5;
-                        int recalcRadius = 7;
+                        int resetRadius = 7;
+                        int recalcRadius = 9;
 
                         //if (prevTile is ILightEmitter)
                         {
@@ -447,9 +447,9 @@ namespace CaveGame.Client
                         //byte b = (byte)(prevLight.Blue - postOpacity);
 
                         //var newL = new Light3(r, g, b);
-                        for (int x = -2; x < 2; x++)
+                        for (int x = -4; x < 4; x++)
                         {
-                            for (int y = -2; y < 2; y++)
+                            for (int y = -4; y < 4; y++)
                             {
                                 SetLight(recv2.X + x, recv2.Y + y, Light3.Dark);
                                 //UpdatedCells.Enqueue(new Cell(recvdata.Item1+x, recvdata.Item2+y, Light3.Dark));

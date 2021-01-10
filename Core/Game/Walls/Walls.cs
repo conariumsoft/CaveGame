@@ -36,7 +36,7 @@ namespace CaveGame.Core.Game.Walls
 
 	public class Wall
 	{
-		public virtual byte Opacity => 4;
+		public virtual byte Opacity => 12;
 		public virtual Color Color => Color.Gray;
 		public virtual Rectangle Quad => TileMap.Default;
 		public virtual byte Hardness => 2;
@@ -51,7 +51,6 @@ namespace CaveGame.Core.Game.Walls
 		public static Random RNG = new Random();
 
 		public byte Damage { get; set; }
-
 
 		public byte[] Serialize()
 		{

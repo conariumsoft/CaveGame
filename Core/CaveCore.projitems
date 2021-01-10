@@ -106,5 +106,6 @@
     <Folder Include="$(MSBuildThisFileDirectory)Logging\" />
     <Folder Include="$(MSBuildThisFileDirectory)Chat\" />
     <Folder Include="$(MSBuildThisFileDirectory)AssetManagement\" />
+    <Folder Include="$(MSBuildThisFileDirectory)NewFolder\" />
   </ItemGroup>
 </Project>
