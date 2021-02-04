@@ -29,6 +29,20 @@ namespace CaveGame.Core
 			return new Vector2((float)Math.Round(og.X, decimalplaces), (float)Math.Round(og.Y, decimalplaces));
 		}
 
+		public static float GetDelta(this GameTime gt)
+		{
+			return (float)gt.ElapsedGameTime.TotalSeconds;
+		}
+
+
+		public static Vector2 Lerp(this Vector2 a, Vector2 b, float alpha)
+		{
+			return new Vector2(
+				MathematicsExtensions.Lerp(a.X, b.X, alpha),
+				MathematicsExtensions.Lerp(a.Y, b.Y, alpha)
+			);
+		}
+
 		public static Vector2 GetY(this Vector2 vec) => new Vector2(0, vec.Y);
 
 		public static Vector2 GetX(this Vector2 vec) => new Vector2(vec.X, 0);

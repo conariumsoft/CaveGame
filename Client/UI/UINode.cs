@@ -28,8 +28,6 @@ namespace CaveGame.Client.UI
 
 		bool IsMouseInside(MouseState ms);
 
-		
-
 		Vector2 AnchorPoint { get; set; }
 		Vector2 AbsoluteSize { get; }
 		Vector2 AbsolutePosition { get; }

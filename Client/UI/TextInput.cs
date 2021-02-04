@@ -42,7 +42,6 @@ namespace CaveGame.Client.UI
 		public string InternalText { get { return InputBuffer; } }
 		public List<char> BlacklistedCharacters;
 
-
 		public bool ClearOnReturn { get; set; }
 
 		public string DisplayText

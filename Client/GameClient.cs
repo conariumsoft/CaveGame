@@ -106,7 +106,6 @@ namespace CaveGame.Client
 			[PacketType.netDamageTile] = OnDamageTile,
 			[PacketType.netPlaceFurniture] = OnPlaceFurniture,
 			[PacketType.netRemoveFurniture] = OnRemoveFurniture,
-
 			[PacketType.sRejectLogin] = OnServerRejectLogin,
 			[PacketType.sAcceptLogin] = OnServerAcceptLogin,
 			[PacketType.sPlayerPeerJoined] = OnPeerJoined,
@@ -129,22 +128,15 @@ namespace CaveGame.Client
         public float ServerKeepAlive { get; set; }
 
 
-		public GameClient(CaveGameGL _game) { } // empty???
-
-		public GameClient(CaveGameGL _game, AuthDetails login)
-		{
+		public GameClient(CaveGameGL _game) {
 			Game = _game;
 			InitNetworkEvents();
 
-			World     = new LocalWorld(this);
-			Camera    = new Camera2D{ Zoom = CameraZoom };
-			Chat      = new GameChat(this);
+			World = new LocalWorld(this);
+			Camera = new Camera2D { Zoom = CameraZoom };
+			Chat = new GameChat(this);
 			PauseMenu = new PauseMenu(this);
 			Inventory = new PlayerContainerFrontend();
-
-			NetworkUsername = login.UserName;
-			NetClient = new NetworkClient(login.ServerAddress);
-			
 
 			ClientTasks = new List<RepeatingIntervalTask>
 			{
@@ -152,40 +144,15 @@ namespace CaveGame.Client
 				new RepeatingIntervalTask(ChunkUnloadingCheck, 1/2.0f),
 				new RepeatingIntervalTask(ChunkLoadingCheckUpdate, 1 / 2.0f),
 			};
-
-
-			/*FPSGraph = new GraphRenderer<FpsSample>
-			{
-				
-				BackgroundColor = new Color(0.2f, 0.2f, 0.4f)*0.5f,
-				ScreenPosition = new Vector2(50, 500),
-				GraphSize = new Vector2(300, 120),
-				GraphName = "FPS",
-				YAxisMin = 0,
-				Scale = 0.5f,
-				YAxisMax = 240,
-			};
-			AverageData = new GraphRecorder<FpsSample>
-			{
-				Boldness = 2.0f,
-				Name = "Average FPS",
-				SampleCount = 500,
-				Color = Color.Yellow,
-
-			};
-			ImmediateData = new GraphRecorder<FpsSample>
-			{
-				Boldness = 1.0f,
-				Name = "FPS",
-				SampleCount = 500,
-				Color = Color.Gray*0.5f,
-
-			};*/
-
-
-
 			ChunkingRadius = 1;
 		}
+
+		public GameClient(CaveGameGL _game, AuthDetails login) : this(_game)
+		{
+			NetworkUsername = login.UserName;
+			NetClient = new NetworkClient(login.ServerAddress);
+		}
+
 		protected struct FpsSample : GraphSample
 		{
 			public double Value { get; set; }

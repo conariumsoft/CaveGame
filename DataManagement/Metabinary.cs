@@ -18,9 +18,8 @@ namespace DataManagement
         COMPLEX = 8,
         STRING = 9,
         BOOL = 10,
-
-
     }
+
     public abstract class MetabinaryTag
     {
         public abstract string Name { get; set; }
