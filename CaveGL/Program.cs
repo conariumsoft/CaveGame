@@ -9,12 +9,32 @@ namespace Cave
 	{
 
 		[STAThread]
-		static void Main()
+		static void Main(string[] args)
 		{
-			Tile.AssertTileEnumeration();
-			using (var game = new CaveGameGL())
+			// parse command line arguments
+			CaveGameArguments arguments = new CaveGameArguments();
+
+			for (int x = 0; x < args.Length; x++)
 			{
-#if !DEBUGBALLS
+				switch(args[x])
+				{
+					case "-world":
+						arguments.AutoLoadWorld = args[x + 1];
+						break;
+					case "-connect":
+						arguments.AutoConnectName = args[x + 1];
+						arguments.AutoConnectAddress = args[x + 2];
+						break;
+					default:
+						break;
+
+				}
+			}
+
+			Tile.AssertTileEnumeration();
+			using (var game = new CaveGameGL(arguments))
+			{
+#if !DEBUG
 
 				try
                 {
@@ -31,7 +51,6 @@ namespace Cave
 #else
 				game.Run();
 				game.Exit();
-
 #endif
 			}
 

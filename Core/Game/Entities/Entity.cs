@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CaveGame.Core.Game.Entities
@@ -22,6 +23,10 @@ namespace CaveGame.Core.Game.Entities
 	}
 	public interface IEntity : IDamageSource
 	{
+		List<StatusEffect> ActiveEffects { get; }
+
+		bool AffectedBy<T>() where T : StatusEffect;
+
 		Rectangle GetCollisionRect();
 		Vector2 Position { get; set; }
 		Vector2 BoundingBox { get; }
@@ -29,7 +34,7 @@ namespace CaveGame.Core.Game.Entities
 		float DurationAlive { get; set; }
 		bool Dead { get; set; }
 		int Health { get; set; }
-		int Defense { get; set; }
+		int Defense { get; }
 		int MaxHealth { get; }
 		//void Update(IGameWorld world, GameTime gt);
 		void ClientUpdate(IGameClient client, GameTime gt);
@@ -50,10 +55,7 @@ namespace CaveGame.Core.Game.Entities
 	}
 	public interface IThinker
     {
-		float Anger { get; }
-		float Fear { get; }
-		float ResponseTime { get; } // time between Think() ticks
-		int IQ { get; } // affects properties within Think() such as accuracy of pathfinding
+		float ReactionTime { get; } // time between Think() ticks
 		void Think(IGameServer server, GameTime gt);
     }
 
@@ -66,7 +68,7 @@ namespace CaveGame.Core.Game.Entities
 		public virtual Vector2 BoundingBox { get; }
 		public virtual int Health { get; set; }
 
-		public virtual int Defense { get; set; }
+		public virtual int Defense { get; }
 		public virtual int MaxHealth { get; }
 		public virtual Vector2 Position { get; set; }
 		#endregion
@@ -76,17 +78,14 @@ namespace CaveGame.Core.Game.Entities
 		public bool RemoteControlled { get; set; }
 		public int EntityNetworkID { get; set; }
 		
-		public List<StatusEffect> ActiveEffects { get; private set; }
+		
 
 		public Light3 Illumination { get; set; }
 
 		public Rectangle GetCollisionRect() => new Rectangle(TopLeft.ToPoint(), (BoundingBox*2).ToPoint());
-        public void ClearActiveEffects() => ActiveEffects.Clear();
+       
 
-		public void AddEffect(StatusEffect effect)
-		{
-
-		}
+		
 
 		public Entity() {
 			ActiveEffects = new List<StatusEffect>();
@@ -113,10 +112,18 @@ namespace CaveGame.Core.Game.Entities
 
         }
 
+
 		public virtual void ClientUpdate(IGameClient client, GameTime gt) {
 			DurationAlive += gt.GetDelta();
 
 			Illumination = client.World.Lighting.GetLight(Position.ToTileCoords());
+
+			foreach (StatusEffect effect in ActiveEffects.ToArray())
+			{
+				effect.Duration -= gt.GetDelta();
+				effect.Tick(client.World, gt);
+			}
+			ActiveEffects.RemoveAll(e => e.Duration < 0);
 		}
 
 		public virtual void ServerUpdate(IGameServer server, GameTime gt) {
@@ -126,15 +133,29 @@ namespace CaveGame.Core.Game.Entities
 			foreach (StatusEffect effect in ActiveEffects.ToArray())
 			{
 				effect.Duration -= gt.GetDelta();
-				effect.Tick(gt);
+				effect.Tick(server.World, gt);
 			}
 			ActiveEffects.RemoveAll(e => e.Duration < 0);
 		}
 
-		
-
 		public virtual void Draw(GraphicsEngine gfx) { }
 
-       
-    }
+
+		// Status Effect stuff
+
+		public List<StatusEffect> ActiveEffects { get; private set; }
+
+
+		public void ClearActiveEffects() => ActiveEffects.Clear();
+
+
+		public void AddEffect(StatusEffect effect)
+		{
+			effect.TargetEntity = this;
+			ActiveEffects.Add(effect);
+		}
+
+		// Check if entity has status effect type
+		public bool AffectedBy<T>() where T: StatusEffect => ActiveEffects.OfType<T>().Any();
+	}
 }

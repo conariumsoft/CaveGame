@@ -18,6 +18,22 @@ namespace CaveGame.Core.Inventory
 
 	public class ItemStack: IEquatable<ItemStack>
 	{
+		public ItemStack()
+		{
+
+		}
+		public ItemStack(Item item, int quantity = 1)
+		{
+			this.Item = item;
+			this.quantity = quantity;
+		}
+
+		public static ItemStack Of<T>(int quantity = 1) where T: Item, new()
+		{
+			ItemStack stack = new ItemStack { Quantity = quantity, Item = new T() };
+			return stack;
+		}
+
 		public static ItemStack Empty = new ItemStack { Quantity = 0 };
 
 		public Item Item;

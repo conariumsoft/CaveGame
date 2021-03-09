@@ -2,8 +2,7 @@
 using CaveGame.Core.Game.Tiles;
 using Microsoft.Xna.Framework;
 using System;
-
-
+using System.Linq;
 
 namespace CaveGame.Core.Game.Entities
 {
@@ -117,7 +116,14 @@ namespace CaveGame.Core.Game.Entities
         {
 			if (t is Lava _)
             {
-				Damage(DamageType.Lava, null, 1);
+
+				// Add burning effect
+				if (!AffectedBy<StatusEffects.Burning>())
+					AddEffect(new StatusEffects.Burning(5));
+
+				// continually reset burning duration to 5 while touching lava
+				ActiveEffects.Find(e => e is StatusEffects.Burning).Duration = 5;
+				
 				return true;
 			}
 			return false;

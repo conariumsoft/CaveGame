@@ -47,6 +47,26 @@ namespace CaveGame.Server
 		public WorldMetadata Metadata { get; private set; }
 
 
+
+
+		protected void WriteWorldDataToMetadata()
+		{
+			// Serialize world info into file.
+			XmlWriter worldXml = XmlWriter.Create(Path.Combine("Worlds", WorldName, "WorldMetadata.xml"));
+			worldXml.WriteStartDocument();
+			worldXml.WriteStartElement("Metadata");
+
+			worldXml.WriteElementString("Name", WorldName);
+			worldXml.WriteElementString("Seed", WorldSeed.ToString());
+			worldXml.WriteElementString("TimeOfDay", TimeOfDay.ToString());
+			worldXml.WriteElementString("LastPlayed", DateTime.Now.ToString());
+			worldXml.WriteElementString("LastVersion", Globals.CurrentVersionFullString);
+
+			worldXml.WriteEndDocument();
+			worldXml.Close();
+		}
+
+
 		public ServerWorld(WorldMetadata metadata) : base()
 		{
 			TileNetworkUpdateQueue = new Queue<Point>();
@@ -61,19 +81,8 @@ namespace CaveGame.Server
             CreateDirectoryIfNull(Path.Combine("Worlds", WorldName));
             CreateDirectoryIfNull(Path.Combine("Worlds", WorldName, "Chunks"));
 
-            // Serialize world info into file.
-            XmlWriter worldXml = XmlWriter.Create(Path.Combine("Worlds", WorldName, "WorldMetadata.xml"));
-            worldXml.WriteStartDocument();
-            worldXml.WriteStartElement("Metadata");
-
-            worldXml.WriteElementString("Name", WorldName);
-            worldXml.WriteElementString("Seed", WorldSeed.ToString());
-            worldXml.WriteElementString("TimeOfDay", TimeOfDay.ToString());
-
-
-            worldXml.WriteEndDocument();
-            worldXml.Close();
-
+			WriteWorldDataToMetadata();
+            
 			WorldTimedTasks.Add(new(ProcessTileUpdateRequests, 1 / 10.0f));
 			WorldTimedTasks.Add(new(DoRandomTileTicks, 1 / 5.0f));
 			WorldTimedTasks.Add(new(SendTileNetworkUpdates, 1 / 5.0f));
@@ -131,7 +140,12 @@ namespace CaveGame.Server
 
 		public void SaveData()
 		{
+
+
 			CreateDirectoryIfNull(Path.Combine("Worlds", WorldName));
+
+			WriteWorldDataToMetadata();
+
 			foreach (var kvp in Chunks)
 			{
 				Chunk chunk = kvp.Value;

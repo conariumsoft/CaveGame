@@ -51,6 +51,11 @@ namespace CaveGame.Client.UI
 			this.InitFromLuaPropertyTable(state, table);
 		}
 
+
+		public delegate void SliderChangedEV(NumericSlider slider, float index);
+
+		public event SliderChangedEV OnValueChanged;
+
 		public float Minimum { get; set; }
 		public float Maximum { get; set; }
 		public float Interval { get; set; }
@@ -115,6 +120,7 @@ namespace CaveGame.Client.UI
 				float percentage = offset / SliderTotalWidth;
 				var translated = Math.Clamp(Maths.NearestMultiple(percentage * range, Interval), 0, range);
 				Value = translated + Minimum;
+				OnValueChanged?.Invoke(this, Value);
 			}
 
 			prevMouse = mouse;

@@ -78,8 +78,9 @@ namespace CaveGame.Core.Game.Entities
         public float Fear { get; }
         public float ResponseTime { get; }
         public int IQ { get; }
+		public float ReactionTime { get; }
 
-        float animationTimer;
+		float animationTimer;
         float triggeredAnimationTimer;
         float autonomousMovement;
 

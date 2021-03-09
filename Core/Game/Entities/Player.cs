@@ -18,7 +18,71 @@ using CaveGame.Core.Game.Items;
 
 namespace CaveGame.Core.Game.Entities
 {
-	public class Player : PhysicsEntity, ICanBleed, IServerPhysicsObserver, IClientPhysicsObserver
+	public class Humanoid : PhysicsEntity
+	{
+
+		public virtual int BaseDefense { get; }
+		public virtual int DefenseModifier { get; set; }
+		public virtual int ArmorDefense
+		{
+			get
+			{
+				int sum = 0;
+				if (ArmorSlots[0, 0].Item is IArmorItem defensive1)
+					sum += defensive1.Defense;
+				if (ArmorSlots[0, 1].Item is IArmorItem defensive2)
+					sum += defensive2.Defense;
+				if (ArmorSlots[0, 2].Item is IArmorItem defensive3)
+					sum += defensive3.Defense;
+				return sum;
+			} 
+		}
+		public override int Defense => BaseDefense + DefenseModifier + ArmorDefense;
+
+		public Humanoid() : base()
+		{
+			ArmorSlots = new Container(1, 3);
+			ArmorSlots.ItemWhitelistEnabled = true;
+			ArmorSlots.ItemTagWhitelist = new List<ItemTag> { ItemTag.Armor };
+		}
+
+		public Direction Facing { get; set; }
+		public bool Walking { get; set; }
+		public override float Mass { get; }
+
+		public Color Color { get; set; }
+
+		public Container ArmorSlots { get; set; }
+
+
+		const float walk_anim_time = 1.25f;
+		const float push_anim_time = 1.0f;
+
+		protected virtual Texture2D Sprite { get; }
+
+
+		public virtual Rectangle GetAnimationFrame() { throw new NotImplementedException(); }
+
+
+
+		public override void Draw(GraphicsEngine gfx)
+		{
+
+			
+			int flipSprite = 0;
+			if (Facing == Direction.Left)
+				flipSprite = 0;
+			if (Facing == Direction.Right)
+				flipSprite = 1;
+
+			DrawHealth(gfx);
+			//DrawName(gfx);
+
+			gfx.Sprite(Sprite, Position, GetAnimationFrame(), Illumination.MultiplyAgainst(Color), Rotation.Zero, new Vector2(8, 12), 1, (SpriteEffects)flipSprite, 0);
+		}
+	}
+
+	public class Player : Humanoid, ICanBleed, IServerPhysicsObserver, IClientPhysicsObserver
 	{
 		public static Rectangle SP_IDLE = new Rectangle(0, 0, 16, 24);
 		public static Rectangle SP_WALK0 = new Rectangle(16, 0, 16, 24);
@@ -54,17 +118,12 @@ namespace CaveGame.Core.Game.Entities
 		public bool OnRope { get; set; }
 		public User User { get; set; }
 		public string DisplayName { get; set; }
-		public Direction Facing { get; set; }
-		public Color Color { get; set; }
-		public bool Walking { get; set; }
 		public bool Pushing { get; set; }
 
 		public Container Inventory { get; set; }
-		public Container ArmorSlots { get; set; }
 
 		protected float animationTimer;
 		protected float landingImpactAnim;
-
 
 		public Player()
 		{
@@ -84,20 +143,13 @@ namespace CaveGame.Core.Game.Entities
 		}
 
 
-
-
 		public override void ClientUpdate(IGameClient client, GameTime gt)
 		{
-
-
 			animationTimer += (float)gt.ElapsedGameTime.TotalSeconds * 5;
 			base.ClientUpdate(client, gt);
 		}
 
-
 		public void ServerPhysicsStep(IServerWorld world, float step)=> PhysicsStep(world, step);
-
-
 		public void ServerPhysicsTick(IServerWorld world, float step) => ServerPhysicsStep(world, step);
 
 		public void DrawName(GraphicsEngine GFX)
@@ -125,7 +177,7 @@ namespace CaveGame.Core.Game.Entities
 			{
 				spriteFrame = WALK_CYCLE.GetSpriteFrame(animationTimer * walk_anim_time);
 				if (Pushing)
-					spriteFrame = SP_PUSH0; //PUSH_CYCLE.GetSpriteFrame(animationTimer * push_anim_time);
+					spriteFrame = SP_PUSH0;
 			}
 			if (!OnGround)
 			{
@@ -134,8 +186,6 @@ namespace CaveGame.Core.Game.Entities
 				else
 					spriteFrame = SP_FALL;
 			}
-
-
 
 			DrawHealth(gfx);
 			DrawName(gfx);
@@ -151,8 +201,6 @@ namespace CaveGame.Core.Game.Entities
 			return base.TopLeft;
 
 		}
-
-       // public override Vector2 TopLeft => GetTopLeft();
 
 
         const float threshold = 0.1f;

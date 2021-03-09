@@ -50,22 +50,14 @@ namespace CaveGame.Client
 		}
 	}
 
+
+	
+
 	// Old name for game settings, backward compatibility
 	[XmlRoot("XGameSettings")]
 	public class GameSettings : Configuration
 	{
-		public static SliderIndex<int>[] VolumeSliderOptions = SliderIndex<int>.GetIntArray(0, 100);
-
-		public static SliderIndex<int>[] FramerateCapSliderOptions =
-		{
-			new SliderIndex<int>("Unlimited", 0),
-			new SliderIndex<int>("240", 240),
-			new SliderIndex<int>("144", 144),
-			new SliderIndex<int>("120", 120),
-			new SliderIndex<int>("90", 90),
-			new SliderIndex<int>("60", 60),
-			new SliderIndex<int>("30", 30),
-		};
+		public static SliderIndex<int>[] VolumeSliderOptions = SliderIndex<int>.GetIntArray(0, 101);
 
 		public static SliderIndex<GameChatSize>[] ChatSizeSliderOptions =
 		{
@@ -78,12 +70,86 @@ namespace CaveGame.Client
 		public GameSettings()
 		{
 			CurrentSettings = this;
+			
 		}
 
-		public bool Fullscreen { get; set; }
-		public bool Particles { get; set; }
-		public int FPSLimit { get; set; }
-		public int FPSLimitIndex { get; set; }
+		[XmlIgnore]
+		public CaveGameGL game;
+
+
+		[XmlIgnore]
+		private bool _fullscreen;
+		private bool _particles;
+		private bool _vsync;
+		private int _fpslimit;
+		private int _masterVolume;
+		private int _musicVolume;
+		private int _sfxVolume;
+
+
+		public bool Fullscreen {
+			get => _fullscreen;
+			set  { 
+				_fullscreen = value;
+				game?.SetFullscreen(value);
+			}
+		}
+		
+
+		public bool Particles {
+			get => _particles;
+			set {
+				_particles = value;
+				
+			}
+		}
+
+		public bool VSync
+		{
+			get => _vsync;
+			set
+			{
+				_vsync = value;
+				game?.SetVSync(value);
+			}
+		}
+
+		
+		public int FPSLimit {
+			get => _fpslimit;
+			set {
+				_fpslimit = value;
+				game?.SetFPSLimit(value);
+			}
+		}
+
+		
+
+		public int MasterVolume {
+			get => _masterVolume;
+			set {
+				_masterVolume = value;
+				AudioManager.MasterVolume = value / 100.0f;
+			}
+		}
+
+		
+		public int MusicVolume { get => _musicVolume;
+			set
+			{
+				_musicVolume = value;
+				AudioManager.MusicVolume = value / 100.0f;
+			}
+		}
+		public int SFXVolume
+		{
+			get => _sfxVolume;
+			set
+			{
+				_sfxVolume = value;
+			}
+		}
+
 		public Keys MoveLeftKey { get; set; }
 		public Keys MoveRightKey { get; set; }
 		public Keys MoveDownKey { get; set; }
@@ -91,17 +157,11 @@ namespace CaveGame.Client
 		public Keys JumpKey { get; set; }
 		public GameChatSize ChatSize { get; set; }
 		public string TexturePackName { get; set; }
-
-		public int MasterVolume { get; set; }
-		public int MusicVolume { get; set; }
-		public int SFXVolume { get; set; }
-		public int MenuVolume { get; set; }
 		public bool CameraShake { get; set; }
 
 		public override void FillDefaults()
 		{
-			FPSLimit = 120;
-			FPSLimitIndex = 3;
+			FPSLimit = 60;
 			Fullscreen = false;
 			MoveDownKey = Keys.S;
 			MoveUpKey = Keys.W;
@@ -109,6 +169,10 @@ namespace CaveGame.Client
 			MoveLeftKey = Keys.A;
 			MoveRightKey = Keys.D;
 			ChatSize = GameChatSize.Normal;
+			MasterVolume = 100;
+			MusicVolume = 50;
+			SFXVolume = 75;
+
 		}
 
 	}

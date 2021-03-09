@@ -24,12 +24,26 @@ namespace CaveGame.Core
 
 		public const int TileSize = 8;
 		public const int ChunkSize = 32;
-		public const string CurrentVersionString = "2.3.0";
-		public const string CurrentVersionFullString = "2.3.0 Beta";
+		public const string CurrentVersionString = "2.3.1";
+		public const string CurrentVersionFullString = "2.3.1 Beta";
 		
 
 		public static UpdateDescription[] UpdateLog =
 		{
+			new UpdateDescription
+			{
+				VersionString = "2.4",
+				Date = "2021 Feb 31",
+				UpdateName = "Patch 1",
+				ChangeLog = new string[]
+				{
+					"+ Cleaned up look and feel of menus.",
+				},
+				Notes = new string[]
+				{
+
+				}
+			},
 			new UpdateDescription
 			{
 				VersionString = "2.3.0",

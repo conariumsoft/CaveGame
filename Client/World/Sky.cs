@@ -23,8 +23,6 @@ namespace CaveGame.Client
 			}
 		}
 
-
-
 		public static Color[] SkyColors =
 		{
 			new Color(0, 2, 6), new Color(5, 5, 30), //0 or 24
@@ -47,11 +45,15 @@ namespace CaveGame.Client
 		}
 
 
-		
-
-
 		private void DrawSkyColorGradient(GraphicsEngine GFX)
 		{
+
+			if (World.Client.Camera.Position.Y > 600)
+			{
+				GFX.Rect(Color.Black, Vector2.Zero, World.Client.Camera.WindowSize);
+				return;
+			}
+
 			for (int y = 0; y < 10; y++)
 			{
 				int hourTime = (int)Math.Floor(((World.TimeOfDay + 1) % 24) / 2);
@@ -72,14 +74,20 @@ namespace CaveGame.Client
 			}
 
 		}
-
+		Random rng = new Random();
+		float rotation = 0;
+		
 		private void DrawBackgroundParallax(GraphicsEngine GFX)
 		{
+			if (World.Client.Camera.Position.Y > 600)
+			{
+				return;
+			}
+
+			Vector2 lill = Rotation.FromDeg(World.TimeOfDay * 360.0f).ToUnitVector() * 0.1f;
+
 			float starfieldPar = 0.85f;
-
-
-
-			float scale = 1.5f;
+			float scale = 0.25f;
 			float textureWidth = GFX.Starfield.Width * scale;
 			float textureHeight = GFX.Starfield.Height * scale;
 
@@ -89,16 +97,16 @@ namespace CaveGame.Client
 				(float)pos.Y / textureHeight
 			) * starfieldPar;
 
+			var textureCenter = new Vector2(GFX.Starfield.Width / 2.0f, GFX.Starfield.Height / 2.0f);
 
 
-
-			for (int tx = -2; tx < 2; tx++)
+			for (int tx = -3; tx < 3; tx++)
 			{
-				for (int ty = -2; ty < 2; ty++)
+				for (int ty = -3; ty < 3; ty++)
 				{
 					float xPos = tx + gridPos.X;
 					float yPos = ty + gridPos.Y;
-					GFX.Sprite(GFX.Starfield, new Vector2(xPos * textureWidth, yPos * textureHeight), null, Color.White, Rotation.Zero, Vector2.Zero, scale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0);
+					GFX.Sprite(GFX.Starfield, new Vector2(xPos * textureWidth, yPos * textureHeight)+lill, null, Color.White, Rotation.FromDeg((tx+ty).Mod(4)*90), textureCenter, scale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0);
 				}
 			}
 

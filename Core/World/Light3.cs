@@ -51,8 +51,7 @@ namespace CaveGame.Core
 			return new Color(
 				(col.R / 255.0f) * (Red / 127.0f),
 				 (col.G / 255.0f) * (Green / 127.0f),
-				(col.B / 255.0f) * (Blue / 127.0f),
-				col.A
+				(col.B / 255.0f) * (Blue / 127.0f)
 			);
 		}
 

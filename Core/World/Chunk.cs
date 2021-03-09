@@ -151,7 +151,7 @@ namespace CaveGame.Core
 			GFX.GraphicsDevice.SetRenderTarget(TileRenderBuffer);
 			GFX.Clear(Color.Black * 0f);
 
-			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+			GFX.Begin(SpriteSortMode.Immediate);
 			Tile tile;
 
 			for (int x = 0; x < ChunkSize; x++)

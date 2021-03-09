@@ -121,5 +121,8 @@ namespace CaveGame.Core.Game.Tiles
 		public static Dictionary<string, Rectangle> Atlas = new Dictionary<string, Rectangle> {
 			
 		};
+
+		public static Rectangle SwitchOff = Quad(0, 11);
+		public static Rectangle SwitchOn = Quad(1, 11);
 	}
 }

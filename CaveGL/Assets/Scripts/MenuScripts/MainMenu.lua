@@ -151,6 +151,7 @@ local changeLogContentWindow = UIRect(script, {
     BorderSize = 2,
     BorderColor = Color(0.2, 0.2, 0.2),
     BorderEnabled = true,
+	ClipsDescendants = true,
 });
 
 local updateLog = UIListContainer();
@@ -162,7 +163,7 @@ local changeLogTextEntries = require("assets.scripts.MenuScripts.ChangeLogGenera
 
 for _, text in pairs(changeLogTextEntries) do
     local displayedText = text;
-    local font = GraphicsEngine.Instance.Fonts.Arial10;
+    local font = GraphicsEngine.Instance.Fonts.Arial12;
     local size = 18;
 
     if (text:find(">>")) then
@@ -174,7 +175,7 @@ for _, text in pairs(changeLogTextEntries) do
         size = 16;
         displayedText = text:gsub(">", "");
     elseif text:find("-") then
-        font = GraphicsEngine.Instance.Fonts.Arial10;
+        font = GraphicsEngine.Instance.Fonts.Arial12;
         size = 12;
     end
 

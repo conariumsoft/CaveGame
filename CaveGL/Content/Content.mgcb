@@ -163,7 +163,7 @@
 
 #begin Sound/ambient/lava.ogg
 /importer:OggImporter
-/processor:SongProcessor
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Sound/ambient/lava.ogg
 
@@ -172,6 +172,12 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Sound/click1.wav
+
+#begin Sound/door.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/door.ogg
 
 #begin Sound/mu/big_brother.ogg
 /importer:OggImporter
@@ -196,4 +202,10 @@
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:Sound/mu/mithril_ocean.ogg
+
+#begin Sound/wind_howl1.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/wind_howl1.ogg
 

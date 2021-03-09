@@ -13,15 +13,17 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyName>CaveGame</AssemblyName>
     <RootNamespace>CaveGame</RootNamespace>
-    <Version>2.1.0</Version>
+    <Version>2.3.0</Version>
     <Company>Conarium Software</Company>
     <Product>Computer Software</Product>
     <Description>A game of mining, exploration, engineering, and explosive creativity!</Description>
-    <Copyright>Copyright Conarium Software 2019- 2020</Copyright>
-    <PackageLicenseExpression>Copyright Conarium Software 2019- 2020</PackageLicenseExpression>
+    <Copyright>Copyright Conarium Software 2019- 2021</Copyright>
+    <PackageLicenseExpression>Copyright Conarium Software 2019- 2021</PackageLicenseExpression>
     <Authors>Joshua O'Leary, Tyler Stewart, Contributing Developers</Authors>
     <PackageReleaseNotes>Testing version, not for release!</PackageReleaseNotes>
     <StartupObject>Cave.Program</StartupObject>
+    <PackageProjectUrl>conarium.xyz</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Optimize>false</Optimize>

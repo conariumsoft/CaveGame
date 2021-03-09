@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace CaveGame.Core.Game.Tiles
@@ -27,10 +28,6 @@ namespace CaveGame.Core.Game.Tiles
 
 		public override void Draw(GraphicsEngine GFX, int x, int y, Light3 color)
 		{
-#if EDITOR
-			GFX.Sprite(GFX.TileSheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), Quad, Color);
-			return;
-#endif
 
 			GFX.Sprite(GFX.TileSheet, new Vector2(x * Globals.TileSize, y * Globals.TileSize), TileMap.Soil, color.MultiplyAgainst(Color.SaddleBrown));
 			var corner = new Rectangle(9 * Globals.TileSize, 6 * Globals.TileSize, Globals.TileSize, Globals.TileSize);
@@ -80,6 +77,7 @@ namespace CaveGame.Core.Game.Tiles
 
 		public void LocalTileUpdate<T>(IGameWorld world, int x, int y)
 		{
+			
 			bool planetop = IsEmpty(world, x, y - 1);
 			bool planebottom = IsEmpty(world, x, y + 1);
 			bool planeleft = IsEmpty(world, x - 1, y);
@@ -96,7 +94,7 @@ namespace CaveGame.Core.Game.Tiles
 			bool cornerb = (gright && gabove && air_tr);
 			bool cornerc = (gright && gbelow && air_br);
 			bool cornerd = (gleft && gbelow && air_bl);
-			byte newNumber = TileState;
+			byte newNumber = 0;
 			newNumber.Set(7, planetop);
 			newNumber.Set(6, planeleft);
 			newNumber.Set(5, planebottom);
@@ -111,6 +109,7 @@ namespace CaveGame.Core.Game.Tiles
 			{
 				TileState = newNumber;
 				world.DoUpdatePropogation(x, y);
+				//world.SetTileUpdated(x, y);
 			}
 		}
 	}

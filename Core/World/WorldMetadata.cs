@@ -11,6 +11,7 @@ namespace CaveGame.Core
 		public int Seed { get; set; }
 		public string Name { get; set; }
 		public string LastPlayTime { get; set; }
+		public string LastVersionPlayedOn { get; set; }
 
 
         public static WorldMetadata LoadWorldData(string directory)
@@ -21,8 +22,11 @@ namespace CaveGame.Core
             WorldMetadata Metadata = new WorldMetadata
             {
                 Name = worldmetaXML["Metadata"]["Name"]?.InnerText,
-                LastPlayTime = worldmetaXML["Metadata"]["Timestamp"]?.InnerText,
+                LastPlayTime = worldmetaXML["Metadata"]["LastPlayed"]?.InnerText,
                 Seed = Int32.Parse(worldmetaXML["Metadata"]["Seed"]?.InnerText),
+				LastVersionPlayedOn = worldmetaXML["Metadata"]["LastVersion"]?.InnerText,
+
+				
             };
 
 

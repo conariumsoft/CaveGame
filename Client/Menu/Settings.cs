@@ -83,26 +83,33 @@ namespace CaveGame.Client.Menu
 				TextYAlign = TextYAlignment.Center,
 			};
 
-			UIRect optionList = new UIRect
+
+			// Left-Side options
+			var LeftList = new UIRect
 			{
 				Parent = SettingsUI,
-				Size = new UICoords(0, 0, 0.6f, 0.7f),
-				Position = new UICoords(0, 0, 0.5f, 0.5f),
-				AnchorPoint = new Vector2(0.5f, 0.5f),
+				Size = new UICoords(0, 0, 0.3f, 0.8f),
+				Position = new UICoords(0, 0, 0.6f, 0.2f),
+				AnchorPoint = new Vector2(0f, 0f),
 				BGColor = Color.Transparent,
 			};
+			var LeftContainer = new UIListContainer{Padding = 2, Parent = LeftList};
 
-			UIListContainer container = new UIListContainer
+			Label graphicsLbl = new Label
 			{
-				Padding = 2,
-				Parent = optionList,
+				TextColor = Color.White,
+				Parent = LeftContainer,
+				Size = new UICoords(0, 25, 1, 0),
+				Font = GFX.Fonts.Arial16,
+				Text = "GRAPHICS",
+				TextXAlign = TextXAlignment.Center,
 			};
 
 			TextButton fullscreenBtn = new TextButton
 			{
-				Parent = container,
+				Parent = LeftContainer,
 				TextColor = Color.White,
-				Text = "Fullscreen: "+ReadableBoolean(GameSettings.CurrentSettings.Fullscreen),
+				Text = "Fullscreen: " + ReadableBoolean(Game.Settings.Fullscreen),
 				Font = GFX.Fonts.Arial14,
 				Size = new UICoords(0, 25, 1, 0),
 				TextXAlign = TextXAlignment.Center,
@@ -112,19 +119,17 @@ namespace CaveGame.Client.Menu
 			};
 			void updateFullscreenBnt(TextButton b, MouseState m)
 			{
-				GameSettings.CurrentSettings.Fullscreen = !GameSettings.CurrentSettings.Fullscreen;
-				fullscreenBtn.Text = "Fullscreen: " + ReadableBoolean(GameSettings.CurrentSettings.Fullscreen);
-				GameSettings.CurrentSettings.Save();
-				Game.OnSetFullscreen(GameSettings.CurrentSettings.Fullscreen);
-				
+				Game.Settings.Fullscreen = !Game.Settings.Fullscreen;
+				fullscreenBtn.Text = "Fullscreen: " + ReadableBoolean(Game.Settings.Fullscreen);
 			}
 			fullscreenBtn.OnLeftClick += updateFullscreenBnt;
 
+			// Particles toggle
 			TextButton particlesBtn = new TextButton
 			{
-				Parent = container,
+				Parent = LeftContainer,
 				TextColor = Color.White,
-				Text = "Particles: " + ReadableBoolean(GameSettings.CurrentSettings.Particles),
+				Text = "Particles: " + ReadableBoolean(Game.Settings.Particles),
 				Font = GFX.Fonts.Arial14,
 				Size = new UICoords(0, 25, 1, 0),
 				TextXAlign = TextXAlignment.Center,
@@ -134,56 +139,70 @@ namespace CaveGame.Client.Menu
 			};
 			void updateParticles(TextButton b, MouseState m)
 			{
-				particlesBtn.Text = "Particles: " + ReadableBoolean(GameSettings.CurrentSettings.Particles);
-				GameSettings.CurrentSettings.Particles = !GameSettings.CurrentSettings.Particles;
-				GameSettings.CurrentSettings.Save();
+				Game.Settings.Particles = !Game.Settings.Particles;
+				particlesBtn.Text = "Particles: " + ReadableBoolean(Game.Settings.Particles);
 			}
 			particlesBtn.OnLeftClick += updateParticles;
 
-
+			// Framerate Cap
 			Label fpsCapText = new Label
 			{
 				TextColor = Color.White,
-				Parent = container,
+				Parent = LeftContainer,
 				Size = new UICoords(0, 25, 1, 0),
 				Font = GFX.Fonts.Arial14,
-				Text = "Framerate Cap: " + GameSettings.CurrentSettings.FPSLimit,
+				Text = "FPS Cap: " + Game.Settings.FPSLimit,
 			};
 
-			Slider<SliderIndex<int>> fpsCapSlider = new UI.Slider<SliderIndex<int>>
+			NumericSlider fpsCapSlider = new NumericSlider
 			{
-				DataSet = GameSettings.FramerateCapSliderOptions,
-				Parent = container,
+				Minimum = 30, Maximum = 241, Interval = 30,
+
+				Parent = LeftContainer,
 				Size = new UICoords(0, 25, 0.5f, 0),
 				AnchorPoint = new Vector2(0.0f, 0.0f),
 				UnselectedBGColor = new Color(0.6f, 0.6f, 0.6f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
-				Scrubber = new Scrubber { Width=20},
+				Scrubber = new Scrubber { Width = 20 },
 				BGColor = new Color(0.25f, 0.25f, 0.25f),
 			};
-			void onFpsCapSliderChanged(Slider<SliderIndex<int>> sl, SliderIndex<int> val, int index)
+			void onFpsCapSliderChanged(NumericSlider slider, float value)
 			{
-				GameSettings.CurrentSettings.FPSLimitIndex = index;
-				GameSettings.CurrentSettings.FPSLimit = val.Value;
-				fpsCapText.Text = "FPS Cap:" + val.Display;
-				Game.OnSetFPSLimit(val.Value);
-				GameSounds.MenuBlip?.Play(0.8f, 1, 0.0f);
+				fpsCapText.Text = "FPS Cap:" + (int)value;
+				Game.Settings.FPSLimit = (int)value;
 			}
 			fpsCapSlider.OnValueChanged += onFpsCapSliderChanged;
-			//fpsCapSlider.SetIndex(GameSettings.CurrentSettings.FPSLimitIndex);
 
+			// Right-Side options
+			UIRect RightList = new UIRect
+			{
+				Parent = SettingsUI,
+				Size = new UICoords(0, 0, 0.3f, 0.8f),
+				Position = new UICoords(0, 0, 0.1f, 0.2f),
+				AnchorPoint = new Vector2(0f, 0f),
+				BGColor = Color.Transparent,
+			};
+
+			UIListContainer RightContainer = new UIListContainer
+			{
+				Padding = 2,
+				Parent = RightList,
+			};
+			
+
+			// chat size slider
 			Label chatSizeText = new Label
 			{
 				TextColor = Color.White,
-				Parent = container,
+				Parent = LeftContainer,
 				Size = new UICoords(0, 25, 1, 0),
 				Font = GFX.Fonts.Arial14,
-				Text = "Chat Size: " + GameSettings.ChatSizeSliderOptions[(int)GameSettings.CurrentSettings.ChatSize].Display,
+				Text = "Chat Size: " + Game.Settings.ChatSize,
 			};
 			Slider<SliderIndex<GameChatSize>> chatSizeSlider = new UI.Slider<SliderIndex<GameChatSize>>
 			{
 				DataSet = GameSettings.ChatSizeSliderOptions,
-				Parent = container,
+				Parent = LeftContainer,
 				Size = new UICoords(0, 25, 0.5f, 0),
 				AnchorPoint = new Vector2(0.0f, 0.0f),
 				UnselectedBGColor = new Color(0.6f, 0.6f, 0.6f),
@@ -193,13 +212,120 @@ namespace CaveGame.Client.Menu
 			};
 			void onChatSliderChanged(Slider<SliderIndex<GameChatSize>> sl, SliderIndex<GameChatSize> val, int index)
 			{
-				GameSettings.CurrentSettings.ChatSize = val.Value;
+				Game.Settings.ChatSize = val.Value;
 				chatSizeText.Text = "Chat Size:" + val.Display;
-				Game.OnSetChatSize(val.Value);
 				GameSounds.MenuBlip?.Play(0.8f, 1, 0.0f);
 			}
 			chatSizeSlider.OnValueChanged += onChatSliderChanged;
-			//chatSizeSlider.SetIndex((int)GameSettings.CurrentSettings.ChatSize);
+
+
+			Label soundLbl = new Label
+			{
+				TextColor = Color.White,
+				Parent = RightContainer,
+				Size = new UICoords(0, 25, 1, 0),
+				Font = GFX.Fonts.Arial16,
+				Text = "SOUND",
+				TextXAlign = TextXAlignment.Center,
+			};
+			Label masterVolumeLabel = new Label
+			{
+				TextColor = Color.White,
+				Parent = RightContainer,
+				Size = new UICoords(0, 25, 1, 0),
+				Font = GFX.Fonts.Arial14,
+				Text = "Master Volume: " + GameSettings.CurrentSettings.MasterVolume + "%",
+			};
+			Slider<SliderIndex<int>> masterVolumeSlider = new UI.Slider<SliderIndex<int>>
+			{
+				DataSet = GameSettings.VolumeSliderOptions,
+				Parent = RightContainer,
+				Size = new UICoords(0, 20, 1f, 0),
+				AnchorPoint = new Vector2(0.0f, 0.0f),
+				UnselectedBGColor = new Color(0.6f, 0.6f, 0.6f),
+				SelectedBGColor = new Color(0.0f, 0.0f, 0.0f),
+				Scrubber = new Scrubber { Width = 20 },
+				BGColor = new Color(0.25f, 0.25f, 0.25f),
+			};
+			void onMasterVolumeSliderChanged(Slider<SliderIndex<int>> sl, SliderIndex<int> val, int index)
+			{
+				GameSettings.CurrentSettings.MasterVolume = val.Value;
+				masterVolumeLabel.Text = "Master Volume: " + val.Display + "%";
+				
+				GameSounds.MenuBlip?.Play(val.Value/100.0f, 1, 0.0f);
+			}
+			masterVolumeSlider.OnValueChanged += onMasterVolumeSliderChanged;
+
+
+
+			Label musicVolumeLabel = new Label
+			{
+				TextColor = Color.White,
+				Parent = RightContainer,
+				Size = new UICoords(0, 25, 1, 0),
+				Font = GFX.Fonts.Arial14,
+				Text = "Music Volume: " + GameSettings.ChatSizeSliderOptions[(int)GameSettings.CurrentSettings.ChatSize].Display,
+			};
+			Slider<SliderIndex<int>> musicVolumeSlider = new UI.Slider<SliderIndex<int>>
+			{
+				DataSet = GameSettings.VolumeSliderOptions,
+				Parent = RightContainer,
+				Size = new UICoords(0, 25, 1f, 0),
+				AnchorPoint = new Vector2(0.0f, 0.0f),
+				UnselectedBGColor = new Color(0.6f, 0.6f, 0.6f),
+				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
+				Scrubber = new Scrubber { Width = 20 },
+				BGColor = new Color(0.25f, 0.25f, 0.25f),
+			};
+			void onMusicVolumeSliderChanged(Slider<SliderIndex<int>> sl, SliderIndex<int> val, int index)
+			{
+				GameSettings.CurrentSettings.MusicVolume = val.Value;
+				musicVolumeLabel.Text = "Music Volume: " + val.Display + "%";
+				Game.Settings.MusicVolume = val.Value;
+				GameSounds.MenuBlip?.Play(val.Value / 100.0f, 1, 0.0f);
+			}
+			musicVolumeSlider.OnValueChanged += onMusicVolumeSliderChanged;
+
+
+
+			Label sfxVolumeLabel = new Label
+			{
+				TextColor = Color.White,
+				Parent = RightContainer,
+				Size = new UICoords(0, 25, 1, 0),
+				Font = GFX.Fonts.Arial14,
+				Text = GetSFXLabelText(GameSettings.CurrentSettings.SFXVolume),
+			};
+			NumericSlider sfxVolumeSlider = new NumericSlider
+			{
+				Maximum = 100, Minimum = 0, Interval = 1,
+
+				Parent = RightContainer,
+				Size = new UICoords(0, 25, 1f, 0),
+				AnchorPoint = new Vector2(0.0f, 0.0f),
+				UnselectedBGColor = new Color(0.6f, 0.6f, 0.6f),
+				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
+				Scrubber = new Scrubber { Width = 20 },
+				BGColor = new Color(0.25f, 0.25f, 0.25f),
+			};
+			string GetSFXLabelText(float value) => "SFX Volume: " + Math.Floor(value) + "%";
+			void OnSFXVolumeSliderChanged(NumericSlider slider, float value)
+			{
+				GameSettings.CurrentSettings.SFXVolume = (int)value;
+				AudioManager.EffectVolume = value / 100.0f;
+				sfxVolumeLabel.Text = GetSFXLabelText(GameSettings.CurrentSettings.SFXVolume);
+			}
+			sfxVolumeSlider.OnValueChanged += OnSFXVolumeSliderChanged;
+
+			Label controlLbl = new Label
+			{
+				TextColor = Color.White,
+				Parent = RightContainer,
+				Size = new UICoords(0, 25, 1, 0),
+				Font = GFX.Fonts.Arial16,
+				Text = "CONTROLS",
+				TextXAlign = TextXAlignment.Center,
+			};
 
 			void bindButtonClick(TextButton b, MouseState m)
 			{
@@ -224,7 +350,7 @@ namespace CaveGame.Client.Menu
 				TextYAlign = TextYAlignment.Center,
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
-				Parent = container,
+				Parent = RightContainer,
 			};
 			jumpKeybindButton.OnLeftClick += bindButtonClick;
 			jumpKeybindButton.OnRebind += jumpRebind;
@@ -246,7 +372,7 @@ namespace CaveGame.Client.Menu
 				TextYAlign = TextYAlignment.Center,
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
-				Parent = container,
+				Parent = RightContainer,
 			};
 			upKeybindButton.OnLeftClick += bindButtonClick;
 			upKeybindButton.OnRebind += upRebind;
@@ -263,7 +389,7 @@ namespace CaveGame.Client.Menu
 				TextYAlign = TextYAlignment.Center,
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
-				Parent = container,
+				Parent = RightContainer,
 			};
 			void downRebind(Keys key)
 			{
@@ -284,7 +410,7 @@ namespace CaveGame.Client.Menu
 				TextYAlign = TextYAlignment.Center,
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
-				Parent = container,
+				Parent = RightContainer,
 			};
 			void leftRebind(Keys key)
 			{
@@ -304,7 +430,7 @@ namespace CaveGame.Client.Menu
 				TextYAlign = TextYAlignment.Center,
 				UnselectedBGColor = new Color(0.2f, 0.2f, 0.2f),
 				SelectedBGColor = new Color(0.1f, 0.1f, 0.1f),
-				Parent = container,
+				Parent = RightContainer,
 			};
 			void rightRebind(Keys key)
 			{

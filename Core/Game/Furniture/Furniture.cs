@@ -338,6 +338,7 @@ namespace CaveGame.Core.Furniture
 						return;
 
 					State = DoorState.OpenLeft;
+					AudioManager.PlayEffect("door", 1, 1, -0.7f);
 					client.Send(new Network.OpenDoorPacket(FurnitureNetworkID, player.Facing));
 				} else
 				{
@@ -349,6 +350,7 @@ namespace CaveGame.Core.Furniture
 						return;
 
 					State = DoorState.OpenRight;
+					AudioManager.PlayEffect("door", 1, 1, 0.7f);
 					client.Send(new Network.OpenDoorPacket(FurnitureNetworkID, player.Facing));
 				}
 			}
@@ -356,6 +358,7 @@ namespace CaveGame.Core.Furniture
 			{
 				client.Send(new Network.CloseDoorPacket(FurnitureNetworkID));
 				State = DoorState.Closed;
+				AudioManager.PlayEffect("door", 1, 0.8f, 0f);
 			}
 		}
 	}

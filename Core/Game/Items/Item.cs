@@ -19,6 +19,7 @@ using CaveGame.Core.Inventory;
 namespace CaveGame.Core.Game.Items
 
 {
+	using JsonString = String;
 	public enum ItemID : short
 	{
 		CopperIngot, LeadIngot, TinIngot, ChromiumIngot, AluminiumIngot,
@@ -28,8 +29,12 @@ namespace CaveGame.Core.Game.Items
 	public enum ItemTag
     {
 		Armor, Potion
-
     }
+
+	public interface IArmorItem
+	{
+		int Defense { get; }
+	}
 
 	public interface IItem
 	{
@@ -54,7 +59,7 @@ namespace CaveGame.Core.Game.Items
 		}
 
 		public virtual string Namespace => "cavegame";
-
+		public virtual string[] Tooltip { get; }
 		public virtual int MaxStack => 99;
 		public virtual string Name => this.GetType().Name;
 		public virtual string DisplayName => Name;
@@ -62,7 +67,6 @@ namespace CaveGame.Core.Game.Items
 		public virtual Texture2D Texture { get; }
 
 		public bool MouseDown { get; set; }
-
 		public void Draw(GraphicsEngine GFX, Texture2D texture, Vector2 position, float scale)
 		{
 			GFX.Sprite(texture, position, null, Color.Gray, Rotation.Zero, Vector2.Zero, scale, SpriteEffects.None, 0);
@@ -72,7 +76,7 @@ namespace CaveGame.Core.Game.Items
         {
 			MouseDown = true;
         }
-		public virtual void OnClientLMBUp(Player player, IGameClient client)
+		public virtual void OnClientLMBUp(Player player, IGameClient client, ItemStack stack)
         {
 			MouseDown = false;
         }
@@ -165,6 +169,36 @@ namespace CaveGame.Core.Game.Items
 
 			return item;
         }
+
+	}
+
+
+	public class Potion : Item
+	{
+
+		public override string[] Tooltip => new string[]{
+			""
+		};
+		public override string DisplayName => base.DisplayName;
+		public override Texture2D Texture => GraphicsEngine.Instance.Potion;
+		public virtual void OnDrink(Player player)=> player.AddEffect(new StatusEffects.Burning(10));
+
+		public override void OnClientLMBDown(Player player, IGameClient client, ItemStack stack)
+		{
+			base.OnClientLMBDown(player, client, stack); 
+			stack.Quantity--;
+			OnDrink(player);
+		}
+	}
+
+	public class Speed : Potion
+	{
+		public override string DisplayName => "Speed Potion";
+		public override void OnDrink(Player player) => player.AddEffect(new StatusEffects.AmphetamineRush(10));
+	}
+
+	public class GlowPotion : Potion
+	{
 
 	}
 
@@ -336,6 +370,15 @@ namespace CaveGame.Core.Game.Items
 		{
 			Tile = tile;
 		}
+
+		public static TileItem Of<T>() where T: Tile, new()
+		{
+			return new TileItem { Tile = new T() };
+		}
+		public static TileItem Of<T>(T Tobj) where T : Tile, new()
+		{
+			return new TileItem { Tile = Tobj };
+		}
 		public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
 		{
 			MouseState mouse = Mouse.GetState();
@@ -419,53 +462,7 @@ namespace CaveGame.Core.Game.Items
 		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale) => Draw(GFX, GFX.BombSprite, position, scale);
 	}
 
-	public class RaycastTesterItem : Item
-    {
-		public override int MaxStack => 1;
-
-		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale) => Draw(GFX, GFX.Bong, position, scale);
-
-		public Vector2 RaySurfaceNormal { get; set; }
-		public Vector2 RayEndpoint { get; set; }
-        public Vector2 RayStartpoint { get; set; }
-
-		public override void OnClientLMBHeld(Player player, IGameClient client, ItemStack stack, GameTime gt)
-        {
-
-			RayStartpoint = player.Position;
-
-			MouseState mouse = Mouse.GetState();
-
-			var mp = client.Camera.ScreenToWorldCoordinates(mouse.Position.ToVector2());
-
-			
-			var unitVec = (mp - player.Position);
-            unitVec.Normalize();
-
-			var result = client.World.TileRaycast(player.Position, Rotation.FromUnitVector(unitVec));
-            
-			if (result.Hit)
-            {
-				RayEndpoint = result.Intersection;
-				RaySurfaceNormal = result.SurfaceNormal;
-				
-			}
-
-            base.OnClientLMBHeld(player, client, stack, gt);
-        }
-
-        public override void OnClientDraw(GraphicsEngine GFX)
-        {
-			if (MouseDown)
-            {
-                GFX.Line(Color.Green, RayStartpoint, RayEndpoint, 1.0f);
-                GFX.Line(Color.Yellow, RayEndpoint, RayEndpoint + (RaySurfaceNormal * 10), 1.0f);
-			}
-
-
-            base.OnClientDraw(GFX);
-        }
-    }
+	
 
 	public class SplatterItem : Item
     {

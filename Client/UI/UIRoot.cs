@@ -17,10 +17,8 @@ using Microsoft.Xna.Framework.Input;
 
 namespace CaveGame.Client.UI
 {
-
 	public static class TypeCastingHax
-    {
-
+	{
 		public static void InitFromLuaPropertyTable(this object thing, Lua environment, LuaTable table)
         {
 			foreach (KeyValuePair<object, object> kvp in environment.GetTableDict(table))

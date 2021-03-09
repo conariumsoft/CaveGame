@@ -1,9 +1,17 @@
-﻿using System;
+﻿using CaveGame.Core.Game.Entities;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace CaveGame.Core.Game.Tiles
 {
+
+
+	public interface IClickableTile
+	{
+		void OnClick(IGameWorld world, Player clicker);
+	}
+
 	public interface IWaterBreakable { }
 	public interface INonMinable { }
 	public interface INonSolid { }

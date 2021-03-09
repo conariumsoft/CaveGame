@@ -15,8 +15,17 @@ namespace DataManagement
             else
                 a = (byte)(a & ~(1 << pos));
         }
+		public static byte SetF(this byte a, int pos, bool value)
+		{
+			if (value)
+				a = (byte)(a | (1 << pos));
+			else
+				a = (byte)(a & ~(1 << pos));
 
-        public static bool Get(this byte a, int pos)
+			return a;
+		}
+
+		public static bool Get(this byte a, int pos)
         {
             return ((a & (1 << pos)) != 0);
         }

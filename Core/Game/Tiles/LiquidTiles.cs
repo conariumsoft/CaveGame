@@ -7,8 +7,6 @@ using System.Text;
 
 namespace CaveGame.Core.Game.Tiles
 {
-
-
 	public abstract class Liquid : Tile, ILiquid, INonSolid, INonMinable
 	{
 
@@ -180,6 +178,8 @@ namespace CaveGame.Core.Game.Tiles
 
 		public void LocalTileUpdate(IGameWorld world, int x, int y)
 		{
+			
+
 			var below = world.GetTile(x, y + 1);
 
 			if (below is Water _)

@@ -58,7 +58,7 @@ namespace CaveGame.Client.Menu
 		{
 			Pages = new Dictionary<string, UIRoot>();
 			Game = _game;
-			rastering = new RasterizerState() { ScissorTestEnable = true };
+			rastering = new RasterizerState() { ScissorTestEnable = false };
 		}
 
 		public void Draw(GraphicsEngine GFX)

@@ -10,11 +10,20 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssetManagement\AssetLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AudioManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\DamageType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\Direction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\GameSteamAchievement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\TextAlignment.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Biomes\Badlands.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Biomes\Biome.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Biomes\Desert.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Biomes\Forest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Biomes\Mountain.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Biomes\Plains.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Camera.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\Zombie.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game\Items\Nimdoc.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ICaveGameImplementation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IDamageSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IEntityManager.cs" />
@@ -100,7 +109,6 @@
     <MonoGameContentReference Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Game\Items\" />
     <Folder Include="$(MSBuildThisFileDirectory)DataTypes\" />
     <Folder Include="$(MSBuildThisFileDirectory)Game\Structures\" />
     <Folder Include="$(MSBuildThisFileDirectory)Logging\" />

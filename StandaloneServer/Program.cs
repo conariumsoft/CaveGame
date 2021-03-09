@@ -17,7 +17,10 @@ namespace StandaloneServer
 		public string Text;
 		public ConsoleColor Color;
 	}
-
+	//
+	//
+	//
+	//
 	public static class Program
 	{
 		private delegate bool ConsoleCtrlHandlerDelegate(int sig);

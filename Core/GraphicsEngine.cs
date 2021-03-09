@@ -138,6 +138,8 @@ namespace CaveGame.Core
 
         public bool LoadFonts { get; set; }
 
+		public float GlobalAnimationTimer { get; private set; }
+
         public static GraphicsEngine Instance { get; private set; }
 
 
@@ -153,6 +155,8 @@ namespace CaveGame.Core
         public Texture2D Slot => Textures["slot.png"];
         public Texture2D CloudBackground => Textures["clouds.png"];
         public Texture2D Starfield => Textures["stars.png"];
+
+		public Texture2D Nimdoc => Textures["items:nimdoc_anim.png"];
 
         public Texture2D Explosion => Textures["michaelbay.png"];
         public Texture2D BowSprite => Textures["items:bow.png"];
@@ -179,7 +183,8 @@ namespace CaveGame.Core
 		public Texture2D Campfire       => Textures["items:campfire.png"]; 
         
         public Texture2D Player       => Textures["entities:player.png"];
-        public Texture2D ArrowEntity => Textures["entities:arrow.png"];
+		public Texture2D Zombie => Textures["entities:zombie.png"];
+		public Texture2D ArrowEntity => Textures["entities:arrow.png"];
         public Texture2D VoidMonster  => Textures["entities:wurmhole.png"];
         public Texture2D Bee          => Textures["entities:bee.png"];
         public Texture2D Goldfish     => Textures["entities:gregothy.png"];
@@ -307,11 +312,18 @@ namespace CaveGame.Core
 
         public void Update(GameTime gt)
         {
+
+			// move asset loading to it's own class?
             if (LoadingQueue.Count > 0)
                 LoadNextAsset(GraphicsDevice);
 
             if (LoadingQueue.Count == 0)
                 ContentLoaded = true;
+
+
+			// increase global anim time.
+			// used by items, entities, and tiles when an internal state is otherwise not ideal.
+			GlobalAnimationTimer += gt.GetDelta();
 
         }
 

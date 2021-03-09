@@ -503,7 +503,7 @@ namespace CaveGame.Core
 
 				Vector2 normal = face.ToSurfaceNormal();
 
-				return new TileRaycastResult { Hit = true, Intersection = intersection, SurfaceNormal = normal, TileCoordinates = tile_coords, Face = face };
+				return new TileRaycastResult { Hit = true, Intersection = intersection, SurfaceNormal = normal, TileCoordinates = tile_coords, Face = face, Target = tileAt };
 		
 			}
 			return new TileRaycastResult { Hit = false };

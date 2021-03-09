@@ -26,10 +26,6 @@ using System.Threading.Tasks;
 
 namespace CaveGame.Client
 {
-
-	
-
-
     using ArrowEntity = Core.Game.Entities.Arrow;
     using BombEntity = Core.Game.Entities.Bomb;
     using DynamiteEntity = Core.Game.Entities.Dynamite;
@@ -51,40 +47,54 @@ namespace CaveGame.Client
 
 	public class GameClient : IGameContext, IGameClient
 	{
-
 		public event ClientShutdown OnShutdown;
 
+
+		// should this be in gamesettings?
+		public int ChunkingRadius { get; set; }
+		public bool ShowChunkBoundaries { get; set; }
+		public static float CameraZoom = 2.0f;
+
+		// not sure why this is stored here.
 		public string NetworkUsername { get; private set; }
 		public string ConnectAddress { get; private set; }
 		public bool Active { get; set; }
 
-		public static float CameraZoom = 2.0f;
-
-		public bool ShowChunkBoundaries { get; set; }
-
+		
 		public CaveGameGL Game { get; private set; }
+		// gameclient subsystems
+
 		public GameChat Chat { get; private set; }
 		public LocalWorld World { get; private set; }
 		public PlayerContainerFrontend Inventory { get; set; }
-		public Camera2D Camera { get;  }
-
+		public Camera2D Camera { get; }
+		public StatusEffectDisplay StatusDisplay { get; private set; }
 		protected NetworkClient NetClient { get; set; }
+
 
 		Microsoft.Xna.Framework.Game IGameContext.Game => Game;
 		IClientWorld IGameClient.World => World;
 		//public Hotbar Hotbar { get; set; }
 		
-		public int ChunkingRadius { get; set; }
+		
+		// ?
+		int MyUserID { get; set; }
+		int MyPlayerID { get; set; }
 
-		int MyUserID;
-		int MyPlayerID;
+
 
 		public Game.Entities.LocalPlayer MyPlayer { get; private set; }
 
+
 		PauseMenu PauseMenu { get; set; }
+
 
 		protected List<RepeatingIntervalTask> ClientTasks { get; set; }
 
+
+		
+		// Initialize events for networkmanager to listen for
+		// each event is bound to a PacketType ID
 		private Dictionary<PacketType, NetworkListener> NetworkEvents;
 		private void InitNetworkEvents() => NetworkEvents = new Dictionary<PacketType, NetworkListener>()
 		{
@@ -136,14 +146,17 @@ namespace CaveGame.Client
 			Camera = new Camera2D { Zoom = CameraZoom };
 			Chat = new GameChat(this);
 			PauseMenu = new PauseMenu(this);
+			StatusDisplay = new StatusEffectDisplay(this);
 			Inventory = new PlayerContainerFrontend();
 
+			// Game Event Scheduler
 			ClientTasks = new List<RepeatingIntervalTask>
 			{
 				new RepeatingIntervalTask(ReplicatePlayerState, 1 / 10.0f),
 				new RepeatingIntervalTask(ChunkUnloadingCheck, 1/2.0f),
 				new RepeatingIntervalTask(ChunkLoadingCheckUpdate, 1 / 2.0f),
 			};
+
 			ChunkingRadius = 1;
 		}
 
@@ -153,16 +166,9 @@ namespace CaveGame.Client
 			NetClient = new NetworkClient(login.ServerAddress);
 		}
 
-		protected struct FpsSample : GraphSample
-		{
-			public double Value { get; set; }
-		}
 
-		//protected GraphRenderer<FpsSample> FPSGraph { get; private set; }
-		//GraphRecorder<FpsSample> ImmediateData;
-		//GraphRecorder<FpsSample> AverageData;
-
-		private void Uncouple()
+		// Cleanup code after leaving any game server.
+		private void Logout()
         {
 			PauseMenu.Open = false;
 
@@ -174,37 +180,42 @@ namespace CaveGame.Client
 			//Dispose();
 		}
 
+		// Fills the player's inventory with test items upon startup.
+		// This is testing data, and should be left out of the final game
+		// Called after creating a player.
+		// Should probably be done on the server...
 		private void FillInventory(Container container)
         {
-			container.ForceSetSlot(0, 0, new ItemStack { Item = new RaycastTesterItem(), Quantity = 1 });
-			//Inventory.Container.ForceSetSlot(0, 0, new ItemStack {Item = new CopperPickaxe(), Quantity = 1 });
-			container.ForceSetSlot(0, 1, new ItemStack { Item = new IronPickaxe(), Quantity = 1 });
-			container.ForceSetSlot(0, 2, new ItemStack { Item = new LeadPickaxe(), Quantity = 1 });
-			container.ForceSetSlot(1, 0, new ItemStack { Item = new TileItem(new Core.Game.Tiles.OakPlank()), Quantity = 999 });
-			container.ForceSetSlot(1, 1, new ItemStack { Item = new GenericWallScraper(), Quantity = 1 });
-			container.ForceSetSlot(2, 0, new ItemStack { Item = new TileItem(new Core.Game.Tiles.StoneBrick()), Quantity = 999 });
-			container.ForceSetSlot(3, 0, new ItemStack { Item = new TileItem(new Core.Game.Tiles.ClayBrick()), Quantity = 999 });
-			container.ForceSetSlot(4, 0, new ItemStack { Item = new BombItem(), Quantity = 999 });
-			container.ForceSetSlot(5, 0, new ItemStack { Item = new TileItem(new RedTorch()), Quantity = 999 });
-			container.ForceSetSlot(6, 0, new ItemStack { Item = new TileItem(new GreenTorch()), Quantity = 999 });
-			container.ForceSetSlot(7, 0, new ItemStack { Item = new TileItem(new BlueTorch()), Quantity = 999 });
-			container.ForceSetSlot(8, 0, new ItemStack { Item = new TileItem(new Torch()), Quantity = 999 });
-			container.ForceSetSlot(9, 0, new ItemStack { Item = new TileItem(new Water()), Quantity = 999 });
-			container.ForceSetSlot(2, 1, new ItemStack { Item = new FurnaceItem(), Quantity = 999 });
-			container.ForceSetSlot(3, 1, new ItemStack { Item = new DoorItem(), Quantity = 999 });
-			container.ForceSetSlot(4, 1, new ItemStack { Item = new WorkbenchItem(), Quantity = 999 });
-			container.ForceSetSlot(5, 1, new ItemStack { Item = new WallItem(new Core.Game.Walls.StoneBrick()), Quantity = 999 });
+			container.ForceSetSlot(0, 3, ItemStack.Of<Nimdoc>(5));
+			container.ForceSetSlot(0, 1, ItemStack.Of<CopperPickaxe>());
+			container.ForceSetSlot(0, 1, ItemStack.Of<IronPickaxe>());
+			container.ForceSetSlot(0, 2, ItemStack.Of<LeadPickaxe>());			
+			container.ForceSetSlot(1, 1, ItemStack.Of<GenericWallScraper>());
+
+			container.ForceSetSlot(0, 0, ItemStack.Of<BombItem>(999));
+
+			container.ForceSetSlot(1, 0, new ItemStack(TileItem.Of<Core.Game.Tiles.OakPlank>(), 999));
+			container.ForceSetSlot(2, 0, new ItemStack(TileItem.Of<Core.Game.Tiles.StoneBrick>(), 999));
+			container.ForceSetSlot(3, 0, new ItemStack(TileItem.Of<Core.Game.Tiles.ClayBrick>(), 999));
+			container.ForceSetSlot(4, 0, new ItemStack(TileItem.Of<GreenTorch>(), 999));
+			container.ForceSetSlot(5, 0, new ItemStack(TileItem.Of<RedTorch>(), 999));
+			container.ForceSetSlot(6, 0, new ItemStack(TileItem.Of<BlueTorch>(), 999));
+			container.ForceSetSlot(7, 0, new ItemStack(TileItem.Of<Lava>(), 999));
+			container.ForceSetSlot(8, 0, ItemStack.Of<FurnaceItem>(999));
+			container.ForceSetSlot(9, 0, ItemStack.Of<DoorItem>(999));
+			container.ForceSetSlot(1, 1, ItemStack.Of<WorkbenchItem>(999));
+			//container.ForceSetSlot(5, 1, new ItemStack { Item = new WallItem(new Core.Game.Walls.StoneBrick()), Quantity = 999 });
 		}
 
 		public void Disconnect()
 		{
-			Uncouple();
+			Logout();
 			Game.GoToMainMenu();
 		}
 
 		public void ForcedDisconnect(string kickReason)
         {
-			Uncouple();
+			Logout();
 			Game.GoToTimeoutPage(kickReason);
 		}
 
@@ -576,8 +587,11 @@ namespace CaveGame.Client
 		}
 
 		#endregion
+
+
 		private void ReadIncomingPackets()
 		{
+			// read all queued packets
 			while (NetClient.HaveIncomingMessage())
 			{
 				NetworkMessage msg = NetClient.GetLatestMessage();
@@ -586,13 +600,15 @@ namespace CaveGame.Client
                     {
 						ServerKeepAlive = 0;
 						ev.Value.Invoke(msg);
-					}
-						
+					}	
 			}
 		}
 
 
 		float redrawTimer { get; set; }
+
+		// chunks are drawn to a back buffer, rather than redrawing the chunk each frame
+		// this causes quite a few issues.
 		private void RedrawChunkBuffers(GraphicsEngine GFX)
 		{
 			foreach (var chunkpair in World.Chunks)
@@ -603,20 +619,20 @@ namespace CaveGame.Client
 			}
 		}
 
-		private void EntityRendering(GraphicsEngine gfx)
+
+		private void DrawEntities(GraphicsEngine gfx)
 		{
 			foreach (Entity entity in World.Entities)
-            {
 				entity.Draw(gfx);
-			}
-
 		}
 
+		// draw foreground chunk buffers
+		// drawn after background
 		private void DrawChunkTileTextures(GraphicsEngine gfx)
 		{
 			foreach (var chunkpair in World.Chunks)
 			{
-				
+
 				Chunk chunk = chunkpair.Value;
 				Vector2 pos = new Vector2(chunk.Coordinates.X * Globals.ChunkSize * Globals.TileSize, chunk.Coordinates.Y * Globals.ChunkSize * Globals.TileSize);
 				if (chunk.TileRenderBuffer != null)
@@ -624,6 +640,9 @@ namespace CaveGame.Client
 
 			}
 		}
+
+		// draw background chunk buffers
+		// drawn before entities & particles
 		private void DrawChunkWallTextures(GraphicsEngine gfx)
 		{
 			foreach (var chunkpair in World.Chunks)
@@ -636,6 +655,9 @@ namespace CaveGame.Client
 					gfx.Sprite(chunk.WallRenderBuffer, pos, Color.White);
 			}
 		}
+
+		// render a shitton of debug data
+		// todo: move to their own togglable datasets
 		private void DrawDebugInfo(GraphicsEngine gfx)
 		{
 			gfx.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
@@ -648,7 +670,6 @@ namespace CaveGame.Client
 			var tileCoords = mp;
 			mp *= 8;
 
-
 			var tileat = World.GetTile((int)tileCoords.X, (int)tileCoords.Y);
 			var wallat = World.GetWall((int)tileCoords.X, (int)tileCoords.Y);
 
@@ -658,8 +679,6 @@ namespace CaveGame.Client
 			debugStats.Add($"userid {MyUserID} netaddr {ConnectAddress}");
 
 
-			//debugStats.Add($"in {Math.Round(NetClient.BytesReceivedPerSecond / 1000.0f, 2)}kb/s || {Math.Round(NetClient.TotalBytesReceived / 1000.0f, 2)}kb total || {NetClient.PacketsReceived}ct");
-			//debugStats.Add($"out {Math.Round(NetClient.BytesSentPerSecond / 1000.0f, 2)}kb/s || {Math.Round(NetClient.TotalBytesSent / 1000.0f, 2)}kb total || {NetClient.PacketsSent}ct");
 			if (World!=null)
 				debugStats.Add($"entities {World.Entities.Count} furn {World.Furniture.Count}");
 
@@ -701,6 +720,8 @@ namespace CaveGame.Client
 			//gameClient.SendPacket(new RequestJoinPacket("jooj"));
 		}
 
+		// on connection failure
+		// show the "OOPS" screen
 		private void FailConnect(string reason)
         {
 			Game.MenuContext.CurrentPage = Game.MenuContext.TimeoutPage;
@@ -717,13 +738,15 @@ namespace CaveGame.Client
 			{
 				// Just Pressed
 				if (mouse.LeftButton == ButtonState.Pressed && previous.LeftButton == ButtonState.Released)
-				{
 					Inventory.EquippedItem.Item.OnClientLMBDown(MyPlayer, this, Inventory.EquippedItem);
-				}
+
+				// being held
 				if (mouse.LeftButton == ButtonState.Pressed && previous.LeftButton == ButtonState.Pressed)
-				{
 					Inventory.EquippedItem.Item.OnClientLMBHeld(MyPlayer, this, Inventory.EquippedItem, gt);
-				}
+
+				// released
+				if (mouse.LeftButton == ButtonState.Released && previous.LeftButton == ButtonState.Pressed)
+					Inventory.EquippedItem.Item.OnClientLMBUp(MyPlayer, this, Inventory.EquippedItem);
 			}
 			
 			// Object interaction
@@ -744,9 +767,11 @@ namespace CaveGame.Client
 
 		}
 
+		// send player direction and animation state to the server
+		// players are handled slightly differently in that animation state is controlled on the client, and replicated to the server
+		// sanity checking is in order
 		private void ReplicatePlayerState()
 		{
-			//Debug.WriteLine("Replicating");
 			if (MyPlayer != null)
 			{
 				NetClient?.SendPacket(new EntityPhysicsStatePacket(MyPlayer));
@@ -756,18 +781,17 @@ namespace CaveGame.Client
 
 
 		float scroll = 2;
+
+		// update game camera
 		private void UpdateCamera(GameTime gt)
 		{
 			MouseState mouse = Mouse.GetState();
 
+			// scroll
 			if (Keyboard.GetState().IsKeyDown(Keys.OemMinus))
-			{
 				scroll -= 0.01f;
-			}
 			if (Keyboard.GetState().IsKeyDown(Keys.OemPlus))
-			{
 				scroll += 0.01f;
-			}
 
 			//float ZoomFactor = ((mouse.ScrollWheelValue - IntitalScrollValue) * (Senitivity / 120)) + 2;
 
@@ -828,24 +852,11 @@ namespace CaveGame.Client
 			previousKB = currentKB;
 		}
 
-		public void Update(GameTime gt)
+		// hide keyboard events from the game engine while the
+		// chat or console are open.
+		private void UpdatePlayerIgnoresKeyboardInput()
 		{
-
-			//AverageData.Push(new FpsSample { Value = Game.FPSCounter.GetAverageFramerate()});
-			//ImmediateData.Push(new FpsSample { Value = Game.FPSCounter.GetExactFramerate() });
-
-			//NetClient.Update(gt);
-			redrawTimer += gt.GetDelta();
-			
-			Profiler.StartRegion("Update");
-
-			ServerKeepAlive += gt.GetDelta();
-			UpdateInputs();
-
-			Camera.Update(gt);
-
-			ClientTasks.ForEach(ct => ct.Update(gt));
-
+			// check for player first
 			if (MyPlayer != null)
 			{
 				if (PauseMenu.Open == true || Chat.Open == true || Game.Console.Open == true)
@@ -853,28 +864,24 @@ namespace CaveGame.Client
 				else
 					MyPlayer.IgnoreInput = false;
 			}
+		}
 
-			Profiler.Start("UIUpdate");
+		public void Update(GameTime gt)
+		{
+			redrawTimer += gt.GetDelta();
+			ServerKeepAlive += gt.GetDelta();
+			UpdateInputs();
+
+			Camera.Update(gt);
+			ClientTasks.ForEach(ct => ct.Update(gt));
 			Inventory.Update(gt);
 			PauseMenu.Update(gt);
-
             Chat.Update(gt);
-			Profiler.End();
-
-			//Profiler.Start("WorldUpdate");
 			World.Update(gt);
-			//Profiler.End();
-
-			Profiler.Start("Camera");
+			StatusDisplay.Update(gt);
 			HotbarUpdate(gt);
 			UpdateCamera(gt);
-			Profiler.End();
-
-			Profiler.Start("ReadPackets");
 			ReadIncomingPackets();
-			Profiler.End();
-
-			Profiler.EndRegion();
 		}
 
 		protected void DrawBackgroundLayer(GraphicsEngine GFX) 
@@ -890,32 +897,20 @@ namespace CaveGame.Client
 			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.View);
 			
 			if (PauseMenu.Open)
-				PauseMenu.DrawWaterPixelsFilter(GFX);
+				PauseMenu.DrawWaterPixelsFilter(GFX); // apply background blur
 
-			World.Sky.DrawBackground(GFX);
-			Profiler.Start("DrawChunkCanvases");
-			DrawChunkWallTextures(GFX);
+			World.Sky.DrawBackground(GFX);	// 0:  render sky/background
+			DrawChunkWallTextures(GFX);		//
 			DrawChunkTileTextures(GFX);
-			Profiler.End();
-
-			Profiler.Start("DrawFurniture");
 			foreach (var furn in World.Furniture)
 			{
 				furn.Draw(GFX);
 			}
-			Profiler.End();
-			Profiler.Start("DrawEntities");
-			EntityRendering(GFX);
-			Profiler.End();
-
-			Profiler.Start("DrawParticles");
+			DrawEntities(GFX);
 			World.ParticleSystem.Draw(GFX);
-			Profiler.End();
 
 			if (!Inventory.EquippedItem.Equals(ItemStack.Empty))
-			{
 				Inventory.EquippedItem.Item?.OnClientDraw(GFX);
-			}
 
 			MouseState mouse = Mouse.GetState();
 
@@ -941,41 +936,31 @@ namespace CaveGame.Client
 
 		protected void DrawUILayer(GraphicsEngine GFX)
         {
-			Profiler.Start("DrawUI");
 			GFX.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
 			Inventory.Draw(GFX);
+			StatusDisplay.Draw(GFX);
 			PauseMenu.Draw(GFX);
 			GFX.End();
 			Chat.Draw(GFX);
-			Profiler.End();
+			
 
-			Profiler.Start("DrawDebug");
 			DrawDebugInfo(GFX);
-			Profiler.End();
 		}
 
 		public void Draw(GraphicsEngine GFX)
 		{
-			Profiler.StartRegion("Draw");
 			
 			if (redrawTimer > (1.0f / 8.0f)) 
 			{
 				redrawTimer = 0;
-				Profiler.Start("DrawChunkBuffers");
 				RedrawChunkBuffers(GFX);
-				//Profiler.Track("DrawChunkBuffers", ()=>RedrawChunkBuffers(GFX));
-				Profiler.End("DrawChunkBuffers");
 			}
 
 			DrawBackgroundLayer(GFX);
 			DrawGameLayer(GFX);
 			DrawUILayer(GFX);
 
-
-			Profiler.EndRegion("Draw");
-
 			GFX.Begin(SpriteSortMode.Immediate);
-			Profiler.Draw(GFX);
 		//	FPSGraph.Draw(GFX);
 			//FPSGraph.DrawLineGraph(GFX, ImmediateData);
 		//	FPSGraph.DrawLineGraph(GFX, AverageData);

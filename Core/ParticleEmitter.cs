@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Collections.Concurrent;
+using CaveGame.Core.Game.Entities;
 
 namespace CaveGame.Core
 {
@@ -271,9 +272,81 @@ namespace CaveGame.Core
 	}
 
 
-	public class FireParticle
+	public class FireParticle : Particle
 	{
+		public static Vector2 Origin => new Vector2(16, 16);
 
+		public override float MaxParticleAge => 0.3f;
+
+
+		public Vector2 Position { get; set; }
+		public Vector2 Scale { get; set; }
+		public Color Color { get; set; }
+		Rotation Rotation { get; set; }
+
+		Random RNG = new Random();
+
+		public static Color[] ColorGradient =
+		{
+			new Color(1, 1, 0), // fire starts yellow
+			new Color(1, 0, 0), // turns red
+		};
+
+		public Color GetColor()
+		{
+			int alpha = (int)((this.ParticleAge * 2.0f) % 2);
+
+			return Color.Lerp(Color.Yellow, Color.Red, this.ParticleAge * 3.0f);
+		}
+
+
+		public static float[] SizeGradient = { 2.0f, 3.5f, 1.0f };
+
+		public Vector2 GetSizeV2()
+		{
+			int alpha = (int)(this.ParticleAge * 2) % 2;
+
+			return new Vector2(2, 2);//Vector2(SizeGradient[alpha], SizeGradient[alpha]);
+		}
+
+
+		float rngRise;
+		public FireParticle()
+		{
+			Dead = false;
+			ParticleAge = 0;
+			Rotation = Rotation.FromDeg(RNG.Next(0, 360));
+			rngRise = (float)RNG.NextDouble()+1.0f;
+		}
+
+		public override void Update(GameTime gt)
+		{
+			ParticleAge += (float)gt.ElapsedGameTime.TotalSeconds;
+
+			count += gt.GetDelta();
+			Position -= new Vector2(0, gt.GetDelta() * ((rngRise+1f)*24f));
+		}
+
+		float count = 0;
+
+		public override void PhysicsStep(IGameWorld world, float step)
+		{
+			
+		}
+
+		public override void Draw(GraphicsEngine gfx)
+		{
+			gfx.Rect(GetColor(), Position, new Vector2(2, 2));
+		}
+
+		public void Initialize(Vector2 _position, Color _color, Rotation _rotation, Vector2 _scale)
+		{
+			ParticleAge = 0;
+			Position = _position;
+			Color = _color;
+			Scale = _scale;
+			Dead = false;
+		}
 	}
 	public class DustParticle
 	{
@@ -293,10 +366,6 @@ namespace CaveGame.Core
 		const int MAX_PARTICLES = 4096;
 
 
-		ObjectPool<SmokeParticle> SmokeParticlePool = new ObjectPool<SmokeParticle>(() => new SmokeParticle());
-		//ObjectPool<SmokeParticle> SmokeParticlePool = new ObjectPool<SmokeParticle>(() => new SmokeParticle());
-		ObjectPool<ExplosionParticle> ExplosionParticlePool = new ObjectPool<ExplosionParticle>(() => new ExplosionParticle());
-
 		private List<Particle> Particles;
 		public IGameWorld World { get; set; }
 
@@ -312,14 +381,14 @@ namespace CaveGame.Core
 
 		public void EmitSmokeParticle(Vector2 position, Color color, Rotation rotation, Vector2 scale, Vector2 accel)
 		{
-			var myParticle = SmokeParticlePool.Get();
+			var myParticle = new SmokeParticle();
 
 			myParticle.Initialize(position, color, rotation, scale, accel);
 			Add(myParticle);
 		}
 		public void EmitExplosionParticle(Vector2 position)
         {
-			var myParticle = ExplosionParticlePool.Get();
+			var myParticle = new ExplosionParticle();
 			myParticle.Initialize(position, Color.White, Rotation.Zero, new Vector2(2.0f));
 			Add(myParticle);
 		}
@@ -336,18 +405,6 @@ namespace CaveGame.Core
 
 				if (particle.Dead)
 				{
-					if (particle is SmokeParticle smokey)
-						SmokeParticlePool.Return(smokey);
-
-					Particles.Remove(particle);
-					continue;
-				}
-
-
-				if (particle.Dead)
-				{
-					if (particle is ExplosionParticle bomb)
-						ExplosionParticlePool.Return(bomb);
 
 					Particles.Remove(particle);
 					continue;

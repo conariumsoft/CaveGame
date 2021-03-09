@@ -16,13 +16,16 @@ using System.Threading.Tasks;
 using CaveGame.Core.Game.Items;
 using CaveGame.Core.Inventory;
 using DataManagement;
+using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Audio;
 
 namespace CaveGame.Client
 {
+
 	public class CaveGameGL : Microsoft.Xna.Framework.Game
 	{
 		// TODO: If running local server, shutdown server when player leaves the world
-		public GameSettings GameSettings { get; set; }
+		public GameSettings Settings { get; set; }
 		public IGameContext CurrentGameContext { get; set; }
 		private IGameContext PreviousGameContext { get; set; }
 		public GameClient GameClientContext { get; private set; }
@@ -37,8 +40,11 @@ namespace CaveGame.Client
 		public SteamManager SteamManager { get; private set; }
 		public static float ClickTimer { get; set; }
 
-
-		public void OnSetFPSLimit(int limit)
+		#region GameSettingMethods
+		// these functions don't actually toggle the associated flags
+		// they are just for applying changes to game state
+		// they should be triggered automatically by setting the flag in Game.Settings
+		public void SetFPSLimit(int limit)
 		{
 			if (limit == 0)
 			{
@@ -49,10 +55,8 @@ namespace CaveGame.Client
 				this.TargetElapsedTime = TimeSpan.FromSeconds(1d / (double)limit);
 			}
 		}
-
-		public void OnSetChatSize(GameChatSize size) { }
-
-		public void OnSetFullscreen(bool full)
+		public void SetChatSize(GameChatSize size) { }
+		public void SetFullscreen(bool full)
 		{
 
 			this.GraphicsDeviceManager.IsFullScreen = full;
@@ -68,6 +72,12 @@ namespace CaveGame.Client
 			}
 			GraphicsDeviceManager.ApplyChanges();
 		}
+		public void SetVSync(bool vsync)
+		{
+			this.GraphicsDeviceManager.SynchronizeWithVerticalRetrace = vsync;
+		}
+
+		#endregion
 
 		// join local (singleplayer server
 		public void EnterLocalGame(WorldMetadata meta)
@@ -90,6 +100,7 @@ namespace CaveGame.Client
 		}
 
 
+
 		public void StartClient(string userName, string address) 
 		{
 			GameClientContext?.Dispose();
@@ -100,16 +111,17 @@ namespace CaveGame.Client
 
 			CurrentGameContext = GameClientContext;
 		}
-
-
-		public CaveGameGL()
+		CaveGameArguments StartupArguments;
+		public CaveGameGL(CaveGameArguments arguments)
 		{
+			StartupArguments = arguments;
+
 			IsMouseVisible = true;
 			Content.RootDirectory = "Assets";
 			Window.AllowUserResizing = true;
 			Window.AllowAltF4 = true;
 
-			GameSettings = Configuration.Load<GameSettings>("settings.xml", true);
+
 			SteamManager = new SteamManager(this);
 			
 			GraphicsDeviceManager = new GraphicsDeviceManager(this) 
@@ -131,10 +143,18 @@ namespace CaveGame.Client
 			GraphicsEngine.LoadingDelay = 0.05f;
 			Splash.SplashTimer = 3f;
 #endif
-			OnSetFPSLimit(GameSettings.FPSLimit);
+
+			// Initialize settings
+			Settings = Configuration.Load<GameSettings>("settings.xml", true);
+			Settings.game = this;
+			SetFPSLimit(Settings.FPSLimit);
+			SetFullscreen(Settings.Fullscreen);
+			SetChatSize(Settings.ChatSize);
+			SetVSync(Settings.VSync);
+
 		}
 
-
+		// Update graphics engine's known window size
 		void Window_ClientSizeChanged(object sender, EventArgs e) => GraphicsEngine.WindowSize = Window.ClientBounds.Size.ToVector2();
 
 
@@ -260,7 +280,7 @@ namespace CaveGame.Client
 			MenuContext.TimeoutMessage = timeout;
 		}
 
-		private void InitCommands()
+		private void InitCommands(CommandBar console)
         {
 			// epic new .NET 5 feature
 			Command[] commands =
@@ -275,51 +295,81 @@ namespace CaveGame.Client
 				new ("gimme", "Gives you an item", new List<string>{"itemid", "amount"}, CmdRequestItemstack),
 				new ("crash", "Forces the game to implode", new List<string>{"fake_reason"}, CmdForceCrash),
 			};
-			commands.ForEach(c => Console.BindCommandInformation(c));
-			//commands.ForEach(Console.BindCommandInformation);
+			commands.ForEach(c => console.BindCommandInformation(c));
 		}
 
 
 		protected override void Initialize()
 		{
+			// setup window
 			Window.TextInput += TextInputManager.OnTextInput;
 			Window.ClientSizeChanged += new EventHandler<EventArgs>(Window_ClientSizeChanged);
-			OnSetFullscreen(GameSettings.Fullscreen);
+			SetFullscreen(Settings.Fullscreen);
 
+			// Create console
 			Console = new CommandBar(this);
-			InitCommands();
-
-			GameConsole.SetInstance(Console);
+			InitCommands(Console); // Inject commands
+			GameConsole.SetInstance(Console); // set Global console
 			Components.Add(Console);
+
+			// init steam
 			SteamManager.Initialize();
 			Components.Add(SteamManager);
+
 			base.Initialize();
 		}
 
 
 		protected override void LoadContent()
 		{
-			GameSounds.LoadAssets(Content);
+			// Load Sounds
+			// can be automated at a further point
+			AudioManager.RegisterSong("hey_bella",		Content.Load<Song>("sound/mu/hey_bella"));
+			AudioManager.RegisterSong("mithril_ocean",	Content.Load<Song>("sound/mu/mithril_ocean"));
+			AudioManager.RegisterSong("cliff",			Content.Load<Song>("sound/mu/cliff"));
+			AudioManager.RegisterSong("big_brother",	Content.Load<Song>("sound/mu/big_brother"));
 
+			AudioManager.RegisterEffect("click1",		Content.Load<SoundEffect>("sound/click1"));
+			//AudioManager.RegisterEffect("ambient_lava", Content.Load<SoundEffect>("sound/ambient/lava"));
+			AudioManager.RegisterEffect("door",			Content.Load<SoundEffect>("sound/door"));
+
+
+
+			GameSounds.LoadAssets(Content);
+			//MediaPlayer.Play(GameSounds.Mu_Hey_Bella);
+			AudioManager.PlaySong("hey_bella");
+
+			// Init content within graphics engine
 			GraphicsEngine.ContentManager = Content;
 			GraphicsEngine.GraphicsDevice = GraphicsDevice;
 			GraphicsEngine.GraphicsDeviceManager = GraphicsDeviceManager;
 
 			GraphicsEngine.Initialize();
-			GraphicsEngine.LoadAssets(GraphicsDevice);
+			GraphicsEngine.LoadAssets(GraphicsDevice); // begin texture loading routine
+			
 
-
+			// game menu contexts
 			MenuContext = new MenuManager(this);
 			GameClientContext = new GameClient(this);
 			SettingsContext = new Settings(this);
 
+			// bind text input handler
 			Window.TextInput += SettingsContext.OnTextInput;
-			CurrentGameContext = MenuContext;
+
+			CurrentGameContext = MenuContext; // set me
+
+			// apply command line args
+			if (StartupArguments.AutoLoadWorld != "")
+				EnterLocalGame(new WorldMetadata {Name = StartupArguments.AutoLoadWorld, Seed = 420 });
+
+			if (StartupArguments.AutoConnectName != "")
+				StartClient(StartupArguments.AutoConnectName, StartupArguments.AutoConnectAddress);
 		}
 
-
+		// should this be here?
 		public void TakeScreenshot(string filename = "")
 		{
+			// doesn't work
 			bool wasEnabled = Console.Enabled;
 			Console.Enabled = false;
 
@@ -347,44 +397,52 @@ namespace CaveGame.Client
 		KeyboardState previousKB = Keyboard.GetState();
 		protected override void Update(GameTime gameTime)
 		{
+
 			// update graphics information
 			GraphicsEngine.WindowSize = Window.ClientBounds.Size.ToVector2();
-			GraphicsEngine.Update(gameTime);
+			GraphicsEngine.Update(gameTime); // graphics engine state
 
+
+			// if asset loading thread is not yet finished
 			if (!GraphicsEngine.ContentLoaded)
-				return;
+				return; // don't bother
 
 			if (Splash.SplashActive)
-            {
 				Splash.Update(gameTime);
-				//return;
-            }
 
+
+			// take screenshot
 			KeyboardState currentKB = Keyboard.GetState();
-			if (currentKB.IsKeyDown(Keys.F5) && !previousKB.IsKeyDown(Keys.F5)) {
+			if (currentKB.IsKeyDown(Keys.F5) && !previousKB.IsKeyDown(Keys.F5))
 				TakeScreenshot();
-			}
 
+
+			// gamestate management
+			// if context has changed, unload previous context
 			if (CurrentGameContext != PreviousGameContext && PreviousGameContext != null)
 			{
 				PreviousGameContext.Unload();
 				PreviousGameContext.Active = false;
 			}
 
+			// if current context is not loaded, initialize
 			if (CurrentGameContext.Active == false)
 			{
 				CurrentGameContext.Load();
 				CurrentGameContext.Active = true;
 			}
 
+			// update context
 			CurrentGameContext.Update(gameTime);
-
 			PreviousGameContext = CurrentGameContext;
 
 			ClickTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 			base.Update(gameTime);
 		}
 
+
+		// main debug screen?
+		// not game-dependent
 		private void DrawDebugOverlay()
 		{
 			GraphicsEngine.Begin();
@@ -395,7 +453,7 @@ namespace CaveGame.Client
 
 		protected override void OnExiting(object sender, EventArgs args)
 		{
-			GameSettings.Save();
+			Settings.Save();
 			GameClientContext.Disconnect();
 			
 			SteamManager.Shutdown();
@@ -435,34 +493,48 @@ namespace CaveGame.Client
 			GFX.End();
         }
 
+		private void DrawGameBackgroundGraphic(GraphicsEngine GFX)
+		{
+			// draw game BG at screen center
+
+			Vector2 center = GraphicsEngine.WindowSize / 2.0f;
+			Vector2 diff = (Mouse.GetState().Position.ToVector2() - center) / (center.Length() / 2.0f);
+			Vector2 origin = new Vector2(GraphicsEngine.BG.Width, GraphicsEngine.BG.Height) / 2.0f;
+			float horizscale = GraphicsEngine.WindowSize.X / (float)GraphicsEngine.BG.Width;
+			float vertscale = GraphicsEngine.WindowSize.Y / (float)GraphicsEngine.BG.Height;
+			float scale = Math.Max(horizscale, vertscale);
+
+			// TODO: Move this into menu context?
+			// reset graphics state
+			GraphicsEngine.Clear(Color.Black);
+			GraphicsEngine.Begin();
+			GraphicsEngine.Sprite(GraphicsEngine.BG, center - diff, null, Color.White, Rotation.Zero, origin, scale, SpriteEffects.None, 0);
+			GraphicsEngine.End();
+		}
+
 		protected override void Draw(GameTime gameTime)
 		{
+
+			// draw loading bar if still loading
 			if (!GraphicsEngine.ContentLoaded)
             {
 				DrawLoadingBar(GraphicsEngine);
 				return;
 			}
+
+			// draw splash screen if active
 			if (Splash.SplashActive)
             {
 				Splash.Draw(GraphicsEngine);
 				return;
             }
 
-			GraphicsEngine.Clear(Color.Black);
-			GraphicsEngine.Begin();
+			DrawGameBackgroundGraphic(GraphicsEngine);
 
-			Vector2 center = GraphicsEngine.WindowSize / 2.0f;
-			Vector2 origin = new Vector2(GraphicsEngine.BG.Width, GraphicsEngine.BG.Height) / 2.0f;
-			float horizscale = GraphicsEngine.WindowSize.X / (float)GraphicsEngine.BG.Width;
-			float vertscale = GraphicsEngine.WindowSize.Y / (float)GraphicsEngine.BG.Height;
-			float scale = Math.Max(horizscale, vertscale);
-
-
-			GraphicsEngine.Sprite(GraphicsEngine.BG, center, null, Color.White, Rotation.Zero, origin, scale, SpriteEffects.None, 0);
-			GraphicsEngine.End();
-
+			// let current context draw
 			if (CurrentGameContext.Active == true)
 				CurrentGameContext.Draw(GraphicsEngine);
+			// debug screen
 			DrawDebugOverlay();
 
 			Console.Draw(GraphicsEngine);

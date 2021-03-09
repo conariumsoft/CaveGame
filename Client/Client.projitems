@@ -34,6 +34,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)PauseMenu.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SavedWorldManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Splash.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StatusEffectDisplay.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\ContextButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\ScrollRect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\UINode.cs" />

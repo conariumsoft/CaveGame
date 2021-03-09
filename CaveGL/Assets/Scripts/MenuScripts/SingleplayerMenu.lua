@@ -103,6 +103,17 @@ for obj in list(worldListing:FindChildrenWithName("Entry")) do
 			TextYAlign = TextYAlignment.Center,
 		});
 
+		local subtext = Label(script, {
+			Name = "WorldData",
+			Parent = instance,
+			Size = UICoords(0, 0, 0.5, 1),
+			Position = UICoords(0,0, 0.5, 0),
+			Font = GraphicsEngine.Instance.Fonts.Arial14,
+			Text = obj.LastVersionPlayedOn,
+			TextColor = Color.White,
+			TextYAlign = TextYAlignment.Center,
+		});
+
 		instance.OnSelected:Bind(function()
 			selectedWorld = obj
 		end)
