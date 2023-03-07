@@ -77,6 +77,8 @@ namespace CaveGame.Client
 		Random rng = new Random();
 		float rotation = 0;
 		
+		
+		// Draw Parallax Background Textures
 		private void DrawBackgroundParallax(GraphicsEngine GFX)
 		{
 			if (World.Client.Camera.Position.Y > 600)
@@ -87,7 +89,7 @@ namespace CaveGame.Client
 			Vector2 lill = Rotation.FromDeg(World.TimeOfDay * 360.0f).ToUnitVector() * 0.1f;
 
 			float starfieldPar = 0.85f;
-			float scale = 0.25f;
+			float scale = 1f;
 			float textureWidth = GFX.Starfield.Width * scale;
 			float textureHeight = GFX.Starfield.Height * scale;
 

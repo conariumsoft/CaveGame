@@ -23,22 +23,22 @@ namespace CaveGame.Client
 
 		public bool Open { get; set; }
 
-		Effect WaterpixelsShader { get; set; }
+		//Effect WaterpixelsShader { get; set; }
 
 		public void DrawWaterPixelsFilter(GraphicsEngine gfx)
         {
-			WaterpixelsShader.Parameters["xSize"].SetValue((float)256);
-			WaterpixelsShader.Parameters["ySize"].SetValue((float)256);
-			WaterpixelsShader.Parameters["xDraw"].SetValue((float)16);
-			WaterpixelsShader.Parameters["yDraw"].SetValue((float)16);
+			//WaterpixelsShader.Parameters["xSize"].SetValue((float)256);
+			//WaterpixelsShader.Parameters["ySize"].SetValue((float)256);
+			//WaterpixelsShader.Parameters["xDraw"].SetValue((float)16);
+			//WaterpixelsShader.Parameters["yDraw"].SetValue((float)16);
 			//effect.Parameters["filterColor"].SetValue(Color.White.ToVector4());
-			WaterpixelsShader.CurrentTechnique.Passes[0].Apply();
+			//WaterpixelsShader.CurrentTechnique.Passes[0].Apply();
 		}
 
 		public void LoadShader(ContentManager GameContent)
         {
-			GameContent.RootDirectory = Path.Combine("Assets", "Shaders");
-			WaterpixelsShader = GameContent.Load<Effect>("Waterpixels");
+			//GameContent.RootDirectory = Path.Combine("Assets", "Shaders");
+			//WaterpixelsShader = GameContent.Load<Effect>("Waterpixels");
         }
 
 		public void Update(GameTime gt) {

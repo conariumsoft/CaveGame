@@ -17,11 +17,7 @@ namespace CaveGame.Client.Game.Entities
 	public class LocalPlayer : Player, IClientPhysicsObserver
 	{
 		float jumpEnergy;
-
 		
-
-
-
 		public bool IgnoreInput { get; set; }
 
 		private void GodPhysicsStep(IGameWorld world, float step)

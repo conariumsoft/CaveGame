@@ -244,9 +244,4 @@ namespace CaveGame.Client.UI
 		}
 	}
 
-
-	public class TextInputWithHistory
-	{
-
-	}
 }

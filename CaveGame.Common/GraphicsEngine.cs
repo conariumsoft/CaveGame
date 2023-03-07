@@ -149,38 +149,38 @@ namespace CaveGame.Common
         public Texture2D CloudBackground => Textures["clouds.png"];
         public Texture2D Starfield => Textures["stars.png"];
 
-		public Texture2D Nimdoc => Textures["items:nimdoc_anim.png"];
+		public Texture2D Nimdoc => Textures["Items:nimdoc_anim.png"];
 
         public Texture2D Explosion => Textures["michaelbay.png"];
-        public Texture2D BowSprite => Textures["items:bow.png"];
-        public Texture2D BombSprite => Textures["items:bomb.png"];
-		public Texture2D Bong => Textures["items:bong.png"];
-		public Texture2D Arrow => Textures["items:arrow.png"];
-		public Texture2D Bucket => Textures["items:bucket.png"];
-		public Texture2D BigPickaxe => Textures["items:bigpickaxe.png"];
-		public Texture2D Helmet => Textures["armor:helmet.png"];
-		public Texture2D Chestplate => Textures["armor:chestplate.png"];
-		public Texture2D Sword => Textures["items:sword.png"];
-		public Texture2D WallScraper => Textures["items:wallscraper.png"];
-		public Texture2D PickaxeNew => Textures["items:pickaxenew.png"];
-		public Texture2D Scroll => Textures["items:scroll.png"];
-		public Texture2D Dynamite => Textures["items:dynamite.png"];
-		public Texture2D Workbench => Textures["items:workbench.png"];
-		public Texture2D Potion => Textures["items:potion.png"];
-		public Texture2D Jetpack => Textures["items:jetpack.png"];
-		public Texture2D Door => Textures["items:door.png"];
-		public Texture2D ForestPainting => Textures["items:forestpainting.png"];
-		public Texture2D Ingot          => Textures["items:ingot.png"];
-		public Texture2D Leggings       => Textures["armor:leggings.png"];
-		public Texture2D Furnace        => Textures["items:furnace.png"];
-		public Texture2D Campfire       => Textures["items:campfire.png"]; 
+        public Texture2D BowSprite => Textures["Items:bow.png"];
+        public Texture2D BombSprite => Textures["Items:bomb.png"];
+		public Texture2D Bong => Textures["Items:bong.png"];
+		public Texture2D Arrow => Textures["Items:arrow.png"];
+		public Texture2D Bucket => Textures["Items:bucket.png"];
+		public Texture2D BigPickaxe => Textures["Items:bigpickaxe.png"];
+		public Texture2D Helmet => Textures["Armor:helmet.png"];
+		public Texture2D Chestplate => Textures["Armor:chestplate.png"];
+		public Texture2D Sword => Textures["Items:sword.png"];
+		public Texture2D WallScraper => Textures["Items:wallscraper.png"];
+		public Texture2D PickaxeNew => Textures["Items:pickaxenew.png"];
+		public Texture2D Scroll => Textures["Items:scroll.png"];
+		public Texture2D Dynamite => Textures["Items:dynamite.png"];
+		public Texture2D Workbench => Textures["Items:workbench.png"];
+		public Texture2D Potion => Textures["Items:potion.png"];
+		public Texture2D Jetpack => Textures["Items:jetpack.png"];
+		public Texture2D Door => Textures["Items:door.png"];
+		public Texture2D ForestPainting => Textures["Items:forestpainting.png"];
+		public Texture2D Ingot          => Textures["Items:ingot.png"];
+		public Texture2D Leggings       => Textures["Armor:leggings.png"];
+		public Texture2D Furnace        => Textures["Items:furnace.png"];
+		public Texture2D Campfire       => Textures["Items:campfire.png"]; 
         
-        public Texture2D Player       => Textures["entities:player.png"];
-		public Texture2D Zombie => Textures["entities:zombie.png"];
-		public Texture2D ArrowEntity => Textures["entities:arrow.png"];
-        public Texture2D VoidMonster  => Textures["entities:wurmhole.png"];
-        public Texture2D Bee          => Textures["entities:bee.png"];
-        public Texture2D Goldfish     => Textures["entities:gregothy.png"];
+        public Texture2D Player       => Textures["Entities:player.png"];
+		public Texture2D Zombie => Textures["Entities:zombie.png"];
+		public Texture2D ArrowEntity => Textures["Entities:arrow.png"];
+        public Texture2D VoidMonster  => Textures["Entities:wurmhole.png"];
+        public Texture2D Bee          => Textures["Entities:bee.png"];
+        public Texture2D Goldfish     => Textures["Entities:gregothy.png"];
 
         //public static Texture2D Campfire	=> Textures["campfire.png"];
         #endregion

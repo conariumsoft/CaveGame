@@ -10,19 +10,19 @@ namespace CaveGame.Common
 {
 	public class FrameCounter: GameComponent
 	{
-		static int framecounting = 120;
+		const int FrameBufferSampleSize = 120;
 
-		double framerate;
-		double[] framesamples;
+		private double _framerate;
+		double[] _framesamples;
 		int frames;
 		double averageFramerate;
 
 		public FrameCounter(Microsoft.Xna.Framework.Game game): base(game)
 		{
 			frames = 0;
-			framerate = 0;
+			_framerate = 0;
 			averageFramerate = 0.1;
-			framesamples = new double[framecounting];
+			_framesamples = new double[FrameBufferSampleSize];
 		}
 
 		public override void Update(GameTime gameTime)
@@ -32,26 +32,26 @@ namespace CaveGame.Common
 			// frame counter
 			frames++;
 
-			if (frames >= framecounting)
+			if (frames >= FrameBufferSampleSize)
 			{
 				frames = 0;
 			}
 
-			framerate = 1 / dt;
+			_framerate = 1 / dt;
 
-			averageFramerate -= framesamples[frames];
-			framesamples[frames] = dt;
-			averageFramerate += framesamples[frames];
+			averageFramerate -= _framesamples[frames];
+			_framesamples[frames] = dt;
+			averageFramerate += _framesamples[frames];
 		}
 
 		public double GetExactFramerate()
 		{
-			return framerate;
+			return _framerate;
 		}
 
 		public double GetAverageFramerate()
 		{
-			return framecounting / averageFramerate;
+			return FrameBufferSampleSize / averageFramerate;
 		}
 	}
 }

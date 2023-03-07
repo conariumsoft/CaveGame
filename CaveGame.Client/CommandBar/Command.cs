@@ -5,9 +5,10 @@ namespace CaveGame.Common;
 public class Command
 {
     public delegate void CommandHandler(CommandBar sender, Command command, params string[] args);
-    public string Keyword;
-    public string Description;
-    public List<string> Args;
+
+    public string Keyword { get; init; }
+    public string Description { get; init; }
+    public List<string> Args { get; init; }
     public event CommandHandler OnCommand;
 
     public Command(string cmd, string desc, List<string> args)
@@ -27,7 +28,7 @@ public class Command
     {
         Keyword = cmd;
         Description = desc;
-        Args = new List<string> { };
+        Args = new List<string>();
         OnCommand += callback;
     }
 

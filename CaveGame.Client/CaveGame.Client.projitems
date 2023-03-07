@@ -10,11 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)CommandBar\Command.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DebugTools\DebugInformation.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DebugTools\GraphRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DebugTools\Profiler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSounds.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DebugTools\ChunkGridLineRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Entities\LocalPlayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InputManager.cs" />
