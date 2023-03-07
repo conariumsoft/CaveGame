@@ -1,14 +1,12 @@
-﻿using CaveGame;
+﻿
 using CaveGame.Client.UI;
 using CaveGame.Common;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using NLua;
 using System.IO;
-using System.Diagnostics;
 using CaveGame.Client.DesktopGL;
 using CaveGame.Common.Extensions;
 using CaveGame.Common.LuaInterop;
@@ -77,9 +75,18 @@ namespace CaveGame.Client.Menu
 			luastate["_G.menumanager"] = this;
 			//luastate["buttonlist"] = buttons;
 			luastate["_G.script"] = luastate;
-            luastate.DoString(@"_G.oldprint = print; _G.print = function(str) game.Console:LuaPrint(str) end");
+            //luastate.DoString(@"_G.oldprint = print; _G.print = function(str)  --game.Console:LuaPrint(str) end");
 			luastate.DoString(LuaSnippets.UtilityFunctions);
-			luastate.DoFile(Path.Combine("Assets", "Scripts", "menu.lua"));
+			Console.WriteLine("PreLoad");
+			try
+			{
+				luastate.DoFile(Path.Combine("Assets", "Scripts", "menu.lua"));
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+			}
+			Console.WriteLine("PostLoad");
 		}
 
 		public void Load()

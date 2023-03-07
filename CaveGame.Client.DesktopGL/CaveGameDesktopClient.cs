@@ -513,20 +513,25 @@ namespace CaveGame.Client.DesktopGL
 
 		protected override void Draw(GameTime gameTime)
 		{
-
+			
 			// draw loading bar if still loading
 			if (!GraphicsEngine.ContentLoaded)
             {
+	            System.Console.WriteLine("Loading Bar");
 				DrawLoadingBar(GraphicsEngine);
+				
 				return;
 			}
 
 			// draw splash screen if active
 			if (Splash.SplashActive)
             {
+	            System.Console.WriteLine("Splash");
 				Splash.Draw(GraphicsEngine);
+				
 				return;
             }
+			System.Console.WriteLine("Render Normal");
 
 			DrawGameBackgroundGraphic(GraphicsEngine);
 

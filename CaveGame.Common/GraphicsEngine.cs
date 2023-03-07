@@ -15,6 +15,7 @@ namespace CaveGame.Common
 {
     using Circle = List<Vector2>;
     using Arc = List<Vector2>;
+
     public interface IGraphicsEngine
     {
         Vector2 WindowSize { get; set; }
@@ -28,24 +29,14 @@ namespace CaveGame.Common
         Effect Shader { get; set; }
         Matrix Matrix { get; set; }
 
-        void Begin(SpriteSortMode sorting = SpriteSortMode.Deferred, BlendState blending = null, SamplerState sampling = null,
-            DepthStencilState depthStencil = null, RasterizerState rasterizing = null, Effect effect = null, Matrix? transform = null);
+        void Begin(SpriteSortMode sorting = SpriteSortMode.Deferred, BlendState blending = null,
+            SamplerState sampling = null,
+            DepthStencilState depthStencil = null, RasterizerState rasterizing = null, Effect effect = null,
+            Matrix? transform = null);
+
         void End();
 
     }
-
-    public class MissingGameDataException : ApplicationException { 
-        public string MissingFilename { get; set; }
-        public string MissingFilepath { get; set; }
-        public string FilePurpose { get; set; }
-        public string WhatToDo { get; set; }
-
-
-    }
-    public class MissingContentFolderException : MissingGameDataException { }
-    public class MissingScriptException : MissingGameDataException { }
-    public class MissingSoundEffectException : MissingGameDataException { }
-    public class MissingTextureException : MissingGameDataException { }
 
     public static class ShapeCache
     {
@@ -217,7 +208,7 @@ namespace CaveGame.Common
             TextureDef nextTex = LoadingQueue.Dequeue();
             Texture2D loaded = AssetLoader.LoadTexture(gdev, nextTex.Path);
             Textures.Add(nextTex.Name, loaded);
-            //Debug.WriteLine("{0} => {1}", nextTex.Name, nextTex.Path);
+            Console.WriteLine("{0} => {1}", nextTex.Name, nextTex.Path);
             LoadedTextures++;
         }
 
@@ -237,7 +228,7 @@ namespace CaveGame.Common
                 
                 var trimmedPath = tex.Replace(texturesPath + @"/", "");
                 var cleanedPath = trimmedPath.Replace(@"/", ":");
-                Console.WriteLine($"QTexture {tex} => {cleanedPath} ");
+                //System.Console.WriteLine($"QTexture {tex} => {cleanedPath} ");
 
                 LoadingQueue.Enqueue(new TextureDef(cleanedPath, tex));
                 TotalTextures++;

@@ -68,6 +68,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Game\Tiles\Torches.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Tiles\VegetationTiles.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Tiles\WoodTiles.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MissingGameDataException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StructureFile.cs" />
     <Folder Include="$(MSBuildThisFileDirectory)FileUtil" />
     <Compile Include="$(MSBuildThisFileDirectory)Game\Furniture\Furniture.cs" />

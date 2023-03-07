@@ -1,7 +1,8 @@
 import ('MonoGame.Framework', 'Microsoft.Xna.Framework')
-import ('CaveGame', 'CaveGame.Client')
-import ('CaveGame', 'CaveGame.Client.UI')
-import ('CaveGame', 'CaveGame.Common')
+import ('CaveGame.Client.DesktopGL', 'CaveGame.Common')
+import ('CaveGame.Client.DesktopGL', 'CaveGame.Client')
+import ('CaveGame.Client.DesktopGL', 'CaveGame.Client.UI')
+
 import ('System', 'System.Collections.Generic')
 
 local compiledLogs = {};
