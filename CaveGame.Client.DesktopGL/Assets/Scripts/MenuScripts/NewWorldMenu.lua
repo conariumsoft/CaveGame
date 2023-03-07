@@ -2,6 +2,7 @@
 import ('CaveGame.Client.DesktopGL', 'CaveGame.Client')
 import ('CaveGame.Client.DesktopGL', 'CaveGame.Client.UI')
 import ('CaveGame.Client.DesktopGL', 'CaveGame.Common')
+import ('CaveGame.Client.DesktopGL', 'CaveGame.Common.World')
 import ('CaveGame.Client.DesktopGL', 'CaveGame.Client.Menu')
 import ('System', 'System')
 
