@@ -19,24 +19,21 @@ namespace CaveGame.Server.ConsoleApp
 		public string Text;
 		public ConsoleColor Color;
 	}
-	//
-	//
-	//
-	//
+
 	public static class Program
 	{
 		private delegate bool ConsoleCtrlHandlerDelegate(int sig);
 
-#if WINDOZE
-		[DllImport("Kernel32")]
-		private static extern bool SetConsoleCtrlHandler(ConsoleCtrlHandlerDelegate handler, bool add);
-#else
-		private static bool SetConsoleCtrlHandler(ConsoleCtrlHandlerDelegate useless, bool shit)
-		{
-			return false;
-		}
-#endif
-		static ConsoleCtrlHandlerDelegate _consoleCtrlHandler;
+//#if WINDOZE
+		//[DllImport("Kernel32")]
+		//private static extern bool SetConsoleCtrlHandler(ConsoleCtrlHandlerDelegate handler, bool add);
+//#else
+		//private static bool SetConsoleCtrlHandler(ConsoleCtrlHandlerDelegate useless, bool shit)
+		//{
+		//	return false;
+		//}
+//#endif
+		//static ConsoleCtrlHandlerDelegate _consoleCtrlHandler;
 
 		static int maxlines = 50;
 
@@ -55,12 +52,12 @@ namespace CaveGame.Server.ConsoleApp
 			StandaloneGameServer server = new StandaloneGameServer(config, worldMDT);
 			server.Output = consoleWrapper;
 
-			_consoleCtrlHandler += s =>
-			{
-				server.Shutdown();
-				return false;
-			};
-			SetConsoleCtrlHandler(_consoleCtrlHandler, true);
+			//_consoleCtrlHandler += s =>
+			//{
+				//server.Shutdown();
+				//return false;
+			//};
+			//SetConsoleCtrlHandler(_consoleCtrlHandler, true);
 			server.LoadPlugins();
 			Task.Run(server.Start);
 			string inputBuf = "";
