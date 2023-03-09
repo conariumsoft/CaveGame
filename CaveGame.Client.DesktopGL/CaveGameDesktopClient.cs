@@ -8,7 +8,6 @@ using CaveGame.Client.UI;
 using System.IO;
 using Microsoft.Xna.Framework.Input;
 using System.Globalization;
-using CaveGame.Common.Generic;
 using System.Threading.Tasks;
 using CaveGame.Common.Game.Items;
 using CaveGame.Common.Game.Inventory;
@@ -28,13 +27,13 @@ namespace CaveGame.Client.DesktopGL
 		public IGameContext CurrentGameContext { get; set; }
 		private IGameContext PreviousGameContext { get; set; }
 		public GameClient GameClientContext { get; private set; }
-		public Menu.MenuManager MenuContext { get; private set; }
-		public Menu.Settings SettingsContext { get; private set; }
+		public MenuManager MenuContext { get; private set; }
+		public Settings SettingsContext { get; private set; }
 		public GraphicsEngine GraphicsEngine { get; private set; }
 		public GraphicsDeviceManager GraphicsDeviceManager { get; private set; }
 		public SpriteBatch SpriteBatch { get; private set; }
 		public CommandBar Console { get; private set; } // TOOD: Change Name of CommandBar class to Console
-		public FrameCounter FPSCounter { get; private set; }
+		public FrameCounter FpsCounter { get; private set; }
 		public Splash Splash { get; private set; }
 		public SteamManager SteamManager { get; private set; }
 		public static float ClickTimer { get; set; }
@@ -43,15 +42,15 @@ namespace CaveGame.Client.DesktopGL
 		// these functions don't actually toggle the associated flags
 		// they are just for applying changes to game state
 		// they should be triggered automatically by setting the flag in Game.Settings
-		public void SetFPSLimit(int limit)
+		public void SetFpsLimit(int limit)
 		{
 			if (limit == 0)
 			{
-				this.IsFixedTimeStep = false;
+				IsFixedTimeStep = false;
 			} else
 			{
-				this.IsFixedTimeStep = true;
-				this.TargetElapsedTime = TimeSpan.FromSeconds(1d / (double)limit);
+				IsFixedTimeStep = true;
+				TargetElapsedTime = TimeSpan.FromSeconds(1d / limit);
 			}
 		}
 		public void SetChatSize(GameChatSize size) { }
@@ -79,17 +78,17 @@ namespace CaveGame.Client.DesktopGL
 		#endregion
 
 		// join local (singleplayer server
-		public void EnterLocalGame(CaveGame.Common.World.WorldMetadata meta)
+		public void EnterLocalGame(WorldMetadata meta)
 		{
-			var serverCFG = new ServerConfig
+			var serverConf = new ServerConfig
 			{
 				Port = 40269, // singleplayer server uses slightly different port
 				World = meta.Name,
 				ServerName = $"LocalServer [{meta.Name}] ",
 				ServerMOTD = "Singleplayer game world.",
 			};
-			var worldMDT = meta;
-			LocalServer server = new LocalServer(serverCFG, worldMDT);
+			var worldMetadata = meta;
+			LocalServer server = new LocalServer(serverConf, worldMetadata);
 			server.Output = Console;
 			Task.Factory.StartNew(server.Start);
 
@@ -110,10 +109,8 @@ namespace CaveGame.Client.DesktopGL
 
 			CurrentGameContext = GameClientContext;
 		}
-		CaveGameArguments StartupArguments;
-		public CaveGameDesktopClient(CaveGameArguments arguments)
+		public CaveGameDesktopClient()
 		{
-			StartupArguments = arguments;
 
 			IsMouseVisible = true;
 			Content.RootDirectory = "Assets";
@@ -135,22 +132,27 @@ namespace CaveGame.Client.DesktopGL
 			GraphicsEngine = new GraphicsEngine();
 			Splash = new Splash();
 
-			FPSCounter = new FrameCounter(this);
-			Components.Add(FPSCounter);
+			FpsCounter = new FrameCounter(this);
+			Components.Add(FpsCounter);
 
-#if DEBUG
+#if DEBUG  
 			GraphicsEngine.LoadingDelay = 0.05f;
 			Splash.SplashTimer = 3f;
 #endif
 
 			// Initialize settings
-			Settings = ConfigFile.Load<GameSettings>("settings.xml", true);
-			Settings.game = this;
-			SetFPSLimit(Settings.FPSLimit);
+			LoadSettings();
+			SetFpsLimit(Settings.FPSLimit);
 			SetFullscreen(Settings.Fullscreen);
 			SetChatSize(Settings.ChatSize);
 			SetVSync(Settings.VSync);
 
+		}
+
+		private void LoadSettings()
+		{
+			Settings = ConfigFile.Load<GameSettings>("settings.xml", true);
+			Settings.game = this;
 		}
 
 		// Update graphics engine's known window size
@@ -356,26 +358,16 @@ namespace CaveGame.Client.DesktopGL
 			Window.TextInput += SettingsContext.OnTextInput;
 
 			CurrentGameContext = MenuContext; // set me
-
-			// apply command line args
-			if (StartupArguments.AutoLoadWorld != "")
-				EnterLocalGame(new WorldMetadata {Name = StartupArguments.AutoLoadWorld, Seed = 420 });
-
-			if (StartupArguments.AutoConnectName != "")
-				StartClient(StartupArguments.AutoConnectName, StartupArguments.AutoConnectAddress);
 		}
 
-		// should this be here?
+		/// <summary>
+		/// Takes a Screenshot of the game window, and saves it to disk as a .png
+		/// </summary>
+		/// <param name="filename">File name to save the screenshot as. Defaults to current timestamp.</param>
 		public void TakeScreenshot(string filename = "")
 		{
-			// doesn't work
-			bool wasEnabled = Console.Enabled;
-			Console.Enabled = false;
-
 			Color[] colors = new Color[GraphicsDevice.Viewport.Width * GraphicsDevice.Viewport.Height];
-
 			GraphicsDevice.GetBackBufferData<Color>(colors);
-
 			using (Texture2D tex2D = new Texture2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height))
 			{
 
@@ -390,7 +382,6 @@ namespace CaveGame.Client.DesktopGL
 					tex2D.SaveAsPng(stream, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 				}
 			}
-			Console.Enabled = wasEnabled;
 		}
 
 		KeyboardState previousKB = Keyboard.GetState();
@@ -445,7 +436,7 @@ namespace CaveGame.Client.DesktopGL
 		private void DrawDebugOverlay()
 		{
 			GraphicsEngine.Begin();
-			GraphicsEngine.Text(String.Format("fps: {0} ", Math.Floor(FPSCounter.GetAverageFramerate())), new Vector2(2, 0));
+			GraphicsEngine.Text(String.Format("fps: {0} ", Math.Floor(FpsCounter.GetAverageFramerate())), new Vector2(2, 0));
 			GraphicsEngine.End();
 		}
 
