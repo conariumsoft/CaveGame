@@ -8,6 +8,7 @@ using CaveGame.Client.UI;
 using System.IO;
 using Microsoft.Xna.Framework.Input;
 using System.Globalization;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using CaveGame.Common.Game.Items;
 using CaveGame.Common.Game.Inventory;
@@ -23,12 +24,16 @@ namespace CaveGame.Client.DesktopGL
 	public class CaveGameDesktopClient : Microsoft.Xna.Framework.Game
 	{
 		// TODO: If running local server, shutdown server when player leaves the world
+		
+		// TODO: Refactor how settings are implemented
 		public GameSettings Settings { get; set; }
+		public Settings SettingsContext { get; private set; }
+		
+		
 		public IGameContext CurrentGameContext { get; set; }
 		private IGameContext PreviousGameContext { get; set; }
 		public GameClient GameClientContext { get; private set; }
 		public MenuManager MenuContext { get; private set; }
-		public Settings SettingsContext { get; private set; }
 		public GraphicsEngine GraphicsEngine { get; private set; }
 		public GraphicsDeviceManager GraphicsDeviceManager { get; private set; }
 		public SpriteBatch SpriteBatch { get; private set; }
@@ -142,7 +147,21 @@ namespace CaveGame.Client.DesktopGL
 
 			// Initialize settings
 			LoadSettings();
-			SetFpsLimit(Settings.FPSLimit);
+
+			Settings.OnMasterVolumeChanged += (o, e) => AudioManager.MasterVolume = e.NewValue / 100.0f;
+			Settings.OnAmbienceVolumeChanged += null;
+			Settings.OnMusicVolumeChanged += null;
+			Settings.OnSFXVolumeChanged += null;
+
+
+			Settings.OnFullscreenStateChanged += (o, e) => SetFullscreen(e.NewValue);
+			//Settings.OnFullscreenResolutionChanged += (o, e) => null;
+			Settings.OnVSyncEnabledChanged += (o,e) => SetVSync(e.NewValue);
+			Settings.OnFpsLimitChanged += (o, e) => SetFpsLimit(e.NewValue);
+			//Settings.OnUIScaleChanged += (o, e) => return;
+			
+
+			SetFpsLimit(Settings.FramerateLimit);
 			SetFullscreen(Settings.Fullscreen);
 			SetChatSize(Settings.ChatSize);
 			SetVSync(Settings.VSync);
@@ -152,7 +171,7 @@ namespace CaveGame.Client.DesktopGL
 		private void LoadSettings()
 		{
 			Settings = ConfigFile.Load<GameSettings>("settings.xml", true);
-			Settings.game = this;
+			
 		}
 
 		// Update graphics engine's known window size
@@ -305,7 +324,7 @@ namespace CaveGame.Client.DesktopGL
 			// setup window
 			Window.TextInput += TextInputManager.OnTextInput;
 			Window.ClientSizeChanged += new EventHandler<EventArgs>(Window_ClientSizeChanged);
-			SetFullscreen(Settings.Fullscreen);
+			//SetFullscreen(Settings.Fullscreen);
 
 			// Create console
 			Console = new CommandBar(this);
@@ -347,7 +366,7 @@ namespace CaveGame.Client.DesktopGL
 
 			GraphicsEngine.Initialize();
 			GraphicsEngine.LoadAssets(GraphicsDevice); // begin texture loading routine
-			
+			// MY COCK HURTS
 
 			// game menu contexts
 			MenuContext = new MenuManager(this);
