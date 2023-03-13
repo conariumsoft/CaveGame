@@ -225,6 +225,23 @@ namespace CaveGame.Client
 					tile.LocalTileUpdate(this, coords.X, coords.Y);
 			}
 		}
+        public void UnloadOutOfRangeChunks()
+        {
+	        foreach (var chunkpair in this.Chunks)
+	        {
+		        if (!this.LoadedChunks.Contains(chunkpair.Key))
+		        {
+			        if (this.Chunks.ContainsKey(chunkpair.Key))
+			        {
+				        this.Chunks.TryRemove(chunkpair.Key, out _);
+				        this.Lighting.UnregisterChunk(chunkpair.Key);
+				        chunkpair.Value.Dispose();
+				        return; // Only do one per cycle
+				        // Helps prevent juttering...
+			        }
+		        }
+	        }
+        }
 	}
 }
 
