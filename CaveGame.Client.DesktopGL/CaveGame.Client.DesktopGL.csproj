@@ -8,7 +8,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
-    <PackageIcon>icon.png</PackageIcon>
+    <PackageIcon>Icon.bmp</PackageIcon>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyName>CaveGame.Client.DesktopGL</AssemblyName>
@@ -93,6 +93,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Remove="Assets\redherring.txt" />
+    <None Update="Assets\Scripts\MenuScripts\SingleplayerMenu.lua">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
