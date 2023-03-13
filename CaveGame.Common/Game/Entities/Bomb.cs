@@ -70,6 +70,7 @@ namespace CaveGame.Common.Game.Entities
 				Thermal = false, // TODO: sets shit on fire?
 				BlastPressure = 5,
 				BlastRadius = 5,
+				Source = this,
 			};
 
 			world.Explosion(explosion, true, true);
