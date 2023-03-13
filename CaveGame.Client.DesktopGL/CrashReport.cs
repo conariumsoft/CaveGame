@@ -96,7 +96,7 @@ GameVersion: {Globals.CurrentVersionFullString} <br/>
 NetworkProtocolVersion: {Globals.ProtocolVersion} <br/>
 TextureLoadSuccess: {GraphicsEngine.Instance.ContentLoaded} <br/>
 TextureCount: {GraphicsEngine.Instance.Textures.Count} <br/>
-Steam Enabled: {Game.SteamManager.Enabled}<br/>
+Steam Enabled: {Game.Steam.Enabled}<br/>
 IsOS64Bit: {Environment.Is64BitOperatingSystem} <br/>
 OperatingSystem: {Environment.OSVersion.Platform} platform. {Environment.OSVersion.VersionString} <br/>
 Architecture: {Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE")} <br/>
@@ -119,7 +119,7 @@ Window Dimensions: {Game.Window.ClientBounds.Width}x{Game.Window.ClientBounds.He
 Window Dimensions: { Game.Window.ClientBounds.Width}x{ Game.Window.ClientBounds.Height} 
 Screen Dimensions: {Game.GraphicsDeviceManager.GraphicsDevice.Adapter.CurrentDisplayMode.Width}x{Game.GraphicsDeviceManager.GraphicsDevice.Adapter.CurrentDisplayMode.Height}<br/>
 Fullscreen: {Game.GraphicsDeviceManager.IsFullScreen}<br/>
-Settings.FPSLimit: {Game.Settings.FPSLimit}<br/>
+Settings.FPSLimit: {Game.Settings.FramerateLimit}<br/>
 Settings.CameraShake: {Game.Settings.CameraShake}<br/>
 Settings.ParticlesEnabled: {Game.Settings.Particles}<br/>
 Game Context: {Game.CurrentGameContext}<br/>

@@ -45,7 +45,7 @@ namespace CaveGame.Client.DesktopGL
 
 	}
 
-	public class SteamManager: GameComponent, ISteamManager
+	public class Steam: GameComponent, ISteamManager
 	{
 
 		
@@ -63,7 +63,7 @@ namespace CaveGame.Client.DesktopGL
 
 
 		//
-		public SteamManager Instance { get; set; }
+		public Steam Instance { get; set; }
 
         public string SteamUsername => SteamEnabled ? SteamFriends.GetPersonaName() : "Player1";
 
@@ -76,7 +76,7 @@ namespace CaveGame.Client.DesktopGL
 
 		RepeatingIntervalTask callbackRun;
 
-		public SteamManager(Microsoft.Xna.Framework.Game _game) : base(_game)
+		public Steam(Microsoft.Xna.Framework.Game _game) : base(_game)
 		{
 			if (Instance != null)
 				throw new Exception("SteamManager is a singleton class, and can only be instantiated once!");

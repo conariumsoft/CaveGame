@@ -31,9 +31,9 @@ local NewWorldMenu = require("Assets.Scripts.MenuScripts.NewWorldMenu")
 print("require NewWorldMenu Succeeded")
 
 menumanager.Pages:Add("mainmenu", MainMenu);
+menumanager.Pages:Add("singleplayermenu", SingleplayerMenu);
 menumanager.Pages:Add("multiplayermenu", MultiplayerMenu);
 menumanager.Pages:Add("timeoutmenu", TimeoutMenu);
-menumanager.Pages:Add("singleplayermenu", SingleplayerMenu);
 menumanager.Pages:Add("creditsmenu", CreditsMenu);
 menumanager.Pages:Add("newworldmenu", NewWorldMenu);
 

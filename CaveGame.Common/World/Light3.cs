@@ -17,7 +17,7 @@ namespace CaveGame.Common
 		public static Light3 Moonlight = new Light3(128, 128, 128);
 		public static Light3 Dawn = new Light3(96, 96, 40);
 		public static Light3 Ambience = new Light3(128, 128, 128);
-		public static Light3 Daylight = new Light3(128, 128, 128);
+		public static Light3 Daylight = new Light3(192, 192, 192);
 		public static Light3 Dusk = new Light3(96, 60, 40);
 
 		[FieldOffset(0)] public byte Red;

@@ -1,18 +1,12 @@
 ﻿using CaveGame.Client.UI;
 using CaveGame.Common;
-using CaveGame.Common.Game.Tiles;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
 using CaveGame.Client.DesktopGL;
 
 namespace CaveGame.Client.Menu
 {
-
 	public class BindButton : TextButton
 	{
 		public event KeysHandler OnRebind;
@@ -152,7 +146,7 @@ namespace CaveGame.Client.Menu
 				Parent = LeftContainer,
 				Size = new UICoords(0, 25, 1, 0),
 				Font = GFX.Fonts.Arial14,
-				Text = "FPS Cap: " + Game.Settings.FPSLimit,
+				Text = "FPS Cap: " + Game.Settings.FramerateLimit,
 			};
 
 			NumericSlider fpsCapSlider = new NumericSlider
@@ -170,7 +164,7 @@ namespace CaveGame.Client.Menu
 			void onFpsCapSliderChanged(NumericSlider slider, float value)
 			{
 				fpsCapText.Text = "FPS Cap:" + (int)value;
-				Game.Settings.FPSLimit = (int)value;
+				Game.Settings.FramerateLimit = (int)value;
 			}
 			fpsCapSlider.OnValueChanged += onFpsCapSliderChanged;
 
@@ -295,7 +289,7 @@ namespace CaveGame.Client.Menu
 				Parent = RightContainer,
 				Size = new UICoords(0, 25, 1, 0),
 				Font = GFX.Fonts.Arial14,
-				Text = GetSFXLabelText(GameSettings.CurrentSettings.SFXVolume),
+				Text = GetSFXLabelText(GameSettings.CurrentSettings.SfxVolume),
 			};
 			NumericSlider sfxVolumeSlider = new NumericSlider
 			{
@@ -312,9 +306,9 @@ namespace CaveGame.Client.Menu
 			string GetSFXLabelText(float value) => "SFX Volume: " + Math.Floor(value) + "%";
 			void OnSFXVolumeSliderChanged(NumericSlider slider, float value)
 			{
-				GameSettings.CurrentSettings.SFXVolume = (int)value;
+				GameSettings.CurrentSettings.SfxVolume = (int)value;
 				AudioManager.EffectVolume = value / 100.0f;
-				sfxVolumeLabel.Text = GetSFXLabelText(GameSettings.CurrentSettings.SFXVolume);
+				sfxVolumeLabel.Text = GetSFXLabelText(GameSettings.CurrentSettings.SfxVolume);
 			}
 			sfxVolumeSlider.OnValueChanged += OnSFXVolumeSliderChanged;
 

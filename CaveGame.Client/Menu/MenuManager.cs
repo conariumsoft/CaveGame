@@ -8,20 +8,18 @@ using System.Collections.Generic;
 using NLua;
 using System.IO;
 using CaveGame.Client.DesktopGL;
-using CaveGame.Common.Extensions;
 using CaveGame.Common.LuaInterop;
 
 namespace CaveGame.Client.Menu
 {
-	public static class EnumExtensions
-    {
-		public static int ToInt(this GameChatSize e)
-        {
-			return (int)e;
-        }
-    }
 	public class MenuManager : IGameContext
 	{
+		
+		public void SetPage(string pagename)
+		{
+			if (this.Pages.TryGetValue(pagename, out UIRoot objeckt))
+				this.CurrentPage = objeckt;
+		}
 
 		public CaveGameDesktopClient Game { get; private set; }
 
@@ -41,7 +39,7 @@ namespace CaveGame.Client.Menu
             {
 				_currentPage?.OnUnload.Invoke(null);
 				_currentPage = value;
-				_currentPage.OnLoad.Invoke(null);
+				_currentPage?.OnLoad.Invoke(null);
             }
 		}
 
@@ -85,6 +83,9 @@ namespace CaveGame.Client.Menu
 			catch (Exception e)
 			{
 				Console.WriteLine(e);
+				Console.WriteLine(e.Message);
+				Console.WriteLine(e.StackTrace);
+				
 			}
 			Console.WriteLine("PostLoad");
 		}

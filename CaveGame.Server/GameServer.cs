@@ -7,18 +7,18 @@ using CaveGame.Common.LuaInterop;
 using CaveGame.Common.Network;
 using CaveGame.Common.Game.Tiles;
 using CaveGame.Common.Extensions;
-using KeraLua;
+
 using Microsoft.Xna.Framework;
-using NLua;
+
 using System;
-using System.Collections.Concurrent;
+
 using System.Collections.Generic;
-using System.Data.SqlTypes;
+
 using System.Diagnostics;
-using System.IO;
+
 using System.Linq;
 using System.Net;
-using System.Text;
+
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -182,7 +182,7 @@ namespace CaveGame.Server
 		}
 		private void HandshakeResponse(NetworkMessage msg)
 		{
-			GameConsole.Log("Handshake response!");
+			Logger.LogServer("Handshake response!");
 			string[] playerslist = ConnectedUsers.Select(z => z.Username).ToArray();
 			NetworkServer.SendPacket(
 				new HandshakeResponsePacket(
@@ -574,7 +574,7 @@ namespace CaveGame.Server
 		}
 		public virtual void Shutdown()
 		{
-			GameConsole.Log("Shutting Down. Not Saving while testing worldgen");
+			Logger.LogServer("Shutting Down. Not Saving while testing worldgen");
 			World.SaveData();
 			Thread.Sleep(100);
 		}

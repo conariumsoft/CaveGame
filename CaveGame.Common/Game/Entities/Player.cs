@@ -20,9 +20,15 @@ using CaveGame.Common.Game.Items;
 
 namespace CaveGame.Common.Game.Entities
 {
-	public class Humanoid : PhysicsEntity
-	{
 
+	public interface IExplosionDamagable
+	{
+		void Damage(DamageType type, IDamageSource source, int amount);
+		void Damage(DamageType type, IDamageSource source, int amount, Vector2 direction);
+	}
+	
+	public class Humanoid : PhysicsEntity, IExplosionDamagable
+	{
 		public virtual int BaseDefense { get; }
 		public virtual int DefenseModifier { get; set; }
 		public virtual int ArmorDefense
@@ -189,8 +195,8 @@ namespace CaveGame.Common.Game.Entities
 					spriteFrame = SP_FALL;
 			}
 
-			DrawHealth(gfx);
-			DrawName(gfx);
+			//DrawHealth(gfx);
+			//DrawName(gfx);
 			
 			gfx.Sprite(gfx.Player, Position, spriteFrame, Illumination.MultiplyAgainst(Color), Rotation.Zero, new Vector2(8, 12), 1, (SpriteEffects)flipSprite, 0);
 		}

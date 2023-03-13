@@ -233,6 +233,12 @@ namespace CaveGame.Common.Game.Items
 			}
 			base.OnClientLMBHeld(player, client, stack, gt);
 		}
+		
+		public  void DrawSwinging(GraphicsEngine GFX, Vector2 position, float scale)
+		{
+			GFX.Sprite(GFX.PickaxeNew, position+new Vector2(8*scale, 8*scale), null, Tint, Rotation.FromRad(swingingTimer), new Vector2(8, 8), scale* Size, SpriteEffects.None, 0);
+		}
+		
 		public override void Draw(GraphicsEngine GFX, Vector2 position, float scale)
 		{
 			GFX.Sprite(GFX.PickaxeNew, position+new Vector2(8*scale, 8*scale), null, Tint, Rotation.Zero, new Vector2(8, 8), scale* Size, SpriteEffects.None, 0);

@@ -1,63 +1,58 @@
 ﻿using System;
 using System.Diagnostics;
 using CaveGame.Client.DesktopGL;
+using CaveGame.Common;
 using CaveGame.Common.Game.Tiles;
 
-
-namespace CaveGame.Client.DesktopGL
+namespace CaveGame.Client.DesktopGL;
+public static class Program
 {
-    public static class Program
+
+	
+	// When Debugging the game, we want direct access to the code
+	private static void DebugGameloop()
 	{
-
-		[STAThread]
-		static void Main(string[] args)
+		using (var game = new CaveGameDesktopClient())
 		{
-			// parse command line arguments
-			CaveGameArguments arguments = new CaveGameArguments();
+			game.Run();
+			game.Exit();
+		}
+	}
 
-			for (int x = 0; x < args.Length; x++)
+
+	// In "Release" We want crashes to generate a report
+	// that the player can submit to us
+	private static void ReleaseGameloop()
+	{
+		using (var game = new CaveGameDesktopClient())
+		{
+			try
 			{
-				switch(args[x])
-				{
-					case "-world":
-						arguments.AutoLoadWorld = args[x + 1];
-						break;
-					case "-connect":
-						arguments.AutoConnectName = args[x + 1];
-						arguments.AutoConnectAddress = args[x + 2];
-						break;
-					default:
-						break;
-
-				}
-			}
-
-			Tile.AssertTileEnumeration();
-			using (var game = new CaveGameDesktopClient(arguments))
-			{
-#if !DEBUG
-
-				try
-                {
-					
-					game.Run();
-					game.Exit();
-				} catch(Exception e)
-                {
-					CrashReport report = new CrashReport(game, e);
-					report.GenerateHTMLReport();
-					throw e;
-					
-                }
-#else
 				game.Run();
 				game.Exit();
-#endif
 			}
-
-			Process.GetCurrentProcess().CloseMainWindow();
-			Environment.Exit(Environment.ExitCode);
-
+			catch(Exception e)
+			{
+				CrashReport report = new CrashReport(game, e);
+				report.GenerateHTMLReport();
+				throw e;
+			}
 		}
+	}
+
+	[STAThread]
+	static void Main(string[] args)
+	{
+		Logger.LogInfo("Starting Program");
+		// parse command line arguments
+		Tile.AssertTileEnumeration();
+		
+#if DEBUG
+		DebugGameloop();
+#else
+		ReleaseGameloop();
+#endif
+		Process.GetCurrentProcess().CloseMainWindow(); 
+		Environment.Exit(Environment.ExitCode); 
 	}
 }

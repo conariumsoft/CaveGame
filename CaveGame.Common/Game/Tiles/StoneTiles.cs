@@ -178,7 +178,6 @@ namespace CaveGame.Common.Game.Tiles
 			else
 				GFX.Sprite(GFX.TileSheet, position + new Vector2(4, 0), TR, color.MultiplyAgainst(Color));
 
-
 		}
 
 		public void LocalTileUpdate(IGameWorld world, int x, int y)

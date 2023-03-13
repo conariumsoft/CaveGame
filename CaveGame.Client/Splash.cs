@@ -1,10 +1,6 @@
 ﻿using CaveGame.Common;
-using CaveGame.Common.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using CaveGame.Common.Extensions;
 
 namespace CaveGame.Client
@@ -16,7 +12,7 @@ namespace CaveGame.Client
 
 		public Splash()
         {
-			SplashTimer = 7;
+			SplashTimer = 4.5f;
         }
 
         public void Update(GameTime gt)

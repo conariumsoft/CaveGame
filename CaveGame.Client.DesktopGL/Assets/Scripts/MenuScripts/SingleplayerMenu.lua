@@ -1,14 +1,15 @@
+print("Load up Singleplayer Menu")
+
 import ('MonoGame.Framework', 'Microsoft.Xna.Framework')
 import ('CaveGame.Client.DesktopGL', 'CaveGame.Client')
 import ('CaveGame.Client.DesktopGL', 'CaveGame.Client.UI')
 import ('CaveGame.Client.DesktopGL', 'CaveGame.Common')
+import ('CaveGame.Client.DesktopGL', 'CaveGame.Common.World')
 import ('CaveGame.Client.DesktopGL', 'CaveGame.Client.Menu')
 
 local GetButton = require("Assets.Scripts.MenuScripts.MenuButton")
 
 local SingleplayerMenu = UIRoot();
-
-
 
 local title = Label(script, {
 	Parent = SingleplayerMenu,
@@ -76,12 +77,14 @@ local deleteWorld = toolbarButton("Delete World", 0);
 
 
 local function refresh()
-for obj in list(worldListing:FindChildrenWithName("Entry")) do
+
+    for obj in list(worldListing:FindChildrenWithName("Entry")) do
 		worldListing.Children:Remove(obj);
 		obj.Parent = nil;
 	end
-	-- TODO: Load the world listing
+
 	for obj in list(SavedWorldManager.GetWorldsOnFile()) do
+	    print(obj)
 		local instance = ContextButton(script, {
 			Parent = worldListing,
 			Size = UICoords(0, 60, 1.0, 0),
@@ -122,7 +125,7 @@ for obj in list(worldListing:FindChildrenWithName("Entry")) do
 		end)
 		instance.ContextNodes:Add(loadWorld);
 	end
-
+    print("Finish Generating World Listing")
 end
 
 deleteWorld.OnLMBClick:Bind(function()
@@ -164,5 +167,5 @@ backbutton.OnLMBClick:Bind(function()
 	menumanager.CurrentPage = menumanager.Pages["mainmenu"];
 end)
 
-
+print("Finished Initialization")
 return SingleplayerMenu;

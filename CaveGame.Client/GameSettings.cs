@@ -17,26 +17,26 @@ public enum FramerateLimiterOptions
     Cap30,
 }
 
-public enum FullscreenResolutionOptions
+public enum FullscreenResolutions
 {
     // 4 by 3
-    Res640x480,
-    Res800x600,
-    Res1024x768,
-    Res1152x864,
-    Res1280x960,
-    Res1440x1050,
-    Res1600x1200,
-    Res2048x1536,
+    Res640X480,
+    Res800X600,
+    Res1024X768,
+    Res1152X864,
+    Res1280X960,
+    Res1440X1050,
+    Res1600X1200,
+    Res2048X1536,
 
     // 16 by 9
-    Res854x480,
-    Res1280x720,
-    Res1366x768,
-    Res1600x900,
-    Res1920x1080,
-    Res2560x1440,
-    Res3840x2160,
+    Res854X480,
+    Res1280X720,
+    Res1366X768,
+    Res1600X900,
+    Res1920X1080,
+    Res2560X1440,
+    Res3840X2160,
 
     UseMonitorSize
 }
@@ -92,6 +92,8 @@ public class SettingChangedEventArgs<T> : EventArgs
     }
 }
 
+// TODO: Create Wrapper Thingy to represent s
+// List<T> where T: Keys, GamepadButton, etc.
 public class InputActionWrapping
 {
     
@@ -118,7 +120,7 @@ public class GameSettings : ConfigFile
         get => _uiScale;
         set
         {
-            OnUIScaleChanged?.Invoke(this, new(_uiScale, value));
+            OnUiScaleChanged?.Invoke(this, new(_uiScale, value));
             _uiScale = value;
         }
     }
@@ -131,6 +133,7 @@ public class GameSettings : ConfigFile
             _fullscreen = value;
         }
     }
+    public FullscreenResolutions FullscreenResolution { get; set; }
     public bool VSync
     {
         get => _vsync;
@@ -177,12 +180,12 @@ public class GameSettings : ConfigFile
             // AudioManager.MusicVolume = value / 100.0f;
         }
     }
-    public int SFXVolume
+    public int SfxVolume
     {
         get => _sfxVolume;
         set
         {
-            OnSFXVolumeChanged?.Invoke(this, new(_sfxVolume, value));
+            OnSfxVolumeChanged?.Invoke(this, new(_sfxVolume, value));
             _sfxVolume = value;
         }
     }
@@ -200,13 +203,14 @@ public class GameSettings : ConfigFile
     public Keys MoveDownKey { get; set; }
     public Keys MoveUpKey { get; set; }
     public Keys JumpKey { get; set; }
-
+    public GameChatSize ChatSize { get; set; }
+    public string TexturePackName { get; set; }
     #endregion
     
     #region Internal values
     [XmlIgnore]
     private bool _fullscreen;
-    private FullscreenResolutionOptions _fullscreenRes;
+    private FullscreenResolutions _fullscreenRes;
     private bool _particles;
     private bool _vsync;
     private int _fpsLimit;
@@ -225,15 +229,15 @@ public class GameSettings : ConfigFile
     public event SettingChangedEvent<int> OnMasterVolumeChanged;
     public event SettingChangedEvent<int> OnMusicVolumeChanged;
     public event SettingChangedEvent<int> OnAmbienceVolumeChanged;
-    public event SettingChangedEvent<int> OnSFXVolumeChanged;
+    public event SettingChangedEvent<int> OnSfxVolumeChanged;
     public event SettingChangedEvent<bool> OnVSyncEnabledChanged;
     public event SettingChangedEvent<int> OnFpsLimitChanged;
     public event SettingChangedEvent<bool> OnFullscreenStateChanged;
-    public event SettingChangedEvent<FullscreenResolutionOptions> OnFullscreenResolutionChanged;
+    public event SettingChangedEvent<FullscreenResolutions> OnFullscreenResolutionChanged;
 
     public event SettingChangedEvent<bool> OnCameraShakeEnabledChanged;
     public event SettingChangedEvent<bool> OnParticlesEnabledChanged;
-    public event SettingChangedEvent<float> OnUIScaleChanged;
+    public event SettingChangedEvent<float> OnUiScaleChanged;
 
 
     public static SliderIndex<int>[] VolumeSliderOptions = SliderIndex<int>.GetIntArray(0, 101);
@@ -245,23 +249,44 @@ public class GameSettings : ConfigFile
         new SliderIndex<GameChatSize>("Small", GameChatSize.Small)
     };
 
-    public static SliderIndex<GameChatSize>[] FPSSliderOptionSet =
+    public static SliderIndex<GameChatSize>[] FpsSliderOptionSet =
     {
         new SliderIndex<GameChatSize>("Large", GameChatSize.Large),
         new SliderIndex<GameChatSize>("Normal", GameChatSize.Normal),
         new SliderIndex<GameChatSize>("Small", GameChatSize.Small)
     };
-
     public static GameSettings CurrentSettings { get; set; }
-
     public GameSettings()
     {
         CurrentSettings = this;
     }
     
-    public GameChatSize ChatSize { get; set; }
-    public string TexturePackName { get; set; }
+    public void Save() {}
+    public void LoadGameSettings()
+    {
+        FillDefaults();
+        // Ur Kidding Me?
+        // OK Here's the issue at hand:
+        // GameSettings instance must exist before loading the file
+        // Because CaveGameDesktopClient connects to it's XSettingChanged
+        // Lazy solution: Create a "clone" object with the data
+        // and copy properties
+        
+        // The alternative to this is to load the XML directly and that's nasty.
 
+        var settings = ConfigFile.Load<GameSettings>("settings.xml", true);
+        this.FramerateLimit = settings.FramerateLimit;
+        this.MoveDownKey = settings.MoveDownKey;
+        this.MasterVolume = settings.MasterVolume;
+        this.SfxVolume = settings.SfxVolume;
+        this.AmbienceVolume = settings.AmbienceVolume;
+        this.VSync = settings.VSync;
+        this.Fullscreen = settings.Fullscreen;
+        this.FullscreenResolution = settings.FullscreenResolution;
+        this.UserInterfaceScale = settings.UserInterfaceScale;
+        this.CameraShake = settings.CameraShake;
+        
+    }
 
     public override void FillDefaults()
     {
@@ -275,6 +300,7 @@ public class GameSettings : ConfigFile
         ChatSize = GameChatSize.Normal;
         MasterVolume = 100;
         MusicVolume = 50;
-        SFXVolume = 75;
+        SfxVolume = 75;
+        FullscreenResolution = FullscreenResolutions.Res1366X768;
     }
 }

@@ -18,6 +18,8 @@ namespace CaveGame.Common
 		public float BlastPressure { get; set; }
 		public bool Thermal { get; set; }
 
+		public IEntity Source { get; set; }
+
 
     }
 
@@ -338,16 +340,19 @@ namespace CaveGame.Common
 
 		protected virtual void InflictExplosionDamageOnEntity(Explosion Blast, IEntity Entity, int Damage, Vector2 Direction, float KickBack)
         {
+	        if (Entity is IExplosionDamagable explosionDamagableEntity)
+		        explosionDamagableEntity.Damage(
+			        type: DamageType.Explosion,
+			        source: Blast,
+			        amount: Damage,
+			        direction: Direction
+		        );
+	        
 			if (Entity is IPhysicsEntity MovingEntity)
             {
-				Entity.Damage(
-					type: DamageType.Explosion,
-					source: Blast,
-					amount: Damage,
-					direction: Direction
-				);
-
-				MovingEntity.Velocity += Direction * KickBack;
+				
+				Logger.LogCurrentContext($"{Direction*KickBack*10000}");
+				MovingEntity.Velocity += Direction * KickBack*10000;
 			}
 			
 		}
@@ -356,17 +361,24 @@ namespace CaveGame.Common
         {
 			foreach (var ent in Entities)
 			{
+				if (ent == Blast.Source)
+					continue; // Skip ourselves
+				
+				
 				if (ent is IPhysicsEntity physicsEntity)
 				{
 					var dist = physicsEntity.Position.Distance(Blast.Position);
 					if (dist < MAX_BLAST_DISTANCE)
                     {
-						var power = Math.Min((1 / dist) * Blast.BlastPressure * 7f, 350);
+						var power = Math.Min((1 / dist) * Blast.BlastPressure * 7f, 3550);
 						var unitVec = (physicsEntity.Position - Blast.Position);
 						unitVec.Normalize();
 						int damage = (int)Math.Max(MAX_DAMAGE - dist, 1);
 
 						InflictExplosionDamageOnEntity(Blast, ent, damage, unitVec, power);
+						
+						// TODO: Implement Explosion Force impact on entity velocity
+						
 					}	
 				}
 			}

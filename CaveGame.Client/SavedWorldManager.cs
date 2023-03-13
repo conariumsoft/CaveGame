@@ -1,4 +1,4 @@
-﻿using CaveGame.Common;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using CaveGame.Common.World;
@@ -13,15 +13,20 @@ namespace CaveGame.Client
             if (!System.IO.Directory.Exists(filename))
                 System.IO.Directory.CreateDirectory(filename);
         }
-
-
+        
         public static List<WorldMetadata> GetWorldsOnFile()
         {
             CreateDirectoryIfNull("Worlds");
             List<WorldMetadata> results = new List<WorldMetadata>();
-            foreach (var directory in Directory.EnumerateDirectories("Worlds")) 
-                results.Add(WorldMetadata.LoadWorldData(directory));
+            foreach (var directory in Directory.EnumerateDirectories("Worlds"))
+            {
+                Console.WriteLine(directory);
 
+                var worldMetadataFilePath = Path.Combine(directory, @"WorldMetadata.xml");
+                var worldMetadataFileExists = File.Exists(worldMetadataFilePath);
+                if (worldMetadataFileExists)
+                    results.Add(WorldMetadata.LoadWorldData(directory));
+            }
             return results;
         }
 

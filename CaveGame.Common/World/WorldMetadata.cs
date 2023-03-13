@@ -6,6 +6,7 @@ using System.Xml;
 
 namespace CaveGame.Common.World
 {
+	// TODO: Candidate for refactor
     public class WorldMetadata
 	{
 		public int Seed { get; set; }

@@ -83,7 +83,13 @@ local GetButton = require("Assets.Scripts.MenuScripts.MenuButton");
 local GetInactiveButton = require("Assets.Scripts.MenuScripts.InactiveMenuButton");
 
 local spb = GetButton("SINGLEPLAYER", buttonContainer);
-spb.OnLMBClick:Bind(function(ev, mousedata)
+spb.OnLMBClick:Bind(function()
+    print(menumanager)
+    print(menumanager.CurrentPage);
+    print(menumanager.Pages["singleplayermenu"]);
+    
+    print("OK");
+    
 	menumanager.CurrentPage = menumanager.Pages["singleplayermenu"];
 end)
 

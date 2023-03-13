@@ -87,6 +87,11 @@ namespace CaveGame.Common
 			return (other.X == X && other.Y == Y);
 		}
 
+		public string ToString()
+		{
+			return $"{X}, {Y}";
+		}
+
 		public override int GetHashCode()
 		{
 			var hash = 42069;
